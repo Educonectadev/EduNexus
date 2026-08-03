@@ -1,0 +1,4 @@
+ALTER TABLE notifications
+  ADD COLUMN IF NOT EXISTS priority VARCHAR(20) DEFAULT 'media' AFTER target_role,
+  ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'general' AFTER priority,
+  ADD COLUMN IF NOT EXISTS pinned TINYINT(1) DEFAULT 0 AFTER status;

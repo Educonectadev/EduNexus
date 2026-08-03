@@ -1,0 +1,175 @@
+import { NextRequest, NextResponse } from 'next/server'
+import pool from '@/lib/db'
+import crypto from 'crypto'
+import fs from 'fs'
+import path from 'path'
+import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
+import { logAudit } from '@/lib/audit'
+
+const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'library')
+
+async function ensureTables() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS document_library (
+        id VARCHAR(36) NOT NULL PRIMARY KEY,
+        institution_id VARCHAR(36) NOT NULL,
+        uploaded_by VARCHAR(36) DEFAULT NULL,
+        name VARCHAR(200) NOT NULL,
+        description TEXT,
+        file_url VARCHAR(500) NOT NULL,
+        file_type VARCHAR(191) NOT NULL,
+        file_size INT DEFAULT 0,
+        category VARCHAR(100) DEFAULT 'general',
+        tags JSON DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_lib_institution (institution_id),
+        INDEX idx_lib_category (category),
+        INDEX idx_lib_uploaded_by (uploaded_by)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `)
+    await pool.query(`ALTER TABLE document_library MODIFY COLUMN file_type VARCHAR(191) NOT NULL`)
+  } catch (e: any) {
+    console.error('[document-library] ensureTables error:', e?.message || e)
+  }
+
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json([], { status: 200 })
+
+    await ensureTables()
+
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    const search = searchParams.get('search')
+
+    let query = `SELECT id, name, description, file_url, file_type, file_size, category, tags, created_at
+                 FROM document_library WHERE institution_id = ?`
+    const params: any[] = [instId]
+
+    if (category && category !== 'all') {
+      query += ` AND category = ?`
+      params.push(category)
+    }
+
+    if (search) {
+      query += ` AND (name LIKE ? OR description LIKE ?)`
+      params.push(`%${search}%`, `%${search}%`)
+    }
+
+    query += ` ORDER BY created_at DESC`
+
+    const [rows] = await pool.query(query, params)
+    return NextResponse.json(rows)
+  } catch (error) {
+    return NextResponse.json({ error: 'Error fetching library' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    await ensureTables()
+
+    const formData = await request.formData()
+    const name = formData.get('name') as string
+    const description = formData.get('description') as string | null
+    const category = formData.get('category') as string || 'general'
+    const file = formData.get('file') as File | null
+
+    if (!name) {
+      return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 })
+    }
+
+    if (!file || file.size === 0) {
+      return NextResponse.json({ error: 'Archivo requerido' }, { status: 400 })
+    }
+
+    const id = crypto.randomUUID()
+    const ext = file.name.split('.').pop() || 'bin'
+    const filename = `${id}-${Date.now()}.${ext}`
+    const buffer = Buffer.from(await file.arrayBuffer())
+    fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer)
+    const file_url = `/uploads/library/${filename}`
+
+    const fileType = file.type || 'application/octet-stream'
+    const fileSize = file.size
+
+    await pool.query(
+      `INSERT INTO document_library (id, institution_id, uploaded_by, name, description, file_url, file_type, file_size, category)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, instId, null, name, description || null, file_url, fileType, fileSize, category]
+    )
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId,
+      action: 'create',
+      entity: 'document_library',
+      entityId: id,
+      details: { name, category, file_type: fileType },
+    })
+
+    return NextResponse.json({ success: true, id, file_url })
+  } catch (error: any) {
+    console.error('[document-library] POST error:', error?.message || error)
+    return NextResponse.json({ error: error?.message || 'Error uploading file' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
+
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    await ensureTables()
+
+    const [existing] = await pool.query(
+      'SELECT file_url, name FROM document_library WHERE id = ? AND institution_id = ?',
+      [id, instId]
+    ) as any
+
+    if (!existing || existing.length === 0) {
+      return NextResponse.json({ error: 'Documento no encontrado' }, { status: 404 })
+    }
+
+    // Delete file from disk
+    const fileUrl = existing[0].file_url
+    if (fileUrl) {
+      const filePath = path.join(process.cwd(), 'public', fileUrl)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      }
+    }
+
+    await pool.query('DELETE FROM document_library WHERE id = ?', [id])
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId,
+      action: 'delete',
+      entity: 'document_library',
+      entityId: id,
+      details: { name: existing[0].name },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json({ error: 'Error deleting file' }, { status: 500 })
+  }
+}

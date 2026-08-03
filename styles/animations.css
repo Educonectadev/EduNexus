@@ -1,0 +1,327 @@
+@layer animations {
+  /* ============================================
+     Easing Curves signature (stepbro.site)
+     ============================================ */
+  /*
+    Spring / Back:
+      cubic-bezier(.34, 1.45, .5, 1)        — hand-group, elastic out
+      cubic-bezier(.37, 1.42, .37, 1)       — buttonClickAnimation, back out
+      cubic-bezier(.38, .49, 0, 1.16)       — style-1 buttons, back
+      cubic-bezier(.38, .49, 0, 1.5)        — rounded/playful, back fuerte
+      cubic-bezier(.38, .49, 0, 2)          — extreme back
+      cubic-bezier(.6, .6, .12, 1.26)       — soft back
+    Smooth / Material:
+      cubic-bezier(0, 0, .5, 1)             — M3 standard
+      cubic-bezier(.11, 1, 0, 1)            — ease out expo
+      cubic-bezier(.48, 0, 0, 1)            — ease in-out custom
+      cubic-bezier(.45, .05, .55, .95)      — text-pretty-flow
+      cubic-bezier(.75, 0, .41, -.06)       — ease out back
+  */
+
+  /* ============================================
+     Entry / Mounting Animations
+     ============================================ */
+  @keyframes md-in {
+    0% { opacity: 0; filter: blur(16px); transform: scale(0.96); }
+    to { opacity: 1; filter: blur(0); transform: scale(1); }
+  }
+
+  @keyframes md-in-dramatic {
+    0% { opacity: 0; filter: blur(32px); transform: scale(0.7); }
+    to { opacity: 1; filter: blur(0); transform: scale(1); }
+  }
+
+  @keyframes md-card-in {
+    0% { opacity: 0; transform: translateY(8px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes md-search-item-in {
+    0% { opacity: 0; filter: blur(16px); transform: translateY(-20px); }
+    to { opacity: 1; filter: blur(0); transform: translateY(0); }
+  }
+
+  @keyframes md-entry-reveal {
+    0% { transform: scaleX(1.4) translateX(0); }
+    to { transform: scaleX(1.4) translateX(100%); }
+  }
+
+  @keyframes md-progress-in {
+    0% { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes md-backdrop-in {
+    0% { background: transparent; }
+    to { background: rgba(0, 0, 0, 0.1); }
+  }
+
+  @keyframes md-icon-fill {
+    0% { font-variation-settings: "FILL" 0; }
+    to { font-variation-settings: "FILL" 1; }
+  }
+
+  @keyframes md-async-fade {
+    0% { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ============================================
+     Exit / Unmounting Animations
+     ============================================ */
+  @keyframes md-item-out {
+    0% { opacity: 1; filter: blur(0); transform: translateY(0); }
+    to { opacity: 0; filter: blur(16px); transform: translateY(-20px); }
+  }
+
+  @keyframes md-item-out-left {
+    0% { opacity: 1; filter: blur(0); transform: translateX(0); }
+    to { opacity: 0; filter: blur(16px); transform: translateX(-64px); }
+  }
+
+  @keyframes md-item-out-bottom {
+    0% { opacity: 1; filter: blur(0); transform: translateY(0); }
+    to { opacity: 0; filter: blur(16px); transform: translateY(24px); }
+  }
+
+  @keyframes md-collapse {
+    0% { padding: 16px; max-height: 94px; }
+    to { filter: blur(16px); opacity: 0; margin-bottom: -8px; padding: 0 16px; max-height: 0px; }
+  }
+
+  /* ============================================
+     Interaction / Feedback
+     ============================================ */
+  @keyframes md-click-squish {
+    0% { transform: scaleX(1) scaleY(1); }
+    50% { transform: scaleX(0.95) scaleY(0.9); }
+    to { transform: scaleX(1) scaleY(1); }
+  }
+
+  @keyframes md-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes md-vibrate {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes md-highlight-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 var(--md-sys-color-primary-container) inset; }
+    50% { box-shadow: 0 0 0 4px var(--md-sys-color-primary-container) inset; }
+    to { transform: scale(1); box-shadow: 0 0 0 0 var(--md-sys-color-primary-container) inset; }
+  }
+
+  @keyframes md-mic-pulse {
+    0%, to { transform: scale(1); }
+    50% { transform: scale(1.01); }
+  }
+
+  /* ============================================
+     Loop / Continuous
+     ============================================ */
+  @keyframes md-shimmer {
+    to { transform: translateX(100%); }
+  }
+
+  @keyframes md-shimmer-sweep {
+    0% { transform: translateX(-100%); }
+    to { transform: translateX(200%); }
+  }
+
+  @keyframes md-shimmer-overlay {
+    to { transform: translateX(100%); }
+  }
+
+  @keyframes md-recording-pulse {
+    0%, to { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  @keyframes md-text-rainbow {
+    0% { background-position: 0% 50%; }
+    to { background-position: 300% 50%; }
+  }
+
+  @keyframes md-text-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    to { background-position: 0% 50%; }
+  }
+
+  /* ============================================
+     Blob Animations (total-balance-card)
+     ============================================ */
+  @keyframes md-blob-1 {
+    0% { transform: rotate(0deg) translate(150px) rotate(0deg); }
+    to { transform: rotate(360deg) translate(150px) rotate(-360deg); }
+  }
+
+  @keyframes md-blob-2 {
+    0% { transform: rotate(180deg) translateY(120px) rotate(-180deg); }
+    to { transform: rotate(540deg) translateY(120px) rotate(-540deg); }
+  }
+
+  /* ============================================
+     Background Aurora Blobs
+     ============================================ */
+  @keyframes md-blob-aurora-1 {
+    0% { transform: translate(-50%, -50%) rotate(0deg) translate(150px) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg) translate(150px) rotate(-360deg); }
+  }
+
+  @keyframes md-blob-aurora-2 {
+    0% { transform: translate(-50%, -50%) rotate(180deg) translateY(120px) rotate(-180deg); }
+    to { transform: translate(-50%, -50%) rotate(540deg) translateY(120px) rotate(-540deg); }
+  }
+
+  /* ============================================
+     Animation Utility Classes
+     ============================================ */
+  .md-anim-in {
+    animation: md-in 300ms cubic-bezier(0, 0, 0.5, 1) forwards;
+  }
+
+  .md-anim-in-dramatic {
+    animation: md-in-dramatic 400ms cubic-bezier(0.37, 1.42, 0.37, 1) forwards;
+  }
+
+  .md-anim-card-in {
+    animation: md-card-in 400ms cubic-bezier(0, 0, 0.5, 1) forwards;
+  }
+
+  .md-anim-search-in {
+    animation: md-search-item-in 500ms cubic-bezier(0.6, 0.6, 0.12, 1.26) forwards;
+  }
+
+  .md-anim-out {
+    animation: md-item-out 400ms ease forwards;
+  }
+
+  .md-anim-out-left {
+    animation: md-item-out-left 400ms ease forwards;
+  }
+
+  .md-anim-out-bottom {
+    animation: md-item-out-bottom 400ms ease forwards;
+  }
+
+  .md-anim-collapse {
+    animation: md-collapse 250ms ease forwards;
+  }
+
+  .md-anim-shake {
+    animation: md-shake 500ms cubic-bezier(0.6, 0.6, 0.12, 1.26) forwards;
+  }
+
+  .md-anim-vibrate {
+    animation: md-vibrate 400ms cubic-bezier(0.6, 0.6, 0.12, 1.26) forwards;
+  }
+
+  .md-anim-click {
+    animation: md-click-squish 300ms cubic-bezier(0.37, 1.42, 0.37, 1);
+  }
+
+  .md-anim-highlight {
+    animation: md-highlight-pulse 600ms ease;
+  }
+
+  .md-loading-shimmer {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .md-loading-shimmer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06), transparent);
+    transform: translateX(-100%);
+    animation: md-shimmer 1s infinite;
+    z-index: 2;
+  }
+
+  .dark .md-loading-shimmer::before,
+  .md-loading-shimmer.dark::before {
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+  }
+
+  .md-loading-sweep {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .md-loading-sweep::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, color-mix(in srgb, var(--md-sys-color-background, #000), transparent 20%), transparent);
+    transform: translateX(-100%);
+    animation: md-shimmer-sweep 1s infinite;
+    border-radius: inherit;
+    z-index: 20;
+  }
+
+  /* ============================================
+     Animation Classes Directas (stepbro)
+     ============================================ */
+  .md-anim-highlight-pulse {
+    animation: md-highlight-pulse 600ms ease;
+  }
+
+  .md-anim-item-out {
+    animation: md-item-out 400ms ease forwards;
+  }
+
+  .md-anim-item-out-2 {
+    animation: md-item-out 500ms ease forwards;
+  }
+
+  .md-anim-item-out-left {
+    animation: md-item-out-left 400ms ease forwards;
+  }
+
+  .md-anim-item-out-bottom {
+    animation: md-item-out-bottom 400ms ease forwards;
+  }
+
+  .md-anim-collapse {
+    animation: md-collapse 250ms ease forwards;
+  }
+
+  .md-anim-async-fade {
+    animation: md-async-fade 300ms ease forwards;
+  }
+
+  .md-asyncstate-data {
+    animation: md-async-fade 400ms ease;
+  }
+
+  .md-anim-recording-pulse {
+    animation: md-recording-pulse 1.5s ease infinite;
+  }
+
+  .md-anim-mic-pulse {
+    animation: md-mic-pulse 2s ease infinite;
+  }
+
+  .md-anim-progress-in {
+    animation: md-progress-in 1s cubic-bezier(0.75, 0, 0.41, -0.06);
+  }
+
+  .md-anim-icon-fill {
+    animation: md-icon-fill 300ms ease forwards;
+  }
+}

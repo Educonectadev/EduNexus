@@ -1,0 +1,7 @@
+Nombre del Alumno,DNI,Fecha Nacimiento (AAAA-MM-DD),Género (M/F),Nombre del Padre/Apoderado,DNI del Padre,Teléfono del Padre,Email del Padre,Grado,Sección
+María García López,12345678,2015-03-15,F,Juan García,87654321,987654321,juan@email.com,1ro,A
+Carlos Pérez Díaz,23456789,2014-06-20,M,Ana Pérez,76543210,976543210,ana@email.com,2do,B
+Ana Torres Vega,34567890,2013-09-10,F,Luis Torres,65432109,965432109,luis@email.com,3ro,A
+Pedro Morales Campos,45678901,2012-12-25,M,Rosa Campos,54321098,954321098,rosa@email.com,4to,A
+Sofía Castillo Ríos,56789012,2011-02-08,F,Miguel Ríos,43210987,943210987,miguel@email.com,5to,B
+Luis Hernández López,67890123,2010-07-30,M,María López,32109876,932109876,maria@email.com,6to,A

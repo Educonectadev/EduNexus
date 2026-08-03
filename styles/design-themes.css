@@ -1,0 +1,504 @@
+/* ============================================
+   Design System Themes
+   ============================================
+   Each `[data-design="..."]` block defines a
+   complete visual identity.
+   Add new designs here.
+   ============================================ */
+
+[data-design="stepbro-money"] { }
+
+/* ═══════════════════════════════════════════════
+   DESIGN: modern — Vibrant / Gradient / Neon
+   Hot pink + cyan, glass cards with glow,
+   gradient nav, completely different from MD3.
+   ═══════════════════════════════════════════════ */
+
+/* ─── Mobile nav ──────────────────────────── */
+
+[data-design="modern"] .sb-money-nav {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: none;
+  max-width: 100%;
+  pointer-events: none;
+}
+
+[data-design="modern"] .sb-money-nav-buttons {
+  width: 100%;
+  justify-content: space-around;
+  padding: 4px 0 max(env(safe-area-inset-bottom, 0px), 4px);
+  border-radius: 16px 16px 0 0;
+  background: color-mix(in srgb, var(--sb-surface) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--sb-primary) 20%, transparent);
+  box-shadow: 0 -4px 24px -8px color-mix(in srgb, var(--sb-primary) 15%, transparent);
+}
+
+[data-design="modern"] .sb-money-nav-btn {
+  flex-direction: column;
+  gap: 2px;
+  min-width: 52px;
+  width: 52px;
+  height: 48px;
+  padding: 4px 0;
+  border-radius: 12px;
+  color: color-mix(in srgb, var(--sb-on-surface-variant) 50%, transparent);
+  background: transparent;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-design="modern"] .sb-money-nav-btn.active {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-primary) 20%, transparent), color-mix(in srgb, var(--sb-secondary, #06b6d4) 15%, transparent));
+  color: var(--sb-primary);
+  min-width: 52px;
+  box-shadow: 0 4px 16px -4px color-mix(in srgb, var(--sb-primary) 25%, transparent);
+}
+
+[data-design="modern"] .sb-money-nav-btn.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(90deg, var(--sb-primary), var(--sb-secondary, #06b6d4));
+}
+
+[data-design="modern"] .sb-money-nav-btn:hover {
+  color: var(--sb-on-surface);
+  background: color-mix(in srgb, var(--sb-surface-container-high) 40%, transparent);
+}
+
+[data-design="modern"] .sb-money-nav-btn:active {
+  transform: scale(0.9);
+}
+
+[data-design="modern"] .sb-money-nav-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
+}
+
+[data-design="modern"] .sb-money-nav-btn.active .sb-money-nav-icon {
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--sb-primary) 40%, transparent));
+}
+
+[data-design="modern"] .sb-money-nav-label {
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 0;
+}
+
+[data-design="modern"] .sb-money-nav-badge {
+  top: 0;
+  right: 0;
+  box-shadow: 0 0 0 2px var(--sb-surface), 0 0 12px -2px #ef4444;
+}
+
+/* ─── Floating pill nav (alternative) ─────── */
+
+[data-design="modern"] .sb-nav-pill {
+  background: color-mix(in srgb, var(--sb-surface-container) 70%, transparent);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid color-mix(in srgb, var(--sb-primary) 15%, transparent);
+  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.3), 0 0 0 1px color-mix(in srgb, var(--sb-primary) 8%, transparent) inset;
+  gap: 2px;
+}
+
+[data-design="modern"] .sb-nav-pill-btn {
+  border-radius: 10px;
+  width: 38px;
+  height: 36px;
+  color: color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-design="modern"] .sb-nav-pill-btn.active {
+  background: linear-gradient(135deg, var(--sb-primary), var(--sb-secondary, #06b6d4));
+  color: var(--sb-on-primary);
+  box-shadow: 0 4px 20px -4px color-mix(in srgb, var(--sb-primary) 40%, transparent);
+}
+
+[data-design="modern"] .sb-nav-pill-btn:not(.active):hover {
+  color: var(--sb-on-surface);
+  background: color-mix(in srgb, var(--sb-surface-container-high) 50%, transparent);
+}
+
+[data-design="modern"] .sb-nav-pill-indicator { display: none; }
+
+/* ─── Desktop sidebar ─────────────────────── */
+
+[data-design="modern"] .glass-sidebar {
+  background: color-mix(in srgb, var(--sb-surface-container) 85%, transparent);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid color-mix(in srgb, var(--sb-primary) 10%, transparent);
+}
+
+/* ─── Cards ──────────────────────────────── */
+
+[data-design="modern"] .sb-card {
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px color-mix(in srgb, var(--sb-outline-variant) 30%, transparent) inset;
+  background: linear-gradient(135deg, var(--sb-surface), color-mix(in srgb, var(--sb-surface) 98%, var(--sb-primary)));
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 300ms ease, border-color 300ms ease, transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-design="modern"] .sb-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sb-primary), var(--sb-secondary, #06b6d4), var(--sb-primary));
+  opacity: 0.6;
+}
+
+[data-design="modern"] .sb-card:hover {
+  box-shadow: 0 8px 32px -12px color-mix(in srgb, var(--sb-primary) 20%, transparent), 0 0 0 1px color-mix(in srgb, var(--sb-primary) 15%, transparent) inset;
+  transform: translateY(-2px);
+}
+
+[data-design="modern"] .sb-card.style-detailed {
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--sb-surface), color-mix(in srgb, var(--sb-surface-container) 50%, var(--sb-surface)));
+}
+
+/* ─── Content box ─────────────────────────── */
+
+[data-design="modern"] .sb-content-box {
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--sb-surface), color-mix(in srgb, var(--sb-surface) 96%, var(--sb-primary)));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px color-mix(in srgb, var(--sb-outline-variant) 20%, transparent) inset;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-design="modern"] .sb-content-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sb-primary), var(--sb-secondary, #06b6d4));
+  opacity: 0.4;
+}
+
+[data-design="modern"] .sb-content-box.light-color {
+  background: linear-gradient(135deg, var(--sb-surface-container-low), color-mix(in srgb, var(--sb-surface-container-low) 95%, var(--sb-primary)));
+}
+
+[data-design="modern"] .sb-content-box.transparent {
+  background: transparent;
+}
+
+/* ─── Buttons ─────────────────────────────── */
+
+[data-design="modern"] .sb-btn {
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 250ms ease,
+              background 250ms ease;
+  letter-spacing: 0.01em;
+}
+
+[data-design="modern"] .sb-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--sb-primary) 20%, transparent);
+}
+
+[data-design="modern"] .sb-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+[data-design="modern"] .sb-btn.rounded {
+  border-radius: 10px;
+  padding: 8px 18px;
+}
+
+[data-design="modern"] .sb-btn.rounded:hover {
+  padding: 8px 20px;
+}
+
+[data-design="modern"] .sb-btn.playful:hover {
+  border-radius: 10px;
+  padding: 8px 20px;
+}
+
+[data-design="modern"] .sb-btn.filled {
+  background: linear-gradient(135deg, var(--sb-primary), var(--sb-secondary, #06b6d4));
+  color: var(--sb-on-primary);
+  box-shadow: 0 4px 16px -4px color-mix(in srgb, var(--sb-primary) 30%, transparent);
+}
+
+[data-design="modern"] .sb-btn.filled:hover {
+  box-shadow: 0 8px 28px -6px color-mix(in srgb, var(--sb-primary) 40%, transparent);
+}
+
+[data-design="modern"] .sb-btn.tonal {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-primary)), color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-secondary, #06b6d4)));
+  color: var(--sb-on-surface);
+}
+
+[data-design="modern"] .sb-btn.outlined {
+  border: 1.5px solid color-mix(in srgb, var(--sb-primary) 30%, transparent);
+  background: transparent;
+  color: var(--sb-primary);
+}
+
+[data-design="modern"] .sb-btn.outlined:hover {
+  background: color-mix(in srgb, var(--sb-primary) 10%, transparent);
+}
+
+[data-design="modern"] .sb-btn-icon {
+  border-radius: 10px;
+  transition: background 200ms ease, border-radius 200ms ease, transform 200ms ease;
+}
+
+[data-design="modern"] .sb-btn-icon:hover {
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sb-primary) 12%, transparent);
+  color: var(--sb-primary);
+}
+
+/* ─── Inputs ──────────────────────────────── */
+
+[data-design="modern"] .sb-input {
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sb-outline-variant) 60%, transparent);
+  background: color-mix(in srgb, var(--sb-surface) 90%, var(--sb-primary));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) inset;
+  padding: 9px 16px;
+  line-height: 24px;
+  transition: border-color 250ms ease, box-shadow 250ms ease, background 250ms ease;
+}
+
+[data-design="modern"] .sb-input:hover {
+  border-color: color-mix(in srgb, var(--sb-outline) 50%, var(--sb-primary));
+  background: var(--sb-surface);
+}
+
+[data-design="modern"] .sb-input:focus {
+  border-color: var(--sb-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sb-primary) 15%, transparent), 0 1px 3px rgba(0, 0, 0, 0.02) inset;
+  background: var(--sb-surface);
+}
+
+[data-design="modern"] .sb-input.rounded { border-radius: 10px; }
+
+/* ─── Select ──────────────────────────────── */
+
+[data-design="modern"] .sb-select {
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--sb-outline-variant) 60%, transparent);
+  background: color-mix(in srgb, var(--sb-surface) 90%, var(--sb-primary));
+  height: 38px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) inset;
+}
+
+[data-design="modern"] .sb-select:hover {
+  border-color: color-mix(in srgb, var(--sb-outline) 50%, var(--sb-primary));
+}
+
+/* ─── Table ───────────────────────────────── */
+
+[data-design="modern"] .sb-table {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--sb-outline-variant) 40%, transparent);
+  overflow: hidden;
+}
+
+[data-design="modern"] .sb-table tr:first-child {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-primary) 8%, var(--sb-surface-container)), color-mix(in srgb, var(--sb-secondary, #06b6d4) 5%, var(--sb-surface-container)));
+}
+
+[data-design="modern"] .sb-table tr:not(:first-child):hover {
+  background: color-mix(in srgb, var(--sb-primary) 5%, var(--sb-surface-container-low));
+}
+
+[data-design="modern"] .sb-table tr:first-child td:first-child { border-radius: 12px 0 0 0; }
+[data-design="modern"] .sb-table tr:first-child td:last-child { border-radius: 0 12px 0 0; }
+[data-design="modern"] .sb-table tr:last-child td:first-child { border-radius: 0 0 0 12px; }
+[data-design="modern"] .sb-table tr:last-child td:last-child { border-radius: 0 0 12px 0; }
+
+/* ─── Modal ───────────────────────────────── */
+
+[data-design="modern"] .sb-modal-window {
+  border-radius: 20px;
+  box-shadow: 0 16px 48px -16px rgba(0, 0, 0, 0.2);
+  border: 1px solid color-mix(in srgb, var(--sb-primary) 15%, transparent);
+  background: linear-gradient(135deg, var(--sb-surface), color-mix(in srgb, var(--sb-surface) 96%, var(--sb-primary)));
+}
+
+/* ─── Data line / chip ────────────────────── */
+
+[data-design="modern"] .sb-data-line {
+  border-radius: 6px;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-primary)), color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-secondary, #06b6d4)));
+  font-weight: 500;
+}
+
+[data-design="modern"] .sb-data-line.accent {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-primary) 15%, transparent), color-mix(in srgb, var(--sb-secondary, #06b6d4) 10%, transparent));
+  color: var(--sb-primary);
+}
+
+[data-design="modern"] .sb-data-line.light-color {
+  background: color-mix(in srgb, var(--sb-surface-container-high) 60%, var(--sb-surface));
+}
+
+/* ─── Glass utilities ─────────────────────── */
+
+[data-design="modern"] .glass {
+  background: color-mix(in srgb, var(--sb-surface) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  border: 1px solid color-mix(in srgb, var(--sb-primary) 10%, transparent);
+}
+
+[data-design="modern"] .glass-card {
+  background: color-mix(in srgb, var(--sb-surface) 85%, transparent);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+  border: 1px solid color-mix(in srgb, var(--sb-primary) 12%, transparent);
+  box-shadow: 0 4px 24px -12px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Modal backdrop ──────────────────────── */
+
+[data-design="modern"] .sb-modal-backdrop {
+  background: color-mix(in srgb, var(--sb-primary) 20%, rgba(0, 0, 0, 0.3));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ─── Section header ──────────────────────── */
+
+[data-design="modern"] .sb-section-header h2 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--sb-on-surface), var(--sb-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Stat value ──────────────────────────── */
+
+[data-design="modern"] .sb-stat-value {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, var(--sb-on-surface), var(--sb-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Hover effects ───────────────────────── */
+
+[data-design="modern"] .sb-hover-shadow:hover {
+  box-shadow: 0 8px 32px -12px color-mix(in srgb, var(--sb-primary) 20%, transparent);
+}
+
+[data-design="modern"] .sb-hover-magic {
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+[data-design="modern"] .sb-hover-magic::before { display: none; }
+
+[data-design="modern"] .sb-hover-magic:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -16px color-mix(in srgb, var(--sb-primary) 25%, transparent);
+}
+
+[data-design="modern"] .sb-hover-glow::after {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-primary) 15%, transparent), color-mix(in srgb, var(--sb-secondary, #06b6d4) 10%, transparent));
+  filter: blur(40px);
+  border-radius: 100px;
+}
+
+[data-design="modern"] .sb-hover-scale {
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+[data-design="modern"] .sb-hover-scale:hover {
+  transform: scale(1.04);
+}
+
+[data-design="modern"] .sb-hover-outline {
+  transition: box-shadow 200ms ease;
+}
+
+[data-design="modern"] .sb-hover-delete:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(220, 38, 38, 0.08));
+}
+
+/* ─── Entry animation ─────────────────────── */
+
+[data-design="modern"] .sb-entry-animation::after {
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--sb-primary) 6%, var(--sb-surface-container)) 30%);
+}
+
+/* ─── Pill tag ────────────────────────────── */
+
+[data-design="modern"] .sb-pill {
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-weight: 600;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-primary)), color-mix(in srgb, var(--sb-surface-container-high) 80%, var(--sb-secondary, #06b6d4)));
+}
+
+[data-design="modern"] .sb-pill.accent {
+  background: linear-gradient(135deg, var(--sb-primary), var(--sb-secondary, #06b6d4));
+  color: var(--sb-on-primary);
+  box-shadow: 0 4px 16px -4px color-mix(in srgb, var(--sb-primary) 30%, transparent);
+}
+
+/* ─── Divider ─────────────────────────────── */
+
+[data-design="modern"] .sb-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sb-primary) 20%, var(--sb-outline-variant)), transparent);
+  opacity: 0.6;
+}
+
+/* ─── Scrollbar ───────────────────────────── */
+
+[data-design="modern"] *::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+[data-design="modern"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sb-primary) 40%, var(--sb-outline-variant)), color-mix(in srgb, var(--sb-secondary, #06b6d4) 30%, var(--sb-outline-variant)));
+  border-radius: 999px;
+}
+
+[data-design="modern"] *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-design="modern"] * {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--sb-primary) 30%, var(--sb-outline-variant)) transparent;
+}

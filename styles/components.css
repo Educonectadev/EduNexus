@@ -1,0 +1,1277 @@
+@layer components {
+  /* ============================================
+     MD3 Typescale Classes
+     ============================================ */
+  .md-display-large {
+    font-family: var(--md-sys-typescale-display-large-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-display-large-font-weight);
+    font-size: var(--md-sys-typescale-display-large-font-size);
+    line-height: var(--md-sys-typescale-display-large-line-height);
+    letter-spacing: var(--md-sys-typescale-display-large-letter-spacing);
+  }
+  .md-display-medium {
+    font-family: var(--md-sys-typescale-display-medium-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-display-medium-font-weight);
+    font-size: var(--md-sys-typescale-display-medium-font-size);
+    line-height: var(--md-sys-typescale-display-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-display-medium-letter-spacing);
+  }
+  .md-display-small {
+    font-family: var(--md-sys-typescale-display-small-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-display-small-font-weight);
+    font-size: var(--md-sys-typescale-display-small-font-size);
+    line-height: var(--md-sys-typescale-display-small-line-height);
+    letter-spacing: var(--md-sys-typescale-display-small-letter-spacing);
+  }
+  .md-headline-large {
+    font-family: var(--md-sys-typescale-headline-large-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-headline-large-font-weight);
+    font-size: var(--md-sys-typescale-headline-large-font-size);
+    line-height: var(--md-sys-typescale-headline-large-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-large-letter-spacing);
+  }
+  .md-headline-medium {
+    font-family: var(--md-sys-typescale-headline-medium-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-headline-medium-font-weight);
+    font-size: var(--md-sys-typescale-headline-medium-font-size);
+    line-height: var(--md-sys-typescale-headline-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-medium-letter-spacing);
+  }
+  .md-headline-small {
+    font-family: var(--md-sys-typescale-headline-small-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-headline-small-font-weight);
+    font-size: var(--md-sys-typescale-headline-small-font-size);
+    line-height: var(--md-sys-typescale-headline-small-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-small-letter-spacing);
+  }
+  .md-title-large {
+    font-family: var(--md-sys-typescale-title-large-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-title-large-font-weight);
+    font-size: var(--md-sys-typescale-title-large-font-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    letter-spacing: var(--md-sys-typescale-title-large-letter-spacing);
+  }
+  .md-title-medium {
+    font-family: var(--md-sys-typescale-title-medium-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-title-medium-font-weight);
+    font-size: var(--md-sys-typescale-title-medium-font-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-title-medium-letter-spacing);
+  }
+  .md-title-small {
+    font-family: var(--md-sys-typescale-title-small-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-title-small-font-weight);
+    font-size: var(--md-sys-typescale-title-small-font-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-letter-spacing);
+  }
+  .md-body-large {
+    font-family: var(--md-sys-typescale-body-large-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-body-large-font-weight);
+    font-size: var(--md-sys-typescale-body-large-font-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-letter-spacing);
+  }
+  .md-body-medium {
+    font-family: var(--md-sys-typescale-body-medium-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-body-medium-font-weight);
+    font-size: var(--md-sys-typescale-body-medium-font-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-body-medium-letter-spacing);
+  }
+  .md-body-small {
+    font-family: var(--md-sys-typescale-body-small-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-body-small-font-weight);
+    font-size: var(--md-sys-typescale-body-small-font-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-letter-spacing);
+  }
+  .md-label-large {
+    font-family: var(--md-sys-typescale-label-large-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-label-large-font-weight);
+    font-size: var(--md-sys-typescale-label-large-font-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);
+  }
+  .md-label-medium {
+    font-family: var(--md-sys-typescale-label-medium-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-label-medium-font-weight);
+    font-size: var(--md-sys-typescale-label-medium-font-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-letter-spacing);
+  }
+  .md-label-small {
+    font-family: var(--md-sys-typescale-label-small-font-family-name), sans-serif;
+    font-weight: var(--md-sys-typescale-label-small-font-weight);
+    font-size: var(--md-sys-typescale-label-small-font-size);
+    line-height: var(--md-sys-typescale-label-small-line-height);
+    letter-spacing: var(--md-sys-typescale-label-small-letter-spacing);
+  }
+
+  /* ============================================
+     Pretty Tabs (stepbro.site)
+     ============================================ */
+  .pretty-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 64px;
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+    overflow: auto;
+    position: relative;
+    scrollbar-width: none;
+  }
+  .pretty-tabs::-webkit-scrollbar { display: none; }
+
+  .pretty-tabs__tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 99em;
+    padding: 16px 24px;
+    border: none;
+    background: transparent;
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    cursor: pointer;
+    transition: color 200ms, background-color 200ms;
+    white-space: nowrap;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pretty-tabs__tab:hover {
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+  .pretty-tabs__tab.active {
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+
+  .pretty-tabs__indicator {
+    position: absolute;
+    border-radius: 99em;
+    background: var(--sb-surface, var(--md-sys-color-surface));
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 0.5px 2.5px rgba(0, 0, 0, 0.08);
+    will-change: transform, width, height;
+    transition: transform 300ms cubic-bezier(0.34, 1.45, 0.5, 1),
+                width 300ms cubic-bezier(0.34, 1.45, 0.5, 1),
+                height 300ms cubic-bezier(0.34, 1.45, 0.5, 1);
+    z-index: 0;
+  }
+
+  .pretty-tabs.orientation-vertical {
+    flex-direction: column;
+    border-radius: 24px;
+  }
+  .pretty-tabs.orientation-vertical .pretty-tabs__tab {
+    justify-content: flex-start;
+  }
+
+  /* Tab size modifiers */
+  .pretty-tabs.small .pretty-tabs__tab {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  .pretty-tabs.xsmall .pretty-tabs__tab {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  /* ============================================
+     Color Ball (selector de color)
+     ============================================ */
+  .color-ball {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.1);
+    transition: transform 200ms, box-shadow 500ms, border-radius 500ms cubic-bezier(0.38, 0.49, 0, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .color-ball:hover {
+    transform: scale(1.1);
+  }
+  .color-ball.active {
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.3);
+    transform: scale(1.15);
+    filter: saturate(1.1);
+  }
+
+  /* ============================================
+     Time Chips / Period Chips
+     ============================================ */
+  .time-chip {
+    all: unset;
+    cursor: pointer;
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 10px 18px;
+    border-radius: 18px;
+    min-width: 72px;
+    text-align: center;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+    font-variant-numeric: tabular-nums;
+    transition: background 125ms, color 125ms;
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+  }
+  .time-chip:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+  .time-chip.active {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+  }
+
+  .period-chip {
+    all: unset;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: 16px;
+    min-width: 48px;
+    text-align: center;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+    transition: background 125ms, color 125ms;
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+  }
+  .period-chip:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+  }
+  .period-chip.active {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+  }
+
+  .cycle-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--sb-on-background, var(--md-sys-color-on-background)) 60%, transparent);
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    cursor: pointer;
+    transition: background 125ms, color 125ms;
+    border: none;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cycle-option:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+  }
+  .cycle-option.active {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+  }
+
+  /* ============================================
+     Movement Row
+     ============================================ */
+  .movement-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px;
+    border-radius: 24px;
+    background: var(--sb-background, var(--md-sys-color-background));
+    transition: background 200ms ease;
+    cursor: pointer;
+  }
+  .movement-row:hover {
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+  }
+
+  /* ============================================
+     Message / Chat Bubble
+     ============================================ */
+  .md-message {
+    display: block;
+    width: fit-content;
+    max-width: 80%;
+    padding: 16px 24px;
+    border-radius: 32px;
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+    background: var(--sb-surface-container, var(--md-sys-color-surface-container));
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+  .md-message.sent {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+    margin-left: auto;
+  }
+
+  /* ============================================
+     Total Balance Card (con blobs)
+     ============================================ */
+  .total-balance-card {
+    position: relative;
+    padding: 32px;
+    border-radius: 40px;
+    height: 420px;
+    overflow: hidden;
+    background: var(--sb-surface-container, var(--md-sys-color-surface-container));
+  }
+
+  .total-balance-card .blob {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .total-balance-card .blob-1 {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    top: -10%;
+    left: -10%;
+    animation: md-blob-1 20s linear infinite;
+  }
+
+  .total-balance-card .blob-2 {
+    background: var(--sb-tertiary-container, var(--md-sys-color-tertiary-container));
+    bottom: -10%;
+    right: -10%;
+    animation: md-blob-2 25s linear infinite;
+  }
+
+  .total-balance-card .blob-3 {
+    background: var(--sb-secondary, var(--md-sys-color-secondary));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: md-blob-1 30s linear infinite reverse;
+    opacity: 0.15;
+  }
+
+  /* ============================================
+     Text Gradients
+     ============================================ */
+  .md-text-rainbow {
+    background: linear-gradient(90deg,
+      #b00020, #b54700, #8a6a00, #0a7a2f, #006c84, #0050c7 80%, #6f2dbd);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dark .md-text-rainbow {
+    background: linear-gradient(90deg,
+      #ff6b8a, #ffb15a, #ffe27a, #7bff9b, #7fe8ff, #89a8ff, #d2a6ff);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .md-text-rainbow.animated {
+    animation: md-text-rainbow 6s linear infinite;
+  }
+
+  .md-text-flow {
+    background: linear-gradient(90deg,
+      var(--sb-primary, var(--md-sys-color-primary)),
+      var(--sb-tertiary-container, var(--md-sys-color-tertiary-container)),
+      var(--sb-primary, var(--md-sys-color-primary)));
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: md-text-flow 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  }
+
+  /* ============================================
+     Hover Effects (stepbro.site)
+     ============================================ */
+  .md-hover-magic {
+    position: relative;
+    overflow: hidden;
+    transition: transform 250ms cubic-bezier(0, 0, 0.5, 1),
+                box-shadow 250ms cubic-bezier(0, 0, 0.5, 1);
+  }
+  .md-hover-magic::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+    transform: translateX(-100%);
+    animation: md-shimmer 2s infinite;
+    pointer-events: none;
+  }
+  .md-hover-magic:hover {
+    transform: scale(1.03);
+    box-shadow: 0 24px 64px -32px var(--sb-primary, var(--md-sys-color-primary));
+  }
+
+  .md-hover-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  .md-hover-glow > * { z-index: 1; position: relative; }
+  .md-hover-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+    opacity: 0;
+    transform: translate3d(-50%, -90%, 0);
+    border-radius: 200px;
+    filter: blur(50px);
+    transition: opacity 300ms cubic-bezier(0, 0, 0.5, 1),
+                transform 300ms cubic-bezier(0, 0, 0.5, 1);
+    pointer-events: none;
+  }
+  .md-hover-glow:hover::after {
+    opacity: 1;
+  }
+
+  /* Hover Magic 2 (blob hover) */
+  .md-hover-blob {
+    position: relative;
+    overflow: hidden;
+  }
+  .md-hover-blob > * { z-index: 1; position: relative; }
+  .md-hover-blob::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 200px;
+    filter: blur(100px);
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+  }
+  .md-hover-blob:hover::after {
+    opacity: 0.5;
+  }
+  .md-hover-blob.primary::after {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+  }
+  .md-hover-blob.secondary::after {
+    background: var(--sb-secondary-container, var(--md-sys-color-secondary-container));
+  }
+
+  .md-hover-blob.small::after {
+    width: 120px;
+    height: 120px;
+    filter: blur(50px);
+  }
+  .md-hover-blob.tiny::after {
+    width: 60px;
+    height: 60px;
+    filter: blur(24px);
+  }
+
+  .md-hover-delete {
+    transition: background 250ms cubic-bezier(0, 0, 0.5, 1),
+                color 250ms cubic-bezier(0, 0, 0.5, 1);
+  }
+  .md-hover-delete:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #f87171;
+  }
+
+  /* ============================================
+     Outline / Shadow Levels (stepbro)
+     ============================================ */
+  .md-outline-light {
+    box-shadow: 0 0 0 1px var(--sb-on-surface, var(--md-sys-color-on-surface)) inset;
+  }
+
+  .md-outline-shadow {
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 0.5px 2.5px rgba(0, 0, 0, 0.12);
+  }
+
+  .md-outline-shadow-strong {
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 0 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .md-outline-shadow-light {
+    box-shadow: 0 0.5px 2.5px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ============================================
+     Glass Backgrounds (stepbro)
+     ============================================ */
+  .md-glass {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 64%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .md-glass-strong {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 80%, transparent);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+  }
+
+  /* ============================================
+     Mix Blend Mode
+     ============================================ */
+  .md-blend-difference {
+    mix-blend-mode: difference;
+  }
+
+  /* ============================================
+     Entry Animation Container
+     ============================================ */
+  .md-entry-reveal {
+    position: relative;
+    overflow: hidden;
+  }
+  .md-entry-reveal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, var(--sb-surface-container, var(--md-sys-color-surface-container)) 30%);
+    transform: scaleX(1.4) translateX(100%);
+    animation: md-entry-reveal 700ms cubic-bezier(0.38, 0.49, 0, 1);
+    transform-origin: right;
+  }
+
+  /* ============================================
+     Hand Group / Time Ring (stepbro)
+     ============================================ */
+  .md-hand-group {
+    transform-origin: 120px 120px;
+    transition: transform 620ms cubic-bezier(0.34, 1.45, 0.5, 1);
+  }
+
+  .md-ring {
+    transform-origin: 120px 120px;
+    transition: transform 620ms cubic-bezier(0.34, 1.45, 0.5, 1);
+  }
+
+  /* ============================================
+     Modal Window Variants (stepbro)
+     ============================================ */
+  .md-modal-slim {
+    max-width: 400px !important;
+  }
+
+  .md-modal-wide {
+    max-width: 800px !important;
+  }
+
+  .md-modal-side-panel {
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .md-modal-increased {
+    --modal-safe-top-min: 0px;
+    padding: 48px 32px;
+  }
+
+  /* ============================================
+     Table Variant 1 (stepbro)
+     ============================================ */
+  .md-table {
+    border-collapse: collapse;
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 1px var(--sb-surface-container, var(--md-sys-color-surface-container));
+    width: 100%;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .md-table th,
+  .md-table td {
+    height: 40px;
+    padding: 4px 12px;
+    text-align: left;
+  }
+  .md-table thead th {
+    font-weight: 500;
+    color: var(--sb-outline, var(--md-sys-color-outline));
+    font-size: 13px;
+  }
+  .md-table tbody tr {
+    transition: background 200ms;
+  }
+  .md-table tbody tr:hover {
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+  }
+  .md-table.variant-1 {
+    --table-line-color: var(--sb-surface-container-highest, var(--md-sys-color-surface-container-highest));
+    box-shadow: inset 0 0 0 1px var(--table-line-color);
+  }
+  .md-table.variant-1 td,
+  .md-table.variant-1 th {
+    border-bottom: 1px solid var(--table-line-color);
+    border-right: 1px solid var(--table-line-color);
+  }
+  .md-table.variant-1 td:last-child,
+  .md-table.variant-1 th:last-child {
+    border-right: none;
+  }
+  .md-table.variant-1 tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ============================================
+     Amount / Chip Amount (stepbro)
+     ============================================ */
+  .md-amount {
+    width: fit-content;
+    font-size: inherit;
+    font-weight: 500;
+    text-wrap: nowrap;
+  }
+  .md-amount.chip {
+    padding: 4px 8px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .md-amount.positive {
+    color: var(--sb-primary, var(--md-sys-color-primary));
+    background: var(--sb-secondary-container, var(--md-sys-color-secondary-container));
+  }
+  .md-amount.negative {
+    color: var(--sb-error, var(--md-sys-color-error));
+    background: var(--sb-error-container, var(--md-sys-color-error-container));
+  }
+
+  /* ============================================
+     Day Picker (stepbro)
+     ============================================ */
+  .md-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    font-size: 14px;
+    border-radius: 16px;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    cursor: pointer;
+    transition: background 125ms, color 125ms, font-size 200ms, font-weight 200ms;
+    border: none;
+    background: transparent;
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .md-day:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+  }
+  .md-day.active {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+    font-weight: 600;
+  }
+  .md-day.today {
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1.5px var(--sb-primary, var(--md-sys-color-primary));
+  }
+
+  /* ============================================
+     Toast Positions (stepbro)
+     ============================================ */
+  .md-toast-stack {
+    position: fixed;
+    pointer-events: none;
+    z-index: var(--z-toast, 100);
+  }
+
+  .md-toast-stack.top-left { top: 16px; left: 16px; }
+  .md-toast-stack.top-center { top: 16px; left: 0; right: 0; display: flex; justify-content: center; }
+  .md-toast-stack.top-right { top: 16px; right: 16px; }
+  .md-toast-stack.center-left { top: 50%; left: 16px; transform: translateY(-50%); }
+  .md-toast-stack.center-right { top: 50%; right: 16px; transform: translateY(-50%); }
+  .md-toast-stack.bottom-left { bottom: 16px; left: 16px; }
+  .md-toast-stack.bottom-center { bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; }
+  .md-toast-stack.bottom-right { bottom: 16px; right: 16px; }
+
+  .md-toast-shell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--sb-surface, var(--md-sys-color-surface));
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    border-radius: 32px;
+    padding: 16px 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.22);
+    max-width: min(460px, calc(100vw - 32px));
+    transition: transform 300ms cubic-bezier(0, 0, 0.5, 1);
+    pointer-events: auto;
+  }
+  .md-toast-shell:hover {
+    transform: scale(1.05);
+  }
+
+  .md-toast-shell.variant-success {
+    background: var(--sb-primary-container, var(--md-sys-color-primary-container));
+    color: var(--sb-on-primary-container, var(--md-sys-color-on-primary-container));
+  }
+  .md-toast-shell.variant-error {
+    background: var(--sb-error-container, var(--md-sys-color-error-container));
+    color: var(--sb-on-error-container, var(--md-sys-color-on-error-container));
+  }
+  .md-toast-shell.variant-info {
+    background: var(--sb-tertiary-container, var(--md-sys-color-tertiary-container));
+    color: var(--sb-on-tertiary-container, var(--md-sys-color-on-tertiary-container));
+  }
+
+  /* ============================================
+     Button Variants (style-1..7 patterns)
+     ============================================ */
+  .md-btn-hero {
+    font-size: 24px;
+    padding: 16px 32px;
+    border-radius: 64px;
+    transition: transform 250ms cubic-bezier(0.38, 0.49, 0, 1.16);
+  }
+  .md-btn-hero:hover {
+    transform: scale(1.1);
+  }
+
+  .md-btn-chip {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: var(--sb-surface-container, var(--md-sys-color-surface-container));
+    transition: background 125ms, border-radius 200ms, padding 400ms cubic-bezier(0.38, 0.49, 0, 2);
+  }
+  .md-btn-chip:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+  }
+  .md-btn-chip.active {
+    background: var(--sb-primary-container, var(--md-sys-color-primary-container));
+    color: var(--sb-on-primary-container, var(--md-sys-color-on-primary-container));
+  }
+  .md-btn-chip.rounded {
+    border-radius: 64px;
+    padding: 8px 16px;
+  }
+  .md-btn-chip.playful:hover {
+    padding: 8px 14px;
+    border-radius: 24px;
+  }
+
+  .md-btn-ghost {
+    background: transparent;
+    border-radius: 12px;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    transition: background 125ms;
+  }
+  .md-btn-ghost:hover {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+  }
+
+  /* Shared modifiers */
+  .md-btn-slim {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+
+  .md-btn-big {
+    padding: 16px 24px !important;
+  }
+
+  .md-btn-chunky {
+    padding: 20px 28px !important;
+    font-size: 15px !important;
+    border-radius: 16px !important;
+  }
+
+  .md-btn-for-icon {
+    padding: 12px !important;
+  }
+
+  /* ============================================
+     Input Variants (style-1..4 patterns)
+     ============================================ */
+  .md-input-glass {
+    background: color-mix(in srgb, var(--sb-neutral-background, var(--md-sys-color-surface)) 50%, transparent);
+    box-shadow:
+      inset 1px 1px 1px rgba(var(--sb-neutral-background, 0, 0, 0), 0.6),
+      inset -1px -1px 1px rgba(var(--sb-neutral-background, 0, 0, 0), 0.6),
+      0 0 16px rgba(0, 0, 0, 0.16);
+    border-radius: 24px;
+    border: none;
+    outline: none;
+    padding: 16px;
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .md-input-ghost {
+    background: transparent;
+    padding: 0;
+    height: auto;
+    border: none;
+    outline: none;
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .md-input-ghost:focus {
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+  }
+
+  .md-input-outline {
+    background: var(--sb-background, var(--md-sys-color-background));
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 0.5px 2.5px rgba(0, 0, 0, 0.12);
+    border: none;
+    outline: none;
+    padding: 14px 16px;
+    border-radius: 16px;
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .md-setup-input {
+    min-height: 120px;
+    padding: 16px;
+    border-radius: 24px;
+    font-size: 18px;
+    line-height: 1.4;
+    resize: none;
+    background: color-mix(in srgb, var(--sb-on-background, var(--md-sys-color-on-background)) 3%, transparent);
+    border: none;
+    outline: none;
+    color: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* ============================================
+     Page Header (stepbro)
+     ============================================ */
+  .md-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .md-page-header-title {
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    font-weight: 500;
+    font-size: var(--md-sys-typescale-display-medium-font-size, 45px);
+    line-height: 1.1;
+  }
+
+  /* ============================================
+     Grid Card (stepbro)
+     ============================================ */
+  .md-grid-card {
+    background: var(--sb-surface-container-low, var(--md-sys-color-surface-container-low));
+    border-radius: 48px;
+    overflow: hidden;
+    transition: background 300ms ease;
+  }
+  .md-grid-card.is-clickable {
+    cursor: pointer;
+  }
+  .md-grid-card.is-clickable:hover {
+    background: var(--sb-surface-container, var(--md-sys-color-surface-container));
+  }
+  .md-grid-card.is-tall {
+    height: calc(100svh - 64px);
+  }
+  .md-grid-card.wide {
+    grid-column: span 2;
+  }
+
+  /* ============================================
+     Content Box Glass (stepbro)
+     ============================================ */
+  .md-content-glass {
+    background: color-mix(in srgb, var(--sb-on-background, var(--md-sys-color-on-background)) 2%, transparent);
+    box-shadow:
+      inset 1px 1px 1px rgba(var(--sb-neutral-background, 0, 0, 0), 0.6),
+      inset -1px -1px 1px rgba(var(--sb-neutral-background, 0, 0, 0), 0.6),
+      0 0 16px color-mix(in srgb, var(--sb-on-background, var(--md-sys-color-on-background)) 8%, transparent);
+    border-radius: 24px;
+    padding: 24px;
+  }
+  .md-content-glass.frosted {
+    background: color-mix(in srgb, var(--sb-background, var(--md-sys-color-background)) 24%, transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  /* ============================================
+     Subtitle / Section Label
+     ============================================ */
+  .md-section-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    opacity: 0.5;
+  }
+
+  /* ============================================
+     Responsive Table Wrapper (stepbro)
+     ============================================ */
+  @media (max-width: 768px) {
+    .md-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -20px;
+      padding: 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sb-outline-variant, var(--md-sys-color-outline-variant)) transparent;
+    }
+    .md-table-wrap .md-table {
+      min-width: 560px;
+    }
+    .md-table-wrap::-webkit-scrollbar { height: 4px; }
+    .md-table-wrap::-webkit-scrollbar-thumb {
+      background: var(--sb-outline-variant, var(--md-sys-color-outline-variant));
+      border-radius: 999px;
+    }
+    .md-table-wrap::-webkit-scrollbar-track { background: transparent; }
+
+    .md-table-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+      opacity: 0.5;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+  }
+
+  /* ============================================
+     Badges (stepbro.site)
+     ============================================ */
+  .md-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .md-badge.active {
+    background: var(--sb-primary, var(--md-sys-color-primary));
+    color: var(--sb-on-primary, var(--md-sys-color-on-primary));
+  }
+  .md-badge.dormant {
+    background: var(--sb-surface-container-high, var(--md-sys-color-surface-container-high));
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+  }
+  .md-badge.trial {
+    background: var(--sb-tertiary-container, var(--md-sys-color-tertiary-container));
+    color: var(--sb-on-tertiary-container, var(--md-sys-color-on-tertiary-container));
+  }
+  .md-badge.error {
+    background: var(--sb-error-container, var(--md-sys-color-error-container));
+    color: var(--sb-on-error-container, var(--md-sys-color-on-error-container));
+  }
+  .md-badge.success {
+    background: var(--sb-primary-container, var(--md-sys-color-primary-container));
+    color: var(--sb-on-primary-container, var(--md-sys-color-on-primary-container));
+  }
+
+  /* ============================================
+     Glass Backgrounds (stepbro)
+     ============================================ */
+  .md-glass-4 {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 80%, transparent);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .md-glass-8 {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 64%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .md-glass-16 {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 60%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .md-glass-24 {
+    background: color-mix(in srgb, var(--sb-surface, var(--md-sys-color-surface)) 50%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+  .md-glass-40 {
+    background: color-mix(in srgb, var(--sb-surface-container, var(--md-sys-color-surface-container)) 80%, transparent);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+  }
+
+  .md-glass-inverted {
+    background: color-mix(in srgb, var(--sb-background, var(--md-sys-color-background)) 80%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ============================================
+     Noise Texture Overlay
+     ============================================ */
+  .md-noise {
+    position: relative;
+  }
+  .md-noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ============================================
+     Outline / Shadow Variants (stepbro completo)
+     ============================================ */
+  .md-outline-1 {
+    box-shadow: inset 0 0 0 1px var(--sb-outline-variant, var(--md-sys-color-outline-variant));
+  }
+  .md-outline-light {
+    box-shadow: 0 0 0 1px var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+  .md-outline-light-1 {
+    box-shadow: inset 0 0 0 1px var(--sb-on-surface, var(--md-sys-color-on-surface));
+  }
+  .md-outline-light-2 {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-on-surface, var(--md-sys-color-on-surface)) 20%, transparent);
+  }
+  .md-outline-shadow {
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 0.5px 2.5px rgba(0, 0, 0, 0.12);
+  }
+  .md-outline-shadow-strong {
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 0 12px rgba(0, 0, 0, 0.06);
+  }
+  .md-outline-shadow-light {
+    box-shadow: 0 0.5px 2.5px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ============================================
+     Text Gradient Variants (stepbro)
+     ============================================ */
+  .md-text-gradient {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .md-text-gradient-primary {
+    background: linear-gradient(90deg, var(--sb-primary, var(--md-sys-color-primary)), var(--sb-tertiary-container, var(--md-sys-color-tertiary-container)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ============================================
+     Hover Magic Variants (stepbro completo)
+     ============================================ */
+  .md-hover-magic-1 {
+    position: relative;
+    overflow: hidden;
+    transition: transform 250ms cubic-bezier(0, 0, 0.5, 1),
+                box-shadow 250ms cubic-bezier(0, 0, 0.5, 1);
+  }
+  .md-hover-magic-1::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+    transform: translateX(-100%);
+    animation: md-shimmer 2s infinite;
+    pointer-events: none;
+  }
+  .md-hover-magic-1:hover {
+    transform: scale(1.03);
+    box-shadow: 0 24px 64px -32px var(--sb-primary, var(--md-sys-color-primary));
+  }
+
+  .md-hover-magic-2 {
+    position: relative;
+    overflow: hidden;
+  }
+  .md-hover-magic-2 > * { z-index: 1; position: relative; }
+  .md-hover-magic-2::after {
+    content: "";
+    position: absolute;
+    border-radius: 200px;
+    filter: blur(100px);
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    background: var(--sb-secondary-container, var(--md-sys-color-secondary-container));
+  }
+  .md-hover-magic-2:hover::after { opacity: 0.5; }
+  .md-hover-magic-2::after {
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .md-hover-magic-2-small::after {
+    width: 120px;
+    height: 120px;
+    filter: blur(50px);
+  }
+
+  .md-hover-magic-2-tiny::after {
+    width: 60px;
+    height: 60px;
+    filter: blur(24px);
+  }
+
+  /* ============================================
+     With Icon (stepbro button pattern)
+     ============================================ */
+  .md-with-icon-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .md-with-icon-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-direction: row-reverse;
+  }
+
+  /* ============================================
+     Page Layout (stepbro)
+     ============================================ */
+  .md-page-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    width: 100%;
+  }
+
+  .md-page-title {
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  /* ============================================
+     Error State
+     ============================================ */
+  .md-error-text {
+    color: var(--sb-error, var(--md-sys-color-error));
+    font-size: 14px;
+  }
+
+  .md-error-container {
+    background: var(--sb-error-container, var(--md-sys-color-error-container));
+    color: var(--sb-on-error-container, var(--md-sys-color-on-error-container));
+    padding: 16px 24px;
+    border-radius: 16px;
+  }
+
+  /* ============================================
+     Empty State
+     ============================================ */
+  .md-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--sb-on-surface-variant, var(--md-sys-color-on-surface-variant));
+    gap: 8px;
+  }
+
+  /* ============================================
+     Filled modifier
+     ============================================ */
+  .md-filled {
+    background: var(--sb-on-surface, var(--md-sys-color-on-surface));
+    color: var(--sb-surface, var(--md-sys-color-surface));
+  }
+  .md-filled:hover {
+    opacity: 0.9;
+  }
+
+  /* ============================================
+     Gooey / Liquid Filter (SVG pattern)
+     ============================================ */
+  .md-gooey {
+    filter: url(#mdGooey);
+    -webkit-filter: url(#mdGooey);
+  }
+
+  /* ============================================
+     Divider
+     ============================================ */
+  .md-divider {
+    height: 1px;
+    background: var(--sb-outline-variant, var(--md-sys-color-outline-variant));
+    opacity: 0.1;
+    border: none;
+    margin: 0;
+    width: 100%;
+  }
+
+  /* ============================================
+     App View Layout (stepbro)
+     ============================================ */
+  .md-app-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .md-app-view-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .md-app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+  }
+
+  .md-app-header-title {
+    font-family: var(--app-main-font, "DM Sans"), sans-serif;
+    font-weight: 500;
+    font-size: var(--md-sys-typescale-display-medium-font-size, 45px);
+    line-height: 1.1;
+  }
+}

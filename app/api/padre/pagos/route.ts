@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from 'next/server'
+import pool from '@/lib/db'
+import { getPadreUserId, getPadreInstitutionId } from '@/lib/getPadreInfo'
+import { checkPlanFeature } from '@/lib/checkPlanLimit'
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = await getPadreUserId(request)
+    if (!userId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    const instId = await getPadreInstitutionId(request)
+    const allowed = await checkPlanFeature(instId || '', 'can_parents_portal')
+    if (!allowed) {
+      return NextResponse.json({ error: 'Portal de padres no disponible en tu plan', upgrade_required: true }, { status: 403 })
+    }
+
+    const [parents] = await pool.query(
+      `SELECT id FROM parents WHERE email = (SELECT email FROM users WHERE id = ?) LIMIT 1`,
+      [userId]
+    ) as any[]
+
+    if (!parents || parents.length === 0) {
+      return NextResponse.json({ summary: null, pending: [], history: [] })
+    }
+
+    const parentId = parents[0].id
+
+    const [rows] = await pool.query(
+      `SELECT p.id, p.concept, p.amount, p.due_date, p.status, p.paid_date, p.payment_method, p.receipt_number
+       FROM payments p
+       WHERE p.parent_id = ?
+       ORDER BY p.due_date DESC`,
+      [parentId]
+    )
+
+    const records = rows as any[]
+    const pending = records.filter(r => r.status === 'pending')
+    const history = records.filter(r => r.status === 'paid')
+    const totalPaid = history.reduce((sum, r) => sum + (r.amount || 0), 0)
+    const totalPending = pending.reduce((sum, r) => sum + (r.amount || 0), 0)
+
+    return NextResponse.json({
+      summary: { total_paid: totalPaid, total_pending: totalPending },
+      pending,
+      history,
+    })
+  } catch (error) {
+    console.error('Error fetching pagos:', error)
+    return NextResponse.json({ summary: null, pending: [], history: [] })
+  }
+}

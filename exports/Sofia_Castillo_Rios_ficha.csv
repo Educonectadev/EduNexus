@@ -1,0 +1,21 @@
+﻿Ficha del Estudiante - Educonecta
+
+SECCIÓN,CAMPO,VALOR
+Datos del estudiante,Código,ALU-MS8H3CRG
+Datos del estudiante,Nombre completo,Sofía Castillo Ríos
+Datos del estudiante,Documento,DNI 56789012
+Datos del estudiante,Fecha de nacimiento,08/02/2011
+Datos del estudiante,Género,Femenino
+Datos del estudiante,Grado,5to
+Datos del estudiante,Sección,B
+Datos del estudiante,Estado,Activo
+Matrícula 2026,Grado,5to
+Matrícula 2026,Sección,B
+Matrícula 2026,Año,2026
+Matrícula 2026,Condición académica,En curso
+Apoderado,Nombre,Miguel Ríos
+Apoderado,Documento,DNI 43210987
+Apoderado,Teléfono,943210987
+Apoderado,Email,miguel@email.com
+
+Generado el,03/08/2026,Por Educonecta

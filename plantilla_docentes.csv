@@ -1,0 +1,7 @@
+Nombre Completo,DNI,Teléfono,Email,Especialidad/Asignatura,Nivel (primaria/secundaria),Tipo Contrato (nombrado/contratado/cas),Estado (active/inactive)
+Juan Carlos Pérez López,70123456,987654321,juan.perez@iep.edu.pe,Matemáticas,secundaria,nombrado,active
+María Ana García Torres,70234567,976543210,maria.garcia@iep.edu.pe,Lenguaje,primaria,contratado,active
+Carlos Eduardo Mendoza Ruiz,70345678,965432109,carlos.mendoza@iep.edu.pe,Ciencias,secundaria,nombrado,active
+Rosa Elizabeth Díaz Campos,70456789,954321098,rosa.diaz@iep.edu.pe,Inglés,primaria,contratado,active
+Pedro Luis Hernández Vega,70567890,943210987,pedro.hernandez@iep.edu.pe,Arte,secundaria,cas,active
+Sofía Valentina Ríos Luna,70678901,932109876,sofia.rios@iep.edu.pe,Ed. Física,primaria,contratado,active
