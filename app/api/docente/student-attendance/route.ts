@@ -25,7 +25,10 @@ export async function GET(request: NextRequest) {
     }
 
     const [courseRows] = await pool.query(
-      `SELECT id, grade, section FROM courses WHERE id = ? AND teacher_id = ?`,
+      `SELECT c.id, c.grade, c.section
+       FROM courses c
+       LEFT JOIN teachers t ON c.teacher_id = t.id
+       WHERE c.id = ? AND t.user_id = ?`,
       [courseId, userId]
     )
     const course = (courseRows as any[])[0]
@@ -34,11 +37,11 @@ export async function GET(request: NextRequest) {
     }
 
     const [students] = await pool.query(
-      `SELECT s.id, s.dni, s.nombres, s.apellidos
+      `SELECT s.id, s.document_number, s.first_name, s.last_name
        FROM students s
        JOIN enrollments e ON e.student_id = s.id
        WHERE s.grade = ? AND s.section = ? AND e.status = 'active'
-       ORDER BY s.apellidos, s.nombres`,
+       ORDER BY s.last_name, s.first_name`,
       [course.grade, course.section]
     )
 
@@ -53,9 +56,9 @@ export async function GET(request: NextRequest) {
 
     const result = (students as any[]).map(s => ({
       id: s.id,
-      dni: s.dni,
-      nombres: s.nombres,
-      apellidos: s.apellidos,
+      dni: s.document_number,
+      nombres: s.first_name,
+      apellidos: s.last_name,
       status: attendanceMap[s.id]?.status || null,
       notes: attendanceMap[s.id]?.notes || '',
     }))
@@ -96,7 +99,10 @@ export async function POST(request: NextRequest) {
     }
 
     const [courseRows] = await pool.query(
-      `SELECT id FROM courses WHERE id = ? AND teacher_id = ?`,
+      `SELECT c.id
+       FROM courses c
+       LEFT JOIN teachers t ON c.teacher_id = t.id
+       WHERE c.id = ? AND t.user_id = ?`,
       [course_id, userId]
     )
     if (!(courseRows as any[])[0]) {
