@@ -320,7 +320,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className={cn("flex items-center h-14 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
           <Link href="/"
-            className="flex items-center justify-center w-7 h-7 rounded-md bg-sb-on-surface shrink-0">
+            className="flex items-center justify-center w-7 h-7 rounded-[6px] bg-sb-on-surface shrink-0">
             <span className="text-sb-surface font-semibold text-[10px] tracking-tight">EN</span>
           </Link>
           {sidebarOpen && (
@@ -355,44 +355,44 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                   <>
                     {!sidebarOpen && (
                       <motion.span
-                        className="absolute inset-0"
-                        initial={false}
-                        animate={{
-                          borderRadius: active ? 14 : 999,
-                          backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
-                        }}
-                        whileHover={{ backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
-                        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
-                      />
-                    )}
-                    <motion.span
-                      className="relative z-10"
-                      whileTap={{ scale: 0.9 }}
-                      animate={{
-                        scale: active ? 1.1 : 1,
-                        opacity: active ? 1 : 0.7,
-                      }}
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
-                    >
-                      <item.icon className="h-[16px] w-[16px] shrink-0" />
-                    </motion.span>
-                    {sidebarOpen && (
-                      <span className={cn(
-                        "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
-                        active ? "font-medium" : "font-normal"
-                      )}>
-                        {item.title}
-                      </span>
-                    )}
-                  </>
-                )
-                const cls = cn(
-                  "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                  sidebarOpen ? "h-8 px-2.5 rounded-md" : "relative justify-center w-9 h-9 mx-auto",
-                  active
-                    ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
-                    : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
-                )
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{
+                    borderRadius: active ? 6 : 999,
+                    backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                  }}
+                  whileHover={{ backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                />
+              )}
+              <motion.span
+                className="relative z-10"
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: active ? 1.1 : 1,
+                  opacity: active ? 1 : 0.7,
+                }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                <item.icon className="h-[16px] w-[16px] shrink-0" />
+              </motion.span>
+              {sidebarOpen && (
+                <span className={cn(
+                  "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
+                  active ? "font-medium" : "font-normal"
+                )}>
+                  {item.title}
+                </span>
+              )}
+            </>
+          )
+          const cls = cn(
+            "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+            sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+            active
+              ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+              : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+          )
                 const title = !sidebarOpen ? item.title : undefined
                 return isAction ? (
                   <button key={item.href} onClick={handleAction} className={cls} title={title}>{inner}</button>
@@ -419,7 +419,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 href="/secretario/asistente"
                 className={cn(
                   "group flex items-center gap-2.5 transition-colors duration-300 ease-out w-full",
-                  sidebarOpen ? "h-8 px-2.5 rounded-md" : "relative justify-center w-9 h-9 mx-auto",
+                  sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
                   pathname.startsWith("/secretario/asistente")
                     ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
                     : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
@@ -456,7 +456,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-md w-full" : "justify-center w-9 h-9 mx-auto rounded-md",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
                 "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
               )}>
               <div className="relative shrink-0 w-[16px] h-[16px]">
@@ -470,7 +470,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={toggleSidebar}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-md w-full" : "justify-center w-9 h-9 mx-auto rounded-md",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
                 "text-sb-on-surface-variant/50 hover:bg-sb-surface-container/60 hover:text-sb-on-surface-variant dark:text-sb-solid-fg/45 dark:hover:text-sb-solid-fg"
               )}>
               <svg className={cn("h-[16px] w-[16px] shrink-0 transition-transform duration-200", !sidebarOpen && "rotate-180")}
@@ -491,7 +491,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <Link href="/perfil"
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-md" : "relative justify-center w-9 h-9 mx-auto",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
                   pathname === "/perfil"
                     ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
                     : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
@@ -524,7 +524,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={handleLogout}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-md w-full" : "justify-center w-9 h-9 mx-auto rounded-md",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
                 "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
               )}>
               <LogOut className="h-[16px] w-[16px] shrink-0" />
