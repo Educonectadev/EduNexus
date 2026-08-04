@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   DollarSign, CreditCard, TrendingDown, AlertCircle, CheckCircle,
   Clock, Search, Plus, Trash2, Edit3, Save, User, BookOpen,
-  Calendar, Settings2, X, Command,
+  Calendar, Settings2, X, Command, Landmark, Smartphone, Coins, ArrowLeftRight,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbBadge, SbInput, SbSelect, SbModal, SbModalBody, SbModalHeader, SbModalFooter, useToast } from "@/components/ui/sb"
@@ -21,6 +21,21 @@ interface Payment {
 
 interface PaymentConcept { id: string; name: string; amount: number; type: ConceptType; is_active: boolean }
 interface SearchResult { id: string; full_name: string; grade: string; section: string }
+
+type MethodType = "efectivo" | "deposito" | "transferencia" | "yape" | "plin" | "otro"
+interface PaymentMethod {
+  id: string; type: MethodType; name: string; bank_name?: string;
+  account_number?: string; account_holder?: string; phone?: string; details?: string; is_active: number;
+}
+
+const methodConfig: Record<MethodType, { icon: typeof Landmark; label: string; color: string; bg: string }> = {
+  efectivo: { icon: Coins, label: "Efectivo", color: "text-emerald-600", bg: "bg-emerald-500/10" },
+  deposito: { icon: Landmark, label: "Depósito bancario", color: "text-blue-600", bg: "bg-blue-500/10" },
+  transferencia: { icon: ArrowLeftRight, label: "Transferencia", color: "text-cyan-600", bg: "bg-cyan-500/10" },
+  yape: { icon: Smartphone, label: "Yape", color: "text-purple-600", bg: "bg-purple-500/10" },
+  plin: { icon: Smartphone, label: "Plin", color: "text-pink-600", bg: "bg-pink-500/10" },
+  otro: { icon: CreditCard, label: "Otro", color: "text-sb-on-surface-variant/60", bg: "bg-sb-on-surface/8" },
+}
 interface PaymentsResponse {
   payments: Payment[]; summary: {
     pending: { count: number; total: number }; paid: { count: number; total: number };
@@ -99,6 +114,8 @@ export default function PagosPage() {
   const [registerModal, setRegisterModal] = React.useState(false)
   const [debtModal, setDebtModal] = React.useState(false)
   const [conceptModal, setConceptModal] = React.useState(false)
+  const [methodModal, setMethodModal] = React.useState(false)
+  const [methods, setMethods] = React.useState<PaymentMethod[]>([])
 
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([])
   const [searching, setSearching] = React.useState(false)
@@ -128,7 +145,14 @@ export default function PagosPage() {
     } catch {}
   }, [])
 
-  React.useEffect(() => { fetchPayments(); fetchConcepts() }, [fetchPayments, fetchConcepts])
+  const fetchMethods = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/secretario/payment-methods")
+      if (res.ok) setMethods(await res.json())
+    } catch {}
+  }, [])
+
+  React.useEffect(() => { fetchPayments(); fetchConcepts(); fetchMethods() }, [fetchPayments, fetchConcepts, fetchMethods])
 
   // Keyboard shortcut: Ctrl/Cmd + K
   React.useEffect(() => {
@@ -292,6 +316,62 @@ export default function PagosPage() {
     }
   }
 
+  const handleSaveMethod = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = new FormData(e.currentTarget)
+    const editingId = form.get("method_editing_id") as string
+    const body = {
+      type: form.get("method_type") as MethodType,
+      name: form.get("method_name") as string,
+      bank_name: (form.get("method_bank") as string) || undefined,
+      account_number: (form.get("method_account") as string) || undefined,
+      account_holder: (form.get("method_holder") as string) || undefined,
+      phone: (form.get("method_phone") as string) || undefined,
+      details: (form.get("method_details") as string) || undefined,
+    }
+    if (!body.type || !body.name.trim()) { toast("Completa tipo y nombre", "warning"); return }
+    try {
+      const url = editingId
+        ? `/api/secretario/payment-methods/${editingId}`
+        : "/api/secretario/payment-methods"
+      const method = editingId ? "PUT" : "POST"
+      const res = await fetch(url, {
+        method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      })
+      if (!res.ok) throw new Error("Error al guardar método")
+      toast(editingId ? "Método actualizado" : "Método de pago creado", "success")
+      setMethodModal(false)
+      fetchMethods()
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Error al guardar", "error")
+    }
+  }
+
+  const handleToggleMethod = async (m: PaymentMethod) => {
+    try {
+      const res = await fetch(`/api/secretario/payment-methods/${m.id}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: m.is_active ? 0 : 1 }),
+      })
+      if (!res.ok) throw new Error("Error al actualizar método")
+      fetchMethods()
+    } catch {
+      toast("Error al actualizar método", "error")
+    }
+  }
+
+  const handleDeleteMethod = async (id: string) => {
+    if (!confirm("¿Eliminar este método de pago?")) return
+    try {
+      const res = await fetch(`/api/secretario/payment-methods/${id}`, { method: "DELETE" })
+      if (!res.ok) throw new Error("Error al eliminar método")
+      toast("Método eliminado", "success")
+      fetchMethods()
+    } catch {
+      toast("Error al eliminar método", "error")
+    }
+  }
+
   const tabs = [
     { id: "all", label: "Todos", count: payments.length },
     { id: "pending", label: "Pendientes", count: pendingCount },
@@ -315,6 +395,10 @@ export default function PagosPage() {
             <SbBtn rounded className="flex items-center gap-2" onClick={() => setConceptModal(true)}>
               <Settings2 className="h-3.5 w-3.5" />
               Conceptos
+            </SbBtn>
+            <SbBtn rounded className="flex items-center gap-2" onClick={() => setMethodModal(true)}>
+              <CreditCard className="h-3.5 w-3.5" />
+              Métodos de pago
             </SbBtn>
             <SbBtn rounded className="flex items-center gap-2" onClick={() => setDebtModal(true)}>
               <TrendingDown className="h-3.5 w-3.5" />
@@ -894,6 +978,109 @@ export default function PagosPage() {
                 <SbBtn variant="filled" rounded className="w-full flex items-center justify-center gap-2 h-10" type="submit">
                   <Save className="h-3.5 w-3.5" />
                   Guardar concepto
+                </SbBtn>
+              </div>
+            </form>
+          </div>
+        </SbModalBody>
+      </SbModal>
+
+      {/* ===== PAYMENT METHODS MODAL ===== */}
+      <SbModal open={methodModal} onClose={() => setMethodModal(false)} maxWidth="620px">
+        <SbModalHeader title="Métodos de pago" onClose={() => setMethodModal(false)} />
+        <SbModalBody>
+          <p className="text-xs text-sb-on-surface-variant/40 mb-4 leading-relaxed">
+            Estas son las formas de pago que verán los padres en su portal. Configura tus cuentas bancarias, Yape, Plin, etc.
+          </p>
+
+          {methods.length === 0 ? (
+            <div className="text-center py-12 mb-4">
+              <CreditCard className="h-12 w-12 text-sb-on-surface-variant/10 mx-auto mb-3" />
+              <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay métodos de pago configurados</p>
+            </div>
+          ) : (
+            <div className="space-y-2 mb-6">
+              <AnimatePresence>
+                {methods.map((m, i) => {
+                  const cfg = methodConfig[m.type] || methodConfig.otro
+                  const Icon = cfg.icon
+                  return (
+                    <motion.div
+                      key={m.id}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ delay: i * 0.03 }}
+                      className={`flex items-center justify-between p-3.5 rounded-xl bg-sb-surface-container/50 hover:bg-sb-surface-container transition-colors ${m.is_active ? "" : "opacity-50"}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${cfg.bg}`}>
+                          <Icon className={`h-4 w-4 ${cfg.color}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-sb-on-surface truncate">{m.name}</p>
+                          <p className="text-[11px] text-sb-on-surface-variant/40 truncate">
+                            {cfg.label}
+                            {m.bank_name && ` · ${m.bank_name}`}
+                            {m.account_number && ` · ${m.account_number}`}
+                            {m.phone && ` · ${m.phone}`}
+                            {!m.is_active && " · Inactivo"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleMethod(m)}
+                          title={m.is_active ? "Desactivar" : "Activar"}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors"
+                        >
+                          <CheckCircle className={`h-3.5 w-3.5 ${m.is_active ? "text-emerald-500" : ""}`} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMethod(m.id)}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-sb-on-surface-variant/40 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </AnimatePresence>
+            </div>
+          )}
+
+          <div className="pt-4 border-t border-sb-outline-variant/10">
+            <p className="text-xs font-medium text-sb-on-surface-variant/60 mb-3">Nuevo método de pago</p>
+            <form id="method-form" onSubmit={handleSaveMethod}>
+              <input type="hidden" name="method_editing_id" />
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <select name="method_type" required className="sbf-native-select w-full">
+                    <option value="">Tipo</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="deposito">Depósito bancario</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="yape">Yape</option>
+                    <option value="plin">Plin</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                  <input name="method_name" placeholder="Nombre (ej: BCP)" required className="sb-input rounded-xl text-sm h-10 w-full" />
+                </div>
+                <input name="method_bank" placeholder="Banco (opcional)" className="sb-input rounded-xl text-sm h-10 w-full" />
+                <div className="grid grid-cols-2 gap-3">
+                  <input name="method_account" placeholder="Nº cuenta / CCI (opcional)" className="sb-input rounded-xl text-sm h-10 w-full" />
+                  <input name="method_holder" placeholder="Titular (opcional)" className="sb-input rounded-xl text-sm h-10 w-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <input name="method_phone" placeholder="Teléfono Yape/Plin (opcional)" className="sb-input rounded-xl text-sm h-10 w-full" />
+                  <input name="method_details" placeholder="Detalle / horario (opcional)" className="sb-input rounded-xl text-sm h-10 w-full" />
+                </div>
+                <SbBtn variant="filled" rounded className="w-full flex items-center justify-center gap-2 h-10" type="submit">
+                  <Save className="h-3.5 w-3.5" />
+                  Guardar método de pago
                 </SbBtn>
               </div>
             </form>
