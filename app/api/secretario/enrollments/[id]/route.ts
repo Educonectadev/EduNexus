@@ -139,7 +139,8 @@ export async function DELETE(
     await conn.beginTransaction()
 
     const [current] = await conn.query(
-      `SELECT e.student_id FROM enrollments e
+      `SELECT e.student_id, s.user_id as student_user_id
+       FROM enrollments e
        JOIN students s ON e.student_id = s.id
        WHERE e.id = ? AND s.institution_id = ?`,
       [id, instId]
@@ -149,7 +150,54 @@ export async function DELETE(
       return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
     }
 
-    await conn.query('DELETE FROM enrollments WHERE id = ?', [id])
+    const studentId = (current as any[])[0].student_id
+    const studentUserId = (current as any[])[0].student_user_id
+
+    // Parents linked only to this student (no other children in this institution)
+    const [linkedParents] = await conn.query(
+      `SELECT ps.parent_id, p.user_id as parent_user_id
+       FROM parent_student ps
+       LEFT JOIN parents p ON p.id = ps.parent_id
+       WHERE ps.student_id = ?`,
+      [studentId]
+    )
+
+    const orphanParentIds: string[] = []
+    const orphanParentUserIds: (string | null)[] = []
+    for (const link of linkedParents as any[]) {
+      const [otherChildren] = await conn.query(
+        `SELECT COUNT(*) as c FROM parent_student ps
+         JOIN students s ON s.id = ps.student_id
+         WHERE ps.parent_id = ? AND ps.student_id != ? AND s.institution_id = ?`,
+        [link.parent_id, studentId, instId]
+      )
+      if (((otherChildren as any[])[0]?.c ?? 0) === 0) {
+        orphanParentIds.push(link.parent_id)
+        if (link.parent_user_id) orphanParentUserIds.push(link.parent_user_id)
+      }
+    }
+
+    // Delete enrollment rows for this student (all of them, not just this one)
+    await conn.query('DELETE FROM enrollments WHERE student_id = ?', [studentId])
+    // Unlink parents from this student
+    await conn.query('DELETE FROM parent_student WHERE student_id = ?', [studentId])
+    // Delete orphaned parents
+    if (orphanParentIds.length > 0) {
+      await conn.query('DELETE FROM parents WHERE id IN (?)', [orphanParentIds])
+    }
+    // Delete orphaned parent user accounts
+    for (const uid of orphanParentUserIds) {
+      if (!uid) continue
+      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
+      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+    }
+    // Delete student user account if any
+    if (studentUserId) {
+      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [studentUserId])
+      await conn.query('DELETE FROM users WHERE id = ?', [studentUserId])
+    }
+    // Delete student (payments/grades/attendance/issued_documents cascade)
+    await conn.query('DELETE FROM students WHERE id = ?', [studentId])
 
     await conn.commit()
 
@@ -160,10 +208,10 @@ export async function DELETE(
       action: 'delete',
       entity: 'enrollment',
       entityId: id,
-      details: {},
+      details: { studentId, studentDeleted: true, parentsDeleted: orphanParentIds.length },
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, studentDeleted: true, parentsDeleted: orphanParentIds.length })
   } catch (error: any) {
     if (conn) {
       try { await conn.rollback() } catch {}

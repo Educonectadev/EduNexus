@@ -358,7 +358,7 @@ export default function SecretarioMatriculasPage() {
         setDeleteOpen(false)
         setDetailOpen(false)
         setSelected(null)
-        setEnrollments(prev => prev.filter(e => e.id !== selected.id))
+        fetchEnrollments()
       } else {
         const data = await res.json().catch(() => ({}))
         console.error("[Delete enrollment] Server error:", res.status, data)
@@ -737,10 +737,11 @@ export default function SecretarioMatriculasPage() {
       <AnimatePresence>
         {deleteOpen && selected && (
           <Modal onClose={() => setDeleteOpen(false)}>
-            <ModalHeader title="Eliminar Matrícula" onClose={() => setDeleteOpen(false)} />
+            <ModalHeader title="Eliminar Alumno" onClose={() => setDeleteOpen(false)} />
             <div className="sb-modal-body">
               <p className="text-sm text-sb-on-surface-variant/60">
-                ¿Estás seguro de eliminar la matrícula de <strong className="text-sb-on-surface">{selected.first_name} {selected.last_name}</strong>?
+                ¿Estás seguro de eliminar <strong className="text-sb-on-surface">{selected.first_name} {selected.last_name}</strong>?
+                Se eliminará su matrícula, sus datos de alumno y las cuentas de sus padres/apoderados.
                 Esta acción no se puede deshacer.
               </p>
               {errorMsg && (
