@@ -13,8 +13,6 @@ import {
   Terminal,
   Shield,
   LogOut,
-  Menu,
-  X,
   Sun,
   Moon,
   Code2,
@@ -22,12 +20,16 @@ import {
   Activity,
   CreditCard,
   UserCircle,
-  FileText,
   Inbox,
-  ChevronRight,
-  DollarSign,
+  Bell,
+  Search,
   BarChart3,
   HardDrive,
+  X,
+  Sparkles,
+  DollarSign,
+  ArrowRight,
+  Clock,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
@@ -37,28 +39,43 @@ interface NavItem {
   href: string
   icon: React.ComponentType<{ className?: string }>
   badge?: string
-  section?: 'main' | 'tools' | 'system'
 }
 
-const devNav: NavItem[] = [
-  { title: "Overview", href: "/dev", icon: LayoutDashboard, section: 'main' },
-  { title: "Solicitudes", href: "/dev/demo", icon: Inbox, badge: "NEW", section: 'main' },
-  { title: "Instituciones", href: "/dev/instituciones", icon: Building2, section: 'main' },
-  { title: "Usuarios", href: "/dev/usuarios", icon: Users, section: 'main' },
-  { title: "Planes", href: "/dev/planes", icon: CreditCard, section: 'main' },
-  { title: "Facturación", href: "/dev/facturacion", icon: DollarSign, section: 'main' },
-  { title: "Reportes", href: "/dev/reportes", icon: BarChart3, section: 'main' },
-  { title: "Contraseñas", href: "/dev/contrasenas", icon: Key, section: 'tools' },
-  { title: "Seguimiento", href: "/dev/seguimiento", icon: Activity, section: 'tools' },
-  { title: "Database", href: "/dev/database", icon: Database, badge: "SQL", section: 'tools' },
-  { title: "Seed", href: "/dev/seed", icon: Terminal, badge: "DEV", section: 'tools' },
-  { title: "Audit", href: "/dev/audit", icon: Shield, section: 'system' },
-  { title: "Backups", href: "/dev/backups", icon: HardDrive, section: 'system' },
-  { title: "Perfil", href: "/dev/perfil", icon: UserCircle, section: 'system' },
-  { title: "Settings", href: "/dev/config", icon: Settings, section: 'system' },
+const navSections: { title: string; items: NavItem[] }[] = [
+  {
+    title: "Principal",
+    items: [
+      { title: "Overview", href: "/dev", icon: LayoutDashboard },
+      { title: "Solicitudes", href: "/dev/demo", icon: Inbox, badge: "NEW" },
+      { title: "Instituciones", href: "/dev/instituciones", icon: Building2 },
+      { title: "Usuarios", href: "/dev/usuarios", icon: Users },
+      { title: "Planes", href: "/dev/planes", icon: CreditCard },
+      { title: "Facturación", href: "/dev/facturacion", icon: DollarSign },
+      { title: "Reportes", href: "/dev/reportes", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "Herramientas",
+    items: [
+      { title: "Contraseñas", href: "/dev/contrasenas", icon: Key },
+      { title: "Seguimiento", href: "/dev/seguimiento", icon: Activity },
+      { title: "Database", href: "/dev/database", icon: Database, badge: "SQL" },
+      { title: "Seed", href: "/dev/seed", icon: Terminal, badge: "DEV" },
+    ],
+  },
+  {
+    title: "Sistema",
+    items: [
+      { title: "Audit", href: "/dev/audit", icon: Shield },
+      { title: "Backups", href: "/dev/backups", icon: HardDrive },
+      { title: "Perfil", href: "/dev/perfil", icon: UserCircle },
+      { title: "Settings", href: "/dev/config", icon: Settings },
+    ],
+  },
 ]
 
-const mobileNav = devNav.filter(n => ["Overview","Solicitudes","Instituciones","Usuarios","Database"].includes(n.title))
+const allNav = navSections.flatMap(s => s.items)
+const mobileNav = allNav.filter(n => ["Overview", "Solicitudes", "Instituciones", "Usuarios", "Database"].includes(n.title))
 
 export default function DevLayout({
   children,
@@ -67,333 +84,299 @@ export default function DevLayout({
 }) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  const [sidebarOpen, setSidebarOpen] = React.useState<boolean>(() => {
+    if (typeof window === "undefined") return true
+    const saved = window.localStorage.getItem("dev-sidebar-open")
+    return saved === null ? true : saved === "1"
+  })
+  const [drawerOpen, setDrawerOpen] = React.useState(false)
+  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const searchRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
-    const saved = localStorage.getItem("sb-theme-variant")
-    if (saved) document.documentElement.setAttribute("data-theme", saved)
-  }, [])
+    if (searchOpen && searchRef.current) searchRef.current.focus()
+  }, [searchOpen])
 
-  const sections = {
-    main: devNav.filter(n => n.section === 'main'),
-    tools: devNav.filter(n => n.section === 'tools'),
-    system: devNav.filter(n => n.section === 'system'),
+  const toggleSidebar = () => {
+    setSidebarOpen(prev => {
+      const next = !prev
+      localStorage.setItem("dev-sidebar-open", next ? "1" : "0")
+      return next
+    })
   }
 
-  const NavItem = ({ item }: { item: NavItem }) => {
-    const isActive = pathname === item.href || (item.href !== "/dev" && pathname.startsWith(item.href))
-    return (
-      <Link href={item.href} className="group relative">
-        <div
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-150",
-            isActive
-              ? "bg-zinc-900 text-white font-medium dark:bg-white dark:text-zinc-900"
-              : "text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60 hover:text-sb-on-surface"
-          )}
-        >
-          <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-white dark:text-zinc-900" : "")} />
-          <span className="truncate">{item.title}</span>
-          {item.badge && (
-            <span className={cn(
-              "ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-md",
-              item.badge === 'NEW' 
-                ? "bg-emerald-500 text-white" 
-                : item.badge === 'DEV'
-                  ? "bg-amber-500 text-white"
-                  : "bg-sb-surface-container text-sb-on-surface-variant"
-            )}>
-              {item.badge}
+  const isActive = (href: string) =>
+    href === "/dev" ? pathname === "/dev" : pathname === href || pathname.startsWith(href + "/")
+
+  const filteredNav = allNav.filter(item =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const pageTitle = allNav.find(n => isActive(n.href))?.title || "Overview"
+
+  return (
+    <div className="flex h-screen overflow-hidden text-[var(--sb-on-background)]" style={{ background: "var(--sb-background)" }}>
+
+      {/* ===== DESKTOP SIDEBAR ===== */}
+      <aside className={cn(
+        "hidden md:flex flex-col h-screen w-[64px] border-r border-sb-outline-variant/8 transition-[width] duration-200 ease-out overflow-hidden shrink-0",
+        "bg-sb-surface z-10",
+        sidebarOpen && "w-[240px]"
+      )}>
+        {/* Logo */}
+        <div className={cn("flex items-center h-14 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
+          <div className="flex items-center justify-center w-7 h-7 rounded-[6px] bg-sb-on-surface shrink-0">
+            <Code2 className="h-[15px] w-[15px] text-sb-on-primary" />
+          </div>
+          {sidebarOpen && (
+            <span className="text-[13px] font-medium text-sb-on-surface tracking-tight truncate">
+              Dev Console
             </span>
           )}
         </div>
-      </Link>
-    )
-  }
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-sb-background text-sb-on-surface">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-[240px] h-full border-r border-sb-outline-variant/8 bg-sb-surface">
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 shrink-0">
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-sb-on-surface">
-            <Code2 className="h-4.5 w-4.5 text-sb-on-primary" />
-          </div>
-          <div>
-            <p className="text-[13px] font-semibold text-sb-on-surface">Developer</p>
-            <p className="text-[10px] text-sb-on-surface-variant/40">Educonecta Panel</p>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-          {/* Main */}
-          <div>
-            <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Principal</p>
-            <div className="space-y-0.5">
-              {sections.main.map(item => <NavItem key={item.href} item={item} />)}
+        {/* Nav grouped by sections */}
+        <nav className={cn(
+          "flex flex-col flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+          sidebarOpen ? "px-2 py-3 gap-4" : "px-2 py-3 gap-2"
+        )}>
+          {navSections.map((section, sIdx) => (
+            <div key={section.title} className="flex flex-col gap-px">
+              {sidebarOpen && (
+                <h3 className={cn(
+                  "px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50",
+                  sIdx > 0 && "mt-1"
+                )}>
+                  {section.title}
+                </h3>
+              )}
+              {section.items.map((item) => {
+                const active = isActive(item.href)
+                const cls = cn(
+                  "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                  sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                  active
+                    ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+                    : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+                )
+                return (
+                  <Link key={item.href} href={item.href} className={cls} title={!sidebarOpen ? item.title : undefined}>
+                    {!sidebarOpen && (
+                      <motion.span
+                        className="absolute inset-0"
+                        initial={false}
+                        animate={{
+                          borderRadius: active ? 6 : 999,
+                          backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                        }}
+                        whileHover={{ backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                      />
+                    )}
+                    <motion.span
+                      className="relative z-10"
+                      whileTap={{ scale: 0.9 }}
+                      animate={{
+                        scale: active ? 1.1 : 1,
+                        opacity: active ? 1 : 0.7,
+                      }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                    >
+                      <item.icon className="h-[16px] w-[16px] shrink-0" />
+                    </motion.span>
+                    {sidebarOpen && (
+                      <span className={cn(
+                        "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
+                        active ? "font-medium" : "font-normal"
+                      )}>
+                        {item.title}
+                      </span>
+                    )}
+                    {sidebarOpen && item.badge && (
+                      <span className={cn(
+                        "ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-[4px]",
+                        item.badge === 'NEW' ? "bg-emerald-500 text-white"
+                          : item.badge === 'DEV' ? "bg-amber-500 text-white"
+                            : "bg-sb-surface-container text-sb-on-surface-variant"
+                      )}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                )
+              })}
             </div>
-          </div>
-
-          {/* Tools */}
-          <div>
-            <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Herramientas</p>
-            <div className="space-y-0.5">
-              {sections.tools.map(item => <NavItem key={item.href} item={item} />)}
-            </div>
-          </div>
-
-          {/* System */}
-          <div>
-            <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Sistema</p>
-            <div className="space-y-0.5">
-              {sections.system.map(item => <NavItem key={item.href} item={item} />)}
-            </div>
-          </div>
+          ))}
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 py-4 border-t border-sb-outline-variant/8 space-y-1">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-[13px] text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60 hover:text-sb-on-surface transition-colors"
-          >
-            <span className="relative h-4 w-4">
-              <Sun className="absolute inset-0 h-4 w-4 transition-all duration-300 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute inset-0 h-4 w-4 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
-            </span>
-            <span>Tema</span>
-          </button>
-          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60 hover:text-sb-on-surface transition-colors">
-            <LogOut className="h-4 w-4" />
-            <span>Salir</span>
-          </Link>
+        <div className="shrink-0 border-t border-sb-outline-variant/6 px-2 py-2 space-y-3">
+          {/* Herramientas section */}
+          <div className="flex flex-col gap-px">
+            {sidebarOpen && (
+              <h3 className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">
+                Herramientas
+              </h3>
+            )}
+
+            {/* Theme */}
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              <div className="relative shrink-0 w-[16px] h-[16px]">
+                <Sun className={cn("absolute inset-0 h-[16px] w-[16px] transition-all duration-200", theme === "dark" ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100")} />
+                <Moon className={cn("absolute inset-0 h-[16px] w-[16px] transition-all duration-200", theme === "dark" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0")} />
+              </div>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Tema</span>}
+            </button>
+
+            {/* Collapse */}
+            <button onClick={toggleSidebar}
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/50 hover:bg-sb-surface-container/60 hover:text-sb-on-surface-variant dark:text-sb-solid-fg/45 dark:hover:text-sb-solid-fg"
+              )}>
+              <svg className={cn("h-[16px] w-[16px] shrink-0 transition-transform duration-200", !sidebarOpen && "rotate-180")}
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Colapsar</span>}
+            </button>
+          </div>
+
+          {/* Cuenta section */}
+          <div className="flex flex-col gap-px border-t border-sb-outline-variant/6 pt-2">
+            {sidebarOpen && (
+              <h3 className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">
+                Cuenta
+              </h3>
+            )}
+            <Link href="/dev/perfil"
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                isActive("/dev/perfil")
+                  ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+                  : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              {!sidebarOpen && (
+                <motion.span
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{
+                    borderRadius: isActive("/dev/perfil") ? 6 : 999,
+                    backgroundColor: isActive("/dev/perfil") ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                  }}
+                  whileHover={{ backgroundColor: isActive("/dev/perfil") ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                />
+              )}
+              <motion.span
+                className="relative z-10"
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: isActive("/dev/perfil") ? 1.1 : 1,
+                  opacity: isActive("/dev/perfil") ? 1 : 0.7,
+                }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                <UserCircle className="h-[16px] w-[16px] shrink-0" />
+              </motion.span>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Perfil</span>}
+            </Link>
+            <Link href="/"
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              <LogOut className="h-[16px] w-[16px] shrink-0" />
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Salir</span>}
+            </Link>
+          </div>
         </div>
       </aside>
 
-      {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed left-0 top-0 bottom-0 w-[280px] bg-sb-surface z-50 flex flex-col lg:hidden border-r border-sb-outline-variant/8 shadow-2xl"
-            >
-              {/* Mobile sidebar header */}
-              <div className="flex items-center justify-between px-5 h-16 shrink-0 border-b border-sb-outline-variant/8">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-sb-on-surface">
-                    <Code2 className="h-4.5 w-4.5 text-sb-on-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-sb-on-surface">Developer</p>
-                    <p className="text-[10px] text-sb-on-surface-variant/40">Educonecta Panel</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setSidebarOpen(false)} 
-                  className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors"
-                >
-                  <X className="h-5 w-5 text-sb-on-surface-variant/60" />
-                </button>
-              </div>
-
-              {/* Mobile sidebar nav */}
-              <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-                <div>
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Principal</p>
-                  <div className="space-y-0.5">
-                    {sections.main.map(item => {
-                      const isActive = pathname === item.href || (item.href !== "/dev" && pathname.startsWith(item.href))
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-all",
-                            isActive
-                              ? "bg-zinc-900 text-white font-medium dark:bg-white dark:text-zinc-900"
-                              : "text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60"
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          <span className="flex-1">{item.title}</span>
-                          {item.badge && (
-                            <span className={cn(
-                              "text-[9px] font-bold px-1.5 py-0.5 rounded-md",
-                              item.badge === 'NEW' ? "bg-emerald-500 text-white" : "bg-sb-surface-container text-sb-on-surface-variant"
-                            )}>
-                              {item.badge}
-                            </span>
-                          )}
-                          <ChevronRight className="h-3.5 w-3.5 text-sb-on-surface-variant/30" />
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Herramientas</p>
-                  <div className="space-y-0.5">
-                    {sections.tools.map(item => {
-                      const isActive = pathname === item.href || (item.href !== "/dev" && pathname.startsWith(item.href))
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-all",
-                            isActive
-                              ? "bg-zinc-900 text-white font-medium dark:bg-white dark:text-zinc-900"
-                              : "text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60"
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          <span className="flex-1">{item.title}</span>
-                          {item.badge && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-sb-surface-container text-sb-on-surface-variant">
-                              {item.badge}
-                            </span>
-                          )}
-                          <ChevronRight className="h-3.5 w-3.5 text-sb-on-surface-variant/30" />
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="px-3 mb-2 text-[10px] font-semibold text-sb-on-surface-variant/30 uppercase tracking-widest">Sistema</p>
-                  <div className="space-y-0.5">
-                    {sections.system.map(item => {
-                      const isActive = pathname === item.href || (item.href !== "/dev" && pathname.startsWith(item.href))
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-all",
-                            isActive
-                              ? "bg-zinc-900 text-white font-medium dark:bg-white dark:text-zinc-900"
-                              : "text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60"
-                          )}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          <span className="flex-1">{item.title}</span>
-                          <ChevronRight className="h-3.5 w-3.5 text-sb-on-surface-variant/30" />
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </div>
-              </nav>
-
-              {/* Mobile sidebar footer */}
-              <div className="px-4 py-4 border-t border-sb-outline-variant/8 space-y-2">
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-[14px] text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60 transition-colors"
-                >
-                  <span className="relative h-4 w-4">
-                    <Sun className="absolute inset-0 h-4 w-4 transition-all duration-300 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute inset-0 h-4 w-4 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
-                  </span>
-                  <span>Cambiar tema</span>
-                </button>
-                <Link
-                  href="/"
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high/60 transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Cerrar sesión</span>
-                </Link>
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Main content */}
+      {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile top bar - compact */}
-        <header className="flex items-center justify-between h-14 px-4 shrink-0 border-b border-sb-outline-variant/8 lg:h-16 lg:px-5">
+        {/* Minimal Header */}
+        <header className="flex items-center justify-between h-14 px-6 shrink-0">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-sb-surface-container-high transition-colors"
+              onClick={() => setDrawerOpen(true)}
+              className="md:hidden p-2 -ml-2 rounded-xl hover:bg-sb-surface-container-high transition-colors"
             >
-              <Menu className="h-5 w-5 text-sb-on-surface-variant/60" />
+              <svg className="h-5 w-5 text-sb-on-surface-variant/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
-            <h1 className="text-[15px] font-medium text-sb-on-surface lg:text-[15px]">
-              {devNav.find(n => pathname === n.href || (n.href !== "/dev" && pathname.startsWith(n.href)))?.title || "Overview"}
-            </h1>
+            <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageTitle}</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
               <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] text-emerald-500 font-medium">Online</span>
             </div>
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="relative p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors overflow-hidden"
-              title="Toggle theme"
-            >
-              <Sun className="h-4 w-4 text-sb-on-surface-variant/50 transition-all duration-300 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute inset-0 m-auto h-4 w-4 text-sb-on-surface-variant/50 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
+
+            <div className="flex md:hidden items-center gap-1 mr-1">
+              <button onClick={() => { setSearchOpen(true) }}
+                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
+                <Search className="h-[18px] w-[18px]" />
+              </button>
+              <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
+                <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </button>
+            </div>
+
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hidden md:flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all relative"
+              title="Toggle theme">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-auto px-4 pb-28 lg:px-5 lg:pb-6">
+        <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}>
               {children}
             </motion.div>
           </AnimatePresence>
         </main>
 
-        {/* Mobile bottom tab bar - modern pill style */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
+        {/* ===== MOBILE BOTTOM NAV ===== */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40">
           <div className="mx-3 mb-3">
             <div className="flex items-center justify-around bg-sb-surface/80 backdrop-blur-xl border border-sb-outline-variant/20 rounded-2xl px-2 py-1.5 shadow-lg shadow-black/10 dark:bg-sb-surface-container/80 dark:shadow-black/30">
               {mobileNav.map((item) => {
-                const isActive = pathname === item.href || (item.href !== "/dev" && pathname.startsWith(item.href))
+                const active = isActive(item.href)
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={cn(
                       "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 min-w-[52px]",
-                      isActive
+                      active
                         ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
                         : "text-sb-on-surface-variant/50 hover:text-sb-on-surface"
                     )}
                   >
-                    <item.icon className={cn("h-5 w-5 transition-all", isActive && "stroke-[2.5]")} />
-                    <span className={cn("text-[9px] font-medium leading-tight", isActive && "font-semibold")}>
+                    <item.icon className={cn("h-5 w-5 transition-all", active && "stroke-[2.5]")} />
+                    <span className={cn("text-[9px] font-medium leading-tight", active && "font-semibold")}>
                       {item.title.slice(0, 6)}
                     </span>
                   </Link>
@@ -402,6 +385,145 @@ export default function DevLayout({
             </div>
           </div>
         </nav>
+
+        {/* ===== SEARCH OVERLAY ===== */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 md:hidden bg-background/80 backdrop-blur-3xl">
+              <div className="flex flex-col h-full">
+                <div className="flex items-center gap-3 px-4 h-14">
+                  <button onClick={() => { setSearchOpen(false); setSearchQuery("") }}
+                    className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 transition-all">
+                    <X className="h-5 w-5" />
+                  </button>
+                  <input ref={searchRef} type="text" placeholder="Buscar secciones..." value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="flex-1 bg-transparent text-sm text-sb-on-surface placeholder:text-sb-on-surface-variant/60 outline-none" />
+                </div>
+                <div className="flex-1 overflow-auto">
+                  {searchQuery ? (
+                    <div className="py-2">
+                      {filteredNav.length > 0 ? filteredNav.map(item => (
+                        <Link key={item.href} href={item.href} onClick={() => { setSearchOpen(false); setSearchQuery("") }}
+                          className="flex items-center gap-3 px-5 py-3 hover:bg-sb-surface-container-highest/50 transition-colors">
+                          <div className="h-9 w-9 rounded-xl bg-sb-surface-container-high flex items-center justify-center">
+                            <item.icon className="h-4 w-4 text-sb-on-surface-variant" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-sb-on-surface">{item.title}</p>
+                            <p className="text-xs text-sb-on-surface-variant/60">{item.href}</p>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-sb-on-surface-variant/30" />
+                        </Link>
+                      )) : (
+                        <div className="px-5 py-12 text-center">
+                          <p className="text-sm text-sb-on-surface-variant/60">Sin resultados</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="px-5 py-8">
+                      <p className="text-[10px] font-medium text-sb-on-surface-variant/60 uppercase tracking-wider mb-3">Accesos rápidos</p>
+                      <div className="space-y-1">
+                        {allNav.slice(0, 5).map(item => (
+                          <Link key={item.href} href={item.href} onClick={() => setSearchOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sb-surface-container-highest/50 transition-colors">
+                            <item.icon className="h-4 w-4 text-sb-on-surface-variant" />
+                            <span className="text-sm text-sb-on-surface/70">{item.title}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ===== MOBILE DRAWER ===== */}
+        <AnimatePresence>
+          {drawerOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden"
+                onClick={() => setDrawerOpen(false)}
+              />
+              <motion.aside
+                initial={{ x: -300 }}
+                animate={{ x: 0 }}
+                exit={{ x: -300 }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                className="fixed left-0 top-0 bottom-0 w-[280px] bg-sb-surface z-50 flex flex-col md:hidden border-r border-sb-outline-variant/8 shadow-2xl"
+              >
+                <div className="flex items-center justify-between px-4 h-14 shrink-0 border-b border-sb-outline-variant/8">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex items-center justify-center w-7 h-7 rounded-[6px] bg-sb-on-surface">
+                      <Code2 className="h-[15px] w-[15px] text-sb-on-primary" />
+                    </div>
+                    <span className="text-[14px] font-medium text-sb-on-surface">Dev Console</span>
+                  </div>
+                  <button onClick={() => setDrawerOpen(false)} className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors">
+                    <X className="h-5 w-5 text-sb-on-surface-variant/60" />
+                  </button>
+                </div>
+                <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
+                  {navSections.map(section => (
+                    <div key={section.title}>
+                      <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">{section.title}</p>
+                      <div className="space-y-0.5">
+                        {section.items.map(item => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setDrawerOpen(false)}
+                            className={cn(
+                              "flex items-center gap-3 px-2.5 py-2.5 rounded-[6px] text-[13px] transition-colors",
+                              isActive(item.href)
+                                ? "bg-sb-on-surface text-sb-surface font-medium"
+                                : "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface"
+                            )}
+                          >
+                            <item.icon className="h-[16px] w-[16px] shrink-0" />
+                            <span className="flex-1">{item.title}</span>
+                            {item.badge && (
+                              <span className={cn(
+                                "text-[9px] font-bold px-1.5 py-0.5 rounded-[4px]",
+                                item.badge === 'NEW' ? "bg-emerald-500 text-white"
+                                  : item.badge === 'DEV' ? "bg-amber-500 text-white"
+                                    : "bg-sb-surface-container text-sb-on-surface-variant"
+                              )}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </nav>
+                <div className="px-3 py-3 border-t border-sb-outline-variant/8 space-y-1">
+                  <button onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); setDrawerOpen(false) }}
+                    className="flex items-center gap-3 w-full px-2.5 py-2.5 rounded-[6px] text-[13px] text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface transition-colors">
+                    <Sun className="h-[16px] w-[16px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute h-[16px] w-[16px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span>Tema</span>
+                  </button>
+                  <Link href="/" onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-2.5 py-2.5 rounded-[6px] text-[13px] text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface transition-colors">
+                    <LogOut className="h-[16px] w-[16px]" />
+                    <span>Salir</span>
+                  </Link>
+                </div>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
