@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
+import { MobileNavbar } from "@/components/ui/mobile-navbar"
 import AIAssistant from "@/components/secretario/ai-assistant"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
 import { usePlanPermissions } from "@/hooks/use-plan-permissions"
@@ -592,7 +593,15 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         </main>
 
         {/* ===== MOBILE BOTTOM NAV ===== */}
-        {/* Eliminado: Pill flotante y Barra inferior */}
+        {role && (
+          <MobileNavbar
+            items={visibleNavItems}
+            activeHref={pathname}
+            role={role}
+            onAiClick={can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
+            maxVisible={4}
+          />
+        )}
 
         {/* ===== SEARCH OVERLAY ===== */}
         <AnimatePresence>

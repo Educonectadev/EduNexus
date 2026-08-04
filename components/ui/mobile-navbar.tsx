@@ -84,19 +84,7 @@ export function MobileNavbar({
 }: MobileNavbarProps) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = React.useState(false)
-  const [navStyle, setNavStyle] = React.useState<string>("pill")
-
-  React.useEffect(() => {
-    const apply = () =>
-      setNavStyle(document.documentElement.getAttribute("data-nav-style") || "pill")
-    apply()
-    const observer = new MutationObserver(apply)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-nav-style"],
-    })
-    return () => observer.disconnect()
-  }, [])
+  const navStyle = "minimal"
 
   const visibleItems = items.slice(0, maxVisible)
   const optionsItems = items.slice(maxVisible)
