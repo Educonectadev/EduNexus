@@ -354,7 +354,7 @@ export default function GestionAcademicaPage() {
               <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Nivel</label>
               <div className="flex gap-1.5">
                 {institutionLevels.map(level => (
-                  <button key={level} onClick={() => setGenerateLevel(level)} className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${generateLevel === level ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high"}`}>{level}</button>
+                  <button key={level} onClick={() => { setGenerateLevel(level); setGenerateCount(getMaxYear(level)) }} className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${generateLevel === level ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high"}`}>{level}</button>
                 ))}
               </div>
             </div>
@@ -369,7 +369,7 @@ export default function GestionAcademicaPage() {
             <div className="bg-sb-surface-container/50 rounded-xl p-3">
               <p className="text-[10px] text-sb-on-surface-variant/40 mb-1.5">Se generarán:</p>
               <div className="flex flex-wrap gap-1">
-                {Array.from({ length: generateCount }, (_, i) => i + 1).map(year => (
+                {Array.from({ length: Math.min(generateCount, getMaxYear(generateLevel)) }, (_, i) => i + 1).map(year => (
                   <span key={year} className="text-[11px] px-2 py-0.5 rounded-full bg-sb-on-surface/8 text-sb-on-surface">{generateName(generateLevel, year)}</span>
                 ))}
               </div>
