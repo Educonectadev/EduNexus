@@ -27,7 +27,29 @@ export async function GET(request: NextRequest) {
     )
     const record = (rows as any[])[0] || null
 
-    return NextResponse.json({ attendance: record, date })
+    const dayOfWeek = new Date(date + 'T00:00:00').getDay()
+    const scheduleDay = dayOfWeek >= 1 && dayOfWeek <= 5 ? dayOfWeek : null
+    let schedule = null
+    if (scheduleDay) {
+      const [schedRows] = await pool.query(
+        `SELECT MIN(h.start_time) as start_time, MAX(h.end_time) as end_time, COUNT(*) as blocks
+         FROM horarios h
+         JOIN courses c ON h.course_id = c.id
+         JOIN teachers t ON c.teacher_id = t.id
+         WHERE t.user_id = ? AND h.status = 'active' AND h.day_of_week = ?`,
+        [userId, scheduleDay]
+      )
+      const s = (schedRows as any[])[0]
+      if (s && s.start_time) {
+        schedule = {
+          start_time: (s.start_time as string).slice(0, 5),
+          end_time: (s.end_time as string).slice(0, 5),
+          blocks: s.blocks,
+        }
+      }
+    }
+
+    return NextResponse.json({ attendance: record, schedule, date })
   } catch (error) {
     return NextResponse.json({ error: 'Error fetching attendance' }, { status: 500 })
   }
@@ -56,6 +78,26 @@ export async function POST(request: NextRequest) {
     const now = new Date()
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
 
+    const dayOfWeek = new Date(today + 'T00:00:00').getDay()
+    const scheduleDay = dayOfWeek >= 1 && dayOfWeek <= 5 ? dayOfWeek : null
+
+    const [schedRows] = scheduleDay ? await pool.query(
+      `SELECT MIN(h.start_time) as start_time, MAX(h.end_time) as end_time
+       FROM horarios h
+       JOIN courses c ON h.course_id = c.id
+       JOIN teachers t ON c.teacher_id = t.id
+       WHERE t.user_id = ? AND h.status = 'active' AND h.day_of_week = ?`,
+      [userId, scheduleDay]
+    ) : [[{ start_time: null, end_time: null }]]
+    const sched = (schedRows as any[])[0]
+    const scheduleStart = sched?.start_time || null
+    const scheduleEnd = sched?.end_time || null
+
+    const graceMinutes = 15
+    const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m }
+    const applyGrace = (t: string) => toMin(t) + graceMinutes
+    const fmt = (mins: number) => `${String(Math.floor(mins / 60) % 24).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}:00`
+
     const [existing] = await pool.query(
       `SELECT id, check_in, check_out, status FROM teacher_attendance WHERE teacher_id = ? AND date = ?`,
       [userId, today]
@@ -63,7 +105,7 @@ export async function POST(request: NextRequest) {
     const record = (existing as any[])[0]
 
     if (action === 'check-in') {
-      const checkInLimit = '08:30:00'
+      const checkInLimit = scheduleStart ? fmt(applyGrace(scheduleStart)) : '08:30:00'
       const status = currentTime <= checkInLimit ? 'present' : 'late'
 
       if (record) {
@@ -83,9 +125,14 @@ export async function POST(request: NextRequest) {
       if (!record) {
         return NextResponse.json({ error: 'No check-in found for today' }, { status: 400 })
       }
+      const checkOutStatus = scheduleEnd && currentTime < fmt(applyGrace(scheduleEnd))
+        ? 'early_leave'
+        : record.status === 'present' || record.status === 'late'
+          ? record.status
+          : 'present'
       await pool.query(
-        `UPDATE teacher_attendance SET check_out = ?, notes = ? WHERE id = ?`,
-        [currentTime, notes || null, record.id]
+        `UPDATE teacher_attendance SET check_out = ?, status = ?, notes = ? WHERE id = ?`,
+        [currentTime, checkOutStatus, notes || null, record.id]
       )
     } else {
       return NextResponse.json({ error: 'Invalid action. Use check-in or check-out' }, { status: 400 })
@@ -95,7 +142,14 @@ export async function POST(request: NextRequest) {
       `SELECT id, teacher_id, date, check_in, check_out, status, notes FROM teacher_attendance WHERE teacher_id = ? AND date = ?`,
       [userId, today]
     )
-    return NextResponse.json({ success: true, attendance: (updated as any[])[0] })
+    const updatedRecord = (updated as any[])[0]
+    return NextResponse.json({
+      success: true,
+      attendance: updatedRecord,
+      schedule: scheduleStart
+        ? { start_time: scheduleStart.slice(0, 5), end_time: (scheduleEnd || '').slice(0, 5), blocks: null }
+        : null,
+    })
   } catch (error) {
     return NextResponse.json({ error: 'Error updating attendance' }, { status: 500 })
   }

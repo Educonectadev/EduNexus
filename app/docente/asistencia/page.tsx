@@ -20,6 +20,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; d
   late: { label: "Tardanza", color: "text-amber-600", bg: "bg-amber-500/10", dot: "bg-amber-500" },
   absent: { label: "Ausente", color: "text-red-500", bg: "bg-red-500/10", dot: "bg-red-500" },
   justified: { label: "Justificado", color: "text-blue-600", bg: "bg-blue-500/10", dot: "bg-blue-500" },
+  early_leave: { label: "Salida anticipada", color: "text-orange-600", bg: "bg-orange-500/10", dot: "bg-orange-500" },
 }
 
 function getAvatarColor(name: string) {
@@ -54,6 +55,7 @@ function getBarConfig(status: string | null) {
   if (status === "late") return { h: "h-2/3", color: "bg-amber-500" }
   if (status === "absent") return { h: "h-1/3", color: "bg-red-400" }
   if (status === "justified") return { h: "h-1/2", color: "bg-blue-500" }
+  if (status === "early_leave") return { h: "h-3/4", color: "bg-orange-500" }
   return { h: "h-1", color: "bg-sb-on-surface-variant/15" }
 }
 
@@ -120,6 +122,7 @@ export default function AsistenciaPage() {
 
 function MiAsistencia() {
   const [attendance, setAttendance] = React.useState<any>(null)
+  const [schedule, setSchedule] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
   const [actionLoading, setActionLoading] = React.useState(false)
   const [history, setHistory] = React.useState<any[]>([])
@@ -135,6 +138,7 @@ function MiAsistencia() {
         ])
         if (cancelled) return
         setAttendance(attRes.attendance)
+        setSchedule(attRes.schedule)
         setHistory(histRes.records || [])
       } catch {} finally { if (!cancelled) setLoading(false) }
     })()
@@ -150,7 +154,10 @@ function MiAsistencia() {
         body: JSON.stringify({ action }),
       })
       const data = await res.json()
-      if (data.success) setAttendance(data.attendance)
+      if (data.success) {
+        setAttendance(data.attendance)
+        if (data.schedule) setSchedule(data.schedule)
+      }
     } catch {} finally { setActionLoading(false) }
   }
 
@@ -198,9 +205,11 @@ function MiAsistencia() {
               </h2>
               <p className="text-sm text-sb-on-surface-variant/50 mt-1.5">
                 {!checkedIn
-                  ? "Aún no has marcado tu entrada. Comienza tu jornada laboral."
+                  ? schedule
+                    ? `Tu horario de hoy es de ${schedule.start_time} a ${schedule.end_time}. Marca tu entrada dentro de los primeros 15 minutos.`
+                    : "Hoy no tienes clases programadas, pero puedes marcar tu asistencia."
                   : !checkedOut
-                    ? `Entrada registrada a las ${checkedIn.slice(0, 5)}. No olvides marcar tu salida.`
+                    ? `Entrada registrada a las ${checkedIn.slice(0, 5)}${schedule ? ` · Tu salida es a las ${schedule.end_time}` : ""}. No olvides marcar tu salida.`
                     : `Jornada completada: ${checkedIn.slice(0, 5)} → ${checkedOut.slice(0, 5)}. ¡Buen trabajo!`}
               </p>
             </div>
@@ -239,6 +248,9 @@ function MiAsistencia() {
               <p className={`text-xl font-bold tracking-tight ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/30"}`}>
                 {checkedIn?.slice(0, 5) || "--:--"}
               </p>
+              {schedule && (
+                <p className="text-[10px] text-sb-on-surface-variant/40 mt-0.5">Programada: {schedule.start_time}</p>
+              )}
             </div>
             <div className="rounded-2xl bg-sb-surface-container-low p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -248,6 +260,9 @@ function MiAsistencia() {
               <p className={`text-xl font-bold tracking-tight ${checkedOut ? "text-sb-on-surface" : "text-sb-on-surface-variant/30"}`}>
                 {checkedOut?.slice(0, 5) || "--:--"}
               </p>
+              {schedule && (
+                <p className="text-[10px] text-sb-on-surface-variant/40 mt-0.5">Programada: {schedule.end_time}</p>
+              )}
             </div>
           </div>
         </div>
