@@ -41,21 +41,19 @@ export default function GestionAcademicaPage() {
   const [selectedItem, setSelectedItem] = React.useState<Grade | Section | null>(null)
   const [saving, setSaving] = React.useState(false)
 
-  React.useEffect(() => { fetchAll() }, [])
-  React.useEffect(() => { if (institutionLevels.length > 0 && !activeLevel) setActiveLevel(institutionLevels[0]) }, [institutionLevels])
-
   const fetchAll = async () => {
-    setLoading(true)
     try {
       const [gRes, sRes, iRes] = await Promise.all([
         fetch('/api/secretario/academic-grades'), fetch('/api/secretario/academic-sections'), fetch('/api/secretario/academic-levels'),
       ])
       if (gRes.ok) setGrades(await gRes.json())
       if (sRes.ok) setSections(await sRes.json())
-      if (iRes.ok) { const data = await iRes.json(); setInstitutionLevels(data.levels || LEVELS) }
-      else setInstitutionLevels(LEVELS)
+      if (iRes.ok) { const data = await iRes.json(); const levels = data.levels || LEVELS; setInstitutionLevels(levels); setActiveLevel(prev => prev || levels[0] || "") }
+      else { setInstitutionLevels(LEVELS); setActiveLevel(prev => prev || LEVELS[0] || "") }
     } catch {} finally { setLoading(false) }
   }
+
+  React.useEffect(() => { const t = setTimeout(fetchAll, 0); return () => clearTimeout(t) }, [])
 
   const handleAddGrade = async () => {
     setSaving(true)
@@ -224,7 +222,7 @@ export default function GestionAcademicaPage() {
             <div className="bg-sb-surface rounded-2xl py-16 text-center">
               <GraduationCap className="h-12 w-12 mx-auto mb-3 text-sb-on-surface-variant/10" />
               <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay grados para {activeLevel}</p>
-              <p className="text-xs text-sb-on-surface-variant/25 mt-1">Agrega el primero o usa "Generar grados"</p>
+              <p className="text-xs text-sb-on-surface-variant/25 mt-1">Agrega el primero o usa «Generar grados»</p>
             </div>
           ) : (
             <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.03 } } }} className="space-y-1.5">
@@ -261,7 +259,7 @@ export default function GestionAcademicaPage() {
             <div className="bg-sb-surface rounded-2xl py-16 text-center">
               <Layers className="h-12 w-12 mx-auto mb-3 text-sb-on-surface-variant/10" />
               <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay secciones configuradas</p>
-              <p className="text-xs text-sb-on-surface-variant/25 mt-1">Usa "Generar A-Z" para crearlas</p>
+              <p className="text-xs text-sb-on-surface-variant/25 mt-1">Usa «Generar A-Z» para crearlas</p>
             </div>
           ) : (
             <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.03 } } }} className="space-y-1.5">
