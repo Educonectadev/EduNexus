@@ -11,6 +11,12 @@ interface Student { id: string; nombre: string; apellido: string; grade: string;
 
 const PERIODS = ["Bimestre 1", "Bimestre 2", "Bimestre 3", "Bimestre 4"]
 
+function normalizeGrade(grade?: string): number | null {
+  if (!grade) return null
+  const m = grade.match(/(\d+)/)
+  return m ? parseInt(m[1], 10) : null
+}
+
 export default function NotasSecretarioPage() {
   const [cursos, setCursos] = React.useState<Course[]>([])
   const [courseId, setCourseId] = React.useState("")
@@ -41,12 +47,28 @@ export default function NotasSecretarioPage() {
     setLoading(true)
     setError("")
     const course = cursos.find(c => c.id === courseId)
+    const courseGrade = normalizeGrade(course?.grade)
+    const courseSection = course?.section || ""
     Promise.all([
-      course ? fetch(`/api/secretario/busqueda?grade=${encodeURIComponent(course.grade)}`).then(r => r.ok ? r.json() : []) : Promise.resolve([]),
+      fetch(`/api/secretario/busqueda`).then(r => r.ok ? r.json() : []),
       fetch(`/api/secretario/grades?course_id=${courseId}&period=${encodeURIComponent(period)}`).then(r => r.ok ? r.json() : []),
     ])
       .then(([studentsData, gradesData]) => {
-        setStudents(Array.isArray(studentsData) ? studentsData : [])
+        const all = Array.isArray(studentsData) ? studentsData : []
+        const filtered = all.filter((s: any) => {
+          const gNum = normalizeGrade(s.grade_level || s.grade)
+          if (gNum === null || courseGrade === null) return false
+          if (gNum !== courseGrade) return false
+          if (courseSection && (s.section || "") !== courseSection) return false
+          return true
+        })
+        setStudents(filtered.map((s: any) => ({
+          id: s.id,
+          nombre: (s.full_name || "").split(" ")[0] || s.full_name || "",
+          apellido: (s.full_name || "").split(" ").slice(1).join(" "),
+          grade: s.grade_level || s.grade,
+          section: s.section || "",
+        })))
         setGrades(Array.isArray(gradesData) ? gradesData : [])
         const scoreMap: Record<string, string> = {}
         if (Array.isArray(gradesData)) {
