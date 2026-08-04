@@ -54,11 +54,7 @@ export default function GestionAcademicaPage() {
     } catch {} finally { setLoading(false) }
   }
 
-  React.useEffect(() => {
-    const t = setTimeout(fetchAll, 0)
-    const min = setTimeout(() => setLoading(false), 600)
-    return () => { clearTimeout(t); clearTimeout(min) }
-  }, [])
+  React.useEffect(() => { const t = setTimeout(fetchAll, 0); return () => clearTimeout(t) }, [])
 
   const handleAddGrade = async () => {
     setSaving(true)
@@ -221,14 +217,9 @@ export default function GestionAcademicaPage() {
 
         {/* Content */}
         {loading ? (
-          <motion.div variants={container} initial="hidden" animate="show" className="space-y-2">
-            {[0, 1, 2].map(i => (
-              <motion.div key={i} variants={listItem} className="h-14 bg-sb-surface rounded-xl overflow-hidden relative">
-                <motion.div className="absolute inset-0 bg-sb-on-surface/5" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: i * 0.15 }} />
-                <motion.div className="absolute inset-y-0 w-2/3 bg-gradient-to-r from-transparent via-sb-on-surface/15 to-transparent" animate={{ x: ["-150%", "250%"] }} transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut", delay: i * 0.15 }} />
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="space-y-2">
+            {[1, 2, 3].map(i => <div key={i} className="h-14 bg-sb-surface rounded-xl animate-pulse" />)}
+          </div>
         ) : activeTab === "grades" ? (
           filteredGrades.length === 0 ? (
             <div className="bg-sb-surface rounded-2xl py-16 text-center">
