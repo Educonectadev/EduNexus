@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const {
-      student_name, student_dni, student_birth_date, student_gender,
+      student_code, student_name, student_dni, student_birth_date, student_gender,
       parent_name, parent_dni, parent_phone, parent_email,
       grade, section, year,
     } = body
@@ -78,13 +78,14 @@ export async function POST(request: NextRequest) {
         }
 
         await conn.query(
-          `UPDATE students SET first_name = ?, last_name = ?, birth_date = COALESCE(?, birth_date), gender = COALESCE(?, gender)
+          `UPDATE students SET first_name = ?, last_name = ?, birth_date = COALESCE(?, birth_date), gender = COALESCE(?, gender),
+           code = COALESCE(NULLIF(?, ''), code)
            WHERE id = ?`,
-          [firstName, lastName, student_birth_date || null, student_gender || null, studentId]
+          [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId]
         )
       } else {
         studentId = crypto.randomUUID()
-        const code = `ALU-${Date.now().toString(36).toUpperCase()}`
+        const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
         await conn.query(
           `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status)
            VALUES (?, ?, ?, ?, ?, 'DNI', ?, NULLIF(?, ''), NULLIF(?, ''), ?, ?, 'active')`,

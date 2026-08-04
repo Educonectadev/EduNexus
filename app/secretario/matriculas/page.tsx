@@ -26,6 +26,7 @@ interface Enrollment {
 
 interface BulkRow {
   row: number
+  student_code: string
   student_name: string
   student_dni: string
   student_birth_date: string
@@ -140,16 +141,17 @@ export default function SecretarioMatriculasPage() {
       
       const rowData: BulkRow = {
         row: index + 2,
-        student_name: cells[0] || "",
-        student_dni: cells[1] || "",
-        student_birth_date: cells[2] || "",
-        student_gender: (cells[3] || "").toUpperCase(),
-        parent_name: cells[4] || "",
-        parent_dni: cells[5] || "",
-        parent_phone: cells[6] || "",
-        parent_email: cells[7] || "",
-        grade: cells[8] || "",
-        section: cells[9] || "",
+        student_code: cells[0] || "",
+        student_name: cells[1] || "",
+        student_dni: cells[2] || "",
+        student_birth_date: cells[3] || "",
+        student_gender: (cells[4] || "").toUpperCase(),
+        parent_name: cells[5] || "",
+        parent_dni: cells[6] || "",
+        parent_phone: cells[7] || "",
+        parent_email: cells[8] || "",
+        grade: cells[9] || "",
+        section: cells[10] || "",
         valid: true,
         errors: [],
         duplicate: false,
@@ -251,6 +253,7 @@ export default function SecretarioMatriculasPage() {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({
+            student_code: importableRows[i].student_code,
             student_name: importableRows[i].student_name,
             student_dni: importableRows[i].student_dni,
             student_birth_date: convertDate(importableRows[i].student_birth_date),
@@ -294,8 +297,8 @@ export default function SecretarioMatriculasPage() {
   }
 
   const downloadTemplate = () => {
-    const headers = ["Nombre del Alumno", "DNI", "Fecha Nacimiento (AAAA-MM-DD)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
-    const example = ["María García López", "12345678", "2015-03-15", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
+    const headers = ["Código del Alumno", "Nombre del Alumno", "DNI", "Fecha Nacimiento (AAAA-MM-DD)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
+    const example = ["ALU-20260001", "María García López", "12345678", "2015-03-15", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
     
     const csvContent = [headers.join(","), example.join(",")].join("\n")
     const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
@@ -907,8 +910,8 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
             </SbBtn>
             <SbBtn variant="tonal" rounded className="flex items-center gap-2"
               onClick={() => {
-                const headers = ["Nombre del Alumno", "DNI", "Fecha Nacimiento (DD/MM/AAAA)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
-                const example = ["María García López", "12345678", "15/03/2015", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
+                const headers = ["Código del Alumno", "Nombre del Alumno", "DNI", "Fecha Nacimiento (DD/MM/AAAA)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
+                const example = ["ALU-20260001", "María García López", "12345678", "15/03/2015", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
                 const csvContent = [headers.join(","), example.join(",")].join("\n")
                 const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
                 const link = document.createElement("a")
