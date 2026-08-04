@@ -36,14 +36,14 @@ export default function MaterialesPage() {
         <SbInput placeholder="Buscar materiales..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: "36px" }} />
       </div>
 
-      <div className="bg-[var(--sb-surface-container)] rounded-2xl divide-y divide-[var(--sb-outline-variant)]/15">
+      <div className="bg-[var(--sb-surface-container)] rounded-md divide-y divide-[var(--sb-outline-variant)]/15">
         {filtered.map((m, i) => {
           const Icon = fileIcons[m.type] || File
           return (
             <motion.div key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="flex items-center gap-4 px-5 py-4">
-              <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${fileColors[m.type] || "bg-[var(--sb-surface-container-high)]"}`}><Icon className="h-4 w-4" /></div>
+              <div className={`h-10 w-10 rounded-md flex items-center justify-center shrink-0 ${fileColors[m.type] || "bg-[var(--sb-surface-container-high)]"}`}><Icon className="h-4 w-4" /></div>
               <div className="flex-1 min-w-0"><p className="text-sm font-medium text-[var(--sb-on-surface)]/80 truncate">{m.name}</p><p className="text-xs text-[var(--sb-on-surface-variant)]/40">{m.subject} · {m.size}</p></div>
-              <button className="p-2 rounded-xl hover:bg-[var(--sb-surface-container-high)] transition-colors shrink-0"><Download className="h-4 w-4 text-[var(--sb-on-surface-variant)]/40" /></button>
+              <button className="p-2 rounded-md hover:bg-[var(--sb-surface-container-high)] transition-colors shrink-0"><Download className="h-4 w-4 text-[var(--sb-on-surface-variant)]/40" /></button>
             </motion.div>
           )
         })}

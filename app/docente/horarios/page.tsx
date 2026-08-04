@@ -57,7 +57,7 @@ export default function DocenteHorariosPage() {
           { icon: BookOpen, label: "Clases", value: `${totalClasses}` },
           { icon: Clock, label: "Horas/semana", value: `${totalHours}` },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-[var(--sb-surface-container)] rounded-2xl p-4">
+          <div key={label} className="bg-[var(--sb-surface-container)] rounded-md p-4">
             <Icon className="h-4 w-4 text-[var(--sb-primary)]" />
             <p className="text-lg font-semibold text-[var(--sb-on-surface)] mt-2">{value}</p>
             <p className="text-[11px] text-[var(--sb-on-surface-variant)]/40 mt-0.5">{label}</p>
@@ -68,7 +68,7 @@ export default function DocenteHorariosPage() {
       <div className="flex gap-2 overflow-x-auto pb-1">
         {scheduleByDay.map(({ day, label, items }) => (
           <button key={day} onClick={() => setActiveDay(activeDay === day ? null : day)}
-            className={cn("flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all whitespace-nowrap",
+            className={cn("flex items-center gap-2 px-4 py-2.5 rounded-md transition-all whitespace-nowrap",
               activeDay === day
                 ? "bg-[var(--sb-on-surface)] text-[var(--sb-surface)]"
                 : todayDay === day
@@ -92,7 +92,7 @@ export default function DocenteHorariosPage() {
             if (activeDay !== null && activeDay !== day) return null
             const isToday = todayDay === day
             return (
-              <div key={day} className={cn("rounded-2xl overflow-hidden",
+              <div key={day} className={cn("rounded-md overflow-hidden",
                 isToday ? "bg-[var(--sb-surface-container)] ring-1 ring-[var(--sb-primary)]/30" : "bg-[var(--sb-surface-container)]")}>
                 <div className={cn("px-4 py-3 flex items-center justify-between border-b",
                   isToday ? "border-[var(--sb-primary)]/20" : "border-[var(--sb-outline-variant)]/10")}>

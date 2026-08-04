@@ -65,15 +65,15 @@ export default function CursoDetallePage() {
     return (
       <div className="space-y-5">
         <div className="h-6 w-48 bg-sb-surface-container rounded animate-pulse" />
-        <div className="bg-sb-surface rounded-2xl p-5 animate-pulse space-y-3">
-          <div className="h-11 w-11 rounded-2xl bg-sb-surface-container" />
+        <div className="bg-sb-surface rounded-md p-5 animate-pulse space-y-3">
+          <div className="h-11 w-11 rounded-md bg-sb-surface-container" />
           <div className="h-4 w-40 rounded bg-sb-surface-container" />
           <div className="h-3 w-24 rounded bg-sb-surface-container" />
         </div>
         {[1, 2, 3].map(i => (
-          <div key={i} className="bg-sb-surface rounded-2xl p-5 animate-pulse">
+          <div key={i} className="bg-sb-surface rounded-md p-5 animate-pulse">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-sb-surface-container" />
+              <div className="h-10 w-10 rounded-md bg-sb-surface-container" />
               <div className="space-y-2">
                 <div className="h-4 w-32 rounded bg-sb-surface-container" />
                 <div className="h-3 w-20 rounded bg-sb-surface-container" />
@@ -118,15 +118,15 @@ export default function CursoDetallePage() {
 
       {/* Stats */}
       <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 gap-3">
-        <motion.div variants={staggerItem} className="bg-sb-surface rounded-2xl p-4">
-          <div className="h-9 w-9 rounded-xl flex items-center justify-center mb-3 bg-blue-500/8">
+        <motion.div variants={staggerItem} className="bg-sb-surface rounded-md p-4">
+          <div className="h-9 w-9 rounded-md flex items-center justify-center mb-3 bg-blue-500/8">
             <GraduationCap className="h-4.5 w-4.5 text-blue-600" />
           </div>
           <p className="text-xl font-bold tracking-tight text-sb-on-surface">{students.length}</p>
           <p className="text-[11px] text-sb-on-surface-variant/45 mt-0.5">Alumnos</p>
         </motion.div>
-        <motion.div variants={staggerItem} className="bg-sb-surface rounded-2xl p-4">
-          <div className="h-9 w-9 rounded-xl flex items-center justify-center mb-3 bg-emerald-500/8">
+        <motion.div variants={staggerItem} className="bg-sb-surface rounded-md p-4">
+          <div className="h-9 w-9 rounded-md flex items-center justify-center mb-3 bg-emerald-500/8">
             <UserRound className="h-4.5 w-4.5 text-emerald-600" />
           </div>
           <p className="text-xl font-bold tracking-tight text-sb-on-surface">{teachers.length}</p>
@@ -150,8 +150,8 @@ export default function CursoDetallePage() {
             <SbEmpty icon={Users} title="Sin alumnos" description="Todavía no hay alumnos matriculados en este curso." />
           ) : (
             students.map(s => (
-              <motion.div key={s.id} variants={staggerItem} className="bg-sb-surface rounded-2xl p-4 flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-xl ${getAvatarColor(`${s.first_name} ${s.last_name}`)} flex items-center justify-center shrink-0`}>
+              <motion.div key={s.id} variants={staggerItem} className="bg-sb-surface rounded-md p-4 flex items-center gap-3">
+                <div className={`h-10 w-10 rounded-md ${getAvatarColor(`${s.first_name} ${s.last_name}`)} flex items-center justify-center shrink-0`}>
                   <span className="text-white text-xs font-bold">{initials(`${s.first_name} ${s.last_name}`)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -175,8 +175,8 @@ export default function CursoDetallePage() {
             <SbEmpty icon={UserRound} title="Sin docentes" description="Aún no hay docentes asignados a este curso." />
           ) : (
             teachers.map(t => (
-              <motion.div key={t.id} variants={staggerItem} className="bg-sb-surface rounded-2xl p-4 flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-xl ${getAvatarColor(t.full_name)} flex items-center justify-center shrink-0`}>
+              <motion.div key={t.id} variants={staggerItem} className="bg-sb-surface rounded-md p-4 flex items-center gap-3">
+                <div className={`h-10 w-10 rounded-md ${getAvatarColor(t.full_name)} flex items-center justify-center shrink-0`}>
                   <span className="text-white text-xs font-bold">{initials(t.full_name)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -197,7 +197,7 @@ export default function CursoDetallePage() {
 
       <SbCard className="p-4">
         <div className="flex items-start gap-3">
-          <div className="h-8 w-8 rounded-lg bg-sb-primary/10 flex items-center justify-center shrink-0">
+          <div className="h-8 w-8 rounded-md bg-sb-primary/10 flex items-center justify-center shrink-0">
             <BookOpen className="h-4 w-4 text-sb-primary" />
           </div>
           <div>

@@ -151,9 +151,9 @@ export default function MessagesPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-sb-surface rounded-2xl p-8 max-w-md w-full text-center shadow-lg"
+          className="bg-sb-surface rounded-md p-8 max-w-md w-full text-center shadow-lg"
         >
-          <div className="w-16 h-16 bg-sb-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-sb-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
             <MessageCircle className="w-8 h-8 text-sb-primary" />
           </div>
           <h2 className="text-xl font-bold text-sb-on-surface mb-2">
@@ -162,7 +162,7 @@ export default function MessagesPage() {
           <p className="text-sb-on-surface/60 mb-6">
             El chat en tiempo real está disponible en el plan Básico o superior.
           </p>
-          <button className="px-6 py-3 bg-sb-primary text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+          <button className="px-6 py-3 bg-sb-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity">
             Mejorar Plan
           </button>
         </motion.div>
@@ -186,7 +186,7 @@ export default function MessagesPage() {
               <input
                 type="text"
                 placeholder="Buscar contactos..."
-                className="w-full pl-9 pr-4 py-2 bg-sb-background border border-sb-on-surface/10 rounded-xl text-sm text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                className="w-full pl-9 pr-4 py-2 bg-sb-background border border-sb-on-surface/10 rounded-md text-sm text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
               />
             </div>
           </div>
@@ -206,13 +206,13 @@ export default function MessagesPage() {
                   }`}
                 >
                   <div className="relative">
-                    <div className="w-10 h-10 bg-sb-on-surface/8 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-sb-on-surface/8 rounded-md flex items-center justify-center">
                       <span className="text-sm font-medium text-sb-on-surface">
                         {contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
                     </div>
                     {onlineUsers.includes(contact.id) && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-sb-surface" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-md border-2 border-sb-surface" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -220,7 +220,7 @@ export default function MessagesPage() {
                     <p className="text-xs text-sb-on-surface/60 capitalize">{contact.role}</p>
                   </div>
                   {contact.unread_count > 0 && (
-                    <span className="w-5 h-5 bg-sb-primary text-white text-xs rounded-full flex items-center justify-center">
+                    <span className="w-5 h-5 bg-sb-primary text-white text-xs rounded-md flex items-center justify-center">
                       {contact.unread_count}
                     </span>
                   )}
@@ -243,11 +243,11 @@ export default function MessagesPage() {
               <div className="p-4 bg-sb-surface border-b border-sb-on-surface/10 flex items-center gap-3">
                 <button
                   onClick={() => setSelectedContact(null)}
-                  className="md:hidden p-2 hover:bg-sb-background rounded-xl"
+                  className="md:hidden p-2 hover:bg-sb-background rounded-md"
                 >
                   <ArrowLeft className="w-5 h-5 text-sb-on-surface" />
                 </button>
-                <div className="w-10 h-10 bg-sb-on-surface/8 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-sb-on-surface/8 rounded-md flex items-center justify-center">
                   <span className="text-sm font-medium text-sb-on-surface">
                     {selectedContact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </span>
@@ -266,7 +266,7 @@ export default function MessagesPage() {
                     key={msg.id}
                     className={`flex ${msg.sender_id === selectedContact.id ? 'justify-start' : 'justify-end'}`}
                   >
-                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-md ${
                       msg.sender_id === selectedContact.id
                         ? 'bg-sb-on-surface/10 text-sb-on-surface'
                         : 'bg-sb-primary text-white'
@@ -284,7 +284,7 @@ export default function MessagesPage() {
                 ))}
                 {typing && (
                   <div className="flex justify-start">
-                    <div className="bg-sb-on-surface/10 px-4 py-2 rounded-2xl">
+                    <div className="bg-sb-on-surface/10 px-4 py-2 rounded-md">
                       <p className="text-sm text-sb-on-surface/60">Escribiendo...</p>
                     </div>
                   </div>
@@ -300,12 +300,12 @@ export default function MessagesPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Escribe un mensaje..."
-                    className="flex-1 px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-xl text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                    className="flex-1 px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!newMessage.trim()}
-                    className="p-3 bg-sb-primary text-white rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="p-3 bg-sb-primary text-white rounded-md hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     <Send className="w-5 h-5" />
                   </button>

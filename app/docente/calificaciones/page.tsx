@@ -193,8 +193,8 @@ export default function CalificacionesPage() {
           { label: "Mejor Nota", value: Math.max(...students.map(s => Math.max(...s.grades.map(g => g.score)))), color: "text-emerald-600", bg: "bg-emerald-500/8" },
           { label: "Total Alumnos", value: students.length, color: "text-blue-600", bg: "bg-blue-500/8" },
         ].map(s => (
-          <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-2xl p-4">
-            <div className={`h-9 w-9 rounded-xl flex items-center justify-center mb-3 ${s.bg}`}>
+          <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-md p-4">
+            <div className={`h-9 w-9 rounded-md flex items-center justify-center mb-3 ${s.bg}`}>
               <BookMarked className={`h-4.5 w-4.5 ${s.color}`} />
             </div>
             <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
@@ -204,7 +204,7 @@ export default function CalificacionesPage() {
       </motion.div>
 
       {/* Student list */}
-      <div className="bg-sb-surface rounded-2xl overflow-hidden">
+      <div className="bg-sb-surface rounded-md overflow-hidden">
         <AnimatePresence>
           {students.map((s, i) => {
             const trend = getTrend(s.grades)
@@ -214,7 +214,7 @@ export default function CalificacionesPage() {
                 onClick={() => openDetail(s)}
                 className="flex items-center justify-between px-5 py-4 hover:bg-sb-surface-container-low/50 transition-colors border-b border-sb-outline-variant/10 last:border-0 cursor-pointer group">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`h-10 w-10 rounded-xl ${getAvatarColor(s.name)} flex items-center justify-center shrink-0`}>
+                  <div className={`h-10 w-10 rounded-md ${getAvatarColor(s.name)} flex items-center justify-center shrink-0`}>
                     <span className="text-[10px] font-bold text-white">{getInitials(s.name)}</span>
                   </div>
                   <div className="min-w-0">
@@ -246,7 +246,7 @@ export default function CalificacionesPage() {
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                 {/* Student header */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className={`h-14 w-14 rounded-2xl ${getAvatarColor(selected.name)} flex items-center justify-center`}>
+                  <div className={`h-14 w-14 rounded-md ${getAvatarColor(selected.name)} flex items-center justify-center`}>
                     <span className="text-base font-bold text-white">{getInitials(selected.name)}</span>
                   </div>
                   <div className="flex-1">
@@ -260,7 +260,7 @@ export default function CalificacionesPage() {
                 </div>
 
                 {/* Performance bar */}
-                <div className="bg-sb-surface-container/50 rounded-2xl p-4 mb-5">
+                <div className="bg-sb-surface-container/50 rounded-md p-4 mb-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-sb-on-surface-variant/40" />
@@ -268,12 +268,12 @@ export default function CalificacionesPage() {
                     </div>
                     <span className={`text-sm font-bold ${getGradeColor(selected.average)}`}>{selected.average}/20</span>
                   </div>
-                  <div className="h-3 rounded-full bg-sb-surface-container overflow-hidden">
+                  <div className="h-3 rounded-md bg-sb-surface-container overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${(selected.average / 20) * 100}%` }}
                       transition={{ duration: 0.8, delay: 0.2 }}
-                      className={`h-full rounded-full ${getGradeBarColor(selected.average)}`}
+                      className={`h-full rounded-md ${getGradeBarColor(selected.average)}`}
                     />
                   </div>
                 </div>
@@ -283,23 +283,23 @@ export default function CalificacionesPage() {
                   <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-3">Historial de Notas</p>
                   <div className="space-y-2">
                     {selected.grades.map((g) => (
-                      <div key={g.id} className="flex items-center gap-3 bg-sb-surface-container/30 rounded-xl px-4 py-3 group">
+                      <div key={g.id} className="flex items-center gap-3 bg-sb-surface-container/30 rounded-md px-4 py-3 group">
                         {editGradeId === g.id ? (
                           <>
                             <input type="number" min={0} max={20} value={editScore} onChange={e => setEditScore(e.target.value)}
-                              className="sb-input rounded-lg text-sm h-8 w-16 text-center" autoFocus />
+                              className="sb-input rounded-md text-sm h-8 w-16 text-center" autoFocus />
                             <button onClick={() => updateGrade(selected.id, g.id, Number(editScore))}
-                              className="h-8 px-3 rounded-lg bg-sb-on-surface text-sb-surface text-xs font-medium hover:bg-sb-on-surface/90 transition-colors">
+                              className="h-8 px-3 rounded-md bg-sb-on-surface text-sb-surface text-xs font-medium hover:bg-sb-on-surface/90 transition-colors">
                               Guardar
                             </button>
                             <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                              className="h-8 px-3 rounded-lg bg-sb-surface-container text-sb-on-surface-variant/60 text-xs font-medium hover:bg-sb-surface-container-high transition-colors">
+                              className="h-8 px-3 rounded-md bg-sb-surface-container text-sb-on-surface-variant/60 text-xs font-medium hover:bg-sb-surface-container-high transition-colors">
                               Cancelar
                             </button>
                           </>
                         ) : (
                           <>
-                            <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
+                            <div className={`h-9 w-9 rounded-md flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
                               <span className={`text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
                             </div>
                             <div className="flex-1 min-w-0">
@@ -308,11 +308,11 @@ export default function CalificacionesPage() {
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
-                                className="h-7 w-7 rounded-lg flex items-center justify-center text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors">
+                                className="h-7 w-7 rounded-md flex items-center justify-center text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors">
                                 <Pencil className="h-3.5 w-3.5" />
                               </button>
                               <button onClick={() => deleteGrade(selected.id, g.id)}
-                                className="h-7 w-7 rounded-lg flex items-center justify-center text-sb-on-surface-variant/40 hover:text-red-500 hover:bg-red-500/10 transition-colors">
+                                className="h-7 w-7 rounded-md flex items-center justify-center text-sb-on-surface-variant/40 hover:text-red-500 hover:bg-red-500/10 transition-colors">
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             </div>
@@ -321,7 +321,7 @@ export default function CalificacionesPage() {
                       </div>
                     ))}
                     {selected.grades.length === 0 && (
-                      <div className="text-center py-8 rounded-xl border border-dashed border-sb-outline-variant/30">
+                      <div className="text-center py-8 rounded-md border border-dashed border-sb-outline-variant/30">
                         <BookMarked className="h-8 w-8 mx-auto mb-2 text-sb-on-surface-variant/20" />
                         <p className="text-sm text-sb-on-surface-variant/40">Sin calificaciones</p>
                       </div>
@@ -330,18 +330,18 @@ export default function CalificacionesPage() {
                 </div>
 
                 {/* Add new grade */}
-                <div className="bg-sb-surface-container/30 rounded-2xl p-4">
+                <div className="bg-sb-surface-container/30 rounded-md p-4">
                   <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-3">Agregar Nota</p>
                   <div className="grid grid-cols-3 gap-2">
                     <input placeholder="Materia" value={newSubject} onChange={e => setNewSubject(e.target.value)}
-                      className="sb-input rounded-xl text-sm h-9" />
+                      className="sb-input rounded-md text-sm h-9" />
                     <input type="number" min={0} max={20} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
-                      className="sb-input rounded-xl text-sm h-9" />
+                      className="sb-input rounded-md text-sm h-9" />
                     <input placeholder="Bimestre" value={newTerm} onChange={e => setNewTerm(e.target.value)}
-                      className="sb-input rounded-xl text-sm h-9" />
+                      className="sb-input rounded-md text-sm h-9" />
                   </div>
                   <button onClick={() => addGrade(selected.id)} disabled={!newSubject || !newScore || !newTerm}
-                    className="w-full mt-2 h-9 rounded-xl bg-sb-on-surface text-sb-surface text-xs font-medium disabled:opacity-30 hover:bg-sb-on-surface/90 transition-colors">
+                    className="w-full mt-2 h-9 rounded-md bg-sb-on-surface text-sb-surface text-xs font-medium disabled:opacity-30 hover:bg-sb-on-surface/90 transition-colors">
                     Agregar
                   </button>
                 </div>
@@ -367,7 +367,7 @@ export default function CalificacionesPage() {
             <div>
               <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Nota (0-20)</label>
               <input type="number" min={0} max={20} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
-                className="sb-input rounded-xl text-sm h-10 w-full" />
+                className="sb-input rounded-md text-sm h-10 w-full" />
             </div>
           </motion.div>
         </SbModalBody>
