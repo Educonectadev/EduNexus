@@ -62,6 +62,8 @@ export default function SecretarioMatriculasPage() {
   const [detailOpen, setDetailOpen] = React.useState(false)
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
+  const [deleteAllOpen, setDeleteAllOpen] = React.useState(false)
+  const [deletingAll, setDeletingAll] = React.useState(false)
   const [selected, setSelected] = React.useState<Enrollment | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
@@ -389,6 +391,23 @@ export default function SecretarioMatriculasPage() {
   }
   const openDelete = (enr: Enrollment) => { setSelected(enr); setDetailOpen(false); setDeleteOpen(true) }
 
+  const handleDeleteAll = async () => {
+    setDeletingAll(true)
+    setErrorMsg(null)
+    try {
+      const res = await fetch("/api/secretario/enrollments", { method: "DELETE" })
+      if (res.ok) {
+        setDeleteAllOpen(false)
+        setEnrollments([])
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setErrorMsg(data.error || data.sql || `Error ${res.status}`)
+      }
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Error de red")
+    } finally { setDeletingAll(false) }
+  }
+
   const filtered = enrollments.filter(e => {
     const matchSearch = `${e.first_name} ${e.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
       e.document_number?.includes(search) ||
@@ -414,9 +433,14 @@ export default function SecretarioMatriculasPage() {
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Registrar y gestionar matrículas del año {currentYear}</p>
         </div>
         {activeTab === "individual" ? (
-          <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { setForm(emptyForm); setCreateOpen(true) }}>
-            <Plus className="h-4 w-4" /> Nueva Matrícula
-          </SbBtn>
+          <div className="flex items-center gap-2">
+            <SbBtn variant="tonal" rounded className="flex items-center gap-2 text-red-400" onClick={() => { setErrorMsg(null); setDeleteAllOpen(true) }} disabled={enrollments.length === 0}>
+              <Trash2 className="h-4 w-4" /> Eliminar Todo
+            </SbBtn>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { setForm(emptyForm); setCreateOpen(true) }}>
+              <Plus className="h-4 w-4" /> Nueva Matrícula
+            </SbBtn>
+          </div>
         ) : (
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={downloadTemplate}>
             <Download className="h-4 w-4" /> Descargar Plantilla
@@ -730,6 +754,33 @@ export default function SecretarioMatriculasPage() {
               <SbBtn rounded className="flex-1" onClick={() => { setEditOpen(false); setErrorMsg(null) }}>Cancelar</SbBtn>
               <SbBtn variant="filled" rounded className="flex-1" onClick={handleUpdate} disabled={saving}>
                 {saving ? "Guardando..." : "Guardar"}
+              </SbBtn>
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+
+      {/* Delete All Confirm */}
+      <AnimatePresence>
+        {deleteAllOpen && (
+          <Modal onClose={() => setDeleteAllOpen(false)}>
+            <ModalHeader title="Eliminar Todas las Matrículas" onClose={() => setDeleteAllOpen(false)} />
+            <div className="sb-modal-body">
+              <p className="text-sm text-sb-on-surface-variant/60">
+                ¿Estás seguro de eliminar <strong className="text-sb-on-surface">todas las matrículas</strong> de la institución?
+                Se borrarán todos los alumnos con sus datos, matrículas y las cuentas de sus padres/apoderados.
+                Esta acción no se puede deshacer.
+              </p>
+              {errorMsg && (
+                <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                  {errorMsg}
+                </div>
+              )}
+            </div>
+            <div className="sb-modal-footer">
+              <SbBtn rounded className="flex-1" onClick={() => setDeleteAllOpen(false)}>Cancelar</SbBtn>
+              <SbBtn variant="danger" rounded className="flex-1" onClick={handleDeleteAll} disabled={deletingAll}>
+                {deletingAll ? "Eliminando..." : "Eliminar Todo"}
               </SbBtn>
             </div>
           </Modal>

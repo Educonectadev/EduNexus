@@ -158,3 +158,94 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Error creating enrollment', details: error.message }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  let conn: any
+  try {
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    conn = await pool.getConnection()
+    await conn.beginTransaction()
+
+    // All students of this institution (their enrollments are tied to them)
+    const [students] = await conn.query(
+      `SELECT id, user_id FROM students WHERE institution_id = ?`,
+      [instId]
+    )
+
+    // All parent_student links belonging to students of this institution
+    const [parentLinks] = await conn.query(
+      `SELECT ps.parent_id FROM parent_student ps
+       JOIN students s ON s.id = ps.student_id
+       WHERE s.institution_id = ?`,
+      [instId]
+    )
+    const parentIds = [...new Set((parentLinks as any[]).map(l => l.parent_id))]
+
+    // Parent user accounts (parents of students of this institution)
+    let parentUserIds: string[] = []
+    if (parentIds.length > 0) {
+      const [parents] = await conn.query(
+        `SELECT user_id FROM parents WHERE id IN (?) AND user_id IS NOT NULL`,
+        [parentIds]
+      )
+      parentUserIds = (parents as any[]).map(p => p.user_id)
+    }
+
+    const studentUserIds = (students as any[]).map(s => s.user_id).filter(Boolean)
+
+    // Delete enrollments of these students
+    await conn.query(
+      `DELETE e FROM enrollments e JOIN students s ON s.id = e.student_id WHERE s.institution_id = ?`,
+      [instId]
+    )
+    // Delete parent_student links
+    if (parentIds.length > 0) {
+      await conn.query('DELETE FROM parent_student WHERE parent_id IN (?)', [parentIds])
+    }
+    // Delete parents (only those belonging to this institution)
+    if (parentIds.length > 0) {
+      await conn.query(
+        `DELETE FROM parents WHERE id IN (?) AND institution_id = ?`,
+        [parentIds, instId]
+      )
+    }
+    // Delete parent user accounts
+    for (const uid of parentUserIds) {
+      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
+      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+    }
+    // Delete student user accounts
+    for (const uid of studentUserIds) {
+      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
+      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+    }
+    // Delete students (payments/grades/attendance/issued_documents cascade)
+    await conn.query('DELETE FROM students WHERE institution_id = ?', [instId])
+
+    await conn.commit()
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId || '',
+      action: 'delete',
+      entity: 'enrollment',
+      entityId: 'all',
+      details: { bulkDelete: true, studentsDeleted: (students as any[]).length, parentsDeleted: parentIds.length },
+    })
+
+    return NextResponse.json({ success: true, studentsDeleted: (students as any[]).length, parentsDeleted: parentIds.length })
+  } catch (error: any) {
+    if (conn) {
+      try { await conn.rollback() } catch {}
+    }
+    console.error('[DELETE /api/secretario/enrollments] bulk', error)
+    return NextResponse.json({ error: error.message, code: error.code, sql: error.sqlMessage }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
+  }
+}
