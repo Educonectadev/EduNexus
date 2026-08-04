@@ -54,8 +54,8 @@ export default function CursosPage() {
           { label: "Total Alumnos", value: courses.reduce((a, c) => a + (c.students || 0), 0), color: "text-blue-600", bg: "bg-blue-500/8" },
           { label: "Promedio x Curso", value: courses.length > 0 ? Math.round(courses.reduce((a, c) => a + (c.students || 0), 0) / courses.length) : 0, color: "text-emerald-600", bg: "bg-emerald-500/8" },
         ].map(s => (
-          <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-md p-4">
-            <div className={`h-9 w-9 rounded-md flex items-center justify-center mb-3 ${s.bg}`}>
+          <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-[6px] p-4">
+            <div className={`h-9 w-9 rounded-[6px] flex items-center justify-center mb-3 ${s.bg}`}>
               <BookOpen className={`h-4.5 w-4.5 ${s.color}`} />
             </div>
             <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
@@ -69,9 +69,9 @@ export default function CursosPage() {
         {loading ? (
           <div className="space-y-2">
             {[1,2,3].map(i => (
-              <div key={i} className="bg-sb-surface rounded-md p-5 animate-pulse">
+              <div key={i} className="bg-sb-surface rounded-[6px] p-5 animate-pulse">
                 <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-md bg-sb-surface-container" />
+                  <div className="h-11 w-11 rounded-[6px] bg-sb-surface-container" />
                   <div className="space-y-2">
                     <div className="h-4 w-32 rounded bg-sb-surface-container" />
                     <div className="h-3 w-20 rounded bg-sb-surface-container" />
@@ -81,7 +81,7 @@ export default function CursosPage() {
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <div className="bg-sb-surface rounded-md py-12 text-center">
+          <div className="bg-sb-surface rounded-[6px] py-12 text-center">
             <BookOpen className="h-10 w-10 text-sb-on-surface-variant/15 mx-auto mb-3" />
             <p className="text-sm text-sb-on-surface-variant/30">Sin cursos asignados</p>
           </div>
@@ -90,10 +90,10 @@ export default function CursosPage() {
             {courses.map((c) => (
               <Link key={c.id} href={`/docente/cursos/${c.id}`} className="block">
                 <motion.div variants={listItem}
-                  className="bg-sb-surface rounded-md p-5 hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer group">
+                  className="bg-sb-surface rounded-[6px] p-5 hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer group">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`h-11 w-11 rounded-md ${getAvatarColor(c.name)} flex items-center justify-center shrink-0`}>
+                      <div className={`h-11 w-11 rounded-[6px] ${getAvatarColor(c.name)} flex items-center justify-center shrink-0`}>
                         <BookOpen className="h-5 w-5 text-white" />
                       </div>
                       <div>

@@ -57,7 +57,7 @@ export default function MensajesPage() {
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">{unreadCount} sin leer de {messages.length}</p>
         </div>
         {unreadCount > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-sb-primary/10">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-sb-primary/10">
             <Mail className="h-3.5 w-3.5 text-sb-primary" />
             <span className="text-xs font-medium text-sb-primary">{unreadCount} nuevo{unreadCount > 1 ? 's' : ''}</span>
           </div>
@@ -69,10 +69,10 @@ export default function MensajesPage() {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-sb-on-surface-variant/30" />
           <input placeholder="Buscar por nombre, asunto o contenido..." value={search} onChange={e => setSearch(e.target.value)}
-            className="sb-input rounded-md text-sm h-12 w-full pl-11 pr-10 bg-sb-surface-container/50 border-sb-outline-variant/10 focus:bg-sb-surface focus:border-sb-primary/30 transition-all" />
+            className="sb-input rounded-[6px] text-sm h-12 w-full pl-11 pr-10 bg-sb-surface-container/50 border-sb-outline-variant/10 focus:bg-sb-surface focus:border-sb-primary/30 transition-all" />
           {search && (
             <button onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-sb-surface-container transition-colors">
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-[6px] hover:bg-sb-surface-container transition-colors">
               <X className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
             </button>
           )}
@@ -88,14 +88,14 @@ export default function MensajesPage() {
             const Icon = f.icon
             return (
               <button key={f.key} onClick={() => setFilter(f.key as any)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-xs font-medium transition-all ${
                   filter === f.key
                     ? 'bg-sb-on-surface text-sb-surface shadow-sm'
                     : 'bg-sb-surface-container/60 text-sb-on-surface-variant/50 hover:bg-sb-surface-container-high'
                 }`}>
                 <Icon className="h-3.5 w-3.5" />
                 {f.label}
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ml-0.5 ${
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-[6px] font-semibold ml-0.5 ${
                   filter === f.key ? 'bg-white/20' : 'bg-sb-surface-container-high text-sb-on-surface-variant/35'
                 }`}>
                   {f.count}
@@ -107,14 +107,14 @@ export default function MensajesPage() {
       </motion.div>
 
       {/* Message list */}
-      <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+      <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
         <AnimatePresence>
           {filtered.map((m, i) => (
             <motion.button key={m.id} variants={listItem} initial="hidden" animate="show" exit="exit"
               transition={{ duration: 0.3, delay: i * 0.03 }}
               onClick={() => { setSelected(m); setReply("") }}
               className={`w-full flex items-start gap-3.5 px-5 py-4 text-left hover:bg-sb-surface-container-low/60 transition-all duration-200 border-b border-sb-outline-variant/8 last:border-0 group ${!m.read ? "bg-sb-primary/[0.03]" : ""}`}>
-              <div className={`h-10 w-10 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
+              <div className={`h-10 w-10 rounded-[6px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
                 !m.read ? "bg-sb-primary/12" : "bg-sb-surface-container"
               }`}>
                 {!m.read ? <MailOpen className="h-4 w-4 text-sb-primary" /> : <User className="h-4 w-4 text-sb-on-surface-variant/35" />}
@@ -123,7 +123,7 @@ export default function MensajesPage() {
                 <div className="flex items-center justify-between gap-2">
                   <p className={`text-sm truncate ${!m.read ? "font-semibold text-sb-on-surface" : "text-sb-on-surface/75"}`}>{m.from}</p>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {!m.read && <span className="h-2 w-2 rounded-md bg-sb-primary animate-pulse" />}
+                    {!m.read && <span className="h-2 w-2 rounded-[6px] bg-sb-primary animate-pulse" />}
                     <span className="text-[10px] text-sb-on-surface-variant/30">{m.time}</span>
                   </div>
                 </div>
@@ -135,7 +135,7 @@ export default function MensajesPage() {
         </AnimatePresence>
         {filtered.length === 0 && (
           <div className="py-14 text-center">
-            <div className="h-14 w-14 rounded-md bg-sb-surface-container flex items-center justify-center mx-auto mb-4">
+            <div className="h-14 w-14 rounded-[6px] bg-sb-surface-container flex items-center justify-center mx-auto mb-4">
               <Mail className="h-6 w-6 text-sb-on-surface-variant/20" />
             </div>
             <p className="text-sm font-medium text-sb-on-surface-variant/30">
@@ -155,10 +155,10 @@ export default function MensajesPage() {
       <AnimatePresence>
         {selected && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+            className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
             <div className="flex items-center justify-between px-5 py-4 border-b border-sb-outline-variant/8 bg-sb-surface-container/30">
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-md ${getAvatarColor(selected.from)} flex items-center justify-center shrink-0`}>
+                <div className={`h-10 w-10 rounded-[6px] ${getAvatarColor(selected.from)} flex items-center justify-center shrink-0`}>
                   <span className="text-[10px] font-bold text-white">{getInitials(selected.from)}</span>
                 </div>
                 <div>
@@ -171,7 +171,7 @@ export default function MensajesPage() {
                   <Clock className="h-3 w-3" /> {selected.time}
                 </span>
                 <button onClick={() => setSelected(null)}
-                  className="p-2 rounded-md hover:bg-sb-surface-container transition-colors">
+                  className="p-2 rounded-[6px] hover:bg-sb-surface-container transition-colors">
                   <X className="h-4 w-4 text-sb-on-surface-variant/40" />
                 </button>
               </div>
@@ -181,8 +181,8 @@ export default function MensajesPage() {
               <div className="flex gap-2">
                 <div className="flex-1 relative">
                   <input placeholder="Escribir respuesta..." value={reply} onChange={e => setReply(e.target.value)}
-                    className="sb-input rounded-md text-sm h-11 w-full pr-12 bg-sb-surface-container/50" />
-                  <button className={`absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-md transition-all ${
+                    className="sb-input rounded-[6px] text-sm h-11 w-full pr-12 bg-sb-surface-container/50" />
+                  <button className={`absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-[6px] transition-all ${
                     reply ? "bg-sb-on-surface text-sb-surface shadow-md" : "text-sb-on-surface-variant/25"
                   }`}>
                     <Send className="h-4 w-4" />

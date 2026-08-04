@@ -64,10 +64,10 @@ export default function AsistenciaPage() {
         <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Control de tu marcación y la asistencia de tus alumnos</p>
       </motion.div>
 
-      <div className="flex gap-1 p-1 bg-sb-surface rounded-md w-fit">
+      <div className="flex gap-1 p-1 bg-sb-surface rounded-[6px] w-fit">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${tab === t.key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/60 hover:text-sb-on-surface-variant"}`}>
+            className={`px-4 py-2 rounded-[6px] text-sm font-medium transition-all ${tab === t.key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/60 hover:text-sb-on-surface-variant"}`}>
             {t.label}
           </button>
         ))}
@@ -125,9 +125,9 @@ function MiAsistencia() {
     return (
       <div className="space-y-5">
         <div className="animate-pulse grid grid-cols-3 gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-md bg-sb-surface-container" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-[6px] bg-sb-surface-container" />)}
         </div>
-        <div className="animate-pulse h-24 rounded-md bg-sb-surface-container" />
+        <div className="animate-pulse h-24 rounded-[6px] bg-sb-surface-container" />
       </div>
     )
   }
@@ -140,10 +140,10 @@ function MiAsistencia() {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-5">
       {/* Jornada card */}
-      <div className="bg-sb-surface rounded-md overflow-hidden">
+      <div className="bg-sb-surface rounded-[6px] overflow-hidden">
         <div className="px-5 py-4 flex items-center justify-between border-b border-sb-outline-variant/8">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-md bg-sb-surface-container flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[6px] bg-sb-surface-container flex items-center justify-center">
               <Clock className="h-5 w-5 text-sb-on-surface-variant/50" />
             </div>
             <div>
@@ -162,8 +162,8 @@ function MiAsistencia() {
             </div>
           </div>
           {s && (
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium ${s.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-md ${s.dot}`} />
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] text-[11px] font-medium ${s.color}`}>
+              <span className={`h-1.5 w-1.5 rounded-[6px] ${s.dot}`} />
               {s.label}
             </span>
           )}
@@ -195,20 +195,20 @@ function MiAsistencia() {
         <div className="px-5 pb-5 pt-1">
           {!checkedIn && (
             <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
-              className="w-full h-11 rounded-md bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-[6px] bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
               Marcar Entrada
             </button>
           )}
           {checkedIn && !checkedOut && (
             <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
-              className="w-full h-11 rounded-md bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-[6px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
               Marcar Salida
             </button>
           )}
           {checkedIn && checkedOut && (
-            <div className="w-full h-11 rounded-md bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2">
+            <div className="w-full h-11 rounded-[6px] bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2">
               <Check className="h-4 w-4" />
               Jornada completada
             </div>
@@ -217,13 +217,13 @@ function MiAsistencia() {
       </div>
 
       {/* Weekly overview */}
-      <div className="bg-sb-surface rounded-md overflow-hidden">
+      <div className="bg-sb-surface rounded-[6px] overflow-hidden">
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-sb-primary/60" />
             <p className="text-sm font-semibold text-sb-on-surface">Últimos 7 días</p>
           </div>
-          <span className="text-[10px] font-medium px-2 py-1 rounded-md bg-sb-surface-container text-sb-on-surface-variant/50">
+          <span className="text-[10px] font-medium px-2 py-1 rounded-[6px] bg-sb-surface-container text-sb-on-surface-variant/50">
             {history.length} registros
           </span>
         </div>
@@ -232,7 +232,7 @@ function MiAsistencia() {
             const isToday = getLocalDateStr() === d.iso
             return (
               <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                <div className="h-20 w-full max-w-[34px] rounded-md bg-sb-surface-container flex items-end overflow-hidden">
+                <div className="h-20 w-full max-w-[34px] rounded-[6px] bg-sb-surface-container flex items-end overflow-hidden">
                   <div className={`w-full h-full transition-all duration-500 ${getBarConfig(d.status)}`} style={{ height: d.status ? "100%" : "8%" }} />
                 </div>
                 <div className="flex flex-col items-center">
@@ -246,7 +246,7 @@ function MiAsistencia() {
       </div>
 
       {/* History */}
-      <div className="bg-sb-surface rounded-md overflow-hidden">
+      <div className="bg-sb-surface rounded-[6px] overflow-hidden">
         <div className="px-5 pt-5 pb-3">
           <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Historial reciente</p>
         </div>
@@ -262,7 +262,7 @@ function MiAsistencia() {
               return (
                 <div key={h.id} className="flex items-center justify-between px-5 py-3 hover:bg-sb-surface-container-low/50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-md bg-sb-surface-container flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-[6px] bg-sb-surface-container flex items-center justify-center">
                       <Calendar className="h-3.5 w-3.5 text-sb-on-surface-variant/30" />
                     </div>
                     <span className="text-sm text-sb-on-surface capitalize">
@@ -272,8 +272,8 @@ function MiAsistencia() {
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-sb-on-surface-variant/50">Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}</span>
                     <span className="text-xs text-sb-on-surface-variant/50">Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}</span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md ${sc.color}`}>
-                      <span className={`h-1 w-1 rounded-md ${sc.dot}`} />
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-[6px] ${sc.color}`}>
+                      <span className={`h-1 w-1 rounded-[6px] ${sc.dot}`} />
                       {sc.label}
                     </span>
                   </div>
@@ -326,7 +326,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 rounded-md border-[1.5px] px-3 text-sm font-medium transition-all cursor-pointer text-left"
+        className="h-10 w-full flex items-center gap-2 rounded-[6px] border-[1.5px] px-3 text-sm font-medium transition-all cursor-pointer text-left"
         style={{
           borderColor: date ? "var(--sb-primary)" : "var(--sb-outline-variant)",
           background: date ? "var(--sb-surface-container)" : "transparent",
@@ -342,7 +342,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute z-30 top-full mt-2 left-0 w-[300px] bg-sb-surface rounded-md border border-sb-outline-variant/10 shadow-2xl shadow-black/20 p-4"
+            className="absolute z-30 top-full mt-2 left-0 w-[300px] bg-sb-surface rounded-[6px] border border-sb-outline-variant/10 shadow-2xl shadow-black/20 p-4"
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -351,11 +351,11 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
               <p className="text-sm font-semibold text-sb-on-surface capitalize">{MonthNames[month]} {year}</p>
               <div className="flex gap-1">
                 <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
-                  className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-sb-surface-container-high transition-colors text-sb-on-surface-variant/60">
+                  className="h-7 w-7 rounded-[6px] flex items-center justify-center hover:bg-sb-surface-container-high transition-colors text-sb-on-surface-variant/60">
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
                 <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
-                  className="h-7 w-7 rounded-md flex items-center justify-center hover:bg-sb-surface-container-high transition-colors text-sb-on-surface-variant/60">
+                  className="h-7 w-7 rounded-[6px] flex items-center justify-center hover:bg-sb-surface-container-high transition-colors text-sb-on-surface-variant/60">
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -378,7 +378,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                   <button key={day} onClick={() => !isFuture && selectDate(day)}
                     disabled={isFuture}
                     className={cn(
-                      "h-8 w-full rounded-md flex items-center justify-center text-[12px] font-medium transition-colors",
+                      "h-8 w-full rounded-[6px] flex items-center justify-center text-[12px] font-medium transition-colors",
                       isFuture && "text-sb-on-surface-variant/15 cursor-not-allowed",
                       isSelected && !isToday && "bg-sb-on-surface text-sb-surface",
                       isToday && !isSelected && "bg-sb-primary/10 text-sb-primary ring-1 ring-sb-primary/30",
@@ -471,7 +471,7 @@ function AsistenciaAlumnos() {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-5">
       {/* Selector */}
-      <div className="bg-sb-surface rounded-md">
+      <div className="bg-sb-surface rounded-[6px]">
         <div className="px-5 pt-5 pb-3">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-sb-primary/60" />
@@ -493,7 +493,7 @@ function AsistenciaAlumnos() {
               <DatePickerDropdown date={date} onSelect={setDate} />
             </div>
             <button onClick={handleCargar} disabled={loading || !selectedCourse}
-              className="h-10 px-4 rounded-md bg-sb-on-surface text-sb-surface text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30 hover:bg-sb-on-surface/90 transition-colors">
+              className="h-10 px-4 rounded-[6px] bg-sb-on-surface text-sb-surface text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30 hover:bg-sb-on-surface/90 transition-colors">
               {loading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Search className="h-4 w-4" />}
               Cargar alumnos
             </button>
@@ -508,8 +508,8 @@ function AsistenciaAlumnos() {
             {summary.map(s => {
               const Icon = s.icon
               return (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="bg-sb-surface rounded-md p-4">
-                  <div className={`h-9 w-9 rounded-md flex items-center justify-center mb-2.5 ${s.bg}`}>
+                <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="bg-sb-surface rounded-[6px] p-4">
+                  <div className={`h-9 w-9 rounded-[6px] flex items-center justify-center mb-2.5 ${s.bg}`}>
                     <Icon className={`h-4 w-4 ${s.color}`} />
                   </div>
                   <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
@@ -520,7 +520,7 @@ function AsistenciaAlumnos() {
           </motion.div>
 
           {/* Student list */}
-          <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+          <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
             {/* Header */}
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-center justify-between mb-4">
@@ -532,14 +532,14 @@ function AsistenciaAlumnos() {
                 <div className="relative w-44">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/30" />
                   <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                    className="sb-input rounded-md text-sm h-9 pl-9" />
+                    className="sb-input rounded-[6px] text-sm h-9 pl-9" />
                 </div>
               </div>
               {/* Legend */}
               <div className="flex items-center gap-4 pt-3 border-t border-sb-outline-variant/8">
                 {statusChips.map(chip => (
                   <div key={chip.status} className="flex items-center gap-1.5">
-                    <span className={`h-4 w-4 rounded-md flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
+                    <span className={`h-4 w-4 rounded-[6px] flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
                     <span className="text-[10px] text-sb-on-surface-variant/40">{chip.title}</span>
                     <span className="text-[10px] font-semibold text-sb-on-surface-variant/50 ml-0.5">
                       {students.filter(s => s.status === chip.status).length}
@@ -556,7 +556,7 @@ function AsistenciaAlumnos() {
                   s.status ? "bg-sb-primary/[0.035]" : "hover:bg-sb-surface-container-low/50"
                 )}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-9 w-9 rounded-md ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
+                    <div className={`h-9 w-9 rounded-[6px] ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
                       <span className="text-white text-[10px] font-bold">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
@@ -568,7 +568,7 @@ function AsistenciaAlumnos() {
                     {statusChips.map(chip => (
                       <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
                         className={cn(
-                          "h-7 px-2.5 rounded-md text-[11px] font-semibold transition-all active:scale-95 flex items-center gap-1",
+                          "h-7 px-2.5 rounded-[6px] text-[11px] font-semibold transition-all active:scale-95 flex items-center gap-1",
                           s.status === chip.status ? chip.activeClass : chip.inactiveClass
                         )}>
                         {chip.label}
@@ -585,12 +585,12 @@ function AsistenciaAlumnos() {
           <div className="flex items-center gap-3 sticky bottom-0">
             <div className="flex-1 space-y-1">
               <p className="text-sm font-semibold text-sb-on-surface">{marked} de {students.length} marcados</p>
-              <div className="h-1.5 rounded-md bg-sb-surface-container overflow-hidden">
-                <div className="h-full bg-sb-primary rounded-md transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
+              <div className="h-1.5 rounded-[6px] bg-sb-surface-container overflow-hidden">
+                <div className="h-full bg-sb-primary rounded-[6px] transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
               </div>
             </div>
             <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-6 rounded-md text-sm font-semibold bg-sb-on-surface text-sb-surface hover:bg-sb-on-surface/90 active:bg-sb-on-surface/95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0">
+              className="h-12 px-6 rounded-[6px] text-sm font-semibold bg-sb-on-surface text-sb-surface hover:bg-sb-on-surface/90 active:bg-sb-on-surface/95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0">
               {saving ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Check className="h-4 w-4" />}
               Guardar
             </button>
@@ -599,14 +599,14 @@ function AsistenciaAlumnos() {
       )}
 
       {loaded && students.length === 0 && (
-        <div className="bg-sb-surface rounded-md py-14 text-center">
+        <div className="bg-sb-surface rounded-[6px] py-14 text-center">
           <UserX className="h-10 w-10 mx-auto text-sb-on-surface-variant/15 mb-3" />
           <p className="text-sm text-sb-on-surface-variant/40">No hay alumnos en este curso</p>
         </div>
       )}
 
       {!loaded && courses.length === 0 && (
-        <div className="bg-sb-surface rounded-md py-14 text-center">
+        <div className="bg-sb-surface rounded-[6px] py-14 text-center">
           <Users className="h-10 w-10 mx-auto text-sb-on-surface-variant/15 mb-3" />
           <p className="text-sm text-sb-on-surface-variant/40">Sin cursos asignados</p>
         </div>

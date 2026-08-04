@@ -206,8 +206,8 @@ export default function TareasPage() {
         ].map(s => {
           const Icon = s.icon
           return (
-            <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-md p-4">
-              <div className={`h-9 w-9 rounded-md flex items-center justify-center mb-3 ${s.bg}`}>
+            <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-[6px] p-4">
+              <div className={`h-9 w-9 rounded-[6px] flex items-center justify-center mb-3 ${s.bg}`}>
                 <Icon className={`h-4.5 w-4.5 ${s.color}`} />
               </div>
               <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
@@ -222,7 +222,7 @@ export default function TareasPage() {
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
           <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-            className="sb-input rounded-md text-sm h-10 w-full pl-9" />
+            className="sb-input rounded-[6px] text-sm h-10 w-full pl-9" />
         </div>
         <div className="flex gap-2">
           {([
@@ -232,13 +232,13 @@ export default function TareasPage() {
             { key: 'graded', label: 'Calificadas' },
           ]).map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-sm font-medium transition-all ${
                 filter === f.key
                   ? 'bg-sb-on-surface text-sb-surface'
                   : 'bg-sb-surface-container text-sb-on-surface-variant/60 hover:bg-sb-surface-container-high'
               }`}>
               {f.label}
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold ${
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-[6px] font-semibold ${
                 filter === f.key ? 'bg-white/20' : 'bg-sb-surface-container-high text-sb-on-surface-variant/40'
               }`}>
                 {counts[f.key as keyof typeof counts]}
@@ -263,20 +263,20 @@ export default function TareasPage() {
               <motion.div key={t.id} variants={listItem} initial="hidden" animate="show" exit="exit"
                 transition={{ duration: 0.3, delay: i * 0.04 }}
                 onClick={() => fetchTaskDetail(t.id)}
-                className={`bg-sb-surface rounded-md overflow-hidden cursor-pointer hover:bg-sb-surface-container-high/50 transition-all duration-200 ${isOverdue ? 'ring-1 ring-red-500/20' : ''}`}>
+                className={`bg-sb-surface rounded-[6px] overflow-hidden cursor-pointer hover:bg-sb-surface-container-high/50 transition-all duration-200 ${isOverdue ? 'ring-1 ring-red-500/20' : ''}`}>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-md ${sc.bg} ${sc.color}`}>
-                          <span className={`h-1.5 w-1.5 rounded-md ${sc.dot}`} />
+                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] ${sc.bg} ${sc.color}`}>
+                          <span className={`h-1.5 w-1.5 rounded-[6px] ${sc.dot}`} />
                           {sc.label}
                         </span>
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${pc.bg} ${pc.color}`}>
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-[6px] ${pc.bg} ${pc.color}`}>
                           {pc.label}
                         </span>
                         {isOverdue && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-md bg-red-500/10 text-red-500">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] bg-red-500/10 text-red-500">
                             <AlertTriangle className="h-3 w-3" /> Vencida
                           </span>
                         )}
@@ -300,12 +300,12 @@ export default function TareasPage() {
                       </div>
                       <span className="text-[10px] text-sb-on-surface-variant/40 font-medium">{Math.round(progress)}%</span>
                     </div>
-                    <div className="h-2 bg-sb-surface-container rounded-md overflow-hidden">
+                    <div className="h-2 bg-sb-surface-container rounded-[6px] overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 0.8, delay: 0.2 + i * 0.05 }}
-                        className={`h-full rounded-md ${
+                        className={`h-full rounded-[6px] ${
                           progress >= 80 ? 'bg-emerald-400' : progress >= 40 ? 'bg-amber-400' : 'bg-red-400'
                         }`}
                       />
@@ -351,14 +351,14 @@ export default function TareasPage() {
         </AnimatePresence>
 
         {!loading && filtered.length === 0 && (
-          <div className="bg-sb-surface rounded-md py-12 text-center">
+          <div className="bg-sb-surface rounded-[6px] py-12 text-center">
             <ClipboardList className="h-10 w-10 text-sb-on-surface-variant/15 mx-auto mb-3" />
             <p className="text-sm text-sb-on-surface-variant/30">No hay tareas en esta categoria</p>
           </div>
         )}
 
         {loading && (
-          <div className="bg-sb-surface rounded-md py-12 text-center">
+          <div className="bg-sb-surface rounded-[6px] py-12 text-center">
             <div className="h-6 w-6 border-2 border-sb-primary/30 border-t-sb-primary rounded-full animate-spin mx-auto mb-3" />
             <p className="text-sm text-sb-on-surface-variant/30">Cargando tareas...</p>
           </div>
@@ -386,7 +386,7 @@ export default function TareasPage() {
             <div>
               <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Titulo de la tarea *</label>
               <input placeholder="Ej: Ejercicios de algebra - Cap. 3" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
-                className="sb-input rounded-md text-sm h-10 w-full" />
+                className="sb-input rounded-[6px] text-sm h-10 w-full" />
             </div>
 
             {/* Asignatura + Prioridad */}
@@ -394,7 +394,7 @@ export default function TareasPage() {
               <div>
                 <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Asignatura</label>
                 <input placeholder="Ej: Matematica" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="sb-input rounded-md text-sm h-10 w-full" />
+                  className="sb-input rounded-[6px] text-sm h-10 w-full" />
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Prioridad</label>
@@ -408,19 +408,19 @@ export default function TareasPage() {
             </div>
 
             {/* Fechas */}
-            <div className="bg-sb-surface-container/50 rounded-md p-4 space-y-3">
+            <div className="bg-sb-surface-container/50 rounded-[6px] p-4 space-y-3">
               <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Fechas de la tarea</p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1 block">Fecha de inicio</label>
                   <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})}
-                    className="sb-input rounded-md text-sm h-10 w-full" />
+                    className="sb-input rounded-[6px] text-sm h-10 w-full" />
                   <p className="text-[9px] text-sb-on-surface-variant/30 mt-1">Desde cuando esta disponible</p>
                 </div>
                 <div>
                   <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1 block">Fecha de vencimiento *</label>
                   <input type="date" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})}
-                    className="sb-input rounded-md text-sm h-10 w-full" />
+                    className="sb-input rounded-[6px] text-sm h-10 w-full" />
                   <p className="text-[9px] text-sb-on-surface-variant/30 mt-1">Ultimo dia para entregar</p>
                 </div>
               </div>
@@ -430,7 +430,7 @@ export default function TareasPage() {
             <div>
               <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Descripcion e instrucciones</label>
               <textarea placeholder="Describe detalladamente la tarea: objetivos, requisitos, criterios de evaluacion, material de referencia..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
-                className="sb-input rounded-md text-sm h-24 w-full resize-none" />
+                className="sb-input rounded-[6px] text-sm h-24 w-full resize-none" />
             </div>
           </motion.div>
         </SbModalBody>
@@ -449,20 +449,20 @@ export default function TareasPage() {
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                 {/* Task Info */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-sb-surface-container/50 rounded-md p-3">
+                  <div className="bg-sb-surface-container/50 rounded-[6px] p-3">
                     <p className="text-[10px] text-sb-on-surface-variant/40 uppercase tracking-wider mb-1">Estado</p>
-                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-md ${statusConfig[selectedTask.status].bg} ${statusConfig[selectedTask.status].color}`}>
-                      <span className={`h-1.5 w-1.5 rounded-md ${statusConfig[selectedTask.status].dot}`} />
+                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] ${statusConfig[selectedTask.status].bg} ${statusConfig[selectedTask.status].color}`}>
+                      <span className={`h-1.5 w-1.5 rounded-[6px] ${statusConfig[selectedTask.status].dot}`} />
                       {statusConfig[selectedTask.status].label}
                     </span>
                   </div>
-                  <div className="bg-sb-surface-container/50 rounded-md p-3">
+                  <div className="bg-sb-surface-container/50 rounded-[6px] p-3">
                     <p className="text-[10px] text-sb-on-surface-variant/40 uppercase tracking-wider mb-1">Prioridad</p>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${priorityConfig[selectedTask.priority].bg} ${priorityConfig[selectedTask.priority].color}`}>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-[6px] ${priorityConfig[selectedTask.priority].bg} ${priorityConfig[selectedTask.priority].color}`}>
                       {priorityConfig[selectedTask.priority].label}
                     </span>
                   </div>
-                  <div className="col-span-2 bg-sb-surface-container/50 rounded-md p-3">
+                  <div className="col-span-2 bg-sb-surface-container/50 rounded-[6px] p-3">
                     <p className="text-[10px] text-sb-on-surface-variant/40 uppercase tracking-wider mb-1">Fechas</p>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
@@ -475,7 +475,7 @@ export default function TareasPage() {
                     </div>
                   </div>
                   {selectedTask.description && (
-                    <div className="col-span-2 bg-sb-surface-container/50 rounded-md p-3">
+                    <div className="col-span-2 bg-sb-surface-container/50 rounded-[6px] p-3">
                       <p className="text-[10px] text-sb-on-surface-variant/40 uppercase tracking-wider mb-1">Descripcion</p>
                       <p className="text-xs text-sb-on-surface whitespace-pre-line">{selectedTask.description}</p>
                     </div>
@@ -490,12 +490,12 @@ export default function TareasPage() {
                       Alumnos ({selectedTask.students?.length || 0})
                     </h3>
                     <div className="flex items-center gap-3 text-[10px]">
-                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-md bg-blue-500" /> {selectedTask.delivered_count} entregadas</span>
-                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-md bg-amber-500" /> {(selectedTask.total_students || 0) - selectedTask.delivered_count} pendientes</span>
+                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-[6px] bg-blue-500" /> {selectedTask.delivered_count} entregadas</span>
+                      <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-[6px] bg-amber-500" /> {(selectedTask.total_students || 0) - selectedTask.delivered_count} pendientes</span>
                     </div>
                   </div>
 
-                  <div className="bg-sb-surface-container/30 rounded-md overflow-hidden">
+                  <div className="bg-sb-surface-container/30 rounded-[6px] overflow-hidden">
                     {selectedTask.students && selectedTask.students.length > 0 ? (
                       <div className="divide-y divide-sb-outline-variant/10">
                         {selectedTask.students.map((student, i) => {
@@ -507,7 +507,7 @@ export default function TareasPage() {
                               transition={{ delay: i * 0.03 }}
                               className="flex items-center justify-between px-4 py-3 hover:bg-sb-surface-container/50 transition-colors">
                               <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-md bg-sb-on-surface/8 flex items-center justify-center text-[10px] font-bold text-sb-on-surface-variant/60">
+                                <div className="h-8 w-8 rounded-[6px] bg-sb-on-surface/8 flex items-center justify-center text-[10px] font-bold text-sb-on-surface-variant/60">
                                   {student.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                                 </div>
                                 <div>
@@ -517,17 +517,17 @@ export default function TareasPage() {
                               </div>
                               <div className="flex items-center gap-2">
                                 {student.submission_grade != null && (
-                                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-[6px]">
                                     {student.submission_grade}
                                   </span>
                                 )}
-                                <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-md ${ss.bg} ${ss.color}`}>
-                                  <span className={`h-1.5 w-1.5 rounded-md ${ss.dot}`} />
+                                <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] ${ss.bg} ${ss.color}`}>
+                                  <span className={`h-1.5 w-1.5 rounded-[6px] ${ss.dot}`} />
                                   {ss.label}
                                 </span>
                                 {student.submission_status === 'pending' && (
                                   <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
-                                    className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-md transition-colors">
+                                    className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-[6px] transition-colors">
                                     Marcar entrega
                                   </button>
                                 )}

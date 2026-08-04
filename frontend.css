@@ -464,6 +464,16 @@
   color: var(--sb-on-surface, var(--md-sys-color-on-surface));
 }
 
+/* --- Docente: esquinas semi-cuadradas suaves (override de radios globales) --- */
+[data-role="docente"] .sb-input,
+[data-role="docente"] .sb-select,
+[data-role="docente"] .sbf-native-select,
+[data-role="docente"] .sb-btn,
+[data-role="docente"] .sb-btn-icon,
+[data-role="docente"] .sb-data-line {
+  border-radius: 6px !important;
+}
+
 /* --- Results Counter --- */
 .sbf-results-count {
   display: flex;

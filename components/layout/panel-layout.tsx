@@ -309,7 +309,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-screen overflow-hidden text-[var(--sb-on-background)]" style={{ background: "var(--sb-background)" }}>
+    <div className="flex h-screen overflow-hidden text-[var(--sb-on-background)]" data-role={role} style={{ background: "var(--sb-background)" }}>
 
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className={cn(

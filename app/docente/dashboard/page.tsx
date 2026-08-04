@@ -129,9 +129,9 @@ export default function DocenteDashboard() {
     return (
       <div className="space-y-5">
         <div className="animate-pulse space-y-5">
-          <div className="h-8 w-56 rounded-md bg-sb-surface-container" />
+          <div className="h-8 w-56 rounded-[6px] bg-sb-surface-container" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 rounded-md bg-sb-surface-container" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 rounded-[6px] bg-sb-surface-container" />)}
           </div>
         </div>
       </div>
@@ -146,8 +146,8 @@ export default function DocenteDashboard() {
           <h1 className="text-[22px] font-bold tracking-tight text-sb-on-surface">{greeting}, {user?.full_name?.split(" ")[0] || "Docente"}</h1>
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5 capitalize">{dateStr}</p>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sb-on-surface/[0.04]">
-          <div className="h-1.5 w-1.5 rounded-md bg-emerald-400 animate-pulse" />
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-sb-on-surface/[0.04]">
+          <div className="h-1.5 w-1.5 rounded-[6px] bg-emerald-400 animate-pulse" />
           <span className="text-[11px] text-sb-on-surface-variant font-medium">Activo</span>
         </div>
       </motion.div>
@@ -160,8 +160,8 @@ export default function DocenteDashboard() {
           return (
             <motion.div key={m.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 + i * 0.04 }}>
               <Link href={m.href} className="block">
-                <div className="bg-sb-surface rounded-md p-5 border border-sb-outline-variant/8 hover:border-sb-outline-variant/15 transition-all group">
-                  <div className={`h-10 w-10 rounded-md ${m.bg} flex items-center justify-center mb-4`}>
+                <div className="bg-sb-surface rounded-[6px] p-5 border border-sb-outline-variant/8 hover:border-sb-outline-variant/15 transition-all group">
+                  <div className={`h-10 w-10 rounded-[6px] ${m.bg} flex items-center justify-center mb-4`}>
                     <Icon className={`h-5 w-5 ${m.color}`} />
                   </div>
                   <p className="text-2xl font-bold tracking-tight text-sb-on-surface">{m.value}</p>
@@ -179,7 +179,7 @@ export default function DocenteDashboard() {
         <div className="lg:col-span-3 space-y-6">
           {/* Horario de hoy */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-            <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
               <div className="px-5 pt-5 pb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-sb-primary/60" />
@@ -189,7 +189,7 @@ export default function DocenteDashboard() {
               </div>
               {todaySchedule.length === 0 ? (
                 <div className="px-5 pb-5">
-                  <div className="rounded-md bg-sb-surface-container p-4 text-center">
+                  <div className="rounded-[6px] bg-sb-surface-container p-4 text-center">
                     <Calendar className="h-6 w-6 mx-auto text-sb-on-surface-variant/20 mb-1.5" />
                     <p className="text-xs text-sb-on-surface-variant/40">No tienes clases hoy</p>
                   </div>
@@ -200,10 +200,10 @@ export default function DocenteDashboard() {
                     const isNext = nextClass?.id === h.id
                     return (
                       <div key={h.id} className={cn(
-                        "flex items-center gap-3 p-3 rounded-md transition-colors",
+                        "flex items-center gap-3 p-3 rounded-[6px] transition-colors",
                         isNext ? "bg-sb-primary/5 ring-1 ring-sb-primary/20" : "bg-sb-surface-container hover:bg-sb-surface-container-high/60"
                       )}>
-                        <div className={cn("h-10 w-14 rounded-md flex flex-col items-center justify-center shrink-0", isNext ? "bg-sb-primary text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant")}>
+                        <div className={cn("h-10 w-14 rounded-[6px] flex flex-col items-center justify-center shrink-0", isNext ? "bg-sb-primary text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant")}>
                           <span className="text-[10px] font-bold leading-none">{h.start_time.slice(0, 5)}</span>
                           <span className="text-[8px] opacity-70 mt-0.5">—</span>
                           <span className="text-[10px] font-bold leading-none">{h.end_time.slice(0, 5)}</span>
@@ -218,7 +218,7 @@ export default function DocenteDashboard() {
                           </div>
                         )}
                         {isNext && (
-                          <span className="text-[9px] font-semibold uppercase px-2 py-1 rounded-md bg-sb-primary/10 text-sb-primary">Siguiente</span>
+                          <span className="text-[9px] font-semibold uppercase px-2 py-1 rounded-[6px] bg-sb-primary/10 text-sb-primary">Siguiente</span>
                         )}
                       </div>
                     )
@@ -230,7 +230,7 @@ export default function DocenteDashboard() {
 
           {/* Mis cursos */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
-            <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
               <div className="px-5 pt-5 pb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-sb-primary/60" />
@@ -247,7 +247,7 @@ export default function DocenteDashboard() {
                 ) : courses.slice(0, 4).map(c => (
                   <Link key={c.id} href={`/docente/cursos/${c.id}`}>
                     <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-sb-surface-container-low/50 transition-colors group">
-                      <div className={cn("h-9 w-9 rounded-md flex items-center justify-center shrink-0", getAvatarColor(c.name))}>
+                      <div className={cn("h-9 w-9 rounded-[6px] flex items-center justify-center shrink-0", getAvatarColor(c.name))}>
                         <BookOpen className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -268,21 +268,21 @@ export default function DocenteDashboard() {
         <div className="lg:col-span-2 space-y-6">
           {/* Asistencia hoy */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
-            <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
               <div className="px-5 pt-5 pb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-sb-primary/60" />
                   <p className="text-sm font-semibold text-sb-on-surface">Asistencia de hoy</p>
                 </div>
                 {attS && (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium ${attS.color}`}>
-                    <span className={`h-1 w-1 rounded-md ${attS.dot}`} /> {attS.label}
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-medium ${attS.color}`}>
+                    <span className={`h-1 w-1 rounded-[6px] ${attS.dot}`} /> {attS.label}
                   </span>
                 )}
               </div>
               <div className="px-5 pb-5 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-md bg-sb-surface-container p-3">
+                  <div className="rounded-[6px] bg-sb-surface-container p-3">
                     <div className="flex items-center gap-1.5 mb-1">
                       <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-sb-on-surface-variant/30"}`} />
                       <span className="text-[9px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Entrada</span>
@@ -290,7 +290,7 @@ export default function DocenteDashboard() {
                     <p className={`text-lg font-bold ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/30"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
                     {schedule && <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Prog. {schedule.start_time}</p>}
                   </div>
-                  <div className="rounded-md bg-sb-surface-container p-3">
+                  <div className="rounded-[6px] bg-sb-surface-container p-3">
                     <div className="flex items-center gap-1.5 mb-1">
                       <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-sb-on-surface-variant/30"}`} />
                       <span className="text-[9px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Salida</span>
@@ -301,19 +301,19 @@ export default function DocenteDashboard() {
                 </div>
                 {!checkedIn && (
                   <button onClick={() => handleCheck("check-in")}
-                    className="w-full h-11 rounded-md bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all">
+                    className="w-full h-11 rounded-[6px] bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all">
                     <LogIn className="h-4 w-4" /> Marcar Entrada
                   </button>
                 )}
                 {checkedIn && !checkedOut && (
                   <button onClick={() => handleCheck("check-out")}
-                    className="w-full h-11 rounded-md bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all">
+                    className="w-full h-11 rounded-[6px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all">
                     <LogOut className="h-4 w-4" /> Marcar Salida
                   </button>
                 )}
                 {checkedIn && checkedOut && (
                   <Link href="/docente/asistencia">
-                    <div className="w-full h-11 rounded-md bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/15 transition-all">
+                    <div className="w-full h-11 rounded-[6px] bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/15 transition-all">
                       <LogIn className="h-4 w-4" /> Ver detalle de asistencia
                     </div>
                   </Link>
@@ -324,7 +324,7 @@ export default function DocenteDashboard() {
 
           {/* Quick actions */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
-            <div className="bg-sb-surface rounded-md overflow-hidden border border-sb-outline-variant/8">
+            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
               <div className="px-5 pt-5 pb-3">
                 <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Acciones rápidas</p>
               </div>
@@ -334,7 +334,7 @@ export default function DocenteDashboard() {
                   return (
                     <Link key={a.label} href={a.href}>
                       <div className="flex items-center gap-3 px-5 py-3 hover:bg-sb-surface-container-low/50 transition-colors group">
-                        <div className="h-8 w-8 rounded-md bg-sb-surface-container flex items-center justify-center shrink-0 group-hover:bg-sb-primary/10 transition-colors">
+                        <div className="h-8 w-8 rounded-[6px] bg-sb-surface-container flex items-center justify-center shrink-0 group-hover:bg-sb-primary/10 transition-colors">
                           <Icon className="h-4 w-4 text-sb-on-surface-variant/50 group-hover:text-sb-primary transition-colors" />
                         </div>
                         <div className="flex-1 min-w-0">

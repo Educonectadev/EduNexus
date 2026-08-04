@@ -145,9 +145,9 @@ export default function VirtualClassesPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-sb-surface rounded-md p-8 max-w-md w-full text-center shadow-lg"
+          className="bg-sb-surface rounded-[6px] p-8 max-w-md w-full text-center shadow-lg"
         >
-          <div className="w-16 h-16 bg-sb-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-sb-primary/10 rounded-[6px] flex items-center justify-center mx-auto mb-4">
             <Video className="w-8 h-8 text-sb-primary" />
           </div>
           <h2 className="text-xl font-bold text-sb-on-surface mb-2">
@@ -156,7 +156,7 @@ export default function VirtualClassesPage() {
           <p className="text-sb-on-surface/60 mb-6">
             Las clases virtuales están disponibles en el plan Pro o superior.
           </p>
-          <button className="px-6 py-3 bg-sb-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity">
+          <button className="px-6 py-3 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity">
             Mejorar Plan
           </button>
         </motion.div>
@@ -175,7 +175,7 @@ export default function VirtualClassesPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-sb-on-surface flex items-center gap-3">
-              <div className="w-10 h-10 bg-sb-on-surface/8 rounded-md flex items-center justify-center">
+              <div className="w-10 h-10 bg-sb-on-surface/8 rounded-[6px] flex items-center justify-center">
                 <Video className="w-5 h-5 text-sb-on-surface" />
               </div>
               Clases Virtuales
@@ -186,7 +186,7 @@ export default function VirtualClassesPage() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-sb-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 px-6 py-3 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity"
           >
             <Plus className="w-5 h-5" />
             Nueva Clase
@@ -194,12 +194,12 @@ export default function VirtualClassesPage() {
         </div>
 
         {loading ? (
-          <div className="bg-sb-surface rounded-md p-12 text-center">
+          <div className="bg-sb-surface rounded-[6px] p-12 text-center">
             <div className="w-12 h-12 border-4 border-sb-primary/20 border-t-sb-primary rounded-full animate-spin mx-auto" />
             <p className="text-sb-on-surface/60 mt-4">Cargando clases...</p>
           </div>
         ) : classes.length === 0 ? (
-          <div className="bg-sb-surface rounded-md p-12 text-center">
+          <div className="bg-sb-surface rounded-[6px] p-12 text-center">
             <Video className="w-12 h-12 text-sb-on-surface/20 mx-auto mb-4" />
             <p className="text-sb-on-surface/60">No hay clases programadas</p>
           </div>
@@ -214,10 +214,10 @@ export default function VirtualClassesPage() {
               <motion.div
                 key={cls.id}
                 variants={listItem}
-                className="bg-sb-surface rounded-md p-5 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-sb-surface rounded-[6px] p-5 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-md ${getStatusColor(cls.status)}`}>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-[6px] ${getStatusColor(cls.status)}`}>
                     {getStatusLabel(cls.status)}
                   </span>
                   <span className="text-lg">{getPlatformIcon(cls.platform)}</span>
@@ -249,7 +249,7 @@ export default function VirtualClassesPage() {
                   href={cls.meeting_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2 bg-sb-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity"
+                  className="flex items-center justify-center gap-2 w-full py-2 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Unirse a la clase
@@ -264,7 +264,7 @@ export default function VirtualClassesPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-sb-surface rounded-md p-6 max-w-lg w-full"
+              className="bg-sb-surface rounded-[6px] p-6 max-w-lg w-full"
             >
               <h2 className="text-xl font-bold text-sb-on-surface mb-4">Nueva Clase Virtual</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -289,7 +289,7 @@ export default function VirtualClassesPage() {
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                     placeholder="Ej: Clase de Matemáticas"
                     required
                   />
@@ -300,7 +300,7 @@ export default function VirtualClassesPage() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                     rows={2}
                     placeholder="Tema de la clase..."
                   />
@@ -326,7 +326,7 @@ export default function VirtualClassesPage() {
                       type="number"
                       value={formData.duration_minutes}
                       onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 60 })}
-                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                       min="15"
                       max="180"
                     />
@@ -339,7 +339,7 @@ export default function VirtualClassesPage() {
                     type="url"
                     value={formData.meeting_url}
                     onChange={(e) => setFormData({ ...formData, meeting_url: e.target.value })}
-                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                    className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                     placeholder="https://zoom.us/j/..."
                     required
                   />
@@ -352,7 +352,7 @@ export default function VirtualClassesPage() {
                       type="date"
                       value={formData.class_date}
                       onChange={(e) => setFormData({ ...formData, class_date: e.target.value })}
-                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                       required
                     />
                   </div>
@@ -362,7 +362,7 @@ export default function VirtualClassesPage() {
                       type="time"
                       value={formData.class_time}
                       onChange={(e) => setFormData({ ...formData, class_time: e.target.value })}
-                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-md text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                      className="w-full px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
                       required
                     />
                   </div>
@@ -372,13 +372,13 @@ export default function VirtualClassesPage() {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 py-3 bg-sb-on-surface/10 text-sb-on-surface rounded-md font-medium hover:bg-sb-on-surface/20 transition-colors"
+                    className="flex-1 py-3 bg-sb-on-surface/10 text-sb-on-surface rounded-[6px] font-medium hover:bg-sb-on-surface/20 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-sb-primary text-white rounded-md font-medium hover:opacity-90 transition-opacity"
+                    className="flex-1 py-3 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity"
                   >
                     Crear Clase
                   </button>
