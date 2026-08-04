@@ -13,10 +13,11 @@ const LEVEL_COLORS: Record<string, string> = { Inicial: "bg-orange-500/8 text-or
 const LEVEL_ICONS: Record<string, typeof School> = { Inicial: School, Primaria: BookOpen, Secundaria: GraduationCap }
 
 const staggerItem = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } } }
 const listItem = {
-  hidden: { opacity: 0, y: -10 },
-  show: { opacity: 1, y: 0 },
-  exit: { opacity: 0, filter: "blur(8px)", y: -10 },
+  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring" as const, stiffness: 380, damping: 30 } },
+  exit: { opacity: 0, x: -18, filter: "blur(6px)", transition: { duration: 0.18 } },
 }
 
 export default function GestionAcademicaPage() {
@@ -216,7 +217,13 @@ export default function GestionAcademicaPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="space-y-2">{[1, 2, 3].map(i => <div key={i} className="h-14 bg-sb-surface rounded-xl animate-pulse" />)}</div>
+          <motion.div variants={container} initial="hidden" animate="show" className="space-y-2">
+            {[0, 1, 2].map(i => (
+              <motion.div key={i} variants={listItem} className="h-14 bg-sb-surface rounded-xl overflow-hidden relative">
+                <motion.div className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-sb-on-surface/5 to-transparent" animate={{ x: ["-150%", "400%"] }} transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut", delay: i * 0.15 }} />
+              </motion.div>
+            ))}
+          </motion.div>
         ) : activeTab === "grades" ? (
           filteredGrades.length === 0 ? (
             <div className="bg-sb-surface rounded-2xl py-16 text-center">
@@ -225,12 +232,12 @@ export default function GestionAcademicaPage() {
               <p className="text-xs text-sb-on-surface-variant/25 mt-1">Agrega el primero o usa «Generar grados»</p>
             </div>
           ) : (
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.03 } } }} className="space-y-1.5">
+            <motion.div key={activeLevel} initial="hidden" animate="show" variants={container} className="space-y-1.5">
               <AnimatePresence>
                 {filteredGrades.map((item, i) => {
                   const LevelIcon = LEVEL_ICONS[item.level] || GraduationCap
                   return (
-                    <motion.div key={item.id} variants={listItem} exit="exit" transition={{ duration: 0.3 }}
+                    <motion.div key={item.id} variants={listItem} exit="exit"
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
                       <div className="flex flex-col gap-0.5">
                         <button onClick={() => handleMove(item, "up")} disabled={i === 0} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3 rotate-180" /></button>
@@ -262,7 +269,7 @@ export default function GestionAcademicaPage() {
               <p className="text-xs text-sb-on-surface-variant/25 mt-1">Usa «Generar A-Z» para crearlas</p>
             </div>
           ) : (
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.03 } } }} className="space-y-1.5">
+            <motion.div initial="hidden" animate="show" variants={container} className="space-y-1.5">
               <div className="flex flex-wrap gap-2 mb-4">
                 {sections.filter(s => s.is_active).map(s => (
                   <span key={s.id} className="h-10 w-10 rounded-xl bg-sb-on-surface/8 text-sb-on-surface flex items-center justify-center text-sm font-bold">{s.name}</span>
@@ -270,7 +277,7 @@ export default function GestionAcademicaPage() {
               </div>
               <AnimatePresence>
                 {sections.map((item, i) => (
-                  <motion.div key={item.id} variants={listItem} exit="exit" transition={{ duration: 0.3 }}
+                  <motion.div key={item.id} variants={listItem} exit="exit"
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
                     <div className="flex flex-col gap-0.5">
                       <button onClick={() => handleMove(item, "up")} disabled={i === 0} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3 rotate-180" /></button>
