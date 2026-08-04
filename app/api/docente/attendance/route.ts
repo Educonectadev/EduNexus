@@ -27,6 +27,19 @@ export async function GET(request: NextRequest) {
     )
     const record = (rows as any[])[0] || null
 
+    const [pendingRows] = await pool.query(
+      `SELECT id, teacher_id, date, check_in, check_out, status, notes
+       FROM teacher_attendance
+       WHERE teacher_id = ? AND check_in IS NOT NULL AND check_out IS NULL AND date < ?
+       ORDER BY date DESC LIMIT 1`,
+      [userId, date]
+    )
+    const pendingCheckout = (pendingRows as any[])[0] || null
+    if (pendingCheckout) {
+      const d = pendingCheckout.date
+      pendingCheckout.date = d instanceof Date ? d.toISOString().slice(0, 10) : String(d).slice(0, 10)
+    }
+
     const dayOfWeek = new Date(date + 'T00:00:00').getDay()
     const scheduleDay = dayOfWeek >= 1 && dayOfWeek <= 5 ? dayOfWeek : null
     let schedule = null
@@ -49,7 +62,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ attendance: record, schedule, date })
+    return NextResponse.json({ attendance: record, schedule, date, pendingCheckout })
   } catch (error) {
     return NextResponse.json({ error: 'Error fetching attendance' }, { status: 500 })
   }
@@ -105,6 +118,23 @@ export async function POST(request: NextRequest) {
     const record = (existing as any[])[0]
 
     if (action === 'check-in') {
+      const [pendingRows] = await pool.query(
+        `SELECT id, teacher_id, date, check_in, check_out, status, notes
+         FROM teacher_attendance
+         WHERE teacher_id = ? AND check_in IS NOT NULL AND check_out IS NULL AND date < ?
+         ORDER BY date DESC LIMIT 1`,
+        [userId, today]
+      )
+      const pendingCheckout = (pendingRows as any[])[0] || null
+      if (pendingCheckout) {
+        const d = pendingCheckout.date
+        pendingCheckout.date = d instanceof Date ? d.toISOString().slice(0, 10) : String(d).slice(0, 10)
+        return NextResponse.json({
+          error: 'PENDING_CHECKOUT',
+          message: 'Debes marcar tu salida del día anterior antes de registrar tu entrada',
+          pendingCheckout,
+        }, { status: 409 })
+      }
       const checkInLimit = scheduleStart ? fmt(applyGrace(scheduleStart)) : '08:30:00'
       const status = currentTime <= checkInLimit ? 'present' : 'late'
 
@@ -150,7 +180,8 @@ export async function POST(request: NextRequest) {
         ? { start_time: scheduleStart.slice(0, 5), end_time: (scheduleEnd || '').slice(0, 5), blocks: null }
         : null,
     })
-  } catch (error) {
+  } catch (error: any) {
+    console.error('[docente attendance POST error]', error?.message, error?.sqlMessage, error?.stack)
     return NextResponse.json({ error: 'Error updating attendance' }, { status: 500 })
   }
 }

@@ -86,6 +86,7 @@ function MiAsistencia() {
   const [loading, setLoading] = React.useState(true)
   const [actionLoading, setActionLoading] = React.useState(false)
   const [history, setHistory] = React.useState<any[]>([])
+  const [pendingCheckout, setPendingCheckout] = React.useState<any>(null)
   const today = getLocalDateStr()
 
   React.useEffect(() => {
@@ -99,24 +100,28 @@ function MiAsistencia() {
         if (cancelled) return
         setAttendance(attRes.attendance)
         setSchedule(attRes.schedule)
+        setPendingCheckout(attRes.pendingCheckout || null)
         setHistory(histRes.records || [])
       } catch {} finally { if (!cancelled) setLoading(false) }
     })()
     return () => { cancelled = true }
   }, [])
 
-  const handleCheck = async (action: "check-in" | "check-out") => {
+  const handleCheck = async (action: "check-in" | "check-out", targetDate?: string) => {
     setActionLoading(true)
     try {
       const res = await fetch("/api/docente/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, ...(targetDate ? { date: targetDate } : {}) }),
       })
       const data = await res.json()
       if (data.success) {
         setAttendance(data.attendance)
         if (data.schedule) setSchedule(data.schedule)
+        setPendingCheckout(null)
+      } else if (res.status === 409 && data.pendingCheckout) {
+        setPendingCheckout(data.pendingCheckout)
       }
     } catch {} finally { setActionLoading(false) }
   }
@@ -136,6 +141,7 @@ function MiAsistencia() {
   const checkedOut = attendance?.check_out
   const s = attendance?.status ? STATUS_CONFIG[attendance.status] : null
   const weekDays = getWeekDays(history)
+  const hasPending = !!pendingCheckout
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-5">
@@ -193,21 +199,39 @@ function MiAsistencia() {
         </div>
 
         <div className="px-5 pb-5 pt-1">
-          {!checkedIn && (
+          {hasPending && (
+            <div className="rounded-[6px] bg-amber-500/10 border border-amber-500/20 p-4">
+              <div className="flex items-start gap-3">
+                <LogOut className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-amber-600">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
+                  <p className="text-xs text-amber-600/70 mt-0.5">
+                    Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida. Completa la salida pendiente antes de marcar una nueva entrada.
+                  </p>
+                  <button onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}
+                    className="mt-3 w-full h-10 rounded-[6px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
+                    {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
+                    Marcar Salida
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {!hasPending && !checkedIn && (
             <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
               className="w-full h-11 rounded-[6px] bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
               Marcar Entrada
             </button>
           )}
-          {checkedIn && !checkedOut && (
+          {!hasPending && checkedIn && !checkedOut && (
             <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
               className="w-full h-11 rounded-[6px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
               Marcar Salida
             </button>
           )}
-          {checkedIn && checkedOut && (
+          {!hasPending && checkedIn && checkedOut && (
             <div className="w-full h-11 rounded-[6px] bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2">
               <Check className="h-4 w-4" />
               Jornada completada
