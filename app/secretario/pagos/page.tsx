@@ -494,12 +494,12 @@ export default function PagosPage() {
           transition={{ delay: 0.22 }}
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6"
         >
-          <div className="flex gap-1 p-1 bg-sb-surface rounded-xl">
+          <div className="flex gap-1 p-1 bg-sb-surface rounded-xl min-w-0 max-w-full overflow-x-auto sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap shrink-0 ${
                   activeTab === tab.id
                     ? "bg-sb-on-surface text-sb-surface"
                     : "text-sb-on-surface-variant/60 hover:bg-sb-surface-container"
