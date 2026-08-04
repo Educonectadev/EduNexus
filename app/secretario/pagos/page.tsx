@@ -391,21 +391,21 @@ export default function PagosPage() {
             <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Pagos / Colegiatura</h1>
             <p className="text-sm text-sb-on-surface-variant/50 mt-1">Administra pagos, deudas y conceptos de cobro</p>
           </div>
-          <div className="flex items-center gap-2">
-            <SbBtn rounded className="flex items-center gap-2" onClick={() => setConceptModal(true)}>
-              <Settings2 className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <SbBtn rounded className="flex items-center gap-1.5 whitespace-nowrap shrink-0 px-3! py-2! text-xs! sm:px-4! sm:text-sm" onClick={() => setConceptModal(true)}>
+              <Settings2 className="h-3.5 w-3.5 shrink-0" />
               Conceptos
             </SbBtn>
-            <SbBtn rounded className="flex items-center gap-2" onClick={() => setMethodModal(true)}>
-              <CreditCard className="h-3.5 w-3.5" />
+            <SbBtn rounded className="flex items-center gap-1.5 whitespace-nowrap shrink-0 px-3! py-2! text-xs! sm:px-4! sm:text-sm" onClick={() => setMethodModal(true)}>
+              <CreditCard className="h-3.5 w-3.5 shrink-0" />
               Métodos de pago
             </SbBtn>
-            <SbBtn rounded className="flex items-center gap-2" onClick={() => setDebtModal(true)}>
-              <TrendingDown className="h-3.5 w-3.5" />
+            <SbBtn rounded className="flex items-center gap-1.5 whitespace-nowrap shrink-0 px-3! py-2! text-xs! sm:px-4! sm:text-sm" onClick={() => setDebtModal(true)}>
+              <TrendingDown className="h-3.5 w-3.5 shrink-0" />
               Generar deuda
             </SbBtn>
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterModal(true)}>
-              <Plus className="h-3.5 w-3.5" />
+            <SbBtn variant="filled" rounded className="flex items-center gap-1.5 whitespace-nowrap shrink-0 px-3! py-2! text-xs! sm:px-4! sm:text-sm" onClick={() => setRegisterModal(true)}>
+              <Plus className="h-3.5 w-3.5 shrink-0" />
               Registrar pago
             </SbBtn>
           </div>
