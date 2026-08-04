@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
+import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Sparkles } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbIconBtn, SbDropdown, SbDropdownItem, SbBadge } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfClearFilters, SbfResultsCount } from "@/components/ui/search-filter-bar"
@@ -41,6 +41,19 @@ interface BulkRow {
   errors: string[]
   duplicate: boolean
   skipped: boolean
+  compareStatus?: "new" | "unchanged" | "changed"
+  changes?: { field: string; old: string; new: string }[]
+  existingCode?: string
+  existingEnrollmentId?: string | null
+}
+
+interface CompareResult {
+  dni: string
+  status: "new" | "unchanged" | "changed"
+  changes: { field: string; old: string; new: string }[]
+  existing: boolean
+  code?: string
+  enrollmentId?: string | null
 }
 
 const currentYear = new Date().getFullYear()
@@ -203,37 +216,63 @@ export default function SecretarioMatriculasPage() {
     setBulkFile(file)
     const rows = await parseExcel(file)
 
-    // Mark duplicates against existing enrollments
-    const currentYear = new Date().getFullYear()
-    const existingKeys = new Set(
-      enrollments
-        .filter(e => e.year === currentYear && e.status === 'active')
-        .map(e => e.document_number)
-    )
-    
+    // Detect repeated DNI inside the file
     const seenDnis = new Set<string>()
-    
     const marked = rows.map(r => {
       if (!r.valid) return r
-      
-      let isDuplicate = false
-      let errMsg = ''
-
-      if (existingKeys.has(r.student_dni)) {
-        isDuplicate = true
-        errMsg = 'Ya tiene matrícula activa este año'
-      } else if (seenDnis.has(r.student_dni)) {
-        isDuplicate = true
-        errMsg = 'DNI repetido en el archivo'
+      if (seenDnis.has(r.student_dni)) {
+        return { ...r, duplicate: true, skipped: true, errors: [...r.errors, 'DNI repetido en el archivo'] }
       }
-
-      if (isDuplicate) {
-        return { ...r, duplicate: true, skipped: true, errors: [...r.errors, errMsg] }
-      }
-      
       if (r.student_dni) seenDnis.add(r.student_dni)
       return r
     })
+
+    // Compare against existing students to detect data changes
+    const validRows = marked.filter(r => r.valid && !r.skipped)
+    if (validRows.length > 0) {
+      try {
+        const res = await fetch("/api/secretario/enrollments/compare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ rows: validRows.map(r => ({
+            student_name: r.student_name,
+            student_dni: r.student_dni,
+            student_birth_date: convertDate(r.student_birth_date),
+            student_gender: r.student_gender === "MASCULINO" ? "M" : r.student_gender === "FEMENINO" ? "F" : r.student_gender,
+            parent_name: r.parent_name,
+            parent_dni: r.parent_dni,
+            parent_phone: r.parent_phone,
+            parent_email: r.parent_email,
+            grade: r.grade,
+            section: r.section,
+          })) }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const byDni = new Map<string, CompareResult>((data.results || []).map((r: CompareResult) => [r.dni, r]))
+          const merged: BulkRow[] = marked.map(r => {
+            const cmp = r.student_dni ? byDni.get(r.student_dni) : null
+            if (!cmp || !r.valid || r.skipped) return r
+            if (cmp.status === "unchanged") {
+              return { ...r, compareStatus: "unchanged" as const, changes: [], existingCode: cmp.code || "", skipped: true }
+            }
+            return {
+              ...r,
+              compareStatus: cmp.status,
+              changes: cmp.changes || [],
+              existingCode: cmp.code || "",
+              existingEnrollmentId: cmp.enrollmentId || null,
+              duplicate: false,
+              skipped: false,
+            }
+          })
+          setBulkRows(merged)
+          setBulkStep("preview")
+          return
+        }
+      } catch {}
+    }
 
     setBulkRows(marked)
     setBulkStep("preview")
@@ -248,33 +287,46 @@ export default function SecretarioMatriculasPage() {
     
     for (let i = 0; i < importableRows.length; i++) {
       setBulkProgress(Math.round(((i + 1) / importableRows.length) * 100))
-      
+
+      const row = importableRows[i]
+      const payload = {
+        student_code: row.student_code,
+        student_name: row.student_name,
+        student_dni: row.student_dni,
+        student_birth_date: convertDate(row.student_birth_date),
+        student_gender: row.student_gender === "MASCULINO" ? "M" : row.student_gender === "FEMENINO" ? "F" : row.student_gender,
+        parent_name: row.parent_name,
+        parent_dni: row.parent_dni,
+        parent_phone: row.parent_phone,
+        parent_email: row.parent_email,
+        grade: row.grade,
+        section: row.section,
+        year: new Date().getFullYear().toString(),
+      }
+
       try {
-        const res = await fetch("/api/secretario/enrollments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            student_code: importableRows[i].student_code,
-            student_name: importableRows[i].student_name,
-            student_dni: importableRows[i].student_dni,
-            student_birth_date: convertDate(importableRows[i].student_birth_date),
-            student_gender: importableRows[i].student_gender === "MASCULINO" ? "M" : importableRows[i].student_gender === "FEMENINO" ? "F" : importableRows[i].student_gender,
-            parent_name: importableRows[i].parent_name,
-            parent_dni: importableRows[i].parent_dni,
-            parent_phone: importableRows[i].parent_phone,
-            parent_email: importableRows[i].parent_email,
-            grade: importableRows[i].grade,
-            section: importableRows[i].section,
-            year: new Date().getFullYear().toString(),
-          }),
-        })
-        
+        let res
+        if (row.compareStatus === "changed" && row.existingEnrollmentId) {
+          res = await fetch(`/api/secretario/enrollments/${row.existingEnrollmentId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload),
+          })
+        } else {
+          res = await fetch("/api/secretario/enrollments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload),
+          })
+        }
+
         if (res.ok) {
           imported++
         } else {
           const data = await res.json().catch(() => ({}))
-          console.error(`[Bulk Import] Row ${importableRows[i].row} failed:`, res.status, data)
+          console.error(`[Bulk Import] Row ${row.row} failed:`, res.status, data)
           if (data.error === 'DUPLICATE_ENROLLMENT' || res.status === 409) {
             skipped++
           } else {
@@ -282,7 +334,7 @@ export default function SecretarioMatriculasPage() {
           }
         }
       } catch (e) {
-        console.error(`[Bulk Import] Row ${importableRows[i].row} exception:`, e)
+        console.error(`[Bulk Import] Row ${row.row} exception:`, e)
         errors++
       }
       
@@ -932,6 +984,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   const validCount = rows.filter(r => r.valid && !r.skipped).length
   const errorCount = rows.filter(r => !r.valid).length
   const duplicateCount = rows.filter(r => r.duplicate).length
+  const newCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "new").length
+  const changedCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "changed").length
+  const unchangedCount = rows.filter(r => r.valid && r.compareStatus === "unchanged").length
 
   if (step === "upload") {
     return (
@@ -1001,11 +1056,29 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           </div>
           
           {/* Stats */}
-          <div className="flex gap-4 mt-3">
+          <div className="flex flex-wrap gap-4 mt-3">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-emerald-400" />
-              <span className="text-xs text-sb-on-surface-variant/60">{validCount} válidos</span>
+              <span className="text-xs text-sb-on-surface-variant/60">{validCount} para importar</span>
             </div>
+            {newCount > 0 && (
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-sb-primary" />
+                <span className="text-xs text-sb-primary">{newCount} nuevos</span>
+              </div>
+            )}
+            {changedCount > 0 && (
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4 text-amber-400" />
+                <span className="text-xs text-amber-400">{changedCount} por actualizar</span>
+              </div>
+            )}
+            {unchangedCount > 0 && (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-emerald-400/70" />
+                <span className="text-xs text-emerald-400/70">{unchangedCount} sin cambios (omitidos)</span>
+              </div>
+            )}
             {duplicateCount > 0 && (
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-400" />
@@ -1035,13 +1108,37 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i} className={`border-b border-sb-outline-variant/10 ${!row.valid ? "bg-red-500/5" : row.duplicate ? "bg-amber-500/5" : ""}`}>
+                <tr key={i} className={`border-b border-sb-outline-variant/10 ${!row.valid ? "bg-red-500/5" : row.duplicate ? "bg-amber-500/5" : row.compareStatus === "changed" ? "bg-amber-500/5" : row.compareStatus === "unchanged" ? "opacity-60" : ""}`}>
                   <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/50">{row.row}</td>
-                  <td className="py-2 px-3 text-sb-on-surface/80">{row.student_name || "—"}</td>
+                  <td className="py-2 px-3 text-sb-on-surface/80">
+                    {row.student_name || "—"}
+                    {row.compareStatus === "changed" && row.changes && row.changes.length > 0 && (
+                      <div className="mt-1.5 space-y-0.5">
+                        {row.changes.map((c, ci) => (
+                          <div key={ci} className="text-[10px] leading-tight">
+                            <span className="text-sb-on-surface-variant/40">{c.field}:</span>{" "}
+                            <span className="text-red-400 line-through">{c.old}</span>
+                            <span className="text-sb-on-surface-variant/40"> → </span>
+                            <span className="text-emerald-400">{c.new}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {row.compareStatus === "changed" && row.existingCode && (
+                      <div className="mt-1 text-[10px] font-mono text-sb-on-surface-variant/40">
+                        Código actual: {row.existingCode}
+                      </div>
+                    )}
+                  </td>
                   <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/60">{row.student_dni || "—"}</td>
                   <td className="py-2 px-3 text-sb-on-surface/70">{row.grade || "—"}</td>
                   <td className="py-2 px-3">
-                    {row.duplicate ? (
+                    {!row.valid ? (
+                      <div className="flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4 text-red-400" />
+                        <span className="text-[10px] text-red-400">{row.errors[0]}</span>
+                      </div>
+                    ) : row.duplicate ? (
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -1057,12 +1154,22 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                           <span className="text-[10px] text-amber-400">{row.errors[0] || "Duplicado"}</span>
                         </div>
                       </label>
-                    ) : row.valid ? (
-                      <CheckCircle className="h-4 w-4 text-emerald-400" />
+                    ) : row.compareStatus === "unchanged" ? (
+                      <div className="flex items-center gap-1">
+                        <CheckCircle className="h-4 w-4 text-emerald-400/70" />
+                        <span className="text-[10px] text-emerald-400/70">Sin cambios</span>
+                      </div>
+                    ) : row.compareStatus === "changed" ? (
+                      <div className="flex items-center gap-1">
+                        <RefreshCw className="h-4 w-4 text-amber-400" />
+                        <span className="text-[10px] text-amber-400">
+                          Actualizar{row.existingEnrollmentId ? "" : " (nueva matrícula)"}
+                        </span>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4 text-red-400" />
-                        <span className="text-[10px] text-red-400">{row.errors[0]}</span>
+                        <Sparkles className="h-4 w-4 text-sb-primary" />
+                        <span className="text-[10px] text-sb-primary">Nuevo</span>
                       </div>
                     )}
                   </td>
@@ -1077,7 +1184,7 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           <SbBtn rounded onClick={onReset}>Cancelar</SbBtn>
           <SbBtn variant="filled" rounded className="flex items-center gap-2"
             onClick={onImport} disabled={validCount === 0}>
-            <Upload className="h-4 w-4" /> Importar {validCount} registros{duplicateCount > 0 ? ` (${duplicateCount} duplicados omitidos)` : ""}
+            <Upload className="h-4 w-4" /> Importar {validCount} registros{changedCount > 0 ? ` (${changedCount} por actualizar)` : ""}
           </SbBtn>
         </div>
       </motion.div>
