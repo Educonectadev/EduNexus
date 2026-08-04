@@ -1628,41 +1628,6 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   bottom: 1rem;
 }
 
-/* pill: cápsula flotante centrada */
-.mobile-navbar[data-style="pill"] .mobile-nav-buttons {
-  background: var(--sb-surface-container);
-  border: 1px solid var(--sb-outline-variant);
-  border-radius: 999px;
-  padding: 4px;
-  box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.25);
-}
-.mobile-navbar[data-style="pill"] .mobile-nav-more {
-  bottom: 0.25rem;
-}
-
-/* bottom: barra fija al fondo */
-.mobile-navbar[data-style="bottom"] {
-  bottom: 0;
-  background: var(--sb-surface-container);
-  border-top: 1px solid var(--sb-outline-variant);
-  padding: 0.25rem 0 calc(0.25rem + env(safe-area-inset-bottom));
-  box-shadow: 0 -4px 20px -12px rgba(0, 0, 0, 0.2);
-}
-.mobile-navbar[data-style="bottom"] .mobile-nav-inner {
-  align-items: center;
-}
-.mobile-navbar[data-style="bottom"] .mobile-nav-buttons {
-  flex: 1;
-  justify-content: space-evenly;
-  gap: 0;
-}
-.mobile-navbar[data-style="bottom"] .mobile-nav-more {
-  position: static;
-}
-.mobile-navbar[data-style="bottom"] .mobile-nav-more > div {
-  align-items: center;
-}
-
 /* minimal: solo iconos, sin etiquetas ni cápsula */
 .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
   gap: 0.25rem;

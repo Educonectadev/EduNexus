@@ -39,11 +39,6 @@ const PERFIL_DESIGNS = [
   { id: "stepbro-money", label: "Clásico", desc: "Diseño del sistema original" },
   { id: "minimal", label: "Minimal", desc: "Aplica el estilo Minimal a todo el panel" },
 ]
-const NAV_STYLES = [
-  { id: "pill",   label: "Pill flotante", desc: "Cápsula flotante centrada" },
-  { id: "bottom", label: "Barra inferior", desc: "Barra fija al fondo" },
-  { id: "minimal",label: "Minimal",        desc: "Solo iconos, sin etiquetas" },
-]
 
 const roleLabels: Record<string, string> = {
   dev: "Developer", super_admin: "Super Admin", admin: "Administrador", director: "Director",
@@ -70,7 +65,6 @@ interface PerfilData {
   showConfirm: boolean; setShowConfirm: (b: boolean) => void
   changingPass: boolean; handleChangePassword: (e: React.FormEvent) => void
   themeVariant: string; resolvedTheme?: string; handleTheme: (t: ThemeOption) => void
-  navStyle: string; handleNavStyle: (id: string) => void
 }
 
 const cardCls = (v: V) => v === "minimal"
@@ -462,78 +456,6 @@ function SystemDesignSection({ v, d, className, delay }: { v: V; d: PerfilData; 
   )
 }
 
-function NavStyleSection({ v, d, className, delay }: { v: V; d: PerfilData; className?: string; delay: number }) {
-  return (
-    <motion.section {...fadeUp} transition={{ ...spring, delay }} className={cn(cardCls(v), className)}>
-      <SectionHeader icon={Layers} title="Navegación móvil" desc="Estilo de la barra inferior" v={v} />
-      {v === "minimal" ? (
-        <div className="space-y-1.5">
-          {NAV_STYLES.map(ns => {
-            const active = d.navStyle === ns.id
-            return (
-              <button key={ns.id} onClick={() => d.handleNavStyle(ns.id)}
-                className={cn("w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
-                  active ? "bg-sb-surface-container-high" : "hover:bg-sb-surface-container-high/50")}>
-                <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", active ? "bg-sb-primary" : "border border-sb-outline-variant/60")} />
-                <div className="flex-1">
-                  <p className={cn("text-xs font-semibold", active ? "text-sb-on-surface" : "text-sb-on-surface-variant")}>{ns.label}</p>
-                  <p className="text-[10px] text-sb-on-surface-variant/45">{ns.desc}</p>
-                </div>
-                {active && <Check className="h-3.5 w-3.5 text-sb-primary" />}
-              </button>
-            )
-          })}
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-3">
-          {NAV_STYLES.map(ns => {
-            const active = d.navStyle === ns.id
-            return (
-              <motion.button
-                key={ns.id}
-                onClick={() => d.handleNavStyle(ns.id)}
-                whileTap={{ scale: 0.97 }}
-                className={cn(
-                  "flex flex-col items-center gap-3 rounded-2xl p-4 transition-all",
-                  active ? "bg-sb-primary/10 shadow-[0_0_0_1.5px_var(--sb-primary)]" : "bg-sb-surface-container-high hover:bg-sb-surface-container-highest"
-                )}
-              >
-                <div className="flex h-9 w-full items-center justify-center overflow-hidden rounded-xl bg-sb-surface-container" style={{ alignItems: ns.id === "bottom" ? "flex-end" : "center" }}>
-                  {ns.id === "pill" && (
-                    <div className="flex gap-1.5 rounded-full bg-sb-primary/20 p-1.5 ring-1 ring-sb-primary/40">
-                      {[1, 0, 0, 0].map((a, i) => (
-                        <span key={i} className="h-3.5 w-3.5 rounded-full" style={{ background: a ? "var(--sb-primary)" : "var(--sb-on-surface-variant)" }} />
-                      ))}
-                    </div>
-                  )}
-                  {ns.id === "bottom" && (
-                    <div className="flex w-full items-end justify-around border-t border-sb-on-surface-variant/15 px-3 pt-2">
-                      {[0, 1, 0, 0].map((a, i) => (
-                        <span key={i} className="h-3.5 w-3.5 rounded-full" style={{ background: a ? "var(--sb-primary)" : "var(--sb-on-surface-variant)" }} />
-                      ))}
-                    </div>
-                  )}
-                  {ns.id === "minimal" && (
-                    <div className="flex gap-2">
-                      {[0, 0, 1].map((a, i) => (
-                        <span key={i} className="h-3.5 w-3.5 rounded-full" style={{ background: a ? "var(--sb-primary)" : "var(--sb-on-surface-variant)" }} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <p className={cn("text-xs font-semibold", active ? "text-sb-primary" : "text-sb-on-surface-variant")}>{ns.label}</p>
-                  <p className="mt-0.5 text-[10px] text-sb-on-surface-variant/45">{ns.desc}</p>
-                </div>
-              </motion.button>
-            )
-          })}
-        </div>
-      )}
-    </motion.section>
-  )
-}
-
 function ClassicLayout({ d }: { d: PerfilData }) {
   return (
     <div className="space-y-5">
@@ -548,7 +470,6 @@ function ClassicLayout({ d }: { d: PerfilData }) {
       </div>
       <div className="grid gap-5 lg:grid-cols-2">
         <SystemDesignSection v="classic" d={d} delay={0.18} />
-        <NavStyleSection v="classic" d={d} delay={0.21} />
       </div>
     </div>
   )
@@ -560,7 +481,6 @@ const M_SECTIONS = [
   { id: "password", label: "Contraseña", icon: Key },
   { id: "tema", label: "Tema", icon: Layers },
   { id: "diseno", label: "Diseño", icon: Sparkles },
-  { id: "nav", label: "Navegación", icon: Layers },
 ] as const
 
 function MBlock({ id, index, label, title, desc, children }: {
@@ -796,26 +716,6 @@ function MinimalLayout({ d }: { d: PerfilData }) {
           <MBlock id="diseno" index={4} label="Diseño" title="Identidad del sistema">
             <DesignSelector />
           </MBlock>
-
-          <MBlock id="nav" index={5} label="Navegación" title="Barra móvil" desc="Estilo de la navegación inferior">
-            <div className="space-y-1.5">
-              {NAV_STYLES.map(ns => {
-                const isActive = d.navStyle === ns.id
-                return (
-                  <button key={ns.id} onClick={() => d.handleNavStyle(ns.id)}
-                    className={cn("w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
-                      isActive ? "bg-sb-surface-container-high" : "hover:bg-sb-surface-container-high/50")}>
-                    <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", isActive ? "bg-sb-primary" : "border border-sb-outline-variant/60")} />
-                    <div className="flex-1">
-                      <p className={cn("text-xs font-semibold", isActive ? "text-sb-on-surface" : "text-sb-on-surface-variant")}>{ns.label}</p>
-                      <p className="text-[10px] text-sb-on-surface-variant/45">{ns.desc}</p>
-                    </div>
-                    {isActive && <Check className="h-3.5 w-3.5 text-sb-primary" />}
-                  </button>
-                )
-              })}
-            </div>
-          </MBlock>
         </div>
       </div>
     </div>
@@ -831,7 +731,6 @@ export default function PerfilPage() {
     const s = getInitial("sb-theme-variant", "")
     return THEMES.some(t => t.variant === s) ? s : ""
   })
-  const [navStyle, setNavStyle] = React.useState<string>(() => getInitial("sb-nav-style", "pill"))
   const [profile, setProfile] = React.useState<UserProfile | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [editMode, setEditMode] = React.useState(false)
@@ -850,13 +749,12 @@ export default function PerfilPage() {
   React.useEffect(() => {
     if (themeVariant) document.documentElement.setAttribute("data-theme", themeVariant)
     else document.documentElement.removeAttribute("data-theme")
-    document.documentElement.setAttribute("data-nav-style", navStyle)
     fetch("/api/auth/me")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) { setProfile(d.user); setFullName(d.user.fullName || "") } })
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [themeVariant, navStyle])
+  }, [themeVariant])
 
   const handlePerfilDesign = (id: string) => {
     setDesign(id)
@@ -872,13 +770,6 @@ export default function PerfilPage() {
     if (t.variant) document.documentElement.setAttribute("data-theme", t.variant)
     else document.documentElement.removeAttribute("data-theme")
     toast(`Tema aplicado: ${t.name}`, "success")
-  }
-
-  const handleNavStyle = (id: string) => {
-    setNavStyle(id)
-    localStorage.setItem("sb-nav-style", id)
-    document.documentElement.setAttribute("data-nav-style", id)
-    toast(`Navegación: ${NAV_STYLES.find(n => n.id === id)?.label}`, "success")
   }
 
   const handleSave = async () => {
@@ -928,7 +819,6 @@ export default function PerfilPage() {
     showCurrent, setShowCurrent, showNew, setShowNew, showConfirm, setShowConfirm,
     changingPass, handleChangePassword,
     themeVariant, resolvedTheme, handleTheme,
-    navStyle, handleNavStyle,
   }
 
   return (
