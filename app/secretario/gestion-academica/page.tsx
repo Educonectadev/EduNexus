@@ -234,8 +234,8 @@ export default function GestionAcademicaPage() {
                   const LevelIcon = LEVEL_ICONS[item.level] || GraduationCap
                   return (
                     <motion.div key={item.id} variants={listItem} exit="exit" layout
-                      whileHover={{ y: -2, scale: 1.01 }}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
+                      whileHover={{ y: -4, scale: 1.015, transition: { type: "spring" as const, stiffness: 400, damping: 25 } }}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors shadow-sm hover:shadow-md ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
                       <div className="flex flex-col gap-0.5">
                         <button onClick={() => handleMove(item, "up")} disabled={i === 0} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3 rotate-180" /></button>
                         <button onClick={() => handleMove(item, "down")} disabled={i === filteredGrades.length - 1} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3" /></button>
@@ -275,8 +275,8 @@ export default function GestionAcademicaPage() {
               <AnimatePresence>
                 {sections.map((item, i) => (
                   <motion.div key={item.id} variants={listItem} exit="exit" layout
-                    whileHover={{ y: -2, scale: 1.01 }}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
+                    whileHover={{ y: -4, scale: 1.015, transition: { type: "spring" as const, stiffness: 400, damping: 25 } }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors shadow-sm hover:shadow-md ${item.is_active ? "bg-sb-surface hover:bg-sb-surface-container-low/50" : "bg-sb-surface/50"}`}>
                     <div className="flex flex-col gap-0.5">
                       <button onClick={() => handleMove(item, "up")} disabled={i === 0} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3 rotate-180" /></button>
                       <button onClick={() => handleMove(item, "down")} disabled={i === sections.length - 1} className="text-sb-on-surface-variant/20 hover:text-sb-on-surface-variant/60 disabled:opacity-20"><ChevronDown className="h-3 w-3" /></button>
