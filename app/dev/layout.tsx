@@ -514,11 +514,11 @@ export default function DevLayout({
                     <Moon className="absolute h-[16px] w-[16px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                     <span>Tema</span>
                   </button>
-                  <Link href="/" onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-2.5 py-2.5 rounded-[6px] text-[13px] text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface transition-colors">
+                  <button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/' }}
+                    className="flex items-center gap-3 w-full px-2.5 py-2.5 rounded-[6px] text-[13px] text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface transition-colors">
                     <LogOut className="h-[16px] w-[16px]" />
                     <span>Salir</span>
-                  </Link>
+                  </button>
                 </div>
               </motion.aside>
             </>

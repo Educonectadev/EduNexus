@@ -30,7 +30,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
       const result = await res.json()
       if (!res.ok) { setError(result.error); setLoading(false); return }
-      const roleRouteMap: Record<string, string> = { dev: "/dev", super_admin: "/super-admin/dashboard", director: "/director/dashboard", secretario: "/secretario/dashboard", docente: "/docente/dashboard", padre: "/padre/dashboard" }
+      const roleRouteMap: Record<string, string> = { dev: "/", super_admin: "/super-admin/dashboard", director: "/director/dashboard", secretario: "/secretario/dashboard", docente: "/docente/dashboard", padre: "/padre/dashboard" }
       router.push(roleRouteMap[result.user.role] || "/director/dashboard")
     } catch { setError("Error de conexión"); setLoading(false) }
   }

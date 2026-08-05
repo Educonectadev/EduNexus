@@ -9,7 +9,7 @@ const roleRouteMap: Record<string, string> = {
   secretario: '/secretario/dashboard',
   docente: '/docente/dashboard',
   padre: '/padre/dashboard',
-  dev: '/dev',
+  dev: '/',
 }
 
 export async function middleware(request: NextRequest) {
@@ -58,7 +58,7 @@ export async function middleware(request: NextRequest) {
         const { payload } = await jwtVerify(token, secret)
         const role = payload.role as string
         const expectedRoute = roleRouteMap[role]
-        if (expectedRoute) {
+        if (expectedRoute && expectedRoute !== '/') {
           return NextResponse.redirect(new URL(expectedRoute, request.url))
         }
       } catch {
