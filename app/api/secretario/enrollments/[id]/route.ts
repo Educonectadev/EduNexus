@@ -25,7 +25,7 @@ export async function GET(
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const { id } = await params
-    const [rows] = await pool.query(
+    const result = await pool.query(
        `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
               s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
               s.code, s.document_type, s.status as student_status
@@ -34,7 +34,7 @@ export async function GET(
        WHERE e.id = ? AND s.institution_id = ?`,
       [id, instId]
     )
-    const enrollment = (rows as any[])[0]
+    const enrollment = (result as any[])[0]?.[0]
     if (!enrollment) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
     return NextResponse.json(enrollment)
   } catch (error: any) {
@@ -63,7 +63,7 @@ export async function PUT(
     conn = await pool.rawPool.connect()
     await conn.query('BEGIN')
 
-    const [current] = await conn.query(
+    const current = await conn.query(
       `SELECT e.student_id FROM enrollments e
        JOIN students s ON e.student_id = s.id
        WHERE e.id = $1 AND s.institution_id = $2`,
@@ -138,7 +138,7 @@ export async function DELETE(
     conn = await pool.rawPool.connect()
     await conn.query('BEGIN')
 
-    const [current] = await conn.query(
+    const current = await conn.query(
       `SELECT e.student_id, s.user_id as student_user_id
        FROM enrollments e
        JOIN students s ON e.student_id = s.id
@@ -153,7 +153,7 @@ export async function DELETE(
     const studentId = current.rows[0].student_id
     const studentUserId = current.rows[0].student_user_id
 
-    const [linkedParents] = await conn.query(
+    const linkedParents = await conn.query(
       `SELECT ps.parent_id, p.user_id as parent_user_id
        FROM parent_student ps
        LEFT JOIN parents p ON p.id = ps.parent_id
@@ -164,7 +164,7 @@ export async function DELETE(
     const orphanParentIds: string[] = []
     const orphanParentUserIds: (string | null)[] = []
     for (const link of linkedParents.rows) {
-      const [otherChildren] = await conn.query(
+      const otherChildren = await conn.query(
         `SELECT COUNT(*)::int as c FROM parent_student ps
          JOIN students s ON s.id = ps.student_id
          WHERE ps.parent_id = $1 AND ps.student_id != $2 AND s.institution_id = $3`,

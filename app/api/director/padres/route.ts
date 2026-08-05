@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       const hashedPassword = await bcrypt.hash(generatedPassword, 10)
       const fullName = `${first_name} ${last_name}`.trim()
 
-      const [exists] = await conn.query(`SELECT id FROM users WHERE email = $1`, [generatedEmail])
+      const exists = await conn.query(`SELECT id FROM users WHERE email = $1`, [generatedEmail])
       if (exists.rows.length > 0) {
         await conn.query('ROLLBACK')
         return NextResponse.json({ error: `El correo ${generatedEmail} ya está registrado` }, { status: 409 })

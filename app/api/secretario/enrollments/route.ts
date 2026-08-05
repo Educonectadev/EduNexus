@@ -57,14 +57,14 @@ export async function POST(request: NextRequest) {
 
     let studentId: string
 
-    const [existingStudent] = await conn.query(
+    const existingStudent = await conn.query(
       'SELECT id FROM students WHERE document_number = $1 AND institution_id = $2',
       [student_dni, instId]
     )
 
     if (existingStudent.rows.length > 0) {
       studentId = existingStudent.rows[0].id
-      const [existingEnrollment] = await conn.query(
+      const existingEnrollment = await conn.query(
         `SELECT id FROM enrollments WHERE student_id = $1 AND grade = $2 AND section = $3 AND year = $4`,
         [studentId, grade, section || 'A', year || new Date().getFullYear()]
       )
@@ -89,14 +89,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const [result] = await conn.query(
+    const result = await conn.query(
       `INSERT INTO enrollments (student_id, grade, section, year, status)
        VALUES ($1, $2, $3, $4, 'active')`,
       [studentId, grade, section || 'A', year || new Date().getFullYear()]
     )
 
     if (parent_dni) {
-      const [existingParent] = await conn.query(
+      const existingParent = await conn.query(
         'SELECT id FROM parents WHERE document_number = $1 AND institution_id = $2',
         [parent_dni, instId]
       )
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const [existingLink] = await conn.query(
+      const existingLink = await conn.query(
         'SELECT id FROM parent_student WHERE parent_id = $1 AND student_id = $2',
         [parentId, studentId]
       )
@@ -164,29 +164,29 @@ export async function DELETE(request: NextRequest) {
     conn = await pool.rawPool.connect()
     await conn.query('BEGIN')
 
-    const [students] = await conn.query(
+    const studentsResult = await conn.query(
       `SELECT id, user_id FROM students WHERE institution_id = $1`,
       [instId]
     )
 
-    const [parentLinks] = await conn.query(
+    const parentLinksResult = await conn.query(
       `SELECT ps.parent_id FROM parent_student ps
        JOIN students s ON s.id = ps.student_id
        WHERE s.institution_id = $1`,
       [instId]
     )
-    const parentIds = [...new Set(parentLinks.rows.map((l: any) => l.parent_id))]
+    const parentIds = [...new Set(parentLinksResult.rows.map((l: any) => l.parent_id))]
 
     let parentUserIds: string[] = []
     if (parentIds.length > 0) {
-      const [parents] = await conn.query(
+      const parentsResult = await conn.query(
         `SELECT user_id FROM parents WHERE id = ANY($1) AND user_id IS NOT NULL`,
         [parentIds]
       )
-      parentUserIds = parents.rows.map((p: any) => p.user_id)
+      parentUserIds = parentsResult.rows.map((p: any) => p.user_id)
     }
 
-    const studentUserIds = students.rows.map((s: any) => s.user_id).filter(Boolean)
+    const studentUserIds = studentsResult.rows.map((s: any) => s.user_id).filter(Boolean)
 
     await conn.query(
       `DELETE FROM enrollments e USING students s WHERE e.student_id = s.id AND s.institution_id = $1`,
@@ -220,10 +220,10 @@ export async function DELETE(request: NextRequest) {
       action: 'delete',
       entity: 'enrollment',
       entityId: 'all',
-      details: { bulkDelete: true, studentsDeleted: students.rows.length, parentsDeleted: parentIds.length },
+      details: { bulkDelete: true, studentsDeleted: studentsResult.rows.length, parentsDeleted: parentIds.length },
     })
 
-    return NextResponse.json({ success: true, studentsDeleted: students.rows.length, parentsDeleted: parentIds.length })
+    return NextResponse.json({ success: true, studentsDeleted: studentsResult.rows.length, parentsDeleted: parentIds.length })
   } catch (error: any) {
     if (conn) {
       try { await conn.query('ROLLBACK') } catch {}
