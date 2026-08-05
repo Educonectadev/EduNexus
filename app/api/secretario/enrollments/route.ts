@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({error: 'No autenticado'}, { status: 401 })
@@ -42,189 +43,175 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nombre, DNI y grado son requeridos' }, { status: 400 })
     }
 
-    // Split full name into first/last
     const nameParts = student_name.trim().split(/\s+/)
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
 
-    // Check plan limit before enrolling new students
     const limitCheck = await checkPlanLimit(instId, 'students')
     if (!limitCheck.allowed) {
       return NextResponse.json({ error: limitCheck.message }, { status: 403 })
     }
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
-      let studentId: string
+    let studentId: string
 
-      // Check if student exists by document_number within this institution
-      const [existingStudent] = await conn.query(
-        'SELECT id FROM students WHERE document_number = ? AND institution_id = ?',
-        [student_dni, instId]
-      )
+    const [existingStudent] = await conn.query(
+      'SELECT id FROM students WHERE document_number = $1 AND institution_id = $2',
+      [student_dni, instId]
+    )
 
-      if ((existingStudent as any[]).length > 0) {
-        // Student exists — check if enrollment already exists for same grade/section/year
-        studentId = (existingStudent as any[])[0].id
-        const [existingEnrollment] = await conn.query(
-          `SELECT id FROM enrollments WHERE student_id = ? AND grade = ? AND section = ? AND year = ?`,
-          [studentId, grade, section || 'A', year || new Date().getFullYear()]
-        )
-        if ((existingEnrollment as any[]).length > 0) {
-          await conn.rollback()
-          return NextResponse.json({ error: 'DUPLICATE_ENROLLMENT', details: `El alumno ya está matriculado en ${grade} ${section || 'A'} ${year || new Date().getFullYear()}` }, { status: 409 })
-        }
-
-        await conn.query(
-          `UPDATE students SET first_name = ?, last_name = ?, birth_date = COALESCE(?, birth_date), gender = COALESCE(?, gender),
-           code = COALESCE(NULLIF(?, ''), code)
-           WHERE id = ?`,
-          [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId]
-        )
-      } else {
-        studentId = crypto.randomUUID()
-        const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
-        await conn.query(
-          `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status)
-           VALUES (?, ?, ?, ?, ?, 'DNI', ?, NULLIF(?, ''), NULLIF(?, ''), ?, ?, 'active')`,
-          [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade, section || 'A']
-        )
-      }
-
-      // Insert enrollment (id is auto_increment)
-      const [result] = await conn.query(
-        `INSERT INTO enrollments (student_id, grade, section, year, status)
-         VALUES (?, ?, ?, ?, 'active')`,
+    if (existingStudent.rows.length > 0) {
+      studentId = existingStudent.rows[0].id
+      const [existingEnrollment] = await conn.query(
+        `SELECT id FROM enrollments WHERE student_id = $1 AND grade = $2 AND section = $3 AND year = $4`,
         [studentId, grade, section || 'A', year || new Date().getFullYear()]
       )
-
-      // Link parent if provided
-      if (parent_dni) {
-        const [existingParent] = await conn.query(
-          'SELECT id FROM parents WHERE document_number = ? AND institution_id = ?',
-          [parent_dni, instId]
-        )
-
-        let parentId: string
-
-        if ((existingParent as any[]).length > 0) {
-          parentId = (existingParent as any[])[0].id
-        } else {
-          parentId = crypto.randomUUID()
-          const parentNameParts = (parent_name || '').trim().split(/\s+/)
-          const parentFirst = parentNameParts[0] || ''
-          const parentLast = parentNameParts.slice(1).join(' ') || ''
-          await conn.query(
-            `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
-             VALUES (?, ?, ?, ?, 'DNI', ?, ?, ?)`,
-            [parentId, instId, parentFirst, parentLast, parent_dni, parent_phone || null, parent_email || null]
-          )
-        }
-
-        const [existingLink] = await conn.query(
-          'SELECT id FROM parent_student WHERE parent_id = ? AND student_id = ?',
-          [parentId, studentId]
-        )
-        if ((existingLink as any[]).length === 0) {
-          await conn.query(
-            `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES (?, ?, 'padre', 1)`,
-            [parentId, studentId]
-          )
-        }
+      if (existingEnrollment.rows.length > 0) {
+        await conn.query('ROLLBACK')
+        return NextResponse.json({ error: 'DUPLICATE_ENROLLMENT', details: `El alumno ya está matriculado en ${grade} ${section || 'A'} ${year || new Date().getFullYear()}` }, { status: 409 })
       }
 
-      await conn.commit()
-
-      const authUser = await getAuthPayload(request)
-      logAudit({
-        userId: (authUser?.userId as string) || '',
-        institutionId: instId || '',
-        action: 'enroll',
-        entity: 'enrollment',
-        entityId: String((result as any).insertId),
-        details: { studentId, grade, section, year: year || new Date().getFullYear() },
-      })
-
-      return NextResponse.json({ success: true, enrollmentId: (result as any).insertId, studentId })
-    } catch (error) {
-      await conn.rollback()
-      throw error
-    } finally {
-      conn.release()
+      await conn.query(
+        `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3, birth_date), gender = COALESCE($4, gender),
+         code = COALESCE(NULLIF($5, ''), code)
+         WHERE id = $6`,
+        [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId]
+      )
+    } else {
+      studentId = crypto.randomUUID()
+      const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
+      await conn.query(
+        `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status)
+         VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, ''), NULLIF($8, ''), $9, $10, 'active')`,
+        [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade, section || 'A']
+      )
     }
+
+    const [result] = await conn.query(
+      `INSERT INTO enrollments (student_id, grade, section, year, status)
+       VALUES ($1, $2, $3, $4, 'active')`,
+      [studentId, grade, section || 'A', year || new Date().getFullYear()]
+    )
+
+    if (parent_dni) {
+      const [existingParent] = await conn.query(
+        'SELECT id FROM parents WHERE document_number = $1 AND institution_id = $2',
+        [parent_dni, instId]
+      )
+
+      let parentId: string
+
+      if (existingParent.rows.length > 0) {
+        parentId = existingParent.rows[0].id
+      } else {
+        parentId = crypto.randomUUID()
+        const parentNameParts = (parent_name || '').trim().split(/\s+/)
+        const parentFirst = parentNameParts[0] || ''
+        const parentLast = parentNameParts.slice(1).join(' ') || ''
+        await conn.query(
+          `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
+           VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7)`,
+          [parentId, instId, parentFirst, parentLast, parent_dni, parent_phone || null, parent_email || null]
+        )
+      }
+
+      const [existingLink] = await conn.query(
+        'SELECT id FROM parent_student WHERE parent_id = $1 AND student_id = $2',
+        [parentId, studentId]
+      )
+      if (existingLink.rows.length === 0) {
+        await conn.query(
+          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, 'padre', true)`,
+          [parentId, studentId]
+        )
+      }
+    }
+
+    await conn.query('COMMIT')
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId || '',
+      action: 'enroll',
+      entity: 'enrollment',
+      entityId: studentId,
+      details: { studentId, grade, section, year: year || new Date().getFullYear() },
+    })
+
+    return NextResponse.json({ success: true, enrollmentId: studentId, studentId })
   } catch (error: any) {
+    if (conn) {
+      try { await conn.query('ROLLBACK') } catch {}
+    }
+    console.error('[POST /api/secretario/enrollments]', error)
     return NextResponse.json({ error: 'Error creating enrollment', details: error.message }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
   }
 }
 
 export async function DELETE(request: NextRequest) {
-  let conn: any
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    conn = await pool.getConnection()
-    await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
-    // All students of this institution (their enrollments are tied to them)
     const [students] = await conn.query(
-      `SELECT id, user_id FROM students WHERE institution_id = ?`,
+      `SELECT id, user_id FROM students WHERE institution_id = $1`,
       [instId]
     )
 
-    // All parent_student links belonging to students of this institution
     const [parentLinks] = await conn.query(
       `SELECT ps.parent_id FROM parent_student ps
        JOIN students s ON s.id = ps.student_id
-       WHERE s.institution_id = ?`,
+       WHERE s.institution_id = $1`,
       [instId]
     )
-    const parentIds = [...new Set((parentLinks as any[]).map(l => l.parent_id))]
+    const parentIds = [...new Set(parentLinks.rows.map((l: any) => l.parent_id))]
 
-    // Parent user accounts (parents of students of this institution)
     let parentUserIds: string[] = []
     if (parentIds.length > 0) {
       const [parents] = await conn.query(
-        `SELECT user_id FROM parents WHERE id IN (?) AND user_id IS NOT NULL`,
+        `SELECT user_id FROM parents WHERE id = ANY($1) AND user_id IS NOT NULL`,
         [parentIds]
       )
-      parentUserIds = (parents as any[]).map(p => p.user_id)
+      parentUserIds = parents.rows.map((p: any) => p.user_id)
     }
 
-    const studentUserIds = (students as any[]).map(s => s.user_id).filter(Boolean)
+    const studentUserIds = students.rows.map((s: any) => s.user_id).filter(Boolean)
 
-    // Delete enrollments of these students
     await conn.query(
-      `DELETE e FROM enrollments e JOIN students s ON s.id = e.student_id WHERE s.institution_id = ?`,
+      `DELETE FROM enrollments e USING students s WHERE e.student_id = s.id AND s.institution_id = $1`,
       [instId]
     )
-    // Delete parent_student links
     if (parentIds.length > 0) {
-      await conn.query('DELETE FROM parent_student WHERE parent_id IN (?)', [parentIds])
+      await conn.query('DELETE FROM parent_student WHERE parent_id = ANY($1)', [parentIds])
     }
-    // Delete parents (only those belonging to this institution)
     if (parentIds.length > 0) {
       await conn.query(
-        `DELETE FROM parents WHERE id IN (?) AND institution_id = ?`,
+        `DELETE FROM parents WHERE id = ANY($1) AND institution_id = $2`,
         [parentIds, instId]
       )
     }
-    // Delete parent user accounts
     for (const uid of parentUserIds) {
-      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
-      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+      await conn.query('DELETE FROM user_roles WHERE user_id = $1', [uid])
+      await conn.query('DELETE FROM users WHERE id = $1', [uid])
     }
-    // Delete student user accounts
     for (const uid of studentUserIds) {
-      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
-      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+      await conn.query('DELETE FROM user_roles WHERE user_id = $1', [uid])
+      await conn.query('DELETE FROM users WHERE id = $1', [uid])
     }
-    // Delete students (payments/grades/attendance/issued_documents cascade)
-    await conn.query('DELETE FROM students WHERE institution_id = ?', [instId])
+    await conn.query('DELETE FROM students WHERE institution_id = $1', [instId])
 
-    await conn.commit()
+    await conn.query('COMMIT')
 
     const authUser = await getAuthPayload(request)
     logAudit({
@@ -233,16 +220,16 @@ export async function DELETE(request: NextRequest) {
       action: 'delete',
       entity: 'enrollment',
       entityId: 'all',
-      details: { bulkDelete: true, studentsDeleted: (students as any[]).length, parentsDeleted: parentIds.length },
+      details: { bulkDelete: true, studentsDeleted: students.rows.length, parentsDeleted: parentIds.length },
     })
 
-    return NextResponse.json({ success: true, studentsDeleted: (students as any[]).length, parentsDeleted: parentIds.length })
+    return NextResponse.json({ success: true, studentsDeleted: students.rows.length, parentsDeleted: parentIds.length })
   } catch (error: any) {
     if (conn) {
-      try { await conn.rollback() } catch {}
+      try { await conn.query('ROLLBACK') } catch {}
     }
     console.error('[DELETE /api/secretario/enrollments] bulk', error)
-    return NextResponse.json({ error: error.message, code: error.code, sql: error.sqlMessage }, { status: 500 })
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 })
   } finally {
     if (conn) {
       try { conn.release() } catch {}
