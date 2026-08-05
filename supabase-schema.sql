@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS institutions (
   logo_url VARCHAR(500) DEFAULT '',
   plan_id VARCHAR(36) REFERENCES plans(id) ON DELETE SET NULL,
   niveles JSONB DEFAULT '["Primaria","Secundaria"]',
+  schedule_config JSONB DEFAULT NULL,
   status VARCHAR(20) DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

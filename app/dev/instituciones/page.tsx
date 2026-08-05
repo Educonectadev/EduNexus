@@ -41,6 +41,8 @@ import {
   Monitor,
   CircleDot,
   ChevronDown,
+  Clock,
+  CalendarDays,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { departments, type Department, type Province } from "@/lib/data/peru-geo"
@@ -69,6 +71,19 @@ interface Institution {
   plan_id?: string
   plan_name?: string
   plan_price?: number
+  schedule_config?: {
+    general_start: string
+    general_end: string
+    weekdays: number[]
+    turnos: { name: string; start: string; end: string; grades: string[] }[]
+  }
+}
+
+interface Turno {
+  name: string
+  start: string
+  end: string
+  grades: string[]
 }
 
 const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -185,6 +200,13 @@ export default function DevInstitucionesPage() {
     notes: "", plan_id: "",
   })
 
+  const [scheduleConfig, setScheduleConfig] = React.useState({
+    general_start: "07:00",
+    general_end: "13:00",
+    weekdays: [1, 2, 3, 4, 5],
+    turnos: [] as Turno[],
+  })
+
   const [selectedDepartment, setSelectedDepartment] = React.useState<Department | null>(null)
   const [selectedProvince, setSelectedProvince] = React.useState<Province | null>(null)
   const [createdCredentials, setCreatedCredentials] = React.useState<{
@@ -228,7 +250,7 @@ export default function DevInstitucionesPage() {
       const res = await fetch("/api/dev/institutions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, schedule_config: scheduleConfig }),
       })
       const data = await res.json()
       if (res.ok) {
@@ -306,6 +328,12 @@ export default function DevInstitucionesPage() {
       total_students: "", total_teachers: "", total_classrooms: "",
       has_lab: false, has_library: false, has_computer_room: false, has_playground: false,
       notes: "", plan_id: "",
+    })
+    setScheduleConfig({
+      general_start: "07:00",
+      general_end: "13:00",
+      weekdays: [1, 2, 3, 4, 5],
+      turnos: [],
     })
     setSelectedDepartment(null)
     setSelectedProvince(null)
@@ -709,7 +737,7 @@ export default function DevInstitucionesPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <SbLabel htmlFor="shift">Turno</SbLabel>
+                  <SbLabel htmlFor="shift">Turno General</SbLabel>
                   <select
                     className="sb-select w-full rounded-xl"
                     value={form.shift}
@@ -733,6 +761,174 @@ export default function DevInstitucionesPage() {
                       <option key={d.value} value={d.value}>{d.label}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              {/* Configuración de Horarios */}
+              <div className="p-4 rounded-xl border border-[var(--sb-outline)]/30 bg-[var(--sb-surface-container)]/50 space-y-4">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                  <Clock className="h-3.5 w-3.5" />
+                  Configuración de Horarios
+                </div>
+
+                {/* Horario General */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <SbLabel className="text-[11px]">Hora Inicio Jornada</SbLabel>
+                    <input
+                      type="time"
+                      value={scheduleConfig.general_start}
+                      onChange={(e) => setScheduleConfig({ ...scheduleConfig, general_start: e.target.value })}
+                      className="sb-select w-full rounded-lg text-[13px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <SbLabel className="text-[11px]">Hora Fin Jornada</SbLabel>
+                    <input
+                      type="time"
+                      value={scheduleConfig.general_end}
+                      onChange={(e) => setScheduleConfig({ ...scheduleConfig, general_end: e.target.value })}
+                      className="sb-select w-full rounded-lg text-[13px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Días de la semana */}
+                <div className="space-y-1.5">
+                  <SbLabel className="text-[11px]">Días de Clase</SbLabel>
+                  <div className="flex gap-1.5">
+                    {["L", "M", "X", "J", "V", "S", "D"].map((d, i) => {
+                      const dayNum = i + 1
+                      const active = scheduleConfig.weekdays.includes(dayNum)
+                      return (
+                        <button
+                          key={dayNum}
+                          type="button"
+                          onClick={() => {
+                            const weekdays = active
+                              ? scheduleConfig.weekdays.filter(d => d !== dayNum)
+                              : [...scheduleConfig.weekdays, dayNum].sort()
+                            setScheduleConfig({ ...scheduleConfig, weekdays })
+                          }}
+                          className={`h-8 w-8 rounded-lg text-[11px] font-medium transition-all ${
+                            active
+                              ? "bg-[var(--sb-primary)] text-[var(--sb-on-primary)]"
+                              : "bg-[var(--sb-surface-container-high)] text-[var(--sb-on-surface-variant)]/50 hover:bg-[var(--sb-surface-container-highest)]"
+                          }`}
+                        >
+                          {d}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Turnos */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <SbLabel className="text-[11px]">Turnos (opcional)</SbLabel>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleConfig({
+                        ...scheduleConfig,
+                        turnos: [...scheduleConfig.turnos, { name: "", start: "07:00", end: "13:00", grades: [] }],
+                      })}
+                      className="flex items-center gap-1 text-[11px] text-[var(--sb-primary)] hover:underline"
+                    >
+                      <Plus className="h-3 w-3" /> Agregar turno
+                    </button>
+                  </div>
+
+                  {scheduleConfig.turnos.length === 0 && (
+                    <p className="text-[11px] text-[var(--sb-on-surface-variant)]/40 py-2">
+                      Sin turnos definidos. La jornada completa usará el horario general.
+                    </p>
+                  )}
+
+                  {scheduleConfig.turnos.map((turno, idx) => (
+                    <div key={idx} className="p-3 rounded-lg border border-[var(--sb-outline)]/20 bg-[var(--sb-surface)] space-y-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Nombre turno (ej: Mañana)"
+                          value={turno.name}
+                          onChange={(e) => {
+                            const turnos = [...scheduleConfig.turnos]
+                            turnos[idx] = { ...turnos[idx], name: e.target.value }
+                            setScheduleConfig({ ...scheduleConfig, turnos })
+                          }}
+                          className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-[var(--sb-on-surface-variant)]/30"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const turnos = scheduleConfig.turnos.filter((_, i) => i !== idx)
+                            setScheduleConfig({ ...scheduleConfig, turnos })
+                          }}
+                          className="p-1 rounded-md hover:bg-red-500/10 text-red-500/60 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Inicio</span>
+                          <input
+                            type="time"
+                            value={turno.start}
+                            onChange={(e) => {
+                              const turnos = [...scheduleConfig.turnos]
+                              turnos[idx] = { ...turnos[idx], start: e.target.value }
+                              setScheduleConfig({ ...scheduleConfig, turnos })
+                            }}
+                            className="sb-select w-full rounded-lg text-[12px] py-1"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Fin</span>
+                          <input
+                            type="time"
+                            value={turno.end}
+                            onChange={(e) => {
+                              const turnos = [...scheduleConfig.turnos]
+                              turnos[idx] = { ...turnos[idx], end: e.target.value }
+                              setScheduleConfig({ ...scheduleConfig, turnos })
+                            }}
+                            className="sb-select w-full rounded-lg text-[12px] py-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Grados</span>
+                        <div className="flex flex-wrap gap-1">
+                          {["1ro", "2do", "3ro", "4to", "5to", "6to"].map(g => {
+                            const active = turno.grades.includes(g)
+                            return (
+                              <button
+                                key={g}
+                                type="button"
+                                onClick={() => {
+                                  const turnos = [...scheduleConfig.turnos]
+                                  const grades = active
+                                    ? turnos[idx].grades.filter(gr => gr !== g)
+                                    : [...turnos[idx].grades, g]
+                                  turnos[idx] = { ...turnos[idx], grades }
+                                  setScheduleConfig({ ...scheduleConfig, turnos })
+                                }}
+                                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
+                                  active
+                                    ? "bg-[var(--sb-primary)]/15 text-[var(--sb-primary)]"
+                                    : "bg-[var(--sb-surface-container-high)] text-[var(--sb-on-surface-variant)]/40"
+                                }`}
+                              >
+                                {g}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -1081,6 +1277,12 @@ export default function DevInstitucionesPage() {
                   <div><span className="text-[var(--sb-on-surface-variant)]/60">Tipo:</span> {institutionTypes.find(t => t.value === form.type)?.label || "—"}</div>
                   <div><span className="text-[var(--sb-on-surface-variant)]/60">Nivel:</span> {institutionLevels.find(l => l.value === form.level)?.label || "—"}</div>
                   <div><span className="text-[var(--sb-on-surface-variant)]/60">Modalidad:</span> {modalities.find(m => m.value === form.modality)?.label || "—"}</div>
+                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Turno:</span> {shifts.find(s => s.value === form.shift)?.label || "—"}</div>
+                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Horario:</span> {scheduleConfig.general_start} - {scheduleConfig.general_end}</div>
+                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Días:</span> {scheduleConfig.weekdays.map(d => ["", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][d]).join(", ")}</div>
+                  {scheduleConfig.turnos.length > 0 && (
+                    <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Turnos:</span> {scheduleConfig.turnos.map(t => `${t.name || "Sin nombre"} (${t.start}-${t.end})`).join(", ")}</div>
+                  )}
                   <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Ubicación:</span> {form.district && form.province && form.department ? `${form.district}, ${form.province}, ${form.department}` : "—"}</div>
                   <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Director:</span> {form.director_name || "—"}</div>
                 </div>

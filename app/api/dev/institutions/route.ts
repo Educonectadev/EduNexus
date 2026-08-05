@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       director_name, director_dni, director_phone, director_email,
       total_students, total_teachers, total_classrooms,
       has_lab, has_library, has_computer_room, has_playground,
-      notes, plan_id,
+      notes, plan_id, schedule_config,
     } = body
 
     if (!name) {
@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
         director_name, director_dni, director_phone, director_email,
         total_students, total_teachers, total_classrooms,
         has_lab, has_library, has_computer_room, has_playground,
-        notes, plan_id, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+        notes, plan_id, schedule_config, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
       [
         instId, instCode, name, type || '', level || '', modality || '', shift || '', dependence || '',
         department || '', province || '', district || '', address || '', reference || '',
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         director_name || '', director_dni || '', director_phone || '', director_email || directorEmail,
         total_students || 0, total_teachers || 0, total_classrooms || 0,
         has_lab ? true : false, has_library ? true : false, has_computer_room ? true : false, has_playground ? true : false,
-        notes || '', plan_id || null,
+        notes || '', plan_id || null, schedule_config ? JSON.stringify(schedule_config) : null,
       ]
     )
 
