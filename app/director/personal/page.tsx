@@ -90,18 +90,18 @@ export default function DirectorPersonalPage() {
     <div className="space-y-5">
       <SbSectionHeader title="Personal" description="Gestiona el personal de la institución"
         action={
-          <div className="flex items-center gap-2">
-            <a href="/plantilla_docentes.csv" download className="sb-btn outlined rounded flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Plantilla
+          <div className="flex flex-wrap items-center gap-2">
+            <a href="/plantilla_docentes.csv" download className="sb-btn outlined rounded flex items-center gap-2 text-xs">
+              <Download className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Plantilla</span>
             </a>
-            <label className="sb-btn tonal rounded flex items-center gap-2 cursor-pointer">
-              <Upload className="h-4 w-4" />
-              Importar CSV
+            <label className="sb-btn tonal rounded flex items-center gap-2 cursor-pointer text-xs">
+              <Upload className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Importar CSV</span>
               <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
             </label>
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { setDialogOpen(true); resetForm() }}>
-              <Plus className="h-4 w-4" /> Contratar
+            <SbBtn variant="filled" rounded className="flex items-center gap-1.5 text-xs" onClick={() => { setDialogOpen(true); resetForm() }}>
+              <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Contratar</span><span className="sm:hidden">Nuevo</span>
             </SbBtn>
           </div>
         } />
@@ -170,18 +170,18 @@ export default function DirectorPersonalPage() {
         )}
         {!loading && filtered.map((s) => (
           <button key={s.id} onClick={() => { setSelectedStaff(s); setNewPassword(null); setDetailOpen(true) }}
-            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-sb-surface-container-high/30 transition-colors text-left">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="h-10 w-10 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
-                <span className="text-xs font-medium text-sb-on-surface-variant/60">{initials(s.full_name)}</span>
+            className="w-full flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3.5 hover:bg-sb-surface-container-high/30 transition-colors text-left">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
+                <span className="text-[10px] sm:text-xs font-medium text-sb-on-surface-variant/60">{initials(s.full_name)}</span>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-sb-on-surface truncate">{s.full_name}</p>
-                <p className="text-xs text-sb-on-surface-variant/40 truncate">{s.email}</p>
+                <p className="text-[13px] sm:text-sm font-medium text-sb-on-surface truncate">{s.full_name}</p>
+                <p className="text-[11px] sm:text-xs text-sb-on-surface-variant/40 truncate">{s.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 shrink-0 ml-3">
-              <SbBadge color="bg-sb-surface-container-high text-sb-on-surface-variant/50">{roleLabels[s.role] || s.role}</SbBadge>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2 sm:ml-3">
+              <SbBadge color="bg-sb-surface-container-high text-sb-on-surface-variant/50" className="hidden sm:inline-flex">{roleLabels[s.role] || s.role}</SbBadge>
               <div className={cn("h-2 w-2 rounded-full", s.status === "active" ? "bg-emerald-400/60" : "bg-sb-on-surface/10")} />
               <ChevronRight className="h-4 w-4 text-sb-on-surface-variant/20" />
             </div>
@@ -192,7 +192,7 @@ export default function DirectorPersonalPage() {
       {/* Hire wizard */}
       <SbModal open={dialogOpen} onClose={() => { setDialogOpen(false); resetForm() }} maxWidth="520px">
         <SbModalBody noPadding>
-          <div className="px-6 pt-6 pb-4">
+          <div className="px-4 sm:px-6 pt-6 pb-4">
             <h3 className="text-lg font-semibold text-sb-on-surface">Contratar Personal</h3>
             <p className="text-xs text-sb-on-surface-variant/50 mt-1">Completa los datos para registrar un nuevo miembro del staff.</p>
             <div className="flex items-center gap-2 mt-4">
@@ -202,7 +202,7 @@ export default function DirectorPersonalPage() {
           </div>
 
           {step === 1 && (
-            <div className="px-6 space-y-4 pb-2">
+            <div className="px-4 sm:px-6 space-y-4 pb-2">
               <div><label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Nombre completo *</label>
                 <div className="relative"><SbInput placeholder="Juan Pérez López" value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} style={{ paddingLeft: "36px" }} />
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sb-on-surface-variant/30"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span></div></div>
@@ -217,12 +217,12 @@ export default function DirectorPersonalPage() {
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Email (opcional)</label>
                 <div className="flex gap-2">
-                  <div className="relative flex-1">
+                  <div className="relative flex-1 min-w-0">
                     <SbInput placeholder="Se genera automáticamente si se deja vacío" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{ paddingLeft: "36px" }} />
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sb-on-surface-variant/30"><Mail className="h-4 w-4" /></span>
                   </div>
                   {formData.full_name && (
-                    <button type="button" className="sb-btn tonal text-xs whitespace-nowrap"
+                    <button type="button" className="sb-btn tonal text-xs whitespace-nowrap shrink-0"
                       onClick={() => {
                         const clean = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
                         const parts = clean(formData.full_name).split(/\s+/)
@@ -267,7 +267,7 @@ export default function DirectorPersonalPage() {
           )}
 
           {step === 2 && (
-            <div className="px-6 space-y-4 pb-2">
+            <div className="px-4 sm:px-6 space-y-4 pb-2">
               {formData.role === "docente" && (
                 <>
                   <div><label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Asignatura *</label>
@@ -308,8 +308,8 @@ export default function DirectorPersonalPage() {
           )}
         </SbModalBody>
 
-        <div className="px-6 py-4 flex flex-row gap-2">
-          {step === 2 && <SbBtn rounded onClick={() => setStep(1)}>Atrás</SbBtn>}
+        <div className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row gap-2">
+          {step === 2 && <SbBtn rounded onClick={() => setStep(1)} className="order-last sm:order-first">Atrás</SbBtn>}
           <div className="flex-1" />
           <SbBtn rounded onClick={() => { setDialogOpen(false); resetForm() }}>Cancelar</SbBtn>
           {step === 1 ? (
@@ -340,7 +340,7 @@ export default function DirectorPersonalPage() {
       <SbModal open={detailOpen} onClose={() => setDetailOpen(false)} maxWidth="480px">
         {selectedStaff && (
           <SbModalBody noPadding>
-            <div className="px-6 pt-6 pb-4">
+            <div className="px-4 sm:px-6 pt-6 pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-xl bg-sb-surface-container-high flex items-center justify-center"><span className="text-sm font-semibold text-sb-on-surface-variant">{initials(selectedStaff.full_name)}</span></div>
@@ -349,8 +349,8 @@ export default function DirectorPersonalPage() {
                 <SbBadge color={selectedStaff.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-sb-surface-container-high text-sb-on-surface-variant/50"}>{selectedStaff.status === "active" ? "Activo" : "Inactivo"}</SbBadge>
               </div>
             </div>
-            <div className="px-6 space-y-3 pb-2">
-              <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-3 border border-sb-outline-variant/10">
+            <div className="px-4 sm:px-6 space-y-3 pb-2">
+              <div className="bg-sb-surface-container-high/50 rounded-xl p-3 sm:p-4 space-y-3 border border-sb-outline-variant/10">
                 <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Contacto</p>
                 <div className="space-y-2.5">
                   {[{ icon: Mail, label: "Email", value: selectedStaff.email }, { icon: BadgeCheck, label: "DNI", value: selectedStaff.dni }, { icon: Phone, label: "Teléfono", value: selectedStaff.phone }].map(item => (
@@ -359,7 +359,7 @@ export default function DirectorPersonalPage() {
                 </div>
               </div>
               {selectedStaff.role === "docente" && (
-                <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-3 border border-sb-outline-variant/10">
+                <div className="bg-sb-surface-container-high/50 rounded-xl p-3 sm:p-4 space-y-3 border border-sb-outline-variant/10">
                   <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Académico</p>
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-3"><div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0"><GraduationCap className="h-4 w-4 text-sb-on-surface-variant/40" /></div><div><p className="text-[10px] text-sb-on-surface-variant/40">Asignatura</p><p className="text-sm text-sb-on-surface">{selectedStaff.subject || "—"}</p></div></div>
@@ -367,13 +367,13 @@ export default function DirectorPersonalPage() {
                   </div>
                 </div>
               )}
-              <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-3 border border-sb-outline-variant/10">
+              <div className="bg-sb-surface-container-high/50 rounded-xl p-3 sm:p-4 space-y-3 border border-sb-outline-variant/10">
                 <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Contrato</p>
                 <div className="space-y-2.5">
                   <div className="flex items-center gap-3"><div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0"><Briefcase className="h-4 w-4 text-sb-on-surface-variant/40" /></div><div><p className="text-[10px] text-sb-on-surface-variant/40">Tipo</p><p className="text-sm text-sb-on-surface capitalize">{selectedStaff.contract_type?.trim() || "—"}</p></div></div>
                 </div>
               </div>
-              <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-3 border border-sb-outline-variant/10">
+              <div className="bg-sb-surface-container-high/50 rounded-xl p-3 sm:p-4 space-y-3 border border-sb-outline-variant/10">
                 <div className="flex items-center justify-between">
                   <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Contraseña</p>
                   <button onClick={() => handleRegenPassword(selectedStaff.id)} disabled={regenerating} className="flex items-center gap-1.5 text-[10px] text-sb-on-surface font-medium hover:opacity-80 transition-opacity disabled:opacity-40">
@@ -387,7 +387,7 @@ export default function DirectorPersonalPage() {
                 ) : <p className="text-xs text-sb-on-surface-variant/30">La contraseña hasheada no se puede mostrar. Usa &ldquo;Regenerar&rdquo; para crear una nueva.</p>}
               </div>
             </div>
-            <div className="px-6 py-4"><SbBtn variant="filled" rounded className="w-full" onClick={() => setDetailOpen(false)}>Cerrar</SbBtn></div>
+            <div className="px-4 sm:px-6 py-4"><SbBtn variant="filled" rounded className="w-full" onClick={() => setDetailOpen(false)}>Cerrar</SbBtn></div>
           </SbModalBody>
         )}
       </SbModal>
