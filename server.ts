@@ -84,7 +84,7 @@ io.on('connection', (socket) => {
     try {
       const { messageId } = data
       await pool.query(
-        'UPDATE chat_messages SET is_read = 1 WHERE id = ? AND receiver_id = ?',
+        'UPDATE chat_messages SET is_read = true WHERE id = ? AND receiver_id = ?',
         [messageId, userId]
       )
       socket.emit('message:read:confirm', { messageId })

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     ) as any
 
     const [todayAttendance] = await pool.query(
-      'SELECT COUNT(*) as count FROM attendance WHERE institution_id = ? AND date = CURDATE() AND status = "absent"',
+      'SELECT COUNT(*) as count FROM attendance WHERE institution_id = ? AND date = CURRENT_DATE AND status = \'absent\'',
       [instId]
     ) as any
 

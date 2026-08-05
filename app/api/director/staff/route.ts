@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error: any) {
-    if (error?.code === 'ER_DUP_ENTRY') {
+    if (error?.code === '23505') {
       return NextResponse.json({ error: 'El DNI o email ya existe' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating staff' }, { status: 500 })

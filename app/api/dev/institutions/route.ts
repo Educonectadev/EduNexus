@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       conn.release()
     }
   } catch (error: any) {
-    if (error?.code === 'ER_DUP_ENTRY') {
+    if (error?.code === '23505') {
       return NextResponse.json({ error: 'Código ya existe, intenta de nuevo' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating institution' }, { status: 500 })

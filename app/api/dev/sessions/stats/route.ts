@@ -9,17 +9,17 @@ export async function GET() {
     const [totalSessions] = await pool.query('SELECT COUNT(*) as count FROM user_sessions')
 
     const [todaySessions] = await pool.query(
-      "SELECT COUNT(*) as count FROM user_sessions WHERE DATE(logged_in_at) = CURDATE()"
+      "SELECT COUNT(*) as count FROM user_sessions WHERE DATE(logged_in_at) = CURRENT_DATE"
     )
 
     const [uniqueToday] = await pool.query(
-      "SELECT COUNT(DISTINCT user_id) as count FROM user_sessions WHERE DATE(logged_in_at) = CURDATE()"
+      "SELECT COUNT(DISTINCT user_id) as count FROM user_sessions WHERE DATE(logged_in_at) = CURRENT_DATE"
     )
 
     const [last7days] = await pool.query(
       `SELECT DATE(logged_in_at) as day, COUNT(*) as sessions, COUNT(DISTINCT user_id) as users
        FROM user_sessions
-       WHERE logged_in_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+       WHERE logged_in_at >= (CURRENT_DATE - INTERVAL '7 days')
        GROUP BY DATE(logged_in_at)
        ORDER BY day ASC`
     )
