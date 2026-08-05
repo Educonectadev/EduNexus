@@ -4,11 +4,11 @@ import { jwtVerify } from 'jose'
 const publicRoutes = ['/', '/login', '/login-padre', '/register', '/forgot-password', '/blog', '/contacto', '/sobre-nosotros', '/terminos', '/privacidad', '/seguridad', '/pdpl', '/trabaja-con-nosotros']
 
 const roleRouteMap: Record<string, string> = {
-  super_admin: '/super-admin',
-  director: '/director',
-  secretario: '/secretario',
-  docente: '/docente',
-  padre: '/padre',
+  super_admin: '/super-admin/dashboard',
+  director: '/director/dashboard',
+  secretario: '/secretario/dashboard',
+  docente: '/docente/dashboard',
+  padre: '/padre/dashboard',
   dev: '/dev',
 }
 
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
         const role = payload.role as string
         const expectedRoute = roleRouteMap[role]
         if (expectedRoute) {
-          return NextResponse.redirect(new URL(`${expectedRoute}/dashboard`, request.url))
+          return NextResponse.redirect(new URL(expectedRoute, request.url))
         }
       } catch {
         // token inválido, continuar como público
@@ -82,10 +82,11 @@ export async function middleware(request: NextRequest) {
     const role = payload.role as string
     const expectedRoute = roleRouteMap[role]
 
-    const isPanelRoute = Object.values(roleRouteMap).some(route => pathname.startsWith(route))
+    const isPanelRoute = ['/super-admin', '/director', '/secretario', '/docente', '/padre', '/dev'].some(route => pathname.startsWith(route))
+    const isOnOwnRoute = expectedRoute && pathname.startsWith(expectedRoute.split('/dashboard')[0])
 
-    if (isPanelRoute && expectedRoute && !pathname.startsWith(expectedRoute)) {
-      return NextResponse.redirect(new URL(`${expectedRoute}/dashboard`, request.url))
+    if (isPanelRoute && !isOnOwnRoute) {
+      return NextResponse.redirect(new URL(expectedRoute, request.url))
     }
 
     return NextResponse.next()
