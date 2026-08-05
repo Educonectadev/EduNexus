@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "npm ci && next build",
+    "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start",
-    "prebuild": "rm -rf .next"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
