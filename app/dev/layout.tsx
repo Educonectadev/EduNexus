@@ -21,15 +21,10 @@ import {
   CreditCard,
   UserCircle,
   Inbox,
-  Bell,
-  Search,
   BarChart3,
   HardDrive,
   X,
-  Sparkles,
   DollarSign,
-  ArrowRight,
-  Clock,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
@@ -75,7 +70,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
 ]
 
 const allNav = navSections.flatMap(s => s.items)
-const mobileNav = allNav.filter(n => ["Overview", "Solicitudes", "Instituciones", "Usuarios", "Database"].includes(n.title))
+const mobileNav = allNav.filter(n => ["Overview", "Instituciones", "Usuarios", "Database"].includes(n.title))
 
 export default function DevLayout({
   children,
@@ -90,13 +85,6 @@ export default function DevLayout({
     return saved === null ? true : saved === "1"
   })
   const [drawerOpen, setDrawerOpen] = React.useState(false)
-  const [searchOpen, setSearchOpen] = React.useState(false)
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const searchRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (searchOpen && searchRef.current) searchRef.current.focus()
-  }, [searchOpen])
 
   const toggleSidebar = () => {
     setSidebarOpen(prev => {
@@ -108,10 +96,6 @@ export default function DevLayout({
 
   const isActive = (href: string) =>
     href === "/dev" ? pathname === "/dev" : pathname === href || pathname.startsWith(href + "/")
-
-  const filteredNav = allNav.filter(item =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   const pageTitle = allNav.find(n => isActive(n.href))?.title || "Overview"
 
@@ -305,47 +289,34 @@ export default function DevLayout({
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Minimal Header */}
-        <header className="flex items-center justify-between h-14 px-6 shrink-0">
-          <div className="flex items-center gap-3">
+        <header className="flex items-center justify-between h-12 px-4 shrink-0 md:px-6">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setDrawerOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-xl hover:bg-sb-surface-container-high transition-colors"
+              className="md:hidden p-1.5 -ml-1.5 rounded-lg hover:bg-sb-surface-container-high transition-colors"
             >
-              <svg className="h-5 w-5 text-sb-on-surface-variant/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="h-4 w-4 text-sb-on-surface-variant/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageTitle}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] text-emerald-500 font-medium">Online</span>
+          <div className="flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="text-[10px] text-emerald-600 font-medium">Live</span>
             </div>
-
-            <div className="flex md:hidden items-center gap-1 mr-1">
-              <button onClick={() => { setSearchOpen(true) }}
-                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
-                <Search className="h-[18px] w-[18px]" />
-              </button>
-              <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
-                <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </button>
-            </div>
-
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all relative"
+              className="hidden md:flex items-center justify-center p-2 rounded-lg text-sb-on-surface-variant hover:bg-sb-surface-container-high transition-colors"
               title="Toggle theme">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="h-[16px] w-[16px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[16px] w-[16px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6">
+        <main className="flex-1 overflow-auto px-4 pb-24 md:px-6 md:pb-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
@@ -360,8 +331,8 @@ export default function DevLayout({
 
         {/* ===== MOBILE BOTTOM NAV ===== */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40">
-          <div className="mx-3 mb-3">
-            <div className="flex items-center justify-around bg-sb-surface/80 backdrop-blur-xl border border-sb-outline-variant/20 rounded-2xl px-2 py-1.5 shadow-lg shadow-black/10 dark:bg-sb-surface-container/80 dark:shadow-black/30">
+          <div className="bg-sb-surface/90 backdrop-blur-xl border-t border-sb-outline-variant/10 px-4 pb-[env(safe-area-inset-bottom)]">
+            <div className="flex items-center justify-around py-1">
               {mobileNav.map((item) => {
                 const active = isActive(item.href)
                 return (
@@ -369,15 +340,15 @@ export default function DevLayout({
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 min-w-[52px]",
+                      "flex flex-col items-center justify-center gap-px px-3 py-2 rounded-lg transition-colors min-w-[48px]",
                       active
-                        ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-                        : "text-sb-on-surface-variant/50 hover:text-sb-on-surface"
+                        ? "text-sb-on-surface"
+                        : "text-sb-on-surface/40"
                     )}
                   >
-                    <item.icon className={cn("h-5 w-5 transition-all", active && "stroke-[2.5]")} />
-                    <span className={cn("text-[9px] font-medium leading-tight", active && "font-semibold")}>
-                      {item.title.slice(0, 6)}
+                    <item.icon className={cn("h-[18px] w-[18px]", active && "stroke-[2.2]")} />
+                    <span className={cn("text-[10px] leading-none", active ? "font-medium" : "font-normal")}>
+                      {item.title.length > 7 ? item.title.slice(0, 7) + "…" : item.title}
                     </span>
                   </Link>
                 )
@@ -385,63 +356,6 @@ export default function DevLayout({
             </div>
           </div>
         </nav>
-
-        {/* ===== SEARCH OVERLAY ===== */}
-        <AnimatePresence>
-          {searchOpen && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 md:hidden bg-background/80 backdrop-blur-3xl">
-              <div className="flex flex-col h-full">
-                <div className="flex items-center gap-3 px-4 h-14">
-                  <button onClick={() => { setSearchOpen(false); setSearchQuery("") }}
-                    className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 transition-all">
-                    <X className="h-5 w-5" />
-                  </button>
-                  <input ref={searchRef} type="text" placeholder="Buscar secciones..." value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="flex-1 bg-transparent text-sm text-sb-on-surface placeholder:text-sb-on-surface-variant/60 outline-none" />
-                </div>
-                <div className="flex-1 overflow-auto">
-                  {searchQuery ? (
-                    <div className="py-2">
-                      {filteredNav.length > 0 ? filteredNav.map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => { setSearchOpen(false); setSearchQuery("") }}
-                          className="flex items-center gap-3 px-5 py-3 hover:bg-sb-surface-container-highest/50 transition-colors">
-                          <div className="h-9 w-9 rounded-xl bg-sb-surface-container-high flex items-center justify-center">
-                            <item.icon className="h-4 w-4 text-sb-on-surface-variant" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-sb-on-surface">{item.title}</p>
-                            <p className="text-xs text-sb-on-surface-variant/60">{item.href}</p>
-                          </div>
-                          <ArrowRight className="h-4 w-4 text-sb-on-surface-variant/30" />
-                        </Link>
-                      )) : (
-                        <div className="px-5 py-12 text-center">
-                          <p className="text-sm text-sb-on-surface-variant/60">Sin resultados</p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="px-5 py-8">
-                      <p className="text-[10px] font-medium text-sb-on-surface-variant/60 uppercase tracking-wider mb-3">Accesos rápidos</p>
-                      <div className="space-y-1">
-                        {allNav.slice(0, 5).map(item => (
-                          <Link key={item.href} href={item.href} onClick={() => setSearchOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sb-surface-container-highest/50 transition-colors">
-                            <item.icon className="h-4 w-4 text-sb-on-surface-variant" />
-                            <span className="text-sm text-sb-on-surface/70">{item.title}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* ===== MOBILE DRAWER ===== */}
         <AnimatePresence>
