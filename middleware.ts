@@ -9,21 +9,38 @@ const roleRouteMap: Record<string, string> = {
   secretario: '/secretario',
   docente: '/docente',
   padre: '/padre',
+  dev: '/dev',
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname === '/favicon.ico') {
-    // Block API dev routes in production
+    // Allow API dev routes for dev role in production
     if (pathname.startsWith('/api/dev') && process.env.NODE_ENV === 'production') {
+      const token = request.cookies.get('token')?.value
+      if (token) {
+        try {
+          const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
+          const { payload } = await jwtVerify(token, secret)
+          if (payload.role === 'dev') return NextResponse.next()
+        } catch {}
+      }
       return NextResponse.json({ error: 'Not available in production' }, { status: 403 })
     }
     return NextResponse.next()
   }
 
-  // Block dev routes in production
+  // Allow dev routes for dev role in production
   if (pathname.startsWith('/dev') && process.env.NODE_ENV === 'production') {
+    const token = request.cookies.get('token')?.value
+    if (token) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
+        const { payload } = await jwtVerify(token, secret)
+        if (payload.role === 'dev') return NextResponse.next()
+      } catch {}
+    }
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
