@@ -63,7 +63,8 @@ async function seedInstitutions(count: number) {
       )
       created.push(code)
     } catch (e: any) {
-      if (e.code !== 'ER_DUP_ENTRY') throw e
+      if (e.code === '23505') continue
+      throw e
     }
   }
   return created
@@ -91,7 +92,8 @@ async function seedUsers(institutionIds: string[], count: number) {
         )
         created.push(email)
       } catch (e: any) {
-        if (e.code !== 'ER_DUP_ENTRY') throw e
+        if (e.code === '23505') continue
+        throw e
       }
     }
   }
@@ -136,7 +138,7 @@ export async function POST(request: NextRequest) {
       const emails = await seedUsers(instIds, userCount)
 
       // Seed audit logs
-      const [users] = await pool.query('SELECT id, full_name, institution_id FROM users ORDER BY RAND() LIMIT 10') as any[]
+      const [users] = await pool.query('SELECT id, full_name, institution_id FROM users ORDER BY RANDOM() LIMIT 10') as any[]
       const actions = ['create', 'update', 'delete', 'enroll']
       const entities = ['students', 'enrollments', 'documents', 'users', 'courses']
       const details = [
@@ -164,8 +166,8 @@ export async function POST(request: NextRequest) {
           const entity = entities[i % entities.length]
           await pool.query(
             `INSERT INTO audit_logs (id, action, entity, entity_id, details, user_name, user_id, institution_id, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? HOUR))`,
-            [crypto.randomUUID(), action, entity, crypto.randomUUID(), details[i], user?.full_name || 'Sistema', user?.id || null, user?.institution_id || instIds[0], i * 3]
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW() - INTERVAL '${i * 3} hours')`,
+            [crypto.randomUUID(), action, entity, crypto.randomUUID(), details[i], user?.full_name || 'Sistema', user?.id || null, user?.institution_id || instIds[0]]
           )
         }
       } catch {}
