@@ -90,9 +90,9 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await conn.query(
-      `INSERT INTO enrollments (student_id, grade, section, year, status)
-       VALUES ($1, $2, $3, $4, 'active')`,
-      [studentId, grade, section || 'A', year || new Date().getFullYear()]
+      `INSERT INTO enrollments (institution_id, student_id, grade, section, year, status)
+       VALUES ($1, $2, $3, $4, $5, 'active')`,
+      [instId, studentId, grade, section || 'A', year || new Date().getFullYear()]
     )
 
     if (parent_dni) {
