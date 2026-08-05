@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Mail, Key, Phone, BadgeCheck, GraduationCap, Briefcase, Copy, Check, RefreshCw, ChevronRight, Search, X, Users, Upload, Download, FileText } from "lucide-react"
+import { Plus, Mail, Key, Phone, BadgeCheck, GraduationCap, Briefcase, Copy, Check, RefreshCw, ChevronRight, Search, X, Users, Upload, Download, FileText, Trash2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbInput, SbBadge } from "@/components/ui/sb"
@@ -34,6 +34,8 @@ export default function DirectorPersonalPage() {
   const [importOpen, setImportOpen] = React.useState(false)
   const [importing, setImporting] = React.useState(false)
   const [importResult, setImportResult] = React.useState<{ created: number; skipped: number; errors: string[]; credentials: Array<{ name: string; email: string; password: string }> } | null>(null)
+  const [deleteAllConfirm, setDeleteAllConfirm] = React.useState<string | null>(null)
+  const [deleting, setDeleting] = React.useState(false)
 
   React.useEffect(() => {
     fetchStaff()
@@ -77,6 +79,23 @@ export default function DirectorPersonalPage() {
     }
   }
 
+  const handleDeleteAll = async (role: string) => {
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/director/staff/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role }),
+      })
+      if (res.ok) {
+        setDeleteAllConfirm(null)
+        fetchStaff()
+      }
+    } catch {} finally {
+      setDeleting(false)
+    }
+  }
+
   const filtered = staff.filter(s => {
     if (!search) return true
     const q = search.toLowerCase()
@@ -116,19 +135,33 @@ export default function DirectorPersonalPage() {
         } />
 
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        {ROLES.map(r => (
-          <div key={r.value} className="bg-sb-surface rounded-xl p-3 sm:p-3.5 border border-sb-outline-variant/8">
-            <div className="flex items-center justify-between mb-2 sm:mb-2.5">
-              <div className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center", r.value === "docente" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500")}>
-                <r.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        {ROLES.map(r => {
+          const count = counts[r.value as keyof typeof counts] || 0
+          return (
+            <div key={r.value} className="bg-sb-surface rounded-xl p-3 sm:p-3.5 border border-sb-outline-variant/8">
+              <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+                <div className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center", r.value === "docente" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500")}>
+                  <r.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
+                    {count}
+                  </span>
+                  {count > 0 && (
+                    <button
+                      onClick={() => setDeleteAllConfirm(r.value)}
+                      className="p-1 rounded-md hover:bg-red-500/10 text-red-400/60 hover:text-red-500 transition-colors"
+                      title={`Eliminar todos los ${r.label.toLowerCase()}s`}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
               </div>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
-                {counts[r.value as keyof typeof counts] || 0}
-              </span>
+              <p className="text-[11px] text-sb-on-surface-variant/50 font-medium">{r.label}</p>
             </div>
-            <p className="text-[11px] text-sb-on-surface-variant/50 font-medium">{r.label}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <div className="relative">
@@ -458,6 +491,29 @@ export default function DirectorPersonalPage() {
         </SbModalBody>
         <SbModalFooter>
           <SbBtn variant="filled" rounded className="w-full" onClick={() => setImportResult(null)}>Entendido</SbBtn>
+        </SbModalFooter>
+      </SbModal>
+
+      {/* Delete All Confirmation */}
+      <SbModal open={!!deleteAllConfirm} onClose={() => setDeleteAllConfirm(null)} maxWidth="400px">
+        <SbModalHeader title="Eliminar personal" onClose={() => setDeleteAllConfirm(null)} />
+        <SbModalBody>
+          <div className="text-center py-2">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 mx-auto mb-3">
+              <Trash2 className="h-5 w-5 text-red-500" />
+            </div>
+            <p className="text-sm text-sb-on-surface">
+              ¿Eliminar <strong>{counts[deleteAllConfirm as keyof typeof counts] || 0}</strong>{' '}
+              {deleteAllConfirm === 'docente' ? 'docentes' : 'secretarios'}?
+            </p>
+            <p className="text-[11px] text-sb-on-surface/40 mt-1">Esta acción no se puede deshacer.</p>
+          </div>
+        </SbModalBody>
+        <SbModalFooter className="flex gap-2">
+          <SbBtn variant="outlined" rounded onClick={() => setDeleteAllConfirm(null)} className="flex-1">Cancelar</SbBtn>
+          <SbBtn variant="filled" rounded onClick={() => handleDeleteAll(deleteAllConfirm!)} disabled={deleting} className="flex-1 bg-red-500 hover:bg-red-600">
+            {deleting ? "Eliminando..." : "Eliminar todos"}
+          </SbBtn>
         </SbModalFooter>
       </SbModal>
     </div>
