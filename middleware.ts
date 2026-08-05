@@ -16,14 +16,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname === '/favicon.ico') {
-    // Allow API dev routes for dev role in production
+    // Allow API dev routes for dev role in production, and director routes for director
     if (pathname.startsWith('/api/dev') && process.env.NODE_ENV === 'production') {
       const token = request.cookies.get('token')?.value
       if (token) {
         try {
           const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
           const { payload } = await jwtVerify(token, secret)
-          if (payload.role === 'dev') return NextResponse.next()
+          if (payload.role === 'dev' || payload.role === 'director') return NextResponse.next()
         } catch {}
       }
       return NextResponse.json({ error: 'Not available in production' }, { status: 403 })
