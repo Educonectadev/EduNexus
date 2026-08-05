@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
       `SELECT c.id, c.name, c.code, c.grade, c.section, c.status, c.created_at,
               (SELECT COUNT(*) FROM enrollments e
                JOIN students s ON e.student_id = s.id
-               WHERE s.grade = c.grade AND s.section = c.section AND e.status = 'active'
+               WHERE s.institution_id = c.institution_id
+                 AND s.grade = c.grade AND s.section = c.section AND e.status = 'active'
               ) as student_count
        FROM courses c
        LEFT JOIN teachers t ON c.teacher_id = t.id

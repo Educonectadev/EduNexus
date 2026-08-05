@@ -12,9 +12,12 @@ export async function PATCH(
     const body = await request.json()
     const { status, type, student_id, notes } = body
 
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
     const [existing] = await pool.query(
-      'SELECT id, institution_id FROM documents WHERE id = ?',
-      [id]
+      'SELECT id, institution_id FROM documents WHERE id = ? AND institution_id = ?',
+      [id, instId]
     ) as any
 
     if (!existing || existing.length === 0) {
@@ -48,11 +51,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Sin cambios' }, { status: 400 })
     }
 
-    values.push(id)
-    await pool.query(`UPDATE documents SET ${updates.join(', ')} WHERE id = ?`, values)
+    values.push(id, instId)
+    await pool.query(`UPDATE documents SET ${updates.join(', ')} WHERE id = ? AND institution_id = ?`, values)
 
     const authUser = await getAuthPayload(request)
-    const instId = await resolveInstId(request)
     logAudit({
       userId: (authUser?.userId as string) || '',
       institutionId: instId || existing[0].institution_id,
@@ -74,14 +76,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const [result] = await pool.query('DELETE FROM documents WHERE id = ?', [id]) as any
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    const [result] = await pool.query('DELETE FROM documents WHERE id = ? AND institution_id = ?', [id, instId]) as any
 
     if (result.affectedRows === 0) {
       return NextResponse.json({ error: 'Documento no encontrado' }, { status: 404 })
     }
 
     const authUser = await getAuthPayload(request)
-    const instId = await resolveInstId(request)
     logAudit({
       userId: (authUser?.userId as string) || '',
       institutionId: instId || '',

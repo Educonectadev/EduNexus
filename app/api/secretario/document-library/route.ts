@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await pool.query('DELETE FROM document_library WHERE id = ?', [id])
+    await pool.query('DELETE FROM document_library WHERE id = ? AND institution_id = ?', [id, instId])
 
     const authUser = await getAuthPayload(request)
     logAudit({

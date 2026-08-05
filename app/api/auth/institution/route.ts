@@ -11,9 +11,7 @@ export async function GET(request: NextRequest) {
     const { payload } = await jwtVerify(token, secret)
 
     if (!payload.institutionId) {
-      const [rows] = await pool.query('SELECT id, name FROM institutions LIMIT 1') as any[]
-      const inst = rows?.[0]
-      return NextResponse.json({ id: inst?.id || null, name: inst?.name || '' })
+      return NextResponse.json({ id: null, name: '' }, { status: 401 })
     }
 
     const [rows] = await pool.query(

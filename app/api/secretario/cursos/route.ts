@@ -6,6 +6,7 @@ import crypto from 'crypto'
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     let query = `
       SELECT c.id, c.institution_id, c.name, c.code, c.grade, c.section,
@@ -13,14 +14,14 @@ export async function GET(request: NextRequest) {
              COALESCE(CONCAT(TRIM(t.first_name), ' ', TRIM(t.last_name)), 'Sin asignar') as teacher_name,
              (SELECT COUNT(*) FROM enrollments e
               JOIN students s ON e.student_id = s.id
-              WHERE s.grade = c.grade AND s.section = c.section AND e.status = 'active'
+              WHERE s.institution_id = c.institution_id
+                AND s.grade = c.grade AND s.section = c.section AND e.status = 'active'
              ) as student_count
       FROM courses c
       LEFT JOIN teachers t ON c.teacher_id = t.id
+      WHERE c.institution_id = ?
     `
-    const params: any[] = []
-
-    if (instId) { query += ` WHERE c.institution_id = ?`; params.push(instId) }
+    const params: any[] = [instId]
 
     query += ` ORDER BY c.grade, c.section, c.name`
 

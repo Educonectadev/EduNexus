@@ -20,8 +20,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const [hwRows] = await pool.query(
       `SELECT h.id, h.title, h.description, h.subject, h.start_date, h.due_date, h.status, h.priority,
               h.assigned_by, h.student_id, h.course_id, h.created_at
-       FROM homework h WHERE h.id = ?`,
-      [id]
+       FROM homework h
+       JOIN courses c ON h.course_id = c.id
+       WHERE h.id = ? AND c.institution_id = ?`,
+      [id, instId]
     ) as any[]
 
     if (hwRows.length === 0) {
@@ -68,6 +70,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { id } = await params
     const body = await request.json()
     const { status, action, submission_id, student_id, grade, feedback } = body
+
+    const [owned] = await pool.query(
+      `SELECT h.id FROM homework h
+       JOIN courses c ON h.course_id = c.id
+       WHERE h.id = ? AND c.institution_id = ?`,
+      [id, instId]
+    ) as any[]
+    if (owned.length === 0) {
+      return NextResponse.json({ error: 'Tarea no encontrada' }, { status: 404 })
+    }
 
     if (action === 'update_submission' && submission_id) {
       await pool.query(
@@ -122,6 +134,16 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'Tareas no disponibles en tu plan' }, { status: 403 })
     }
     const { id } = await params
+
+    const [owned] = await pool.query(
+      `SELECT h.id FROM homework h
+       JOIN courses c ON h.course_id = c.id
+       WHERE h.id = ? AND c.institution_id = ?`,
+      [id, instId]
+    ) as any[]
+    if (owned.length === 0) {
+      return NextResponse.json({ error: 'Tarea no encontrada' }, { status: 404 })
+    }
 
     await pool.query(`DELETE FROM homework_submissions WHERE homework_id = ?`, [id])
     await pool.query(`DELETE FROM homework WHERE id = ?`, [id])

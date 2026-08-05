@@ -12,9 +12,12 @@ export async function PATCH(
     const body = await request.json()
     const { student_name, type, status, student_id } = body
 
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
     const [existing] = await pool.query(
-      'SELECT student_name, type, status, institution_id FROM certificates WHERE id = ?',
-      [id]
+      'SELECT student_name, type, status, institution_id FROM certificates WHERE id = ? AND institution_id = ?',
+      [id, instId]
     ) as any
 
     if (!existing || existing.length === 0) {
@@ -48,8 +51,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Sin cambios' }, { status: 400 })
     }
 
-    values.push(id)
-    await pool.query(`UPDATE certificates SET ${updates.join(', ')} WHERE id = ?`, values)
+    values.push(id, instId)
+    await pool.query(`UPDATE certificates SET ${updates.join(', ')} WHERE id = ? AND institution_id = ?`, values)
 
     const authUser = await getAuthPayload(request)
     logAudit({
@@ -73,12 +76,15 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const [cert] = await pool.query('SELECT student_name, type, institution_id FROM certificates WHERE id = ?', [id]) as any
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    const [cert] = await pool.query('SELECT student_name, type, institution_id FROM certificates WHERE id = ? AND institution_id = ?', [id, instId]) as any
     if (!cert || cert.length === 0) {
       return NextResponse.json({ error: 'Certificado no encontrado' }, { status: 404 })
     }
 
-    await pool.query('DELETE FROM certificates WHERE id = ?', [id])
+    await pool.query('DELETE FROM certificates WHERE id = ? AND institution_id = ?', [id, instId])
 
     const authUser = await getAuthPayload(request)
     logAudit({

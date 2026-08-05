@@ -6,6 +6,7 @@ import crypto from 'crypto'
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     let query = `
       SELECT h.id, h.institution_id, h.course_id, h.day_of_week, h.start_time, h.end_time,
@@ -15,11 +16,9 @@ export async function GET(request: NextRequest) {
       FROM horarios h
       JOIN courses c ON h.course_id = c.id
       LEFT JOIN teachers t ON c.teacher_id = t.id
-      WHERE 1=1
+      WHERE h.institution_id = ?
     `
-    const params: any[] = []
-
-    if (instId) { query += ` AND h.institution_id = ?`; params.push(instId) }
+    const params: any[] = [instId]
 
     query += ` ORDER BY h.day_of_week, h.start_time`
 
