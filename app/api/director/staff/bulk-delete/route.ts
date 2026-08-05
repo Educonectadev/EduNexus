@@ -12,17 +12,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}))
-    const role = body.role || 'docente'
+    const role = body.role
 
-    const [result] = await pool.query(
-      `DELETE FROM users WHERE institution_id = $1 AND role = $2`,
-      [institutionId, role]
-    ) as any[]
+    let query = `DELETE FROM users WHERE institution_id = $1 AND role IN ('docente', 'secretario')`
+    const params: any[] = [institutionId]
+
+    if (role) {
+      query = `DELETE FROM users WHERE institution_id = $1 AND role = $2`
+      params.push(role)
+    }
+
+    const [result] = await pool.query(query, params) as any[]
 
     return NextResponse.json({
       success: true,
       deleted: result.affectedRows || 0,
-      message: `${result.affectedRows || 0} ${role === 'docente' ? 'docentes' : 'secretarios'} eliminados`,
+      message: `${result.affectedRows || 0} personal eliminado`,
     })
   } catch (error: any) {
     console.error('Bulk delete error:', error)

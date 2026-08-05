@@ -85,7 +85,7 @@ export default function DirectorPersonalPage() {
       const res = await fetch('/api/director/staff/bulk-delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
+        body: JSON.stringify(role === 'all' ? {} : { role }),
       })
       if (res.ok) {
         setDeleteAllConfirm(null)
@@ -131,6 +131,15 @@ export default function DirectorPersonalPage() {
             <SbBtn variant="filled" rounded className="flex items-center gap-1.5 text-xs" onClick={() => { setDialogOpen(true); resetForm() }}>
               <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Contratar</span><span className="sm:hidden">Nuevo</span>
             </SbBtn>
+            {total > 0 && (
+              <button
+                onClick={() => setDeleteAllConfirm('all')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-red-500/70 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Eliminar plantel</span>
+              </button>
+            )}
           </div>
         } />
 
@@ -503,8 +512,12 @@ export default function DirectorPersonalPage() {
               <Trash2 className="h-5 w-5 text-red-500" />
             </div>
             <p className="text-sm text-sb-on-surface">
-              ¿Eliminar <strong>{counts[deleteAllConfirm as keyof typeof counts] || 0}</strong>{' '}
-              {deleteAllConfirm === 'docente' ? 'docentes' : 'secretarios'}?
+              {deleteAllConfirm === 'all' ? (
+                <>¿Eliminar <strong>todo el plantel</strong> ({total} personas)?</>
+              ) : (
+                <>¿Eliminar <strong>{counts[deleteAllConfirm as keyof typeof counts] || 0}</strong>{' '}
+                {deleteAllConfirm === 'docente' ? 'docentes' : 'secretarios'}?</>
+              )}
             </p>
             <p className="text-[11px] text-sb-on-surface/40 mt-1">Esta acción no se puede deshacer.</p>
           </div>
