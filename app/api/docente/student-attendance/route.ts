@@ -45,12 +45,18 @@ export async function GET(request: NextRequest) {
       [course.grade, course.section]
     )
 
-    const [attendanceRows] = await pool.query(
-      `SELECT student_id, status, notes FROM attendance WHERE date = ? AND student_id IN (${(students as any[]).length ? (students as any[]).map(() => '?').join(',') : 'NULL'})`,
-      [date, ...(students as any[]).map(s => s.id)]
-    )
+    const studentIds = (students as any[]).map(s => s.id)
+    let attendanceRows: any[] = []
+    if (studentIds.length > 0) {
+      const [ar] = await pool.query(
+        `SELECT student_id, status, notes FROM attendance WHERE date = $1 AND student_id = ANY($2)`,
+        [date, studentIds]
+      )
+      attendanceRows = ar as any[]
+    }
+
     const attendanceMap: Record<string, any> = {}
-    for (const a of attendanceRows as any[]) {
+    for (const a of attendanceRows) {
       attendanceMap[a.student_id] = a
     }
 
@@ -78,6 +84,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let conn: any = null
   try {
     const user = await getAuthPayload(request)
     if (!user || user.role !== 'docente') {
@@ -109,33 +116,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Curso no encontrado o no asignado' }, { status: 404 })
     }
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
-      for (const r of records) {
-        if (!r.student_id || !r.status) continue
-        const id = crypto.randomUUID()
-        await conn.query(
-          `INSERT INTO attendance (id, institution_id, student_id, date, status, notes, created_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT (student_id, date) DO UPDATE SET
-             status = EXCLUDED.status,
-             notes = EXCLUDED.notes`,
-          [id, instId, r.student_id, date, r.status, r.notes || '', userId]
-        )
-      }
-
-      await conn.commit()
-    } catch (err) {
-      await conn.rollback()
-      throw err
-    } finally {
-      conn.release()
+    for (const r of records) {
+      if (!r.student_id || !r.status) continue
+      const id = crypto.randomUUID()
+      await conn.query(
+        `INSERT INTO attendance (id, institution_id, student_id, date, status, notes, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (student_id, date) DO UPDATE SET
+           status = EXCLUDED.status,
+           notes = EXCLUDED.notes`,
+        [id, instId, r.student_id, date, r.status, r.notes || '', userId]
+      )
     }
+
+    await conn.query('COMMIT')
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    if (conn) {
+      try { await conn.query('ROLLBACK') } catch {}
+    }
     return NextResponse.json({ error: 'Error saving attendance' }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
   }
 }

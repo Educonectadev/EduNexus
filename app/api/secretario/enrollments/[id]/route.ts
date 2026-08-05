@@ -47,7 +47,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let conn: any
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
@@ -60,42 +60,42 @@ export async function PUT(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
 
-    conn = await pool.getConnection()
-    await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
     const [current] = await conn.query(
       `SELECT e.student_id FROM enrollments e
        JOIN students s ON e.student_id = s.id
-       WHERE e.id = ? AND s.institution_id = ?`,
+       WHERE e.id = $1 AND s.institution_id = $2`,
       [id, instId]
     )
-    if ((current as any[]).length === 0) {
-      await conn.rollback()
+    if (current.rows.length === 0) {
+      await conn.query('ROLLBACK')
       return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
     }
 
-    const studentId = (current as any[])[0].student_id
+    const studentId = current.rows[0].student_id
 
     if (student_name) {
       const nameParts = student_name.trim().split(/\s+/)
       const firstName = nameParts[0] || ''
       const lastName = nameParts.slice(1).join(' ') || ''
       await conn.query(
-        `UPDATE students SET first_name = ?, last_name = ?, document_number = COALESCE(?, document_number),
-         birth_date = COALESCE(?, birth_date), gender = COALESCE(?, gender)
-         WHERE id = ?`,
+        `UPDATE students SET first_name = $1, last_name = $2, document_number = COALESCE($3, document_number),
+         birth_date = COALESCE($4, birth_date), gender = COALESCE($5, gender)
+         WHERE id = $6`,
         [firstName, lastName, student_dni || null, student_birth_date || null, student_gender || null, studentId]
       )
     }
 
     await conn.query(
-      `UPDATE enrollments SET grade = COALESCE(?, grade), section = COALESCE(?, section),
-       year = COALESCE(?, year), status = COALESCE(?, status)
-       WHERE id = ?`,
+      `UPDATE enrollments SET grade = COALESCE($1, grade), section = COALESCE($2, section),
+       year = COALESCE($3, year), status = COALESCE($4, status)
+       WHERE id = $5`,
       [grade || null, section || null, year || null, status || null, id]
     )
 
-    await conn.commit()
+    await conn.query('COMMIT')
 
     const authUser = await getAuthPayload(request)
     logAudit({
@@ -110,10 +110,10 @@ export async function PUT(
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (conn) {
-      try { await conn.rollback() } catch {}
+      try { await conn.query('ROLLBACK') } catch {}
     }
     console.error('[PUT /api/secretario/enrollments/[id]]', error)
-    return NextResponse.json({ error: error.message, code: error.code, sql: error.sqlMessage }, { status: 500 })
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 })
   } finally {
     if (conn) {
       try { conn.release() } catch {}
@@ -125,7 +125,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let conn: any
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
@@ -135,71 +135,64 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
 
-    conn = await pool.getConnection()
-    await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
     const [current] = await conn.query(
       `SELECT e.student_id, s.user_id as student_user_id
        FROM enrollments e
        JOIN students s ON e.student_id = s.id
-       WHERE e.id = ? AND s.institution_id = ?`,
+       WHERE e.id = $1 AND s.institution_id = $2`,
       [id, instId]
     )
-    if ((current as any[]).length === 0) {
-      await conn.rollback()
+    if (current.rows.length === 0) {
+      await conn.query('ROLLBACK')
       return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
     }
 
-    const studentId = (current as any[])[0].student_id
-    const studentUserId = (current as any[])[0].student_user_id
+    const studentId = current.rows[0].student_id
+    const studentUserId = current.rows[0].student_user_id
 
-    // Parents linked only to this student (no other children in this institution)
     const [linkedParents] = await conn.query(
       `SELECT ps.parent_id, p.user_id as parent_user_id
        FROM parent_student ps
        LEFT JOIN parents p ON p.id = ps.parent_id
-       WHERE ps.student_id = ?`,
+       WHERE ps.student_id = $1`,
       [studentId]
     )
 
     const orphanParentIds: string[] = []
     const orphanParentUserIds: (string | null)[] = []
-    for (const link of linkedParents as any[]) {
+    for (const link of linkedParents.rows) {
       const [otherChildren] = await conn.query(
-        `SELECT COUNT(*) as c FROM parent_student ps
+        `SELECT COUNT(*)::int as c FROM parent_student ps
          JOIN students s ON s.id = ps.student_id
-         WHERE ps.parent_id = ? AND ps.student_id != ? AND s.institution_id = ?`,
+         WHERE ps.parent_id = $1 AND ps.student_id != $2 AND s.institution_id = $3`,
         [link.parent_id, studentId, instId]
       )
-      if (((otherChildren as any[])[0]?.c ?? 0) === 0) {
+      if ((otherChildren.rows[0]?.c ?? 0) === 0) {
         orphanParentIds.push(link.parent_id)
         if (link.parent_user_id) orphanParentUserIds.push(link.parent_user_id)
       }
     }
 
-    // Delete enrollment rows for this student (all of them, not just this one)
-    await conn.query('DELETE FROM enrollments WHERE student_id = ?', [studentId])
-    // Unlink parents from this student
-    await conn.query('DELETE FROM parent_student WHERE student_id = ?', [studentId])
-    // Delete orphaned parents
+    await conn.query('DELETE FROM enrollments WHERE student_id = $1', [studentId])
+    await conn.query('DELETE FROM parent_student WHERE student_id = $1', [studentId])
     if (orphanParentIds.length > 0) {
-      await conn.query('DELETE FROM parents WHERE id IN (?)', [orphanParentIds])
+      await conn.query('DELETE FROM parents WHERE id = ANY($1)', [orphanParentIds])
     }
-    // Delete orphaned parent user accounts
     for (const uid of orphanParentUserIds) {
       if (!uid) continue
-      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [uid])
-      await conn.query('DELETE FROM users WHERE id = ?', [uid])
+      await conn.query('DELETE FROM user_roles WHERE user_id = $1', [uid])
+      await conn.query('DELETE FROM users WHERE id = $1', [uid])
     }
-    // Delete student user account if any
     if (studentUserId) {
-      await conn.query('DELETE FROM user_roles WHERE user_id = ?', [studentUserId])
-      await conn.query('DELETE FROM users WHERE id = ?', [studentUserId])
+      await conn.query('DELETE FROM user_roles WHERE user_id = $1', [studentUserId])
+      await conn.query('DELETE FROM users WHERE id = $1', [studentUserId])
     }
-    // Delete student (payments/grades/attendance/issued_documents cascade)
-    await conn.query('DELETE FROM students WHERE id = ?', [studentId])
+    await conn.query('DELETE FROM students WHERE id = $1', [studentId])
 
-    await conn.commit()
+    await conn.query('COMMIT')
 
     const authUser = await getAuthPayload(request)
     logAudit({
@@ -214,10 +207,10 @@ export async function DELETE(
     return NextResponse.json({ success: true, studentDeleted: true, parentsDeleted: orphanParentIds.length })
   } catch (error: any) {
     if (conn) {
-      try { await conn.rollback() } catch {}
+      try { await conn.query('ROLLBACK') } catch {}
     }
     console.error('[DELETE /api/secretario/enrollments/[id]]', error)
-    return NextResponse.json({ error: error.message, code: error.code, sql: error.sqlMessage }, { status: 500 })
+    return NextResponse.json({ error: error.message, code: error.code }, { status: 500 })
   } finally {
     if (conn) {
       try { conn.release() } catch {}

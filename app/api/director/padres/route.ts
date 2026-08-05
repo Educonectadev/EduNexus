@@ -42,8 +42,6 @@ async function generateEmail(firstName: string, lastName: string, documentNumber
   return candidate
 }
 
-// Schema managed by migrations/
-
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
@@ -100,6 +98,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No se encontró la institución' }, { status: 400 })
@@ -115,73 +114,73 @@ export async function POST(request: NextRequest) {
     let generatedEmail: string | null = null
     let generatedPassword: string | null = null
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
+    await conn.query(
+      `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null]
+    )
+
+    if (student_id) {
       await conn.query(
-        `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null]
+        `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, $3, true)`,
+        [id, student_id, relationship || 'padre']
+      )
+    }
+
+    if (create_account !== false) {
+      generatedEmail = email || (await generateEmail(first_name, last_name, document_number, instId))
+      generatedPassword = generateParentPassword()
+      const hashedPassword = await bcrypt.hash(generatedPassword, 10)
+      const fullName = `${first_name} ${last_name}`.trim()
+
+      const [exists] = await conn.query(`SELECT id FROM users WHERE email = $1`, [generatedEmail])
+      if (exists.rows.length > 0) {
+        await conn.query('ROLLBACK')
+        return NextResponse.json({ error: `El correo ${generatedEmail} ya está registrado` }, { status: 409 })
+      }
+
+      const userId = crypto.randomUUID()
+      await conn.query(
+        `INSERT INTO users (id, email, full_name, password_hash, role, institution_id, status)
+         VALUES ($1, $2, $3, $4, 'padre', $5, 'active')`,
+        [userId, generatedEmail, fullName, hashedPassword, instId]
       )
 
-      if (student_id) {
-        await conn.query(
-          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES (?, ?, ?, 1)`,
-          [id, student_id, relationship || 'padre']
-        )
-      }
-
-      if (create_account !== false) {
-        generatedEmail = email || (await generateEmail(first_name, last_name, document_number, instId))
-        generatedPassword = generateParentPassword()
-        const hashedPassword = await bcrypt.hash(generatedPassword, 10)
-        const fullName = `${first_name} ${last_name}`.trim()
-
-        const [exists] = await conn.query(`SELECT id FROM users WHERE email = ?`, [generatedEmail]) as any[]
-        if (exists && exists.length > 0) {
-          await conn.rollback()
-          return NextResponse.json({ error: `El correo ${generatedEmail} ya está registrado` }, { status: 409 })
-        }
-
-        const userId = crypto.randomUUID()
-        await conn.query(
-          `INSERT INTO users (id, email, password, full_name, password_hash, role, institution_id, status)
-           VALUES (?, ?, ?, ?, ?, 'padre', ?, 'active')`,
-          [userId, generatedEmail, generatedPassword, fullName, hashedPassword, instId]
-        )
-
-        await conn.query(`UPDATE parents SET email = ? WHERE id = ?`, [generatedEmail, id])
-      }
-
-      await conn.commit()
-
-      const authUser = await getAuthPayload(request)
-      logAudit({
-        userId: (authUser?.userId as string) || '',
-        institutionId: instId,
-        action: 'create',
-        entity: 'parent',
-        entityId: id,
-        details: { name: `${first_name} ${last_name}`, document: document_number },
-      })
-
-      return NextResponse.json({
-        success: true,
-        id,
-        generated_email: generatedEmail,
-        generated_password: generatedPassword,
-      })
-    } catch (e) {
-      try { await conn.rollback() } catch {}
-      throw e
-    } finally {
-      conn.release()
+      await conn.query(`UPDATE parents SET email = $1 WHERE id = $2`, [generatedEmail, id])
     }
+
+    await conn.query('COMMIT')
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId,
+      action: 'create',
+      entity: 'parent',
+      entityId: id,
+      details: { name: `${first_name} ${last_name}`, document: document_number },
+    })
+
+    return NextResponse.json({
+      success: true,
+      id,
+      generated_email: generatedEmail,
+      generated_password: generatedPassword,
+    })
   } catch (error: any) {
+    if (conn) {
+      try { await conn.query('ROLLBACK') } catch {}
+    }
     if (error?.code === '23505') {
       return NextResponse.json({ error: 'Ya existe un padre/guardián con ese DNI en esta institución' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating parent', details: error?.message }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
   }
 }

@@ -53,6 +53,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let conn: any = null
   try {
     const user = await getAuthPayload(request)
     if (!user || user.role !== 'super_admin') {
@@ -61,75 +62,48 @@ export async function DELETE(
 
     const { id } = await params
 
-    const [[inst]] = await pool.query('SELECT id, name FROM institutions WHERE id = ?', [id]) as any[]
+    const [instResult] = await pool.query('SELECT id, name FROM institutions WHERE id = ?', [id]) as any[]
+    const inst = instResult?.[0]
     if (!inst) {
       return NextResponse.json({ error: 'Institution not found' }, { status: 404 })
     }
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
-      await conn.query('DELETE FROM users WHERE institution_id = ?', [id])
+    await conn.query('DELETE FROM users WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM institution_dashboards WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM enrollments WHERE student_id IN (SELECT id FROM students WHERE institution_id = $1)', [id])
+    await conn.query('DELETE FROM students WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM courses WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM parent_student WHERE parent_id IN (SELECT id FROM parents WHERE institution_id = $1)', [id])
+    await conn.query('DELETE FROM parents WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM chat_messages WHERE institution_id = $1', [id])
+    await conn.query('DELETE FROM virtual_classes WHERE institution_id = $1', [id])
 
-      await conn.query('DELETE FROM institution_dashboards WHERE institution_id = ?', [id])
+    try { await conn.query('DELETE FROM notifications WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM horarios WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM attendance WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM academic_grades WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM documents WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM certificates WHERE institution_id = $1', [id]) } catch {}
+    try { await conn.query('DELETE FROM payments WHERE institution_id = $1', [id]) } catch {}
 
-      await conn.query('DELETE FROM students WHERE institution_id = ?', [id])
+    await conn.query('DELETE FROM institutions WHERE id = $1', [id])
 
-      await conn.query('DELETE FROM enrollments WHERE institution_id = ?', [id])
+    await conn.query('COMMIT')
 
-      await conn.query('DELETE FROM courses WHERE institution_id = ?', [id])
-
-      await conn.query('DELETE FROM parents WHERE institution_id = ?', [id])
-
-      await conn.query('DELETE FROM parent_student WHERE parent_id IN (SELECT id FROM parents WHERE institution_id = ?)', [id])
-
-      await conn.query('DELETE FROM chat_messages WHERE institution_id = ?', [id])
-
-      await conn.query('DELETE FROM virtual_classes WHERE institution_id = ?', [id])
-
-      try {
-        await conn.query('DELETE FROM notifications WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM horarios WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM attendance WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM academic_grades WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM documents WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM certificates WHERE institution_id = ?', [id])
-      } catch {}
-
-      try {
-        await conn.query('DELETE FROM payments WHERE institution_id = ?', [id])
-      } catch {}
-
-      await conn.query('DELETE FROM institutions WHERE id = ?', [id])
-
-      await conn.commit()
-
-      return NextResponse.json({ success: true, message: `Institution "${inst.name}" and all associated data deleted` })
-    } catch (error) {
-      await conn.rollback()
-      throw error
-    } finally {
-      conn.release()
-    }
+    return NextResponse.json({ success: true, message: `Institution "${inst.name}" and all associated data deleted` })
   } catch (error) {
+    if (conn) {
+      try { await conn.query('ROLLBACK') } catch {}
+    }
     console.error('Error deleting institution:', error)
     return NextResponse.json({ error: 'Error deleting institution' }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
   }
 }
 

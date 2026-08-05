@@ -42,8 +42,6 @@ async function generateEmail(firstName: string, lastName: string, documentNumber
   return candidate
 }
 
-// Schema managed by migrations/
-
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
@@ -74,20 +72,20 @@ export async function GET(request: NextRequest) {
     let linkedMap: Record<string, { name: string; relationship: string; id: string; grade: string; section: string }[]> = {}
     if (parentIds.length > 0) {
       const [rawLinks] = await pool.query(
-        `SELECT * FROM parent_student WHERE parent_id IN (${parentIds.map(() => '?').join(',')})`,
-        parentIds
+        `SELECT * FROM parent_student WHERE parent_id = ANY($1)`,
+        [parentIds]
       ) as any[]
-      
+
       if (rawLinks && rawLinks.length > 0) {
         const studentIds = rawLinks.map((l: any) => l.student_id)
         const [students] = await pool.query(
-          `SELECT id, first_name, last_name, grade, section FROM students WHERE id IN (${studentIds.map(() => '?').join(',')})`,
-          studentIds
+          `SELECT id, first_name, last_name, grade, section FROM students WHERE id = ANY($1)`,
+          [studentIds]
         ) as any[]
-        
+
         const studentMap: Record<string, any> = {}
         for (const s of students) studentMap[s.id] = s
-        
+
         for (const l of rawLinks) {
           if (!linkedMap[l.parent_id]) linkedMap[l.parent_id] = []
           const s = studentMap[l.student_id]
@@ -109,8 +107,8 @@ export async function GET(request: NextRequest) {
         const [users] = await pool.query(
           `SELECT email, status AS user_status
            FROM users
-           WHERE email IN (${emails.map(() => '?').join(',')}) AND role = 'padre' AND institution_id = ?`,
-          [...emails, instId]
+           WHERE email = ANY($1) AND role = 'padre' AND institution_id = $2`,
+          [emails, instId]
         ) as any[]
         for (const u of users) {
           const parent = parents.find(r => r.email === u.email)
@@ -134,6 +132,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No se encontró la institución' }, { status: 400 })
@@ -149,104 +148,73 @@ export async function POST(request: NextRequest) {
     let generatedEmail: string | null = null
     let generatedPassword: string | null = null
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
 
-      // Crear registro en parents
+    await conn.query(
+      `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null]
+    )
+
+    if (student_id) {
       await conn.query(
-        `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null]
+        `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, $3, true)`,
+        [id, student_id, relationship || 'padre']
+      )
+    }
+
+    if (create_account !== false) {
+      generatedEmail = email || (await generateEmail(first_name, last_name, document_number, instId))
+      generatedPassword = (customPassword && customPassword.trim()) || generateParentPassword()
+      const hashedPassword = await bcrypt.hash(generatedPassword!, 10)
+      const fullName = `${first_name} ${last_name}`.trim()
+
+      const [exists] = await conn.query(`SELECT id FROM users WHERE email = $1`, [generatedEmail])
+      if (exists.rows.length > 0) {
+        await conn.query('ROLLBACK')
+        return NextResponse.json({ error: `El correo ${generatedEmail} ya está registrado en el sistema` }, { status: 409 })
+      }
+
+      const userId = crypto.randomUUID()
+      await conn.query(
+        `INSERT INTO users (id, email, full_name, password_hash, role, institution_id, status)
+         VALUES ($1, $2, $3, $4, 'padre', $5, 'active')`,
+        [userId, generatedEmail, fullName, hashedPassword, instId]
       )
 
-      // Vincular estudiante si viene
-      if (student_id) {
-        await conn.query(
-          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES (?, ?, ?, 1)`,
-          [id, student_id, relationship || 'padre']
-        )
-      }
-
-      // Crear cuenta de usuario para login del padre
-      if (create_account !== false) {
-        generatedEmail = email || (await generateEmail(first_name, last_name, document_number, instId))
-        generatedPassword = (customPassword && customPassword.trim()) || generateParentPassword()
-        const hashedPassword = await bcrypt.hash(generatedPassword!, 10)
-        const fullName = `${first_name} ${last_name}`.trim()
-
-        // Verificar que el email no exista
-        const [exists] = await conn.query(`SELECT id FROM users WHERE email = ?`, [generatedEmail]) as any[]
-        if (exists && exists.length > 0) {
-          await conn.rollback()
-          return NextResponse.json({ error: `El correo ${generatedEmail} ya está registrado en el sistema` }, { status: 409 })
-        }
-
-        // Asegurar columnas necesarias
-        const [cols] = await conn.query(
-          `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
-          ['users']
-        ) as any[]
-        const colNames = (cols || []).map((c: any) => c.column_name)
-        const userId = crypto.randomUUID()
-
-        const insertCols: string[] = ['id', 'email', 'full_name', 'role', 'institution_id', 'status']
-        const insertVals: any[] = [userId, generatedEmail, fullName, 'padre', instId, 'active']
-
-        if (colNames.includes('password')) {
-          insertCols.push('password'); insertVals.push(generatedPassword)
-        }
-        if (colNames.includes('password_hash')) {
-          insertCols.push('password_hash'); insertVals.push(hashedPassword)
-        }
-        if (colNames.includes('document_number')) {
-          insertCols.push('document_number'); insertVals.push(document_number)
-        }
-        if (colNames.includes('phone')) {
-          insertCols.push('phone'); insertVals.push(phone || null)
-        }
-        if (colNames.includes('full_name') === false && colNames.includes('name')) {
-          insertCols[insertCols.indexOf('full_name')] = 'name'
-        }
-
-        const placeholders = insertCols.map(() => '?').join(', ')
-        await conn.query(
-          `INSERT INTO users (${insertCols.join(', ')}) VALUES (${placeholders})`,
-          insertVals
-        )
-
-        // Actualizar email en parents también
-        await conn.query(`UPDATE parents SET email = ? WHERE id = ?`, [generatedEmail, id])
-      }
-
-      await conn.commit()
-
-      const authUser = await getAuthPayload(request)
-      logAudit({
-        userId: (authUser?.userId as string) || '',
-        institutionId: instId,
-        action: 'create',
-        entity: 'parent',
-        entityId: id,
-        details: { name: `${first_name} ${last_name}`, document: document_number },
-      })
-
-      return NextResponse.json({
-        success: true,
-        id,
-        generated_email: generatedEmail,
-        generated_password: generatedPassword,
-      })
-    } catch (e) {
-      try { await conn.rollback() } catch {}
-      throw e
-    } finally {
-      conn.release()
+      await conn.query(`UPDATE parents SET email = $1 WHERE id = $2`, [generatedEmail, id])
     }
+
+    await conn.query('COMMIT')
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || '',
+      institutionId: instId,
+      action: 'create',
+      entity: 'parent',
+      entityId: id,
+      details: { name: `${first_name} ${last_name}`, document: document_number },
+    })
+
+    return NextResponse.json({
+      success: true,
+      id,
+      generated_email: generatedEmail,
+      generated_password: generatedPassword,
+    })
   } catch (error: any) {
+    if (conn) {
+      try { await conn.query('ROLLBACK') } catch {}
+    }
     if (error?.code === '23505') {
       return NextResponse.json({ error: 'Ya existe un padre/guardián con ese DNI en esta institución' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating parent', details: error?.message }, { status: 500 })
+  } finally {
+    if (conn) {
+      try { conn.release() } catch {}
+    }
   }
 }
