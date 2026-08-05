@@ -130,7 +130,7 @@ export default function DevPerfilPage() {
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full max-w-[900px] mx-auto space-y-6 py-2">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg ${
+        <div className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg text-center sm:text-left ${
           toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
         }`}>
           {toast.message}
@@ -138,68 +138,68 @@ export default function DevPerfilPage() {
       )}
 
       <motion.div variants={fadeUp}>
-        <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Mi Perfil</h2>
-        <p className="text-[14px] text-sb-on-surface/60 mt-1">Información personal y configuración de cuenta</p>
+        <h2 className="text-[20px] sm:text-[26px] font-bold tracking-tight text-sb-on-surface">Mi Perfil</h2>
+        <p className="text-[12px] sm:text-[14px] text-sb-on-surface/60 mt-1">Información personal y configuración de cuenta</p>
       </motion.div>
 
       {/* Profile Header */}
-      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-6 flex items-center gap-5">
+      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-6 flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-5">
         {profile?.avatarUrl ? (
-          <img src={profile.avatarUrl} alt="" className="w-16 h-16 rounded-2xl object-cover" />
+          <img src={profile.avatarUrl} alt="" className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover shrink-0" />
         ) : (
-          <div className="w-16 h-16 rounded-2xl bg-sb-surface-container-high flex items-center justify-center">
-            <span className="text-[22px] font-bold text-sb-on-surface/40">{initials}</span>
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
+            <span className="text-[20px] sm:text-[22px] font-bold text-sb-on-surface/40">{initials}</span>
           </div>
         )}
-        <div className="flex-1">
-          <h3 className="text-[18px] font-semibold text-sb-on-surface">{profile?.fullName || "Sin nombre"}</h3>
-          <p className="text-[13px] text-sb-on-surface/50 mt-0.5">{profile?.email}</p>
+        <div className="flex-1 text-center sm:text-left min-w-0">
+          <h3 className="text-[16px] sm:text-[18px] font-semibold text-sb-on-surface truncate">{profile?.fullName || "Sin nombre"}</h3>
+          <p className="text-[12px] sm:text-[13px] text-sb-on-surface/50 mt-0.5 truncate">{profile?.email}</p>
         </div>
-        <span className="px-3 py-1.5 rounded-full bg-sb-primary/10 text-sb-primary text-[11px] font-semibold uppercase tracking-wider">
+        <span className="px-3 py-1.5 rounded-full bg-sb-primary/10 text-sb-primary text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider shrink-0">
           {roleLabels[profile?.role || ""] || profile?.role || "—"}
         </span>
       </motion.div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
           <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Información de cuenta</p>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-              <span className="text-[13px] text-sb-on-surface/60">Miembro desde {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString("es-PE") : "—"}</span>
+              <span className="text-[12px] sm:text-[13px] text-sb-on-surface/60">Miembro desde {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString("es-PE") : "—"}</span>
             </div>
             {profile?.role !== "dev" && profile?.institutionId && (
               <div className="flex items-center gap-3">
                 <Building2 className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-                <span className="text-[13px] text-sb-on-surface/60">Institución: {profile.institutionId}</span>
+                <span className="text-[12px] sm:text-[13px] text-sb-on-surface/60 truncate">Institución: {profile.institutionId}</span>
               </div>
             )}
             <div className="flex items-center gap-3">
               <Shield className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-              <span className="text-[12px] text-sb-on-surface/50 font-mono">ID: {profile?.id?.slice(0, 16)}...</span>
+              <span className="text-[11px] sm:text-[12px] text-sb-on-surface/50 font-mono truncate">ID: {profile?.id?.slice(0, 16)}...</span>
             </div>
           </div>
         </motion.div>
 
-        <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
+        <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
           <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Sesión activa</p>
-          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-sb-surface-container-high">
-            <Globe className="h-5 w-5 text-sb-on-surface/30" />
-            <div className="flex-1">
-              <p className="text-[13px] font-medium text-sb-on-surface/80">Esta sesión</p>
-              <p className="text-[11px] text-sb-on-surface/40 mt-0.5">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
+          <div className="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl bg-sb-surface-container-high">
+            <Globe className="h-5 w-5 text-sb-on-surface/30 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] sm:text-[13px] font-medium text-sb-on-surface/80">Esta sesión</p>
+              <p className="text-[10px] sm:text-[11px] text-sb-on-surface/40 mt-0.5 truncate">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] text-emerald-500 font-medium">Activa</span>
+              <span className="text-[10px] sm:text-[11px] text-emerald-500 font-medium">Activa</span>
             </div>
           </div>
         </motion.div>
       </div>
 
       {/* Personal Data */}
-      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
+      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
             <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider">Datos personales</p>
@@ -242,9 +242,9 @@ export default function DevPerfilPage() {
               </div>
               <p className="text-[10px] text-sb-on-surface/20 mt-1">El email no se puede cambiar</p>
             </div>
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button onClick={handleSave} disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
                 {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="h-4 w-4" />}
                 {saving ? "Guardando..." : "Guardar cambios"}
               </button>
@@ -262,9 +262,9 @@ export default function DevPerfilPage() {
               { label: "Teléfono", value: profile?.phone || "—" },
               { label: "DNI", value: profile?.dni || "—" },
             ].map((field) => (
-              <div key={field.label} className="flex items-center gap-3">
-                <span className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider w-20 shrink-0">{field.label}</span>
-                <span className="text-[14px] text-sb-on-surface/80">{field.value}</span>
+              <div key={field.label} className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3">
+                <span className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider sm:w-20 shrink-0">{field.label}</span>
+                <span className="text-[14px] text-sb-on-surface/80 break-all sm:break-normal">{field.value}</span>
               </div>
             ))}
           </div>
@@ -272,7 +272,7 @@ export default function DevPerfilPage() {
       </motion.div>
 
       {/* Password */}
-      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
+      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
             <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider">Contraseña</p>
@@ -312,9 +312,9 @@ export default function DevPerfilPage() {
                 </div>
               </div>
             ))}
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button type="submit" disabled={changingPass}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
                 {changingPass ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Key className="h-4 w-4" />}
                 {changingPass ? "Actualizando..." : "Actualizar contraseña"}
               </button>
@@ -328,16 +328,16 @@ export default function DevPerfilPage() {
       </motion.div>
 
       {/* Theme */}
-      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
+      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
         <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Tema de la app</p>
-        <div className="grid grid-cols-7 gap-3">
+        <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-7 sm:overflow-visible sm:pb-0">
           {THEMES.map(t => {
             const isActive = (resolvedTheme === t.mode) && (themeVariant === t.variant)
             return (
               <motion.div
                 key={t.name}
                 layout
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-2 shrink-0 w-[52px] sm:w-auto"
               >
                 <motion.button
                   animate={{
