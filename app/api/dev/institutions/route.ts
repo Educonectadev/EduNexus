@@ -10,7 +10,7 @@ function generateId(): string {
 async function generateCode(): Promise<string> {
   try {
     const [rows] = await pool.query(
-      `SELECT code FROM institutions WHERE code LIKE 'COL-%' ORDER BY CAST(SUBSTRING(code, 5) AS UNSIGNED) DESC LIMIT 1`
+      `SELECT code FROM institutions WHERE code LIKE 'COL-%' ORDER BY CAST(SUBSTRING(code, 5) AS INTEGER) DESC LIMIT 1`
     ) as any[]
     if (rows.length > 0) {
       const lastCode = rows[0].code
@@ -82,57 +82,45 @@ export async function POST(request: NextRequest) {
     const directorPassword = generatePassword()
     const hashedPassword = await bcrypt.hash(directorPassword, 10)
 
-    const conn = await pool.getConnection()
-    try {
-      await conn.beginTransaction()
+    await pool.query(
+      `INSERT INTO institutions (
+        id, code, name, type, level, modality, shift, dependence,
+        department, province, district, address, reference,
+        phone, phone2, email, website,
+        director_name, director_dni, director_phone, director_email,
+        total_students, total_teachers, total_classrooms,
+        has_lab, has_library, has_computer_room, has_playground,
+        notes, plan_id, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+      [
+        instId, instCode, name, type || '', level || '', modality || '', shift || '', dependence || '',
+        department || '', province || '', district || '', address || '', reference || '',
+        phone || '', phone2 || '', directorEmail, website || '',
+        director_name || '', director_dni || '', director_phone || '', director_email || directorEmail,
+        total_students || 0, total_teachers || 0, total_classrooms || 0,
+        has_lab ? true : false, has_library ? true : false, has_computer_room ? true : false, has_playground ? true : false,
+        notes || '', plan_id || null,
+      ]
+    )
 
-      await conn.query(
-        `INSERT INTO institutions (
-          id, code, name, type, level, modality, shift, dependence,
-          department, province, district, address, reference,
-          phone, phone2, email, website,
-          director_name, director_dni, director_phone, director_email,
-          total_students, total_teachers, total_classrooms,
-          has_lab, has_library, has_computer_room, has_playground,
-          notes, plan_id, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
-        [
-          instId, instCode, name, type || '', level || '', modality || '', shift || '', dependence || '',
-          department || '', province || '', district || '', address || '', reference || '',
-          phone || '', phone2 || '', directorEmail, website || '',
-          director_name || '', director_dni || '', director_phone || '', director_email || directorEmail,
-          total_students || 0, total_teachers || 0, total_classrooms || 0,
-          has_lab ? 1 : 0, has_library ? 1 : 0, has_computer_room ? 1 : 0, has_playground ? 1 : 0,
-          notes || '', plan_id || null,
-        ]
+    if (director_name) {
+      const userId = generateId()
+      await pool.query(
+        `INSERT INTO users (id, email, full_name, password_hash, role, institution_id, dni, status)
+         VALUES (?, ?, ?, ?, 'director', ?, ?, 'active')`,
+        [userId, directorEmail, director_name, hashedPassword, instId, director_dni || '']
       )
-
-      if (director_name) {
-        const userId = generateId()
-        await conn.query(
-          `INSERT INTO users (id, email, full_name, password_hash, role, institution_id, dni, status)
-           VALUES (?, ?, ?, ?, 'director', ?, ?, 'active')`,
-          [userId, directorEmail, director_name, hashedPassword, instId, director_dni || '']
-        )
-      }
-
-      await conn.commit()
-
-      return NextResponse.json({
-        success: true,
-        code: instCode,
-        director: {
-          email: directorEmail,
-          password: directorPassword,
-          name: director_name,
-        },
-      })
-    } catch (error) {
-      await conn.rollback()
-      throw error
-    } finally {
-      conn.release()
     }
+
+    return NextResponse.json({
+      success: true,
+      code: instCode,
+      director: {
+        email: directorEmail,
+        password: directorPassword,
+        name: director_name,
+      },
+    })
   } catch (error: any) {
     if (error?.code === '23505') {
       return NextResponse.json({ error: 'Código ya existe, intenta de nuevo' }, { status: 409 })
