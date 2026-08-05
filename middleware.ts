@@ -9,7 +9,7 @@ const roleRouteMap: Record<string, string> = {
   secretario: '/secretario/dashboard',
   docente: '/docente/dashboard',
   padre: '/padre/dashboard',
-  dev: '/',
+  dev: '/dev',
 }
 
 export async function middleware(request: NextRequest) {
