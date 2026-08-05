@@ -272,7 +272,7 @@ export default function DevDashboard() {
                   <Server className="h-4 w-4 text-emerald-500 lg:h-5 lg:w-5" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-medium text-sb-on-surface/80 lg:text-[14px]">MySQL</p>
+                  <p className="text-[13px] font-medium text-sb-on-surface/80 lg:text-[14px]">PostgreSQL</p>
                   <p className="text-[11px] text-sb-on-surface/50 lg:text-[12px]">Base de datos</p>
                 </div>
               </div>
@@ -286,8 +286,8 @@ export default function DevDashboard() {
 
             <div className="space-y-2.5 lg:space-y-3">
               {[
-                { label: "Database", value: "educonecta" },
-                { label: "Host", value: "localhost:3306" },
+                { label: "Database", value: "postgres" },
+                { label: "Host", value: "Supabase Pooler" },
                 { label: "Pool", value: "50 conexiones" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
