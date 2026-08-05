@@ -57,7 +57,7 @@ export default function DirectorPersonalPage() {
   const handleRegenPassword = async (staffId: string) => { setRegenerating(true); setNewPassword(null); try { const res = await fetch(`/api/director/staff/${staffId}/reset-password`, { method: "POST" }); const data = await res.json(); if (res.ok && data.password) setNewPassword(data.password) } catch {} finally { setRegenerating(false) } }
   const handleCopy = (text: string) => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500) }
 
-  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>, endpoint: string) => {
     const file = e.target.files?.[0]
     if (!file) return
     setImporting(true)
@@ -65,7 +65,7 @@ export default function DirectorPersonalPage() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('/api/dev/docentes/import', { method: 'POST', body: formData })
+      const res = await fetch(endpoint, { method: 'POST', body: formData })
       const data = await res.json()
       if (res.ok) {
         setImportResult(data)
@@ -93,12 +93,21 @@ export default function DirectorPersonalPage() {
           <div className="flex flex-wrap items-center gap-2">
             <a href="/plantilla_docentes.csv" download className="sb-btn outlined rounded flex items-center gap-2 text-xs">
               <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Plantilla</span>
+              <span className="hidden sm:inline">Plantilla Docentes</span>
+            </a>
+            <a href="/plantilla_secretarios.csv" download className="sb-btn outlined rounded flex items-center gap-2 text-xs">
+              <Download className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Plantilla Sec.</span>
             </a>
             <label className="sb-btn tonal rounded flex items-center gap-2 cursor-pointer text-xs">
               <Upload className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Importar CSV</span>
-              <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
+              <span className="hidden sm:inline">Importar Docentes</span>
+              <input type="file" accept=".csv" onChange={e => handleImport(e, '/api/dev/docentes/import')} className="hidden" disabled={importing} />
+            </label>
+            <label className="sb-btn tonal rounded flex items-center gap-2 cursor-pointer text-xs">
+              <Upload className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Importar Sec.</span>
+              <input type="file" accept=".csv" onChange={e => handleImport(e, '/api/dev/secretarios/import')} className="hidden" disabled={importing} />
             </label>
             <SbBtn variant="filled" rounded className="flex items-center gap-1.5 text-xs" onClick={() => { setDialogOpen(true); resetForm() }}>
               <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Contratar</span><span className="sm:hidden">Nuevo</span>
