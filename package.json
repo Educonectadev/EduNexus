@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
-    "@tailwindcss/postcss": "^4.1.9",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22",
     "@types/react": "^19",
