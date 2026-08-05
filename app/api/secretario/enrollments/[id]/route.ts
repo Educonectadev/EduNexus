@@ -82,7 +82,7 @@ export async function PUT(
       const lastName = nameParts.slice(1).join(' ') || ''
       await conn.query(
         `UPDATE students SET first_name = $1, last_name = $2, document_number = COALESCE($3, document_number),
-         birth_date = COALESCE($4, birth_date), gender = COALESCE($5, gender)
+         birth_date = COALESCE($4::date, birth_date), gender = COALESCE($5, gender)
          WHERE id = $6`,
         [firstName, lastName, student_dni || null, student_birth_date || null, student_gender || null, studentId]
       )

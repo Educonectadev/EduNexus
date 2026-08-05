@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       }
 
       await conn.query(
-        `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3, birth_date), gender = COALESCE($4, gender),
+        `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender),
          code = COALESCE(NULLIF($5, ''), code)
          WHERE id = $6`,
         [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId]
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
       await conn.query(
         `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status)
-         VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, ''), NULLIF($8, ''), $9, $10, 'active')`,
+         VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, 'active')`,
         [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade, section || 'A']
       )
     }
