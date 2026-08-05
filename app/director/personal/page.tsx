@@ -106,12 +106,12 @@ export default function DirectorPersonalPage() {
           </div>
         } />
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {ROLES.map(r => (
-          <div key={r.value} className="bg-sb-surface rounded-xl p-3.5 border border-sb-outline-variant/8">
-            <div className="flex items-center justify-between mb-2.5">
-              <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", r.value === "docente" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500")}>
-                <r.icon className="h-4 w-4" />
+          <div key={r.value} className="bg-sb-surface rounded-xl p-3 sm:p-3.5 border border-sb-outline-variant/8">
+            <div className="flex items-center justify-between mb-2 sm:mb-2.5">
+              <div className={cn("h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center", r.value === "docente" ? "bg-emerald-500/10 text-emerald-500" : "bg-purple-500/10 text-purple-500")}>
+                <r.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
                 {counts[r.value as keyof typeof counts] || 0}
@@ -123,16 +123,16 @@ export default function DirectorPersonalPage() {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
         <input
           ref={inputRef}
-          placeholder="Buscar por nombre, DNI, email, asignatura..."
+          placeholder="Buscar por nombre, DNI, email..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
           className={cn(
-            "w-full h-11 pl-11 pr-20 bg-sb-surface rounded-xl border text-sm text-sb-on-surface placeholder:text-sb-on-surface-variant/30 outline-none transition-all",
+            "w-full h-10 sm:h-11 pl-10 pr-16 sm:pr-20 bg-sb-surface rounded-xl border text-[13px] sm:text-sm text-sb-on-surface placeholder:text-sb-on-surface-variant/30 outline-none transition-all",
             searchFocused ? "border-sb-primary/30 ring-1 ring-sb-primary/10" : "border-sb-outline-variant/10"
           )}
         />
@@ -341,12 +341,12 @@ export default function DirectorPersonalPage() {
         {selectedStaff && (
           <SbModalBody noPadding>
             <div className="px-4 sm:px-6 pt-6 pb-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-xl bg-sb-surface-container-high flex items-center justify-center"><span className="text-sm font-semibold text-sb-on-surface-variant">{initials(selectedStaff.full_name)}</span></div>
-                  <div><p className="text-base font-semibold text-sb-on-surface">{selectedStaff.full_name}</p><p className="text-xs text-sb-on-surface-variant/50">{roleLabels[selectedStaff.role] || selectedStaff.role}</p></div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0"><span className="text-xs sm:text-sm font-semibold text-sb-on-surface-variant">{initials(selectedStaff.full_name)}</span></div>
+                  <div className="min-w-0"><p className="text-[15px] sm:text-base font-semibold text-sb-on-surface truncate">{selectedStaff.full_name}</p><p className="text-[11px] sm:text-xs text-sb-on-surface-variant/50">{roleLabels[selectedStaff.role] || selectedStaff.role}</p></div>
                 </div>
-                <SbBadge color={selectedStaff.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-sb-surface-container-high text-sb-on-surface-variant/50"}>{selectedStaff.status === "active" ? "Activo" : "Inactivo"}</SbBadge>
+                <SbBadge color={selectedStaff.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-sb-surface-container-high text-sb-on-surface-variant/50"} className="shrink-0">{selectedStaff.status === "active" ? "Activo" : "Inactivo"}</SbBadge>
               </div>
             </div>
             <div className="px-4 sm:px-6 space-y-3 pb-2">

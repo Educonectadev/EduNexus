@@ -95,8 +95,8 @@ function SectionHeader({ icon: Icon, title, desc, action, v }: {
 }) {
   if (v === "minimal") {
     return (
-      <div className="mb-5 flex items-start justify-between gap-4 border-b border-sb-outline-variant/30 pb-4">
-        <div>
+      <div className="mb-5 flex items-start justify-between gap-3 border-b border-sb-outline-variant/30 pb-4">
+        <div className="min-w-0">
           <h3 className="text-sm font-semibold text-sb-on-surface">{title}</h3>
           {desc && <p className="mt-0.5 text-xs text-sb-on-surface-variant/60">{desc}</p>}
         </div>
@@ -105,12 +105,12 @@ function SectionHeader({ icon: Icon, title, desc, action, v }: {
     )
   }
   return (
-    <div className="mb-5 flex items-start justify-between gap-4">
-      <div className="flex items-center gap-3">
+    <div className="mb-5 flex items-start justify-between gap-3">
+      <div className="flex items-center gap-3 min-w-0">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sb-primary/10">
           <Icon className="h-4 w-4 text-sb-primary" />
         </div>
-        <div>
+        <div className="min-w-0">
           <h3 className="text-sm font-semibold text-sb-on-surface">{title}</h3>
           {desc && <p className="mt-0.5 text-xs text-sb-on-surface-variant/60">{desc}</p>}
         </div>
@@ -224,16 +224,16 @@ function InfoSection({ v, d, className, delay }: { v: V; d: PerfilData; classNam
             { icon: Calendar, k: "Miembro desde", val: d.profile?.createdAt ? new Date(d.profile.createdAt).toLocaleDateString("es-PE") : "—" },
             { icon: Shield, k: "ID", val: d.profile?.id?.slice(0, 16), mono: true },
           ].map(({ icon: Icon, k, val, mono }) => (
-            <div key={k} className="flex items-center gap-4 py-3">
-              <div className="w-32 shrink-0">
+            <div key={k} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-3">
+              <div className="sm:w-28 sm:shrink-0">
                 <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
               </div>
               <dd className={cn("flex-1 truncate text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
             </div>
           ))}
           {d.profile?.role !== "dev" && d.profile?.institutionId && (
-            <div className="flex items-center gap-4 py-3">
-              <div className="w-32 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-3">
+              <div className="sm:w-28 sm:shrink-0">
                 <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Institución</dt>
               </div>
               <dd className="flex-1 truncate text-sm">{d.profile.institutionId}</dd>
@@ -606,9 +606,9 @@ function MinimalLayout({ d }: { d: PerfilData }) {
                     { k: "ID", val: d.profile?.id?.slice(0, 16), mono: true },
                     ...(d.profile?.role !== "dev" && d.profile?.institutionId ? [{ k: "Institución", val: d.profile.institutionId }] : []),
                   ].map(({ k, val, mono }) => (
-                    <div key={k} className="flex items-baseline justify-between gap-6 border-b border-sb-outline-variant/15 py-3">
+                    <div key={k} className="flex items-center justify-between gap-4 border-b border-sb-outline-variant/15 py-3">
                       <dt className="shrink-0 text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
-                      <dd className={cn("truncate text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
+                      <dd className={cn("truncate text-right text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
                     </div>
                   ))}
                 </dl>
