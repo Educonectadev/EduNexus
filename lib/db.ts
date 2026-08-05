@@ -2,20 +2,29 @@ import { Pool, PoolClient } from 'pg'
 
 // National scale: 34,000+ institutions, ~2M students
 // Pool must handle concurrent requests across all tenants
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
-    ? { rejectUnauthorized: false }
-    : false,
-  max: parseInt(process.env.DB_POOL_LIMIT || '50'),
-  idleTimeoutMillis: 60000,
-  connectionTimeoutMillis: 10000,
-})
+const poolConfig: any = process.env.DATABASE_URL || process.env.POSTGRES_URL
+  ? {
+      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+      ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+    }
+  : {
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432'),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+    }
+
+poolConfig.max = parseInt(process.env.DB_POOL_LIMIT || '50')
+poolConfig.idleTimeoutMillis = 60000
+poolConfig.connectionTimeoutMillis = 10000
+
+const pool = new Pool(poolConfig)
 
 // Convert mysql-style ? placeholders to pg-style $1, $2, ...
 function toPgParams(sql: string, params: any[] = []): { text: string; values: any[] } {
