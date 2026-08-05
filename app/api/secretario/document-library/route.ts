@@ -8,32 +8,9 @@ import { logAudit } from '@/lib/audit'
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'library')
 
-async function ensureTables() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS document_library (
-        id VARCHAR(36) NOT NULL PRIMARY KEY,
-        institution_id VARCHAR(36) NOT NULL,
-        uploaded_by VARCHAR(36) DEFAULT NULL,
-        name VARCHAR(200) NOT NULL,
-        description TEXT,
-        file_url VARCHAR(500) NOT NULL,
-        file_type VARCHAR(191) NOT NULL,
-        file_size INT DEFAULT 0,
-        category VARCHAR(100) DEFAULT 'general',
-        tags JSON DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_lib_institution (institution_id),
-        INDEX idx_lib_category (category),
-        INDEX idx_lib_uploaded_by (uploaded_by)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `)
-    await pool.query(`ALTER TABLE document_library MODIFY COLUMN file_type VARCHAR(191) NOT NULL`)
-  } catch (e: any) {
-    console.error('[document-library] ensureTables error:', e?.message || e)
-  }
+// Schema managed by migrations/
 
+function ensureUploadDir() {
   if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true })
   }
@@ -43,8 +20,6 @@ export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([], { status: 200 })
-
-    await ensureTables()
 
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
@@ -78,7 +53,7 @@ export async function POST(request: NextRequest) {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    await ensureTables()
+    ensureUploadDir()
 
     const formData = await request.formData()
     const name = formData.get('name') as string
@@ -135,8 +110,6 @@ export async function DELETE(request: NextRequest) {
 
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-
-    await ensureTables()
 
     const [existing] = await pool.query(
       'SELECT file_url, name FROM document_library WHERE id = ? AND institution_id = ?',

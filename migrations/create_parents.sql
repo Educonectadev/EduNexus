@@ -15,8 +15,7 @@ CREATE TABLE parents (
   occupation VARCHAR(100) DEFAULT NULL,
   status VARCHAR(20) DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_parent_dni_inst (document_number, institution_id),
-  INDEX idx_parent_institution (institution_id),
-  INDEX idx_parent_name (first_name, last_name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT uk_parent_dni_inst UNIQUE (document_number, institution_id)
+);
+CREATE INDEX idx_parent_institution ON parents (institution_id);
+CREATE INDEX idx_parent_name ON parents (first_name, last_name);

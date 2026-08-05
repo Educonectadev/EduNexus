@@ -4,58 +4,7 @@ import { getAuthPayload } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
 import crypto from 'crypto'
 
-async function ensureTables() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS homework (
-      id VARCHAR(36) PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      subject VARCHAR(100),
-      start_date DATE,
-      due_date DATE,
-      status ENUM('pending','delivered','graded') DEFAULT 'pending',
-      priority ENUM('high','medium','low') DEFAULT 'medium',
-      assigned_by VARCHAR(36),
-      student_id VARCHAR(36),
-      course_id VARCHAR(36),
-      institution_id VARCHAR(36),
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_homework_course (course_id),
-      INDEX idx_homework_student (student_id),
-      INDEX idx_homework_due (due_date)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-
-  const [cols] = await pool.query(`SHOW COLUMNS FROM homework LIKE 'course_id'`) as any[]
-  if (cols.length === 0) {
-    await pool.query(`ALTER TABLE homework ADD COLUMN course_id VARCHAR(36) AFTER student_id`)
-    await pool.query(`ALTER TABLE homework ADD COLUMN institution_id VARCHAR(36) AFTER course_id`)
-    await pool.query(`ALTER TABLE homework ADD INDEX idx_homework_course (course_id)`)
-  }
-
-  const [startCol] = await pool.query(`SHOW COLUMNS FROM homework LIKE 'start_date'`) as any[]
-  if (startCol.length === 0) {
-    await pool.query(`ALTER TABLE homework ADD COLUMN start_date DATE AFTER subject`)
-  }
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS homework_submissions (
-      id VARCHAR(36) PRIMARY KEY,
-      homework_id VARCHAR(36) NOT NULL,
-      student_id VARCHAR(36) NOT NULL,
-      status ENUM('pending','submitted','graded') DEFAULT 'pending',
-      grade DECIMAL(5,2),
-      feedback TEXT,
-      submitted_at TIMESTAMP NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_submission_homework (homework_id),
-      INDEX idx_submission_student (student_id),
-      UNIQUE KEY uk_submission (homework_id, student_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-}
+// Schema managed by migrations/
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,8 +20,6 @@ export async function GET(request: NextRequest) {
     const userId = user.id as string
     const { searchParams } = new URL(request.url)
     const courseId = searchParams.get('course_id')
-
-    await ensureTables()
 
     let query: string
     let params: any[]
@@ -142,8 +89,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'title and course_id required' }, { status: 400 })
     }
 
-    await ensureTables()
-
     if (assigned_to_all) {
       const [students] = await pool.query(
         `SELECT e.student_id FROM enrollments e WHERE e.course_id = ? AND e.status = 'active'`,
@@ -161,7 +106,7 @@ export async function POST(request: NextRequest) {
         const submissionId = crypto.randomUUID()
         await pool.query(
           `INSERT INTO homework_submissions (id, homework_id, student_id, status) VALUES (?, ?, ?, 'pending')
-           ON DUPLICATE KEY UPDATE status = status`,
+           ON CONFLICT (homework_id, student_id) DO NOTHING`,
           [submissionId, homeworkId, row.student_id]
         )
       }

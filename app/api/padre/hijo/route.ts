@@ -22,8 +22,11 @@ export async function GET(request: NextRequest) {
 
     const placeholders = childrenIds.map(() => '?').join(',')
 
-    const [colRows] = await pool.query(`SHOW COLUMNS FROM students`) as any[]
-    const studentCols = (colRows || []).map((c: any) => c.Field)
+    const [colRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+      ['students']
+    ) as any[]
+    const studentCols = (colRows || []).map((c: any) => c.column_name)
 
     const selectCols = ['s.id', 's.first_name', 's.last_name', 's.document_number', 's.grade', 's.section', 's.status']
     if (studentCols.includes('academic_condition')) selectCols.push('s.academic_condition')
@@ -37,8 +40,10 @@ export async function GET(request: NextRequest) {
 
     const students = rows as any[]
 
-    const [tableRows] = await pool.query(`SHOW TABLES`) as any[]
-    const tables = (tableRows || []).map((r: any) => Object.values(r)[0] as string)
+    const [tableRows] = await pool.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() ORDER BY table_name`
+    ) as any[]
+    const tables = (tableRows || []).map((r: any) => r.table_name as string)
     const hasGrades = tables.includes('grades')
     const hasAttendance = tables.includes('attendance')
 
@@ -61,7 +66,7 @@ export async function GET(request: NextRequest) {
         try {
           const [attendance] = await pool.query(
             `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present
-             FROM attendance WHERE student_id = ? AND MONTH(date) = MONTH(NOW())`,
+             FROM attendance WHERE student_id = ? AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM CURRENT_DATE)`,
             [student.id]
           )
           const att = (attendance as any[])[0] || {}

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS notifications (
   meeting_time TIME DEFAULT NULL,
   institution_id VARCHAR(36) DEFAULT NULL,
   created_by VARCHAR(36) DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_notif_type (type),
-  INDEX idx_notif_institution (institution_id),
-  INDEX idx_notif_created (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_notif_type ON notifications (type);
+CREATE INDEX idx_notif_institution ON notifications (institution_id);
+CREATE INDEX idx_notif_created ON notifications (created_at);

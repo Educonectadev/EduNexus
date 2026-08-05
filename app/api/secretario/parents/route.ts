@@ -42,52 +42,12 @@ async function generateEmail(firstName: string, lastName: string, documentNumber
   return candidate
 }
 
-async function ensureTables() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS parents (
-      id VARCHAR(36) NOT NULL PRIMARY KEY,
-      institution_id VARCHAR(36) NOT NULL,
-      first_name VARCHAR(100) NOT NULL,
-      last_name VARCHAR(100) NOT NULL,
-      document_type VARCHAR(20) DEFAULT 'DNI',
-      document_number VARCHAR(20) NOT NULL,
-      email VARCHAR(255) DEFAULT NULL,
-      phone VARCHAR(20) DEFAULT NULL,
-      address VARCHAR(255) DEFAULT NULL,
-      occupation VARCHAR(100) DEFAULT NULL,
-      status VARCHAR(20) DEFAULT 'active',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_parent_dni_inst (document_number, institution_id),
-      INDEX idx_parent_institution (institution_id),
-      INDEX idx_parent_name (first_name, last_name)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-  const [cols] = await pool.query(`SHOW COLUMNS FROM parents LIKE 'occupation'`) as any[]
-  if (cols.length === 0) {
-    await pool.query(`ALTER TABLE parents ADD COLUMN occupation VARCHAR(100) DEFAULT NULL AFTER address`)
-  }
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS parent_student (
-      id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-      parent_id VARCHAR(36) NOT NULL,
-      student_id VARCHAR(36) NOT NULL,
-      relationship ENUM('padre','madre','apoderado','tio','abuelo','hermano','otro') NOT NULL DEFAULT 'padre',
-      is_primary TINYINT(1) DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_parent_student (parent_id, student_id),
-      INDEX idx_ps_student (student_id),
-      INDEX idx_ps_parent (parent_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-}
+// Schema managed by migrations/
 
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([])
-
-    await ensureTables()
 
     const { searchParams } = new URL(request.url)
     const q = searchParams.get('q') || ''
@@ -178,8 +138,6 @@ export async function POST(request: NextRequest) {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No se encontró la institución' }, { status: 400 })
 
-    await ensureTables()
-
     const body = await request.json()
     const { first_name, last_name, document_type, document_number, email, phone, address, occupation, student_id, relationship, create_account, password: customPassword } = body
 
@@ -225,8 +183,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Asegurar columnas necesarias
-        const [cols] = await conn.query(`SHOW COLUMNS FROM users`) as any[]
-        const colNames = (cols || []).map((c: any) => c.Field)
+        const [cols] = await conn.query(
+          `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+          ['users']
+        ) as any[]
+        const colNames = (cols || []).map((c: any) => c.column_name)
         const userId = crypto.randomUUID()
 
         const insertCols: string[] = ['id', 'email', 'full_name', 'role', 'institution_id', 'status']
@@ -283,7 +244,7 @@ export async function POST(request: NextRequest) {
       conn.release()
     }
   } catch (error: any) {
-    if (error?.code === 'ER_DUP_ENTRY') {
+    if (error?.code === '23505') {
       return NextResponse.json({ error: 'Ya existe un padre/guardián con ese DNI en esta institución' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating parent', details: error?.message }, { status: 500 })

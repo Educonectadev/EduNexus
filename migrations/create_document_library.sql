@@ -7,12 +7,11 @@ CREATE TABLE IF NOT EXISTS document_library (
   description TEXT,
   file_url VARCHAR(500) NOT NULL,
   file_type VARCHAR(50) NOT NULL,
-  file_size INT DEFAULT 0,
+  file_size INTEGER DEFAULT 0,
   category VARCHAR(100) DEFAULT 'general',
-  tags JSON DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_lib_institution (institution_id),
-  INDEX idx_lib_category (category),
-  INDEX idx_lib_uploaded_by (uploaded_by)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  tags JSONB DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_lib_institution ON document_library (institution_id);
+CREATE INDEX idx_lib_category ON document_library (category);
+CREATE INDEX idx_lib_uploaded_by ON document_library (uploaded_by);

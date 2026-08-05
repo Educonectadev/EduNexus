@@ -1,63 +1,42 @@
 "use client"
 
 import * as React from "react"
-import { Plus, BookMarked, TrendingUp, TrendingDown, X, Pencil, Trash2, BarChart3 } from "lucide-react"
+import { Plus, BookMarked, TrendingUp, TrendingDown, X, Pencil, Trash2, BarChart3, ChevronDown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 
 interface Grade {
   id: string
-  subject: string
+  student_id: string
+  course_id: string
+  period: string
   score: number
-  term: string
-  date: string
+  max_score: number
+  notes: string | null
+  created_at: string
 }
 
 interface Student {
   id: string
-  name: string
+  code: string
+  first_name: string
+  last_name: string
+  document_number: string
+  grade: string
+  section: string
   grades: Grade[]
-  average: number
 }
 
-const defaultStudents: Student[] = [
-  { id: "1", name: "Carlos García López", grades: [
-    { id: "g1", subject: "Matemática", score: 15, term: "1er Bimestre", date: "2026-04-15" },
-    { id: "g2", subject: "Matemática", score: 17, term: "2do Bimestre", date: "2026-06-10" },
-    { id: "g3", subject: "Comunicación", score: 14, term: "1er Bimestre", date: "2026-04-18" },
-    { id: "g4", subject: "Comunicación", score: 18, term: "2do Bimestre", date: "2026-06-12" },
-  ], average: 16 },
-  { id: "2", name: "María Fernández Ruiz", grades: [
-    { id: "g5", subject: "Matemática", score: 18, term: "1er Bimestre", date: "2026-04-15" },
-    { id: "g6", subject: "Matemática", score: 19, term: "2do Bimestre", date: "2026-06-10" },
-    { id: "g7", subject: "Ciencia", score: 17, term: "1er Bimestre", date: "2026-04-20" },
-    { id: "g8", subject: "Ciencia", score: 20, term: "2do Bimestre", date: "2026-06-14" },
-  ], average: 18.5 },
-  { id: "3", name: "Juan Pérez Díaz", grades: [
-    { id: "g9", subject: "Matemática", score: 12, term: "1er Bimestre", date: "2026-04-15" },
-    { id: "g10", subject: "Matemática", score: 10, term: "2do Bimestre", date: "2026-06-10" },
-    { id: "g11", subject: "Historia", score: 13, term: "1er Bimestre", date: "2026-04-22" },
-    { id: "g12", subject: "Historia", score: 11, term: "2do Bimestre", date: "2026-06-16" },
-  ], average: 11.5 },
-  { id: "4", name: "Ana Torres Vega", grades: [
-    { id: "g13", subject: "Matemática", score: 16, term: "1er Bimestre", date: "2026-04-15" },
-    { id: "g14", subject: "Matemática", score: 15, term: "2do Bimestre", date: "2026-06-10" },
-    { id: "g15", subject: "Comunicación", score: 16, term: "1er Bimestre", date: "2026-04-18" },
-    { id: "g16", subject: "Comunicación", score: 17, term: "2do Bimestre", date: "2026-06-12" },
-  ], average: 16 },
-  { id: "5", name: "Luis Morales Campos", grades: [
-    { id: "g17", subject: "Ciencia", score: 14, term: "1er Bimestre", date: "2026-04-20" },
-    { id: "g18", subject: "Ciencia", score: 13, term: "2do Bimestre", date: "2026-06-14" },
-    { id: "g19", subject: "Historia", score: 15, term: "1er Bimestre", date: "2026-04-22" },
-    { id: "g20", subject: "Historia", score: 12, term: "2do Bimestre", date: "2026-06-16" },
-  ], average: 13.5 },
-  { id: "6", name: "Sofía Castillo Ríos", grades: [
-    { id: "g21", subject: "Matemática", score: 19, term: "1er Bimestre", date: "2026-04-15" },
-    { id: "g22", subject: "Matemática", score: 18, term: "2do Bimestre", date: "2026-06-10" },
-    { id: "g23", subject: "Comunicación", score: 20, term: "1er Bimestre", date: "2026-04-18" },
-    { id: "g24", subject: "Comunicación", score: 19, term: "2do Bimestre", date: "2026-06-12" },
-  ], average: 19 },
-]
+interface Course {
+  id: string
+  name: string
+  code: string
+  grade: string
+  section: string
+}
+
+const PERIODS = ["Bimestre 1", "Bimestre 2", "Bimestre 3", "Bimestre 4"]
+const MAX_SCORE = 20
 
 const staggerItem = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
 const listItem = {
@@ -84,158 +63,235 @@ function calcAverage(grades: Grade[]) {
   return Number((grades.reduce((a, g) => a + g.score, 0) / grades.length).toFixed(1))
 }
 
+function studentName(s: Student) { return `${s.first_name} ${s.last_name}` }
+
 export default function CalificacionesPage() {
-  const [students, setStudents] = React.useState<Student[]>(defaultStudents)
-  const [registerOpen, setRegisterOpen] = React.useState(false)
+  const [courses, setCourses] = React.useState<Course[]>([])
+  const [courseId, setCourseId] = React.useState("")
+  const [students, setStudents] = React.useState<Student[]>([])
+  const [courseLabel, setCourseLabel] = React.useState("")
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+
   const [detailOpen, setDetailOpen] = React.useState(false)
   const [selected, setSelected] = React.useState<Student | null>(null)
   const [editGradeId, setEditGradeId] = React.useState<string | null>(null)
   const [editScore, setEditScore] = React.useState("")
-  const [newSubject, setNewSubject] = React.useState("")
+  const [newPeriod, setNewPeriod] = React.useState("")
   const [newScore, setNewScore] = React.useState("")
-  const [newTerm, setNewTerm] = React.useState("")
+  const [newNotes, setNewNotes] = React.useState("")
+
+  const [registerOpen, setRegisterOpen] = React.useState(false)
+  const [registerCourseId, setRegisterCourseId] = React.useState("")
   const [registerStudentId, setRegisterStudentId] = React.useState("")
+  const [registerPeriod, setRegisterPeriod] = React.useState("")
   const [registerScore, setRegisterScore] = React.useState("")
+  const [saving, setSaving] = React.useState(false)
 
-  const openDetail = (student: Student) => {
-    setSelected(student)
-    setDetailOpen(true)
-    setEditGradeId(null)
-  }
+  const loadCourses = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/docente/calificaciones")
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Error al cargar")
+      setCourses(Array.isArray(data.courses) ? data.courses : [])
+      if (Array.isArray(data.courses) && data.courses.length > 0) {
+        setCourseId(data.courses[0].id)
+        setRegisterCourseId(data.courses[0].id)
+      }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  const updateGrade = (studentId: string, gradeId: string, newScore: number) => {
-    setStudents(prev => prev.map(s => {
-      if (s.id !== studentId) return s
-      const updated = s.grades.map(g => g.id === gradeId ? { ...g, score: newScore } : g)
-      return { ...s, grades: updated, average: calcAverage(updated) }
-    }))
-    setSelected(prev => {
-      if (!prev || prev.id !== studentId) return prev
-      const updated = prev.grades.map(g => g.id === gradeId ? { ...g, score: newScore } : g)
-      return { ...prev, grades: updated, average: calcAverage(updated) }
-    })
+  const loadCourseData = React.useCallback(async (id: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/docente/calificaciones?course_id=${id}`)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Error al cargar")
+      setStudents(Array.isArray(data.students) ? data.students : [])
+      if (data.course) {
+        setCourseLabel(`${data.course.name} · ${data.course.grade} "${data.course.section}"`)
+      }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  React.useEffect(() => { ;(async () => { await loadCourses() })() }, [loadCourses])
+  React.useEffect(() => { if (courseId) { ;(async () => { await loadCourseData(courseId) })() } }, [courseId, loadCourseData])
+
+  const handleSaveGrade = async (studentId: string, gradeId: string, newScore: number) => {
+    try {
+      const target = selected?.grades.find(g => g.id === gradeId)
+      if (!target) return
+      await fetch("/api/docente/calificaciones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId, course_id: target.course_id, period: target.period, score: newScore, max_score: MAX_SCORE }),
+      })
+      if (courseId) loadCourseData(courseId)
+    } catch {}
     setEditGradeId(null); setEditScore("")
   }
 
-  const deleteGrade = (studentId: string, gradeId: string) => {
-    setStudents(prev => prev.map(s => {
-      if (s.id !== studentId) return s
-      const updated = s.grades.filter(g => g.id !== gradeId)
-      return { ...s, grades: updated, average: calcAverage(updated) }
-    }))
-    setSelected(prev => {
-      if (!prev || prev.id !== studentId) return prev
-      const updated = prev.grades.filter(g => g.id !== gradeId)
-      return { ...prev, grades: updated, average: calcAverage(updated) }
-    })
+  const handleDeleteGrade = async (gradeId: string) => {
+    try {
+      await fetch(`/api/docente/calificaciones?id=${gradeId}`, { method: "DELETE" })
+      if (courseId) loadCourseData(courseId)
+    } catch {}
   }
 
-  const addGrade = (studentId: string) => {
-    if (!newSubject || !newScore || !newTerm) return
-    const grade: Grade = {
-      id: `g-${Date.now()}`,
-      subject: newSubject,
-      score: Number(newScore),
-      term: newTerm,
-      date: new Date().toISOString().split("T")[0],
-    }
-    setStudents(prev => prev.map(s => {
-      if (s.id !== studentId) return s
-      const updated = [...s.grades, grade]
-      return { ...s, grades: updated, average: calcAverage(updated) }
-    }))
-    setSelected(prev => {
-      if (!prev || prev.id !== studentId) return prev
-      const updated = [...prev.grades, grade]
-      return { ...prev, grades: updated, average: calcAverage(updated) }
+  const handleAddGrade = async (studentId: string) => {
+    if (!newPeriod || !newScore) return
+    await fetch("/api/docente/calificaciones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null }),
     })
-    setNewSubject(""); setNewScore(""); setNewTerm("")
+    setNewPeriod(""); setNewScore(""); setNewNotes("")
+    if (courseId) loadCourseData(courseId)
   }
 
-  const handleRegister = () => {
-    if (!registerStudentId || !registerScore) return
-    const grade: Grade = {
-      id: `g-${Date.now()}`,
-      subject: "General",
-      score: Number(registerScore),
-      term: "Actual",
-      date: new Date().toISOString().split("T")[0],
+  const handleRegister = async () => {
+    if (!registerStudentId || !registerScore || !registerPeriod) return
+    setSaving(true)
+    try {
+      await fetch("/api/docente/calificaciones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: registerStudentId, course_id: registerCourseId, period: registerPeriod, score: Number(registerScore), max_score: MAX_SCORE }),
+      })
+      setRegisterOpen(false)
+      setRegisterStudentId(""); setRegisterPeriod(""); setRegisterScore("")
+      if (registerCourseId === courseId) loadCourseData(courseId)
+      else { setCourseId(registerCourseId); setRegisterCourseId(registerCourseId) }
+    } finally {
+      setSaving(false)
     }
-    setStudents(prev => prev.map(s => {
-      if (s.id !== registerStudentId) return s
-      const updated = [...s.grades, grade]
-      return { ...s, grades: updated, average: calcAverage(updated) }
-    }))
-    setRegisterOpen(false); setRegisterStudentId(""); setRegisterScore("")
   }
 
   const getTrend = (grades: Grade[]) => {
     if (grades.length < 2) return true
-    return grades[grades.length - 1].score > grades[grades.length - 2].score
+    const sorted = [...grades].sort((a, b) => a.period.localeCompare(b.period))
+    return sorted[sorted.length - 1].score >= sorted[sorted.length - 2].score
   }
+
+  const averages = students.map(s => calcAverage(s.grades))
+  const avgGeneral = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length) : 0
+  const bestScore = students.length ? Math.max(...students.map(s => s.grades.length ? Math.max(...s.grades.map(g => g.score)) : 0)) : 0
+
+  const registerStudents = registerCourseId === courseId ? students : []
 
   return (
     <div className="space-y-5">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Calificaciones</h1>
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Gestiona las notas de tus alumnos</p>
         </div>
-        <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterOpen(true)}>
-          <Plus className="h-4 w-4" /> Registrar
-        </SbBtn>
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-[220px]">
+            <select
+              value={courseId}
+              onChange={e => setCourseId(e.target.value)}
+              disabled={loading}
+              className="sb-input rounded-[6px] text-sm h-10 w-full appearance-none pr-9 disabled:opacity-50"
+            >
+              {courses.length === 0 && <option value="">Sin cursos asignados</option>}
+              {courses.map(c => (
+                <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
+              ))}
+            </select>
+            <ChevronDown className="h-4 w-4 text-sb-on-surface-variant/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+          <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+            <Plus className="h-4 w-4" /> Registrar
+          </SbBtn>
+        </div>
       </motion.div>
 
-      {/* Stats */}
-      <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-3">
-        {[
-          { label: "Promedio General", value: (students.reduce((a, s) => a + s.average, 0) / students.length).toFixed(1), color: "text-sb-on-surface", bg: "bg-sb-on-surface/8" },
-          { label: "Mejor Nota", value: Math.max(...students.map(s => Math.max(...s.grades.map(g => g.score)))), color: "text-emerald-600", bg: "bg-emerald-500/8" },
-          { label: "Total Alumnos", value: students.length, color: "text-blue-600", bg: "bg-blue-500/8" },
-        ].map(s => (
-          <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-[6px] p-4">
-            <div className={`h-9 w-9 rounded-[6px] flex items-center justify-center mb-3 ${s.bg}`}>
-              <BookMarked className={`h-4.5 w-4.5 ${s.color}`} />
-            </div>
-            <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
-            <p className="text-[11px] text-sb-on-surface-variant/45 mt-0.5">{s.label}</p>
-          </motion.div>
-        ))}
-      </motion.div>
+      {error && (
+        <div className="rounded-[6px] bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
-      {/* Student list */}
-      <div className="bg-sb-surface rounded-[6px] overflow-hidden">
-        <AnimatePresence>
-          {students.map((s, i) => {
-            const trend = getTrend(s.grades)
-            return (
-              <motion.div key={s.id} variants={listItem} initial="hidden" animate="show" exit="exit"
-                transition={{ duration: 0.3, delay: i * 0.03 }}
-                onClick={() => openDetail(s)}
-                className="flex items-center justify-between px-5 py-4 hover:bg-sb-surface-container-low/50 transition-colors border-b border-sb-outline-variant/10 last:border-0 cursor-pointer group">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`h-10 w-10 rounded-[6px] ${getAvatarColor(s.name)} flex items-center justify-center shrink-0`}>
-                    <span className="text-[10px] font-bold text-white">{getInitials(s.name)}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-sb-on-surface truncate">{s.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {s.grades.slice(-4).map((g, j) => (
-                        <span key={j} className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
-                      ))}
-                      {s.grades.length > 4 && <span className="text-[10px] text-sb-on-surface-variant/30">+{s.grades.length - 4}</span>}
-                    </div>
-                  </div>
+      {loading ? (
+        <div className="animate-pulse space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-[6px] bg-sb-surface-container" />)}
+          </div>
+          <div className="bg-sb-surface rounded-[6px] h-64 animate-pulse" />
+        </div>
+      ) : students.length === 0 ? (
+        <div className="bg-sb-surface rounded-[6px] py-16 text-center border border-sb-outline-variant/8">
+          <BookMarked className="h-10 w-10 mx-auto mb-3 text-sb-on-surface-variant/20" />
+          <p className="text-sm font-medium text-sb-on-surface-variant/40">
+            {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Stats */}
+          <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Promedio General", value: avgGeneral.toFixed(1), color: "text-sb-on-surface", bg: "bg-sb-on-surface/8" },
+              { label: "Mejor Nota", value: bestScore, color: "text-emerald-600", bg: "bg-emerald-500/8" },
+              { label: "Total Alumnos", value: students.length, color: "text-blue-600", bg: "bg-blue-500/8" },
+            ].map(s => (
+              <motion.div key={s.label} variants={staggerItem} className="bg-sb-surface rounded-[6px] p-4">
+                <div className={`h-9 w-9 rounded-[6px] flex items-center justify-center mb-3 ${s.bg}`}>
+                  <BookMarked className={`h-4.5 w-4.5 ${s.color}`} />
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
-                  <span className={`text-lg font-bold ${getGradeColor(s.average)}`}>{s.average}</span>
-                </div>
+                <p className="text-xl font-bold tracking-tight text-sb-on-surface">{s.value}</p>
+                <p className="text-[11px] text-sb-on-surface-variant/45 mt-0.5">{s.label}</p>
               </motion.div>
-            )
-          })}
-        </AnimatePresence>
-      </div>
+            ))}
+          </motion.div>
+
+          {/* Student list */}
+          <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
+            <AnimatePresence>
+              {students.map((s, i) => {
+                const avg = calcAverage(s.grades)
+                const trend = getTrend(s.grades)
+                return (
+                  <motion.div key={s.id} variants={listItem} initial="hidden" animate="show" exit="exit"
+                    transition={{ duration: 0.3, delay: i * 0.03 }}
+                    onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
+                    className="flex items-center justify-between px-5 py-4 hover:bg-sb-surface-container-low/50 transition-colors border-b border-sb-outline-variant/10 last:border-0 cursor-pointer group">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`h-10 w-10 rounded-[6px] ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
+                        <span className="text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-sb-on-surface truncate">{studentName(s)}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] text-sb-on-surface-variant/30">{s.grades.length} notas</span>
+                          {s.grades.slice(-4).map((g, j) => (
+                            <span key={j} className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
+                          ))}
+                          {s.grades.length > 4 && <span className="text-[10px] text-sb-on-surface-variant/30">+{s.grades.length - 4}</span>}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
+                      <span className={`text-lg font-bold ${avg === 0 ? "text-sb-on-surface-variant/30" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </AnimatePresence>
+          </div>
+        </>
+      )}
 
       {/* ===== DETAIL MODAL ===== */}
       <SbModal open={detailOpen} onClose={() => setDetailOpen(false)} maxWidth="560px">
@@ -246,37 +302,41 @@ export default function CalificacionesPage() {
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                 {/* Student header */}
                 <div className="flex items-center gap-4 mb-6">
-                  <div className={`h-14 w-14 rounded-[6px] ${getAvatarColor(selected.name)} flex items-center justify-center`}>
-                    <span className="text-base font-bold text-white">{getInitials(selected.name)}</span>
+                  <div className={`h-14 w-14 rounded-[6px] ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
+                    <span className="text-base font-bold text-white">{getInitials(studentName(selected))}</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-semibold text-sb-on-surface">{selected.name}</p>
-                    <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">{selected.grades.length} calificaciones registradas</p>
+                    <p className="text-lg font-semibold text-sb-on-surface">{studentName(selected)}</p>
+                    <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">{courseLabel} · {selected.grades.length} calificaciones</p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-2xl font-bold ${getGradeColor(selected.average)}`}>{selected.average}</p>
+                    <p className={`text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-sb-on-surface-variant/30"}`}>
+                      {selected.grades.length ? calcAverage(selected.grades) : "—"}
+                    </p>
                     <p className="text-[10px] text-sb-on-surface-variant/40">Promedio</p>
                   </div>
                 </div>
 
                 {/* Performance bar */}
-                <div className="bg-sb-surface-container/50 rounded-[6px] p-4 mb-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-sb-on-surface-variant/40" />
-                      <span className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Rendimiento</span>
+                {selected.grades.length > 0 && (
+                  <div className="bg-sb-surface-container/50 rounded-[6px] p-4 mb-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-sb-on-surface-variant/40" />
+                        <span className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Rendimiento</span>
+                      </div>
+                      <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
                     </div>
-                    <span className={`text-sm font-bold ${getGradeColor(selected.average)}`}>{selected.average}/20</span>
+                    <div className="h-3 rounded-[6px] bg-sb-surface-container overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%` }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className={`h-full rounded-[6px] ${getGradeBarColor(calcAverage(selected.grades))}`}
+                      />
+                    </div>
                   </div>
-                  <div className="h-3 rounded-[6px] bg-sb-surface-container overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(selected.average / 20) * 100}%` }}
-                      transition={{ duration: 0.8, delay: 0.2 }}
-                      className={`h-full rounded-[6px] ${getGradeBarColor(selected.average)}`}
-                    />
-                  </div>
-                </div>
+                )}
 
                 {/* Grades list */}
                 <div className="mb-5">
@@ -286,9 +346,9 @@ export default function CalificacionesPage() {
                       <div key={g.id} className="flex items-center gap-3 bg-sb-surface-container/30 rounded-[6px] px-4 py-3 group">
                         {editGradeId === g.id ? (
                           <>
-                            <input type="number" min={0} max={20} value={editScore} onChange={e => setEditScore(e.target.value)}
+                            <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
                               className="sb-input rounded-[6px] text-sm h-8 w-16 text-center" autoFocus />
-                            <button onClick={() => updateGrade(selected.id, g.id, Number(editScore))}
+                            <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
                               className="h-8 px-3 rounded-[6px] bg-sb-on-surface text-sb-surface text-xs font-medium hover:bg-sb-on-surface/90 transition-colors">
                               Guardar
                             </button>
@@ -303,15 +363,18 @@ export default function CalificacionesPage() {
                               <span className={`text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-sb-on-surface">{g.subject}</p>
-                              <p className="text-[10px] text-sb-on-surface-variant/40">{g.term} · {g.date}</p>
+                              <p className="text-sm font-medium text-sb-on-surface">{g.period}</p>
+                              <p className="text-[10px] text-sb-on-surface-variant/40">
+                                {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
+                                {g.notes ? ` · ${g.notes}` : ""}
+                              </p>
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
                                 className="h-7 w-7 rounded-[6px] flex items-center justify-center text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors">
                                 <Pencil className="h-3.5 w-3.5" />
                               </button>
-                              <button onClick={() => deleteGrade(selected.id, g.id)}
+                              <button onClick={() => handleDeleteGrade(g.id)}
                                 className="h-7 w-7 rounded-[6px] flex items-center justify-center text-sb-on-surface-variant/40 hover:text-red-500 hover:bg-red-500/10 transition-colors">
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
@@ -333,14 +396,17 @@ export default function CalificacionesPage() {
                 <div className="bg-sb-surface-container/30 rounded-[6px] p-4">
                   <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-3">Agregar Nota</p>
                   <div className="grid grid-cols-3 gap-2">
-                    <input placeholder="Materia" value={newSubject} onChange={e => setNewSubject(e.target.value)}
+                    <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
+                      className="sbf-native-select text-sm">
+                      <option value="">Bimestre</option>
+                      {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
                       className="sb-input rounded-[6px] text-sm h-9" />
-                    <input type="number" min={0} max={20} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
-                      className="sb-input rounded-[6px] text-sm h-9" />
-                    <input placeholder="Bimestre" value={newTerm} onChange={e => setNewTerm(e.target.value)}
+                    <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)}
                       className="sb-input rounded-[6px] text-sm h-9" />
                   </div>
-                  <button onClick={() => addGrade(selected.id)} disabled={!newSubject || !newScore || !newTerm}
+                  <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
                     className="w-full mt-2 h-9 rounded-[6px] bg-sb-on-surface text-sb-surface text-xs font-medium disabled:opacity-30 hover:bg-sb-on-surface/90 transition-colors">
                     Agregar
                   </button>
@@ -357,24 +423,38 @@ export default function CalificacionesPage() {
         <SbModalBody>
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div>
-              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Alumno</label>
-              <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)}
+              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Curso</label>
+              <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }}
                 className="sbf-native-select w-full">
-                <option value="">Seleccionar alumno...</option>
-                {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Nota (0-20)</label>
-              <input type="number" min={0} max={20} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
+              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Alumno</label>
+              <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} disabled={registerCourseId !== courseId}
+                className="sbf-native-select w-full disabled:opacity-50">
+                <option value="">{registerCourseId === courseId ? "Seleccionar alumno..." : "Selecciona primero el curso en la vista"}</option>
+                {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Bimestre</label>
+              <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="sbf-native-select w-full">
+                <option value="">Seleccionar bimestre...</option>
+                {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
+              <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
                 className="sb-input rounded-[6px] text-sm h-10 w-full" />
             </div>
           </motion.div>
         </SbModalBody>
         <SbModalFooter>
           <SbBtn rounded onClick={() => setRegisterOpen(false)}>Cancelar</SbBtn>
-          <SbBtn variant="filled" rounded disabled={!registerStudentId || !registerScore} onClick={handleRegister}>
-            Guardar
+          <SbBtn variant="filled" rounded disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+            {saving ? "Guardando..." : "Guardar"}
           </SbBtn>
         </SbModalFooter>
       </SbModal>

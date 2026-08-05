@@ -3,27 +3,7 @@ import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
 
-async function ensureTable() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS academic_grades (
-        id VARCHAR(36) NOT NULL PRIMARY KEY,
-        institution_id VARCHAR(36) NOT NULL,
-        name VARCHAR(200) NOT NULL,
-        level VARCHAR(50) NOT NULL,
-        year_number INT NOT NULL DEFAULT 0,
-        sort_order INT NOT NULL DEFAULT 0,
-        is_active TINYINT(1) NOT NULL DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_ag_institution (institution_id),
-        INDEX idx_ag_level (level)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `)
-  } catch (e: any) {
-    console.error('[academic-grades] ensureTable error:', e?.message || e)
-  }
-}
+// Schema managed by migrations/
 
 function generateName(yearNumber: number, level: string): string {
   const suffixes: Record<string, string> = {
@@ -43,8 +23,6 @@ export async function GET(request: NextRequest) {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([])
 
-    await ensureTable()
-
     const [rows] = await pool.query(
       `SELECT id, name, level, year_number, sort_order, is_active FROM academic_grades WHERE institution_id = ? ORDER BY sort_order ASC`,
       [instId]
@@ -60,8 +38,6 @@ export async function POST(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-
-    await ensureTable()
 
     const body = await request.json()
     let { name, level, year_number } = body

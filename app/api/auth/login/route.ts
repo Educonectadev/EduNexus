@@ -12,8 +12,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email y contraseña son requeridos' }, { status: 400 })
     }
 
-    const [colRows] = await pool.query(`SHOW COLUMNS FROM users`) as any[]
-    const colNames = (colRows || []).map((c: any) => c.Field)
+    const [colRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+      ['users']
+    ) as any[]
+    const colNames = (colRows || []).map((c: any) => c.column_name)
     const hasPasswordHash = colNames.includes('password_hash')
     const hasStatus = colNames.includes('status')
 

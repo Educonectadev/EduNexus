@@ -1,198 +1,320 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Send, Search, User, Mail, MailOpen, X, Filter, Inbox, Eye, Clock } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { 
+  MessageCircle, Send, Search, ArrowLeft, 
+  Circle, CreditCard 
+} from 'lucide-react'
+import { connectSocket, getSocket } from '@/lib/socket'
 
-interface Message { id: string; from: string; subject: string; preview: string; time: string; read: boolean }
-
-const defaultMessages: Message[] = [
-  { id: "1", from: "María García (Apoderada)", subject: "Re: Permiso de salida", preview: "Estimado profesor, agradecería que mi hijo Carlos pueda...", time: "Hace 30 min", read: false },
-  { id: "2", from: "Dirección", subject: "Capacitación obligatoria", preview: "Se recuerda que todos los docentes deben asistir a la capacitación...", time: "Hace 2h", read: false },
-  { id: "3", from: "Pedro Torres (Apoderado)", subject: "Consulta sobre notas", preview: "Buenos días, me gustaría conversar sobre el rendimiento de...", time: "Ayer", read: true },
-  { id: "4", from: "Secretaría", subject: "Documento pendiente", preview: "Falta firmar el acta de calificaciones del segundo bimestre...", time: "Hace 3 días", read: true },
-  { id: "5", from: "Ana López (Apoderada)", subject: "Justificación de inasistencia", preview: "Estimado profesor, mi hija Ana no podrá asistir el día de...", time: "Hace 5 días", read: true },
-]
-
-const staggerItem = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
-const listItem = {
-  hidden: { opacity: 0, y: -10 },
-  show: { opacity: 1, y: 0 },
-  exit: { opacity: 0, filter: "blur(8px)", y: -10 },
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
 }
 
-function getAvatarColor(name: string) {
-  const colors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-pink-500", "bg-cyan-500", "bg-rose-500"]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
+interface Contact {
+  id: string
+  full_name: string
+  role: string
+  unread_count: number
+  last_message_at: string | null
 }
 
-function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
+interface Message {
+  id: string
+  sender_id: string
+  sender_name: string
+  receiver_id?: string
+  message: string
+  message_type: string
+  created_at: string
+  is_read: boolean
+}
 
-export default function MensajesPage() {
-  const [messages] = React.useState<Message[]>(defaultMessages)
-  const [search, setSearch] = React.useState("")
-  const [filter, setFilter] = React.useState<"all" | "unread" | "read">("all")
-  const [selected, setSelected] = React.useState<Message | null>(null)
-  const [reply, setReply] = React.useState("")
+export default function MessagesPage() {
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
+  const [newMessage, setNewMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [planError, setPlanError] = useState(false)
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([])
+  const [typing, setTyping] = useState<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const socketRef = useRef<any>(null)
 
-  const filtered = messages.filter(m => {
-    const matchesSearch = !search ||
-      m.subject.toLowerCase().includes(search.toLowerCase()) ||
-      m.from.toLowerCase().includes(search.toLowerCase()) ||
-      m.preview.toLowerCase().includes(search.toLowerCase())
-    const matchesFilter = filter === "all" || (filter === "unread" && !m.read) || (filter === "read" && m.read)
-    return matchesSearch && matchesFilter
-  })
+  const initSocket = () => {
+    const socket = connectSocket()
+    socketRef.current = socket
 
-  const unreadCount = messages.filter(m => !m.read).length
-  const readCount = messages.filter(m => m.read).length
+    socket.on('connect', () => {
+      console.log('Connected to chat server')
+    })
+
+    socket.on('message:new', (message: Message) => {
+      if (selectedContact && 
+          (message.sender_id === selectedContact.id || message.receiver_id === selectedContact.id)) {
+        setMessages(prev => [...prev, message])
+      }
+      fetchContacts()
+    })
+
+    socket.on('user:online', ({ userId }: { userId: string }) => {
+      setOnlineUsers(prev => [...prev, userId])
+    })
+
+    socket.on('user:offline', ({ userId }: { userId: string }) => {
+      setOnlineUsers(prev => prev.filter(id => id !== userId))
+    })
+
+    socket.on('typing:start', ({ userId }: { userId: string }) => {
+      setTyping(userId)
+    })
+
+    socket.on('typing:stop', () => {
+      setTyping(null)
+    })
+
+    socket.connect()
+  }
+
+  const fetchContacts = async () => {
+    try {
+      const res = await fetch('/api/messages')
+      if (res.status === 403) {
+        setPlanError(true)
+        return
+      }
+      const data = await res.json()
+      setContacts(data)
+    } catch (error) {
+      console.error('Error fetching contacts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchContacts()
+    initSocket()
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const fetchMessages = async (contactId: string) => {
+    try {
+      const res = await fetch(`/api/messages?contact_id=${contactId}`)
+      const data = await res.json()
+      setMessages(data)
+    } catch (error) {
+      console.error('Error fetching messages:', error)
+    }
+  }
+
+  const selectContact = (contact: Contact) => {
+    setSelectedContact(contact)
+    fetchMessages(contact.id)
+  }
+
+  const sendMessage = () => {
+    if (!newMessage.trim() || !selectedContact) return
+
+    const socket = getSocket()
+    socket.emit('message:send', {
+      receiverId: selectedContact.id,
+      message: newMessage,
+      messageType: 'text'
+    })
+
+    setNewMessage('')
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
+    }
+  }
+
+  if (planError) {
+    return (
+      <div className="min-h-screen bg-sb-background flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-sb-surface rounded-[6px] p-8 max-w-md w-full text-center shadow-lg"
+        >
+          <div className="w-16 h-16 bg-sb-primary/10 rounded-[6px] flex items-center justify-center mx-auto mb-4">
+            <MessageCircle className="w-8 h-8 text-sb-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-sb-on-surface mb-2">
+            Chat no disponible
+          </h2>
+          <p className="text-sb-on-surface/60 mb-6">
+            El chat en tiempo real está disponible en el plan Básico o superior.
+          </p>
+          <button className="px-6 py-3 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity">
+            Mejorar Plan
+          </button>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
-    <div className="space-y-5">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Mensajes</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">{unreadCount} sin leer de {messages.length}</p>
-        </div>
-        {unreadCount > 0 && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-sb-primary/10">
-            <Mail className="h-3.5 w-3.5 text-sb-primary" />
-            <span className="text-xs font-medium text-sb-primary">{unreadCount} nuevo{unreadCount > 1 ? 's' : ''}</span>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Search + Filters */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-sb-on-surface-variant/30" />
-          <input placeholder="Buscar por nombre, asunto o contenido..." value={search} onChange={e => setSearch(e.target.value)}
-            className="sb-input rounded-[6px] text-sm h-12 w-full pl-11 pr-10 bg-sb-surface-container/50 border-sb-outline-variant/10 focus:bg-sb-surface focus:border-sb-primary/30 transition-all" />
-          {search && (
-            <button onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-[6px] hover:bg-sb-surface-container transition-colors">
-              <X className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Filter className="h-3.5 w-3.5 text-sb-on-surface-variant/30" />
-          {([
-            { key: 'all', label: 'Todos', count: messages.length, icon: Inbox },
-            { key: 'unread', label: 'Sin leer', count: unreadCount, icon: MailOpen },
-            { key: 'read', label: 'Leidos', count: readCount, icon: Eye },
-          ]).map(f => {
-            const Icon = f.icon
-            return (
-              <button key={f.key} onClick={() => setFilter(f.key as any)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] text-xs font-medium transition-all ${
-                  filter === f.key
-                    ? 'bg-sb-on-surface text-sb-surface shadow-sm'
-                    : 'bg-sb-surface-container/60 text-sb-on-surface-variant/50 hover:bg-sb-surface-container-high'
-                }`}>
-                <Icon className="h-3.5 w-3.5" />
-                {f.label}
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-[6px] font-semibold ml-0.5 ${
-                  filter === f.key ? 'bg-white/20' : 'bg-sb-surface-container-high text-sb-on-surface-variant/35'
-                }`}>
-                  {f.count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </motion.div>
-
-      {/* Message list */}
-      <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-        <AnimatePresence>
-          {filtered.map((m, i) => (
-            <motion.button key={m.id} variants={listItem} initial="hidden" animate="show" exit="exit"
-              transition={{ duration: 0.3, delay: i * 0.03 }}
-              onClick={() => { setSelected(m); setReply("") }}
-              className={`w-full flex items-start gap-3.5 px-5 py-4 text-left hover:bg-sb-surface-container-low/60 transition-all duration-200 border-b border-sb-outline-variant/8 last:border-0 group ${!m.read ? "bg-sb-primary/[0.03]" : ""}`}>
-              <div className={`h-10 w-10 rounded-[6px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                !m.read ? "bg-sb-primary/12" : "bg-sb-surface-container"
-              }`}>
-                {!m.read ? <MailOpen className="h-4 w-4 text-sb-primary" /> : <User className="h-4 w-4 text-sb-on-surface-variant/35" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <p className={`text-sm truncate ${!m.read ? "font-semibold text-sb-on-surface" : "text-sb-on-surface/75"}`}>{m.from}</p>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {!m.read && <span className="h-2 w-2 rounded-[6px] bg-sb-primary animate-pulse" />}
-                    <span className="text-[10px] text-sb-on-surface-variant/30">{m.time}</span>
-                  </div>
-                </div>
-                <p className={`text-xs truncate mt-0.5 ${!m.read ? "font-medium text-sb-on-surface/80" : "text-sb-on-surface-variant/50"}`}>{m.subject}</p>
-                <p className="text-xs text-sb-on-surface-variant/30 truncate mt-1">{m.preview}</p>
-              </div>
-            </motion.button>
-          ))}
-        </AnimatePresence>
-        {filtered.length === 0 && (
-          <div className="py-14 text-center">
-            <div className="h-14 w-14 rounded-[6px] bg-sb-surface-container flex items-center justify-center mx-auto mb-4">
-              <Mail className="h-6 w-6 text-sb-on-surface-variant/20" />
+    <div className="min-h-screen bg-sb-background">
+      <div className="max-w-6xl mx-auto h-screen flex">
+        <div className={`w-80 bg-sb-surface border-r border-sb-on-surface/10 flex flex-col ${
+          selectedContact ? 'hidden md:flex' : 'flex'
+        }`}>
+          <div className="p-4 border-b border-sb-on-surface/10">
+            <h1 className="text-xl font-bold text-sb-on-surface flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              Mensajes
+            </h1>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sb-on-surface/40" />
+              <input
+                type="text"
+                placeholder="Buscar contactos..."
+                className="w-full pl-9 pr-4 py-2 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sm text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+              />
             </div>
-            <p className="text-sm font-medium text-sb-on-surface-variant/30">
-              {search ? "No se encontraron mensajes" : "No hay mensajes"}
-            </p>
-            {search && (
-              <button onClick={() => { setSearch(""); setFilter("all") }}
-                className="text-xs text-sb-primary mt-2 hover:underline">
-                Limpiar busqueda
-              </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="p-4 text-center text-sb-on-surface/60">Cargando...</div>
+            ) : contacts.length === 0 ? (
+              <div className="p-4 text-center text-sb-on-surface/60">No hay contactos</div>
+            ) : (
+              contacts.map((contact) => (
+                <button
+                  key={contact.id}
+                  onClick={() => selectContact(contact)}
+                  className={`w-full p-4 flex items-center gap-3 hover:bg-sb-background/50 transition-colors text-left ${
+                    selectedContact?.id === contact.id ? 'bg-sb-primary/5' : ''
+                  }`}
+                >
+                  <div className="relative">
+                    <div className="w-10 h-10 bg-sb-on-surface/8 rounded-[6px] flex items-center justify-center">
+                      <span className="text-sm font-medium text-sb-on-surface">
+                        {contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </span>
+                    </div>
+                    {onlineUsers.includes(contact.id) && (
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-[6px] border-2 border-sb-surface" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sb-on-surface truncate">{contact.full_name}</p>
+                    <p className="text-xs text-sb-on-surface/60 capitalize">{contact.role}</p>
+                  </div>
+                  {contact.unread_count > 0 && (
+                    <span className="w-5 h-5 bg-sb-primary text-white text-xs rounded-[6px] flex items-center justify-center">
+                      {contact.unread_count}
+                    </span>
+                  )}
+                </button>
+              ))
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* Selected message detail */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-sb-outline-variant/8 bg-sb-surface-container/30">
-              <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-[6px] ${getAvatarColor(selected.from)} flex items-center justify-center shrink-0`}>
-                  <span className="text-[10px] font-bold text-white">{getInitials(selected.from)}</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-sb-on-surface">{selected.from}</p>
-                  <p className="text-xs text-sb-on-surface-variant/40">{selected.subject}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-sb-on-surface-variant/30 flex items-center gap-1">
-                  <Clock className="h-3 w-3" /> {selected.time}
-                </span>
-                <button onClick={() => setSelected(null)}
-                  className="p-2 rounded-[6px] hover:bg-sb-surface-container transition-colors">
-                  <X className="h-4 w-4 text-sb-on-surface-variant/40" />
-                </button>
+        <div className={`flex-1 flex flex-col ${!selectedContact ? 'hidden md:flex' : 'flex'}`}>
+          {!selectedContact ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageCircle className="w-12 h-12 text-sb-on-surface/20 mx-auto mb-4" />
+                <p className="text-sb-on-surface/60">Selecciona un contacto para chatear</p>
               </div>
             </div>
-            <div className="p-5 space-y-4">
-              <p className="text-sm text-sb-on-surface-variant/70 leading-relaxed">{selected.preview}</p>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <input placeholder="Escribir respuesta..." value={reply} onChange={e => setReply(e.target.value)}
-                    className="sb-input rounded-[6px] text-sm h-11 w-full pr-12 bg-sb-surface-container/50" />
-                  <button className={`absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-[6px] transition-all ${
-                    reply ? "bg-sb-on-surface text-sb-surface shadow-md" : "text-sb-on-surface-variant/25"
-                  }`}>
-                    <Send className="h-4 w-4" />
+          ) : (
+            <>
+              <div className="p-4 bg-sb-surface border-b border-sb-on-surface/10 flex items-center gap-3">
+                <button
+                  onClick={() => setSelectedContact(null)}
+                  className="md:hidden p-2 hover:bg-sb-background rounded-[6px]"
+                >
+                  <ArrowLeft className="w-5 h-5 text-sb-on-surface" />
+                </button>
+                <div className="w-10 h-10 bg-sb-on-surface/8 rounded-[6px] flex items-center justify-center">
+                  <span className="text-sm font-medium text-sb-on-surface">
+                    {selectedContact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-medium text-sb-on-surface">{selectedContact.full_name}</p>
+                  <p className="text-xs text-sb-on-surface/60">
+                    {onlineUsers.includes(selectedContact.id) ? 'En línea' : 'Desconectado'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.sender_id === selectedContact.id ? 'justify-start' : 'justify-end'}`}
+                  >
+                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-[6px] ${
+                      msg.sender_id === selectedContact.id
+                        ? 'bg-sb-on-surface/10 text-sb-on-surface'
+                        : 'bg-sb-primary text-white'
+                    }`}>
+                      <p className="text-sm">{msg.message}</p>
+                      <p className={`text-xs mt-1 ${
+                        msg.sender_id === selectedContact.id
+                          ? 'text-sb-on-surface/60'
+                          : 'text-white/60'
+                      }`}>
+                        {new Date(msg.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {typing && (
+                  <div className="flex justify-start">
+                    <div className="bg-sb-on-surface/10 px-4 py-2 rounded-[6px]">
+                      <p className="text-sm text-sb-on-surface/60">Escribiendo...</p>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <div className="p-4 bg-sb-surface border-t border-sb-on-surface/10">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Escribe un mensaje..."
+                    className="flex-1 px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-[6px] text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20"
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!newMessage.trim()}
+                    className="p-3 bg-sb-primary text-white rounded-[6px] hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    <Send className="w-5 h-5" />
                   </button>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

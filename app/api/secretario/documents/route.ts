@@ -5,29 +5,10 @@ import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
 import { checkPlanFeature, checkPlanLimit } from '@/lib/checkPlanLimit'
 
-async function ensureTables() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS documents (
-      id VARCHAR(36) NOT NULL PRIMARY KEY,
-      institution_id VARCHAR(36) NOT NULL,
-      student_id VARCHAR(36) DEFAULT NULL,
-      type VARCHAR(100) NOT NULL,
-      status ENUM('pending','approved','rejected','ready') NOT NULL DEFAULT 'pending',
-      notes TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE CASCADE,
-      FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-      INDEX idx_doc_institution (institution_id),
-      INDEX idx_doc_student (student_id),
-      INDEX idx_doc_status (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-}
+// Schema managed by migrations/
 
 export async function GET(request: NextRequest) {
   try {
-    await ensureTables()
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([], { status: 200 })
 
@@ -47,7 +28,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await ensureTables()
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 

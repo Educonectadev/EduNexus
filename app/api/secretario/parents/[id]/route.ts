@@ -49,8 +49,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     // Resetear contraseña del padre si se proporcionó una nueva
     if (password && password.trim()) {
       const hashedPassword = await bcrypt.hash(password.trim(), 10)
-      const [colRows] = await pool.query(`SHOW COLUMNS FROM users`) as any[]
-      const colNames = (colRows || []).map((c: any) => c.Field)
+      const [colRows] = await pool.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+        ['users']
+      ) as any[]
+      const colNames = (colRows || []).map((c: any) => c.column_name)
       const updates: string[] = []
       const vals: any[] = []
       if (colNames.includes('password')) { updates.push('password = ?'); vals.push(password.trim()) }
@@ -76,7 +79,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    if (error?.code === 'ER_DUP_ENTRY') {
+    if (error?.code === '23505') {
       return NextResponse.json({ error: 'Ya existe un padre con ese DNI' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error updating parent' }, { status: 500 })
@@ -114,8 +117,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       const hashedPassword = await bcrypt.hash(generatedPassword, 10)
       const fullName = `${parent.first_name} ${parent.last_name}`.trim()
 
-      const [colRows] = await pool.query(`SHOW COLUMNS FROM users`) as any[]
-      const colNames = (colRows || []).map((c: any) => c.Field)
+      const [colRows] = await pool.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+        ['users']
+      ) as any[]
+      const colNames = (colRows || []).map((c: any) => c.column_name)
 
       const insertCols: string[] = ['id', 'email', 'full_name', 'role', 'institution_id', 'status']
       const insertVals: any[] = [userId, parent.email, fullName, 'padre', instId, 'active']
@@ -150,8 +156,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       const parent = parents[0]
       if (!parent) return NextResponse.json({ error: 'Padre no encontrado' }, { status: 404 })
 
-      const [colRows] = await pool.query(`SHOW COLUMNS FROM users`) as any[]
-      const colNames = (colRows || []).map((c: any) => c.Field)
+      const [colRows] = await pool.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
+        ['users']
+      ) as any[]
+      const colNames = (colRows || []).map((c: any) => c.column_name)
 
       const updates: string[] = []
       const vals: any[] = []
@@ -163,12 +172,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       }
 
       vals.push(parent.email, instId)
-      const [result] = await pool.query(
+      const [, meta] = await pool.query(
         `UPDATE users SET ${updates.join(', ')} WHERE email = ? AND institution_id = ? AND role = 'padre'`,
         vals
       ) as any[]
 
-      if (result.affectedRows === 0) {
+      if (meta.affectedRows === 0) {
         return NextResponse.json({ error: 'No se encontró cuenta de usuario para este padre' }, { status: 404 })
       }
 

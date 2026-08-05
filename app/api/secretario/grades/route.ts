@@ -65,7 +65,10 @@ export async function POST(request: NextRequest) {
     await pool.query(
       `INSERT INTO grades (id, institution_id, student_id, course_id, period, score, max_score, notes)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE score = VALUES(score), max_score = VALUES(max_score), notes = VALUES(notes)`,
+       ON CONFLICT (student_id, course_id, period) DO UPDATE SET
+         score = EXCLUDED.score,
+         max_score = EXCLUDED.max_score,
+         notes = EXCLUDED.notes`,
       [id, instId, student_id, course_id, period, Number(score), Number(max_score || 20), notes || null]
     )
 

@@ -4,16 +4,15 @@ CREATE TABLE IF NOT EXISTS documents (
   institution_id VARCHAR(36) NOT NULL,
   student_id VARCHAR(36) DEFAULT NULL,
   type VARCHAR(100) NOT NULL,
-  status ENUM('pending','approved','rejected','ready') NOT NULL DEFAULT 'pending',
+  status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','ready')),
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE CASCADE,
-  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-  INDEX idx_doc_institution (institution_id),
-  INDEX idx_doc_student (student_id),
-  INDEX idx_doc_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
+);
+CREATE INDEX idx_doc_institution ON documents (institution_id);
+CREATE INDEX idx_doc_student ON documents (student_id);
+CREATE INDEX idx_doc_status ON documents (status);
 
 -- Certificados emitidos
 CREATE TABLE IF NOT EXISTS certificates (
@@ -24,12 +23,11 @@ CREATE TABLE IF NOT EXISTS certificates (
   type VARCHAR(100) NOT NULL,
   issue_date DATE DEFAULT NULL,
   file_url VARCHAR(500) DEFAULT NULL,
-  status ENUM('emitido','pendiente','anulado') NOT NULL DEFAULT 'emitido',
+  status VARCHAR(20) NOT NULL DEFAULT 'emitido' CHECK (status IN ('emitido','pendiente','anulado')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE CASCADE,
-  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL,
-  INDEX idx_cert_institution (institution_id),
-  INDEX idx_cert_student (student_id),
-  INDEX idx_cert_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE SET NULL
+);
+CREATE INDEX idx_cert_institution ON certificates (institution_id);
+CREATE INDEX idx_cert_student ON certificates (student_id);
+CREATE INDEX idx_cert_status ON certificates (status);

@@ -71,7 +71,9 @@ export async function POST(request: NextRequest) {
     await pool.query(
       `INSERT INTO attendance (id, institution_id, student_id, date, status, notes, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE status = VALUES(status), notes = VALUES(notes)`,
+       ON CONFLICT (student_id, date) DO UPDATE SET
+         status = EXCLUDED.status,
+         notes = EXCLUDED.notes`,
       [id, instId, student_id, date, status, notes || null, null]
     )
 

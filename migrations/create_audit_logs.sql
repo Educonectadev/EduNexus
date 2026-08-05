@@ -8,9 +8,9 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   user_id VARCHAR(36) DEFAULT NULL,
   institution_id VARCHAR(36) DEFAULT NULL,
   ip_address VARCHAR(45) DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_audit_institution (institution_id),
-  INDEX idx_audit_action (action),
-  INDEX idx_audit_entity (entity),
-  INDEX idx_audit_created (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_audit_institution ON audit_logs (institution_id);
+CREATE INDEX idx_audit_action ON audit_logs (action);
+CREATE INDEX idx_audit_entity ON audit_logs (entity);
+CREATE INDEX idx_audit_created ON audit_logs (created_at);

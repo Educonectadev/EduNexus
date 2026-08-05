@@ -42,63 +42,30 @@ async function generateEmail(firstName: string, lastName: string, documentNumber
   return candidate
 }
 
-async function ensureTables() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS parents (
-      id VARCHAR(36) NOT NULL PRIMARY KEY,
-      institution_id VARCHAR(36) NOT NULL,
-      first_name VARCHAR(100) NOT NULL,
-      last_name VARCHAR(100) NOT NULL,
-      document_type VARCHAR(20) DEFAULT 'DNI',
-      document_number VARCHAR(20) NOT NULL,
-      email VARCHAR(255) DEFAULT NULL,
-      phone VARCHAR(20) DEFAULT NULL,
-      address VARCHAR(255) DEFAULT NULL,
-      occupation VARCHAR(100) DEFAULT NULL,
-      status VARCHAR(20) DEFAULT 'active',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_parent_dni_inst (document_number, institution_id),
-      INDEX idx_parent_institution (institution_id),
-      INDEX idx_parent_name (first_name, last_name)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS parent_student (
-      id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-      parent_id VARCHAR(36) NOT NULL,
-      student_id VARCHAR(36) NOT NULL,
-      relationship ENUM('padre','madre','apoderado','tio','abuelo','hermano','otro') NOT NULL DEFAULT 'padre',
-      is_primary TINYINT(1) DEFAULT 0,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE KEY uk_parent_student (parent_id, student_id),
-      INDEX idx_ps_student (student_id),
-      INDEX idx_ps_parent (parent_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  `)
-}
+// Schema managed by migrations/
 
 export async function GET(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([])
 
-    await ensureTables()
-
     const { searchParams } = new URL(request.url)
     const q = searchParams.get('q') || ''
 
     let query = `
       SELECT p.*,
-        GROUP_CONCAT(
-          CONCAT(s.first_name, ' ', s.last_name, '|', ps.relationship, '|', s.id, '|', s.grade, '|', s.section)
-          SEPARATOR ';;'
+        (
+          SELECT string_agg(
+            (s.first_name || ' ' || s.last_name || '|' || ps.relationship || '|' || s.id || '|' || COALESCE(s.grade, '') || '|' || COALESCE(s.section, '')),
+            ';;' ORDER BY s.first_name
+          )
+          FROM parent_student ps
+          LEFT JOIN students s ON ps.student_id = s.id
+          WHERE ps.parent_id = p.id
         ) AS linked_students,
         u.email as user_email,
         u.status as user_status
       FROM parents p
-      LEFT JOIN parent_student ps ON ps.parent_id = p.id
-      LEFT JOIN students s ON ps.student_id = s.id
       LEFT JOIN users u ON u.email = p.email AND u.role = 'padre'
       WHERE p.institution_id = ?
     `
@@ -136,8 +103,6 @@ export async function POST(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No se encontró la institución' }, { status: 400 })
-
-    await ensureTables()
 
     const body = await request.json()
     const { first_name, last_name, document_type, document_number, email, phone, address, occupation, student_id, relationship, create_account } = body
@@ -214,7 +179,7 @@ export async function POST(request: NextRequest) {
       conn.release()
     }
   } catch (error: any) {
-    if (error?.code === 'ER_DUP_ENTRY') {
+    if (error?.code === '23505') {
       return NextResponse.json({ error: 'Ya existe un padre/guardián con ese DNI en esta institución' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Error creating parent', details: error?.message }, { status: 500 })
