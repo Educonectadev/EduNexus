@@ -29,7 +29,8 @@ VALUES
   ('60753914-a859-4f07-b596-c938a5af6d8d', 'director@educonecta.pe', 'Carlos Director', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'director', '4a82156b-f9f6-4c26-aa54-5140e9e8bf96', '00000002', '999000002', 'active'),
   ('d5efa415-53e9-4e96-9178-2d67a07fcb69', 'secretario@educonecta.pe', 'Maria Secretaria', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'secretario', '4a82156b-f9f6-4c26-aa54-5140e9e8bf96', '00000003', '999000003', 'active'),
   ('3a3b2e10-d609-4197-9f40-3e242da550a4', 'docente@educonecta.pe', 'Juan Docente', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'docente', '4a82156b-f9f6-4c26-aa54-5140e9e8bf96', '00000004', '999000004', 'active'),
-  ('a1d74e61-bc98-40e0-80c9-2014bccd91b2', 'padre@educonecta.pe', 'Pedro Padre', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'padre', '4a82156b-f9f6-4c26-aa54-5140e9e8bf96', '00000005', '999000005', 'active')
+  ('a1d74e61-bc98-40e0-80c9-2014bccd91b2', 'padre@educonecta.pe', 'Pedro Padre', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'padre', '4a82156b-f9f6-4c26-aa54-5140e9e8bf96', '00000005', '999000005', 'active'),
+  ('f0a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c', 'dev@educonecta.pe', 'Dev Educonecta', '$2b$10$PWn8L7b8s4B1WrXgkwFG/upkBCrK9lkqOc3HQFxqiM5Trg/3dxWRC', 'dev', NULL, '00000000', '999000000', 'active')
 ON CONFLICT (email) DO NOTHING;
 
 -- Docentes
