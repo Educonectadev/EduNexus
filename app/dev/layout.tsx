@@ -273,15 +273,16 @@ export default function DevLayout({
               </motion.span>
               {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Perfil</span>}
             </Link>
-            <Link href="/"
+            <button
+              onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/' }}
               className={cn(
-                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out w-full",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
                 "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
               )}>
               <LogOut className="h-[16px] w-[16px] shrink-0" />
               {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Salir</span>}
-            </Link>
+            </button>
           </div>
         </div>
       </aside>
