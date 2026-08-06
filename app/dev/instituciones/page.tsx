@@ -1364,7 +1364,7 @@ export default function DevInstitucionesPage() {
           <>
             <SbModalHeader title={selectedInst.name} onClose={() => setSelectedInst(null)} />
             <SbModalBody className="max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center gap-2 mt-0.5">
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
                 <p className="text-xs text-[var(--sb-on-surface-variant)]/50 font-mono">{selectedInst.code}</p>
                 <span className="text-[var(--sb-on-surface)]/10">·</span>
                 <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -1491,13 +1491,13 @@ export default function DevInstitucionesPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-1">
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
                   <SbBtn
                     variant={selectedInst.status === "active" ? "outlined" : "tonal"}
                     size="sm"
                     rounded
                     onClick={() => toggleStatus(selectedInst.id, selectedInst.status)}
-                    className={`flex-1 ${selectedInst.status === "active" ? "text-amber-500 border-amber-500/30" : "text-emerald-500 bg-emerald-500/10"}`}
+                    className={`flex-1 w-full sm:w-auto ${selectedInst.status === "active" ? "text-amber-500 border-amber-500/30" : "text-emerald-500 bg-emerald-500/10"}`}
                   >
                     {selectedInst.status === "active" ? "Desactivar" : "Activar"}
                   </SbBtn>
@@ -1506,7 +1506,7 @@ export default function DevInstitucionesPage() {
                     size="sm"
                     rounded
                     onClick={() => setCleanConfirm(selectedInst.id)}
-                    className="flex-1 text-orange-500 border-orange-500/30"
+                    className="flex-1 w-full sm:w-auto text-orange-500 border-orange-500/30"
                   >
                     Limpiar BD
                   </SbBtn>
@@ -1515,7 +1515,7 @@ export default function DevInstitucionesPage() {
                     size="sm"
                     rounded
                     onClick={() => setDeleteConfirm(selectedInst.id)}
-                    className="flex-1"
+                    className="flex-1 w-full sm:w-auto"
                   >
                     Eliminar
                   </SbBtn>

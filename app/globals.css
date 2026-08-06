@@ -1016,6 +1016,39 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
     padding: 16px 24px 24px 24px;
   }
 
+  /* --- MODALS: responsive mobile --- */
+  @media (max-width: 640px) {
+    .sb-modal-backdrop {
+      padding: 8px;
+      align-items: flex-end;
+    }
+    .sb-modal-window {
+      width: 100%;
+      max-width: none;
+      max-height: 92vh;
+      border-radius: 24px 24px 16px 16px;
+    }
+    .sb-modal-header {
+      padding: 20px 20px 0 20px;
+    }
+    .sb-modal-header h3 {
+      font-size: 15px;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+    }
+    .sb-modal-body {
+      padding: 16px 20px;
+    }
+    .sb-modal-footer {
+      padding: 14px 20px 20px 20px;
+    }
+  }
+
   @keyframes sb-blur-in {
     0% { filter: blur(32px); opacity: 0; }
     100% { filter: blur(0); opacity: 1; }
