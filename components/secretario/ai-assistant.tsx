@@ -700,7 +700,7 @@ function AIAssistant({ open, onClose }: AIAssistantPanelProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md md:bg-black/40"
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md md:bg-black/40"
           onClick={onClose}
         >
           <motion.div
@@ -708,7 +708,7 @@ function AIAssistant({ open, onClose }: AIAssistantPanelProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 right-0 bottom-0 h-[85vh] max-h-[85vh] bg-sb-surface shadow-2xl flex flex-col rounded-t-2xl overflow-hidden md:absolute md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-1/2 md:-translate-x-1/2 md:max-w-md md:max-h-[calc(100vh-2rem)] md:rounded-2xl"
+            className="fixed left-0 right-0 bottom-0 h-[85vh] max-h-[85vh] bg-sb-surface shadow-2xl flex flex-col rounded-t-2xl overflow-hidden md:absolute md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-1/2 md:-translate-x-1/2 md:max-w-md md:max-h-[calc(100vh-2rem)] md:rounded-2xl z-[70]"
             onClick={e => e.stopPropagation()}
           >
             {/* Drag handle for mobile */}
