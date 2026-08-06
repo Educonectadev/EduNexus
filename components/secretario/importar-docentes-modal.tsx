@@ -136,7 +136,7 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
     const formData = new FormData()
     formData.append('file', file)
     try {
-      const res = await fetch('/api/dev/docentes/import', { method: 'POST', body: formData })
+      const res = await fetch('/api/secretario/docentes/import', { method: 'POST', body: formData })
       const data = await res.json()
       if (res.ok) {
         setResult(data)
@@ -161,11 +161,11 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
   return (
     <SbModal open={open} onClose={handleClose} maxWidth="640px">
       <SbModalBody noPadding className="max-h-[85vh] overflow-y-auto">
-        <div className="px-6 pt-6 pb-4">
+        <div className="px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
           <h3 className="text-lg font-semibold text-sb-on-surface">Importar Personal</h3>
           <p className="text-xs text-sb-on-surface-variant/50 mt-1">Sube un archivo CSV para contratar docentes o secretarios masivamente.</p>
         </div>
-        <div className="px-6 space-y-4 pb-2">
+        <div className="px-4 sm:px-6 space-y-4 pb-2">
           <div className="bg-sb-surface rounded-xl border border-sb-outline-variant/10 p-4">
             <div className="flex items-center gap-2 mb-2">
               <Info className="h-4 w-4 text-sb-primary" />
@@ -210,7 +210,7 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {COLUMN_KEYS.map(key => (
                     <div key={key} className="flex items-center gap-3">
-                      <label className="text-xs text-sb-on-surface-variant/60 w-28 shrink-0">{COLUMN_LABELS[key]}{key === 'full_name' ? ' *' : ''}</label>
+                      <label className="text-xs text-sb-on-surface-variant/60 w-24 sm:w-28 shrink-0">{COLUMN_LABELS[key]}{key === 'full_name' ? ' *' : ''}</label>
                       <select
                         className="sbf-native-select flex-1"
                         value={mapping[key] ?? ''}
@@ -252,11 +252,11 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
                 </div>
               )}
 
-              <div className="flex items-center gap-3">
-                <SbBtn variant="filled" rounded onClick={handleImport} disabled={loading || !allMapped}>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <SbBtn variant="filled" rounded onClick={handleImport} disabled={loading || !allMapped} className="w-full sm:w-auto">
                   {loading ? 'Importando…' : `Importar ${rows.length} personas`}
                 </SbBtn>
-                <SbBtn rounded onClick={handleDownloadTemplate}>
+                <SbBtn rounded onClick={handleDownloadTemplate} className="w-full sm:w-auto">
                   <Download className="h-4 w-4 mr-1.5" /> Descargar plantilla
                 </SbBtn>
               </div>
@@ -316,7 +316,7 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
           )}
         </div>
       </SbModalBody>
-      <div className="px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
+      <div className="px-4 sm:px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
         <SbBtn rounded onClick={handleClose}>Cerrar</SbBtn>
         <div className="flex-1" />
         <SbBtn rounded onClick={handleDownloadTemplate} className="flex items-center gap-2">

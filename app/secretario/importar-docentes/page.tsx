@@ -149,7 +149,7 @@ export default function ImportarDocentesPage() {
     const formData = new FormData()
     formData.append('file', file)
     try {
-      const res = await fetch('/api/dev/docentes/import', { method: 'POST', body: formData })
+      const res = await fetch('/api/secretario/docentes/import', { method: 'POST', body: formData })
       const data = await res.json()
       if (res.ok) setResult(data)
       else setGlobalError(data.error || 'Error al importar.')
