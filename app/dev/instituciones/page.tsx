@@ -162,9 +162,18 @@ export default function DevInstitucionesPage() {
   const [plans, setPlans] = React.useState<{ id: string; name: string; price: number }[]>([])
   const [statusFilter, setStatusFilter] = React.useState<string>("all")
   const [filtersOpen, setFiltersOpen] = React.useState(false)
+  const [filterSize, setFilterSize] = React.useState({ width: 0, height: 0 })
+  const filterContentRef = React.useRef<HTMLDivElement>(null)
   const filterContainerRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => { fetchPlans() }, [])
+
+  React.useLayoutEffect(() => {
+    if (filtersOpen && filterContentRef.current) {
+      const el = filterContentRef.current
+      setFilterSize({ width: el.offsetWidth, height: el.offsetHeight })
+    }
+  }, [filtersOpen])
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -442,102 +451,111 @@ export default function DevInstitucionesPage() {
 
             {/* Filter Button */}
             <div ref={filterContainerRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setFiltersOpen(!filtersOpen)}
-                className={`md-anim-click relative h-11 px-4 rounded-xl flex items-center gap-2 text-sm font-medium transition-all duration-200 border ${
-                  activeFilterCount > 0
-                    ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                    : "bg-sb-surface-container border-sb-outline-variant/20 text-sb-on-surface/80 hover:bg-sb-surface-container-high"
-                }`}
+              <motion.div
+                className="relative z-50 overflow-hidden shadow-2xl shadow-black/20"
+                style={{ transformOrigin: "top right", backgroundColor: "var(--sb-surface-container)" }}
+                animate={{
+                  width: filtersOpen ? Math.max(filterSize.width, 168) : 168,
+                  height: filtersOpen ? Math.max(filterSize.height, 44) : 44,
+                  borderRadius: filtersOpen ? 16 : 12,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
               >
-                <Filter className="h-4 w-4" />
-                <span className="hidden sm:inline">Filtros</span>
-                {activeFilterCount > 0 && (
-                  <span className="h-5 min-w-5 px-1.5 rounded-full bg-[var(--sb-primary)] text-[var(--sb-on-primary)] text-[10px] font-bold flex items-center justify-center">
-                    {activeFilterCount}
-                  </span>
-                )}
-                <motion.div animate={{ rotate: filtersOpen ? 180 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}>
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </motion.div>
-              </button>
-
-              {/* Inline Filter Panel */}
-              <AnimatePresence>
-                {filtersOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
-                    className="absolute right-0 z-50 w-72"
-                    style={{ bottom: 0 }}
-                  >
-                    <div className="bg-[var(--sb-surface-container)] rounded-2xl border border-[var(--sb-outline-variant)]/15 shadow-2xl shadow-black/20 p-4">
-                      <motion.div
-                        initial="hidden"
-                        animate="show"
-                        variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.035, delayChildren: 0.05 } } }}
-                        className="space-y-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-semibold text-sb-on-surface">Filtros de búsqueda</p>
-                          <button onClick={() => setFiltersOpen(false)} className="h-6 w-6 rounded-lg flex items-center justify-center hover:bg-sb-surface-container-high transition-colors">
-                            <X className="h-3.5 w-3.5 text-sb-on-surface/60" />
-                          </button>
-                        </div>
-
-                        {/* Estado */}
-                        <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-2">Estado</p>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {[
-                              { value: "all", label: "Todos" },
-                              { value: "active", label: "Activos" },
-                              { value: "inactive", label: "Inactivos" },
-                            ].map(({ value, label }) => {
-                              const active = statusFilter === value
-                              return (
-                                <motion.button
-                                  key={value}
-                                  variants={{ hidden: { opacity: 0, y: 8, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }}
-                                  whileTap={{ scale: 0.96 }}
-                                  onClick={() => setStatusFilter(value)}
-                                  className={`relative px-2.5 py-2 rounded-xl text-xs font-medium transition-colors border ${
-                                    active
-                                      ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                                      : "text-sb-on-surface/80 border-transparent hover:bg-sb-surface-container-high"
-                                  }`}
-                                >
-                                  {label}
-                                  {active && (
-                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.8 }} className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[var(--sb-primary)] flex items-center justify-center">
-                                      <Check className="h-2.5 w-2.5 text-[var(--sb-on-primary)]" />
-                                    </motion.div>
-                                  )}
-                                </motion.button>
-                              )
-                            })}
-                          </div>
-                        </motion.div>
-
-                        {/* Footer */}
-                        <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="flex gap-2 pt-2 border-t border-sb-outline-variant/10">
-                          {activeFilterCount > 0 && (
-                            <button onClick={() => setStatusFilter("all")} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-sb-on-surface/80 hover:bg-sb-surface-container-high transition-colors border border-sb-outline-variant/20">
-                              Limpiar
-                            </button>
-                          )}
-                          <button onClick={() => setFiltersOpen(false)} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium bg-sb-on-surface text-sb-surface hover:opacity-90 transition-opacity">
-                            Aplicar
-                          </button>
-                        </motion.div>
-                      </motion.div>
-                    </div>
+                <motion.button
+                  type="button"
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                  animate={{
+                    left: filtersOpen ? Math.max(filterSize.width - 18, 0) : 0,
+                    top: filtersOpen ? Math.max(filterSize.height - 18, 0) : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
+                  className="absolute flex items-center gap-2 pr-4 pl-4 h-11 text-sm font-medium z-20"
+                >
+                  <Filter className="h-4 w-4" />
+                  <span className="hidden sm:inline">Filtros</span>
+                  {activeFilterCount > 0 && (
+                    <span className="h-5 min-w-5 px-1.5 rounded-full bg-[var(--sb-primary)] text-[var(--sb-on-primary)] text-[10px] font-bold flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <motion.div animate={{ rotate: filtersOpen ? 180 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}>
+                    <ChevronDown className="h-3.5 w-3.5" />
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </motion.button>
+
+                <AnimatePresence>
+                  {filtersOpen && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                      <div ref={filterContentRef} className="w-72 p-4">
+                        <motion.div
+                          initial="hidden"
+                          animate="show"
+                          variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.035, delayChildren: 0.05 } } }}
+                          className="space-y-4"
+                        >
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold text-sb-on-surface">Filtros de búsqueda</p>
+                            <button onClick={() => setFiltersOpen(false)} className="h-6 w-6 rounded-lg flex items-center justify-center hover:bg-sb-surface-container-high transition-colors">
+                              <X className="h-3.5 w-3.5 text-sb-on-surface/60" />
+                            </button>
+                          </div>
+
+                          {/* Estado */}
+                          <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }}>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-2">Estado</p>
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {[
+                                { value: "all", label: "Todos" },
+                                { value: "active", label: "Activos" },
+                                { value: "inactive", label: "Inactivos" },
+                              ].map(({ value, label }) => {
+                                const active = statusFilter === value
+                                return (
+                                  <motion.button
+                                    key={value}
+                                    variants={{ hidden: { opacity: 0, y: 8, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }}
+                                    whileTap={{ scale: 0.96 }}
+                                    onClick={() => setStatusFilter(value)}
+                                    className={`relative px-2.5 py-2 rounded-xl text-xs font-medium transition-colors border ${
+                                      active
+                                        ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
+                                        : "text-sb-on-surface/80 border-transparent hover:bg-sb-surface-container-high"
+                                    }`}
+                                  >
+                                    {label}
+                                    {active && (
+                                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.8 }} className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[var(--sb-primary)] flex items-center justify-center">
+                                        <Check className="h-2.5 w-2.5 text-[var(--sb-on-primary)]" />
+                                      </motion.div>
+                                    )}
+                                  </motion.button>
+                                )
+                              })}
+                            </div>
+                          </motion.div>
+
+                          {/* Footer */}
+                          <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="flex gap-2 pt-2 border-t border-sb-outline-variant/10">
+                            {activeFilterCount > 0 && (
+                              <button onClick={() => setStatusFilter("all")} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-sb-on-surface/80 hover:bg-sb-surface-container-high transition-colors border border-sb-outline-variant/20">
+                                Limpiar
+                              </button>
+                            )}
+                            <button onClick={() => setFiltersOpen(false)} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium bg-sb-on-surface text-sb-surface hover:opacity-90 transition-opacity">
+                              Aplicar
+                            </button>
+                          </motion.div>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
           </div>
         </div>
