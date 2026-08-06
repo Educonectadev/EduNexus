@@ -21,8 +21,8 @@ export function ensureUploadDir<T>(_category?: string): T | undefined {
 }
 
 /** Saves a buffer into Supabase Storage and returns its public URL. */
-export async function saveUpload(category: string, filename: string, buffer: Buffer): Promise<string> {
-  const objectPath = `${category}/${filename}`
+export async function saveUpload(category: string, institutionId: string, filename: string, buffer: Buffer): Promise<string> {
+  const objectPath = `${category}/${institutionId}/${filename}`
   const { data, error } = await supabase.storage.from(BUCKET).upload(objectPath, buffer, {
     contentType: guessMime(filename),
     cacheControl: '3600',
@@ -35,12 +35,12 @@ export async function saveUpload(category: string, filename: string, buffer: Buf
         `. Verifica que el bucket "uploads" exista y las políticas anon estén instaladas.`,
     )
   }
-  return publicUrl(category, filename)
+  return publicUrl(category, institutionId, filename)
 }
 
 /** Returns a public object URL without requesting it. */
-export function publicUrl(category: string, filename: string): string {
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${category}/${filename}`
+export function publicUrl(category: string, institutionId: string, filename: string): string {
+  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${category}/${institutionId}/${filename}`
 }
 
 /** Returns public URL for a legacy (pre-Supabase) path if it only exists locally. */

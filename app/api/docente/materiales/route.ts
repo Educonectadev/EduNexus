@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       const ext = file.name.split('.').pop() || 'bin'
       const filename = `${id}-${Date.now()}.${ext}`
       const buffer = Buffer.from(await file.arrayBuffer())
-      file_url = saveUpload('materials', filename, buffer)
+      file_url = await saveUpload('materials', instId, filename, buffer)
       fileType = file.type || 'application/octet-stream'
       fileSize = file.size
     }

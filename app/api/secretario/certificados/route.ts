@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       const ext = file.name.split('.').pop() || 'pdf'
       const filename = `${id}-${Date.now()}.${ext}`
       const buffer = Buffer.from(await file.arrayBuffer())
-      file_url = await saveUpload('certificates', filename, buffer)
+      file_url = await saveUpload('certificates', instId, filename, buffer)
     }
 
     await pool.query(

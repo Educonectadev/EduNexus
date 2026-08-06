@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split('.').pop() || 'bin'
     const filename = `${id}-${Date.now()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
-    const file_url = await saveUpload('library', filename, buffer)
+    const file_url = await saveUpload('library', instId, filename, buffer)
 
     const fileType = file.type || 'application/octet-stream'
     const fileSize = file.size
