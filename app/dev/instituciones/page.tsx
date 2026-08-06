@@ -491,7 +491,7 @@ export default function DevInstitucionesPage() {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
                     >
-                      <div ref={filterContentRef} className="w-72 max-w-[calc(100vw-2rem)] p-4">
+                      <div ref={filterContentRef} className="w-72 max-w-[calc(100vw_-_2rem)] p-4">
                         <motion.div
                           initial="hidden"
                           animate="show"
