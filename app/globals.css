@@ -1665,10 +1665,20 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
   gap: 0.25rem;
   padding: 0;
-  margin-right: 2.25rem;
+  margin-right: 4rem;
   background: transparent;
   border: none;
   box-shadow: none;
+}
+@media (max-width: 380px) {
+  .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
+    margin-right: 3.25rem;
+  }
+}
+@media (min-width: 480px) {
+  .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
+    margin-right: 5rem;
+  }
 }
 .mobile-navbar[data-style="minimal"] .mobile-nav-buttons button > span {
   display: none;
