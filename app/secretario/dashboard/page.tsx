@@ -141,7 +141,7 @@ export default function SecretarioDashboard() {
       <button
         onClick={() => setOnboardingOpen(true)}
         title="¿Cómo funciona el sistema?"
-        className="fixed bottom-5 right-5 z-40 h-11 w-11 rounded-2xl bg-sb-primary text-sb-on-primary flex items-center justify-center shadow-lg shadow-sb-primary/25 hover:scale-105 active:scale-95 transition-transform"
+        className="fixed bottom-24 right-5 z-40 h-11 w-11 rounded-2xl bg-sb-primary text-sb-on-primary flex items-center justify-center shadow-lg shadow-sb-primary/25 hover:scale-105 active:scale-95 transition-transform"
       >
         <HelpCircle className="h-5 w-5" />
       </button>
