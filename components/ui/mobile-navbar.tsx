@@ -109,7 +109,7 @@ export function MobileNavbar({
   return (
     <div className="md:hidden">
       <motion.nav
-        className={cn("mobile-navbar fixed left-0 right-0 z-30", className)}
+        className={cn("mobile-navbar fixed left-0 right-0 z-[60]", className)}
         data-style={navStyle}
         initial={{ y: 100, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
