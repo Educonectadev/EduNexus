@@ -40,7 +40,7 @@ export async function GET() {
        FROM users u
        LEFT JOIN user_sessions us ON u.id = us.user_id
        GROUP BY u.id, u.full_name, u.email, u.role
-       HAVING session_count > 0
+       HAVING COUNT(us.id) > 0
        ORDER BY session_count DESC
        LIMIT 10`
     )
