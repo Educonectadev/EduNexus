@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS document_library (
   name VARCHAR(200) NOT NULL,
   description TEXT,
   file_url VARCHAR(500) NOT NULL,
-  file_type VARCHAR(50) NOT NULL,
+  file_type VARCHAR(255) NOT NULL,
   file_size INTEGER DEFAULT 0,
   category VARCHAR(100) DEFAULT 'general',
   tags JSONB DEFAULT NULL,
