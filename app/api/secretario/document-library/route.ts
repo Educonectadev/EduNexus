@@ -44,8 +44,6 @@ export async function POST(request: NextRequest) {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    ensureUploadDir()
-
     const formData = await request.formData()
     const name = formData.get('name') as string
     const description = formData.get('description') as string | null
