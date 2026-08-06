@@ -137,6 +137,10 @@ export function MobileNavbar({
                 aria-label="Más opciones"
                 aria-expanded={menuOpen}
                 whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: menuOpen ? 1.12 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 380, damping: 14, mass: 0.7 }}
               >
                 <motion.div
                   className="absolute inset-0"
@@ -151,10 +155,16 @@ export function MobileNavbar({
                   className="relative z-10 flex items-center justify-center"
                   animate={{
                     rotate: menuOpen ? 90 : 0,
+                    scale: menuOpen ? 1.2 : 1,
                     color: menuOpen ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
                     opacity: menuOpen ? 1 : 0.7,
                   }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 16,
+                    mass: 0.8,
+                  }}
                 >
                   <MoreHorizontal className="h-5 w-5" />
                 </motion.div>
@@ -163,11 +173,16 @@ export function MobileNavbar({
                 {menuOpen && (
                   <motion.div
                     className="absolute bottom-0 right-0 z-10 w-64 overflow-hidden rounded-xl shadow-[0_8px_40px_-8px_rgba(0,0,0,0.35)]"
-                    initial={{ opacity: 0, scaleY: 0.4, y: 12, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, scaleY: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scaleY: 0.4, y: 12, filter: "blur(8px)" }}
-                    transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
-                    style={{ transformOrigin: "bottom", backgroundColor: "var(--sb-on-surface)" }}
+                    initial={{ opacity: 0, scale: 0.6, y: 16, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, scale: 0.6, y: 16, filter: "blur(10px)" }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 20,
+                      mass: 0.8,
+                    }}
+                    style={{ transformOrigin: "bottom right", backgroundColor: "var(--sb-on-surface)" }}
                   >
                     <div className="p-2">
                       {onAiClick && (
