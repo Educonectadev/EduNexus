@@ -276,29 +276,29 @@ export function DocumentLibrary({ open, onClose, onSelect, mode = "manage" }: Do
                             {formatFileSize(item.file_size)} · {item.category}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={e => { e.stopPropagation(); setPreview(item) }}
-                            className="h-7 w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors"
+                            className="h-8 w-8 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/50 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors"
                             title="Vista previa"
                           >
-                            <Eye className="h-3.5 w-3.5" />
+                            <Eye className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                           </button>
                           <a
                             href={item.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
-                            className="h-7 w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors"
+                            className="h-8 w-8 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/50 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors"
                           >
-                            <Download className="h-3.5 w-3.5" />
+                            <Download className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                           </a>
                           {mode === "manage" && (
                             <button
                               onClick={e => { e.stopPropagation(); setDeleteId(item.id) }}
-                              className="h-7 w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/30 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                              className="h-8 w-8 sm:h-7 sm:w-7 flex items-center justify-center rounded-lg text-sb-on-surface-variant/40 hover:text-red-500 hover:bg-red-500/10 transition-colors"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                             </button>
                           )}
                         </div>
