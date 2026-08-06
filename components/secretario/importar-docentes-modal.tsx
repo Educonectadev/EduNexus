@@ -97,7 +97,24 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
       const [header, ...dataRows] = parsed
       setHeaderRow(header)
       setRows(dataRows)
-      setMapping(EMPTY_MAPPING)
+      // Auto-detect column mapping by header name (fast import, no manual steps)
+      const findCol = (keys: string[]) => {
+        const hit = header.findIndex(h => {
+          const hl = h.trim().toLowerCase()
+          return keys.some(k => hl.includes(k))
+        })
+        return hit === -1 ? null : hit
+      }
+      setMapping({
+        full_name: findCol(['nombre', 'name', 'full']),
+        dni: findCol(['dni', 'documento']),
+        phone: findCol(['teléfono', 'telefono', 'phone']),
+        email: findCol(['email', 'correo']),
+        subject: findCol(['especialidad', 'asignatura', 'subject']),
+        level: findCol(['nivel', 'level']),
+        contract_type: findCol(['contrato', 'contract']),
+        status: findCol(['estado', 'status']),
+      })
     }
     reader.onerror = () => setGlobalError('Error al leer el archivo.')
     reader.readAsText(f)
@@ -184,7 +201,12 @@ export default function ImportarDocentesModal({ open, onClose, onImported }: { o
           {headerRow.length > 0 && !result && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div className="bg-sb-surface rounded-xl border border-sb-outline-variant/10 p-4">
-                <h4 className="text-xs font-semibold text-sb-on-surface mb-3">Mapeo de columnas</h4>
+                <h4 className="text-xs font-semibold text-sb-on-surface mb-1">Mapeo de columnas</h4>
+                <p className="text-[11px] text-sb-on-surface-variant/50 mb-3">
+                  {mapping.full_name !== null
+                    ? "Detectadas automáticamente. Ajusta solo si es necesario."
+                    : "Selecciona la columna de nombre para importar."}
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {COLUMN_KEYS.map(key => (
                     <div key={key} className="flex items-center gap-3">

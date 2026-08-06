@@ -100,7 +100,24 @@ export default function ImportarDocentesPage() {
       const [header, ...dataRows] = parsed
       setHeaderRow(header)
       setRows(dataRows)
-      setMapping({ full_name: null, dni: null, phone: null, email: null, subject: null, level: null, contract_type: null, status: null })
+      // Auto-detect column mapping by header name (fast import, no manual steps)
+      const findCol = (keys: string[]) => {
+        const hit = header.findIndex(h => {
+          const hl = h.trim().toLowerCase()
+          return keys.some(k => hl.includes(k))
+        })
+        return hit === -1 ? null : hit
+      }
+      setMapping({
+        full_name: findCol(['nombre', 'name', 'full']),
+        dni: findCol(['dni', 'documento']),
+        phone: findCol(['teléfono', 'telefono', 'phone']),
+        email: findCol(['email', 'correo']),
+        subject: findCol(['especialidad', 'asignatura', 'subject']),
+        level: findCol(['nivel', 'level']),
+        contract_type: findCol(['contrato', 'contract']),
+        status: findCol(['estado', 'status']),
+      })
     }
     reader.onerror = () => setGlobalError('Error al leer el archivo.')
     reader.readAsText(f)
@@ -120,6 +137,8 @@ export default function ImportarDocentesPage() {
 
   const previewRows = rows.slice(0, 5)
   const handleMappingChange = (key: ColumnKey, colIndex: number | null) => setMapping(prev => ({ ...prev, [key]: colIndex }))
+  const mappedCount = Object.entries(mapping).filter(([k, v]) => k !== 'phone' && v !== null).length
+  const autoMapped = mapping.full_name !== null
   const allMapped = mapping.full_name !== null
 
   const handleImport = async () => {
@@ -194,7 +213,17 @@ export default function ImportarDocentesPage() {
       {headerRow.length > 0 && !result && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
           <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-5">
-            <h3 className="text-sm font-semibold text-sb-on-surface mb-4">Mapeo de columnas</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-sm font-semibold text-sb-on-surface">Mapeo de columnas</h3>
+              {autoMapped && (
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-semibold">
+                  <Check className="h-3 w-3" /> Detectado automáticamente
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-sb-on-surface-variant/50 mb-4">
+              Las columnas se detectan solas. Solo ajústalas si es necesario; puedes importar directamente.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {COLUMN_KEYS.map(key => (
                 <div key={key} className="flex items-center gap-3">
