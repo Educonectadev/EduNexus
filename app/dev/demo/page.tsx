@@ -128,15 +128,15 @@ export default function DevDemoPage() {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="w-full space-y-6 py-2">
       {/* Header */}
-      <motion.div variants={item} className="flex items-center justify-between">
+      <motion.div variants={item} className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
           <h2 className="text-[22px] font-bold tracking-tight text-sb-on-surface">Solicitudes de Demo</h2>
           <p className="text-[13px] text-sb-on-surface-variant/50 mt-1">Gestiona las solicitudes de demonstración del sistema</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={fetchRequests}
-            className="flex items-center gap-2 px-4 py-2 bg-sb-surface-container text-sb-on-surface rounded-xl text-[13px] font-medium hover:bg-sb-surface-container-high transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-sb-surface-container text-sb-on-surface rounded-xl text-[13px] font-medium hover:bg-sb-surface-container-high transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Actualizar
@@ -144,7 +144,7 @@ export default function DevDemoPage() {
           <a
             href="/demo"
             target="_blank"
-            className="flex items-center gap-2 px-4 py-2 bg-sb-on-surface text-white rounded-xl text-[13px] font-medium hover:opacity-90 transition-opacity"
+            className="flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 bg-sb-on-surface text-white rounded-xl text-[13px] font-medium hover:opacity-90 transition-opacity"
           >
             <ArrowUpRight className="h-4 w-4" />
             Formulario público
@@ -348,20 +348,20 @@ export default function DevDemoPage() {
             </div>
 
             {/* Actions */}
-            <div className="px-6 py-4 border-t border-sb-outline-variant/8 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-sb-outline-variant/8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <button
                 onClick={() => deleteRequest(selectedRequest.id)}
-                className="flex items-center gap-2 px-3 py-2 text-[12px] text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 text-[12px] text-red-500 hover:bg-red-50 rounded-xl transition-colors order-2 sm:order-1"
               >
                 <Trash2 className="h-4 w-4" />
                 Eliminar
               </button>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2">
                 {selectedRequest.status === 'pending' && (
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'contacted')}
                     disabled={updating}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Marcar contactado
                   </button>
@@ -370,7 +370,7 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'scheduled')}
                     disabled={updating}
-                    className="px-4 py-2 bg-purple-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Programar demo
                   </button>
@@ -379,7 +379,7 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'completed')}
                     disabled={updating}
-                    className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Marcar completado
                   </button>
@@ -388,7 +388,7 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'cancelled')}
                     disabled={updating}
-                    className="px-4 py-2 bg-sb-surface-container text-sb-on-surface-variant rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-sb-surface-container text-sb-on-surface-variant rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50"
                   >
                     Cancelar
                   </button>
