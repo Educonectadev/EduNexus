@@ -140,7 +140,7 @@ export function MobileNavbar({
           <div className="mobile-nav-more absolute right-4 bottom-0">
             <div className="relative flex flex-col items-end">
               <motion.div
-                className="relative overflow-hidden shadow-[0_8px_40px_-8px_rgba(0,0,0,0.35)]"
+                className="relative z-50 overflow-hidden shadow-[0_8px_40px_-8px_rgba(0,0,0,0.35)]"
                 style={{ transformOrigin: "bottom right", backgroundColor: "var(--sb-on-surface)" }}
                 animate={{
                   width: menuOpen ? Math.max(openSize.width, 56) : 56,
