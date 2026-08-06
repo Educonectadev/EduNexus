@@ -16,6 +16,33 @@ interface Stats {
   certificates: number; total_debt: number; absent_today: number
 }
 
+interface ActivityItem {
+  id: string
+  type: string
+  title: string
+  description: string
+  time: string | null
+}
+
+const activityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  matricula: UserPlus,
+  asistencia: CheckCircle,
+  pago: CreditCard,
+  documento: FileSignature,
+}
+
+const timeAgo = (iso: string) => {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return "Ahora"
+  if (mins < 60) return `Hace ${mins}m`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `Hace ${hrs}h`
+  const days = Math.floor(hrs / 24)
+  if (days < 7) return `Hace ${days}d`
+  return new Date(iso).toLocaleDateString("es-PE", { day: "numeric", month: "short" })
+}
+
 export default function SecretarioDashboard() {
   const user = useAuthStore((s) => s.user)
 
@@ -25,6 +52,7 @@ export default function SecretarioDashboard() {
     certificates: 0, total_debt: 0, absent_today: 0,
   })
   const [loading, setLoading] = React.useState(true)
+  const [activitiesData, setActivitiesData] = React.useState<ActivityItem[]>([])
   const [onboardingOpen, setOnboardingOpen] = React.useState(() => {
     try {
       return !localStorage.getItem("educo_onboarding_secretario")
@@ -57,7 +85,21 @@ export default function SecretarioDashboard() {
         })
       } catch {} finally { setLoading(false) }
     }
+
+    const fetchActivity = async () => {
+      try {
+        const res = await fetch("/api/secretario/activity")
+        if (res.ok) {
+          const data = await res.json()
+          if (Array.isArray(data.activities)) setActivitiesData(data.activities)
+        }
+      } catch {}
+    }
+
     fetchAll()
+    fetchActivity()
+    const interval = setInterval(fetchActivity, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const metrics = loading ? [] : [
@@ -79,12 +121,13 @@ export default function SecretarioDashboard() {
     { label: "Buscar alumno", desc: "Expediente completo", icon: Search, href: "/secretario/busqueda" },
   ]
 
-  const activities = [
-    { id: "act1", title: "Nueva matricula", description: "Se registro un nuevo alumno en 1° de secundaria", time: "Hace 2h", icon: UserPlus },
-    { id: "act2", title: "Asistencia registrada", description: "Se tomo asistencia del aula 3°A — 28 presentes", time: "Hace 4h", icon: CheckCircle },
-    { id: "act3", title: "Pago registrado", description: "Colegiatura de Julio — Apoderado: Maria Lopez", time: "Hace 6h", icon: CreditCard },
-    { id: "act4", title: "Documento generado", description: "Constancia de estudios para Juan Perez", time: "Ayer", icon: FileSignature },
-  ]
+  const activities = activitiesData.map(a => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    time: a.time ? timeAgo(a.time) : "Ahora",
+    icon: activityIcons[a.type] || UserPlus,
+  }))
 
   return (
     <>
