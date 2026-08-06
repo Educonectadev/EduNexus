@@ -161,6 +161,8 @@ export default function DevInstitucionesPage() {
   const [search, setSearch] = React.useState("")
   const [plans, setPlans] = React.useState<{ id: string; name: string; price: number }[]>([])
   const [statusFilter, setStatusFilter] = React.useState<string>("all")
+  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [searchModalQuery, setSearchModalQuery] = React.useState("")
   const [filtersOpen, setFiltersOpen] = React.useState(false)
   const [filterSize, setFilterSize] = React.useState({ width: 0, height: 0 })
   const filterContentRef = React.useRef<HTMLDivElement>(null)
@@ -184,6 +186,18 @@ export default function DevInstitucionesPage() {
     if (filtersOpen) document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [filtersOpen])
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+      if (e.key === "Escape") setSearchOpen(false)
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [])
 
   const fetchPlans = async () => {
     try { const res = await fetch("/api/dev/planes"); if (res.ok) setPlans(await res.json()) } catch {}
@@ -361,6 +375,18 @@ export default function DevInstitucionesPage() {
     return matchesSearch && matchesStatus
   })
 
+  const searchResults = institutions.filter(inst => {
+    const q = searchModalQuery.trim().toLowerCase()
+    if (!q) return true
+    return (
+      inst.name?.toLowerCase().includes(q) ||
+      inst.code?.toLowerCase().includes(q) ||
+      inst.district?.toLowerCase().includes(q) ||
+      inst.province?.toLowerCase().includes(q) ||
+      inst.department?.toLowerCase().includes(q)
+    )
+  }).slice(0, 8)
+
   const totalSteps = 4
   const progress = (currentStep / totalSteps) * 100
   const activeCount = institutions.filter(i => i.status === "active").length
@@ -431,22 +457,17 @@ export default function DevInstitucionesPage() {
         <div className="bg-sb-surface rounded-2xl p-3 border border-sb-outline-variant/10">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
-              <input
-                placeholder="Buscar por nombre, código o distrito..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-11 w-full pl-11 pr-10 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="h-11 w-full pl-11 pr-10 rounded-xl bg-sb-surface-container flex items-center text-[14px] text-sb-on-surface/60 border border-transparent hover:bg-sb-surface-container-high focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-colors"
+              >
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
+                <span className="truncate">Buscar por nombre, código o distrito...</span>
+                <kbd className="hidden sm:inline-flex ml-auto items-center gap-1 px-1.5 h-5 rounded-md bg-sb-surface-container-high text-[10px] font-medium text-sb-on-surface/50 border border-sb-outline-variant/20">
+                  ⌘K
+                </kbd>
+              </button>
             </div>
 
             {/* Filter Button */}
@@ -1590,6 +1611,95 @@ export default function DevInstitucionesPage() {
             {cleaning ? "Limpiando..." : "Limpiar todo"}
           </SbBtn>
         </SbModalFooter>
+      </SbModal>
+
+      {/* Search Institutions Modal */}
+      <SbModal open={searchOpen} onClose={() => setSearchOpen(false)} maxWidth="min(640px, 95vw)">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
+          <input
+            autoFocus
+            placeholder="Buscar por nombre, código o distrito..."
+            value={searchModalQuery}
+            onChange={(e) => setSearchModalQuery(e.target.value)}
+            className="h-12 w-full pl-11 pr-10 rounded-xl bg-sb-surface-container text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
+          />
+          <button
+            type="button"
+            onClick={() => { setSearchModalQuery(""); setSearchOpen(false) }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        <SbModalBody className="mt-3 overflow-hidden" noPadding>
+          <div className="max-h-[60vh] overflow-y-auto">
+            {searchResults.length === 0 ? (
+              <div className="px-5 py-14 text-center">
+                <Building2 className="h-8 w-8 text-[var(--sb-primary)]/40 mx-auto mb-3" />
+                <p className="text-sm font-medium text-sb-on-surface/70">
+                  {searchModalQuery ? "Sin resultados" : "Escribe para buscar"}
+                </p>
+                <p className="text-xs text-sb-on-surface/60 mt-1">
+                  {searchModalQuery ? "Prueba con otro término" : "Busca instituciones por nombre, código o ubicación"}
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-sb-outline-variant/10">
+                {searchResults.map((inst) => {
+                  const TypeIcon = typeIcons[inst.type] || Building2
+                  const gradient = typeColors[inst.type] || "from-gray-500 to-gray-600"
+                  return (
+                    <button
+                      key={inst.id}
+                      type="button"
+                      onClick={() => {
+                        setSearchModalQuery("")
+                        setSearchOpen(false)
+                        setSelectedInst(inst)
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-sb-surface-container/60 transition-colors md-anim-card-in"
+                    >
+                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
+                        <TypeIcon className="h-4 w-4 text-sb-surface" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-sb-on-surface truncate">{inst.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[10px] font-mono text-sb-on-surface/60 bg-sb-surface-container-high/80 px-1.5 py-0.5 rounded-md">{inst.code}</span>
+                          {inst.district && (
+                            <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {inst.district}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          inst.status === "active"
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "bg-sb-surface-container-high text-sb-on-surface/60"
+                        }`}>
+                          <div className={`h-1.5 w-1.5 rounded-full ${inst.status === "active" ? "bg-emerald-500" : "bg-sb-on-surface/50"}`} />
+                          {inst.status === "active" ? "Activa" : "Inactiva"}
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-sb-on-surface/40" />
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          <div className="p-3 border-t border-sb-outline-variant/10 flex items-center justify-between text-[11px] text-sb-on-surface/50 bg-sb-surface-container/50">
+            <span>{searchResults.length} resultado{searchResults.length !== 1 ? "s" : ""}</span>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <kbd className="px-1.5 h-4 rounded bg-sb-surface-container-high border border-sb-outline-variant/20">Esc</kbd>
+              <span>para cerrar</span>
+            </div>
+          </div>
+        </SbModalBody>
       </SbModal>
     </motion.div>
   )
