@@ -298,10 +298,16 @@ export default function DevLayout({
               <span className="text-[11px] text-emerald-600 font-medium">Live</span>
             </div>
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex items-center justify-center p-2 rounded-lg text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors"
+              className="flex items-center justify-center p-2 rounded-lg text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors"
               title="Toggle theme">
               <Sun className="h-[16px] w-[16px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[16px] w-[16px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </button>
+            <button
+              onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/' }}
+              className="flex items-center justify-center p-2 rounded-lg text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors"
+              title="Cerrar sesión">
+              <LogOut className="h-[16px] w-[16px]" />
             </button>
           </div>
         </header>
