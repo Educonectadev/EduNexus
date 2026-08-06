@@ -44,13 +44,13 @@ export default function DevConfigPage() {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-8 py-2">
       <motion.div variants={fadeUp}>
-        <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Configuración</h2>
-        <p className="text-[14px] text-sb-on-surface/60 mt-1">Información del sistema y configuración actual</p>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Configuración</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Información del sistema y configuración actual</p>
       </motion.div>
 
       {categories.map((cat) => (
         <motion.div key={cat} variants={fadeUp}>
-          <p className="text-[11px] font-semibold text-sb-on-surface/40 uppercase tracking-widest mb-3">{cat}</p>
+          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-widest mb-3">{cat}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {config.filter(c => c.category === cat).map((item, i) => (
               <motion.div
@@ -61,11 +61,11 @@ export default function DevConfigPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-sb-surface-container-high flex items-center justify-center group-hover:bg-sb-primary/10 transition-colors">
-                    <item.icon className="h-5 w-5 text-sb-on-surface/40 group-hover:text-sb-primary transition-colors" />
+                    <item.icon className="h-5 w-5 text-sb-on-surface/50 group-hover:text-sb-primary transition-colors" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] text-sb-on-surface/60">{item.key}</p>
-                    <p className="text-[14px] font-medium text-sb-on-surface/90 font-mono truncate">{item.value}</p>
+                    <p className="text-[13px] text-sb-on-surface/70">{item.key}</p>
+                    <p className="text-[14px] font-medium text-sb-on-surface font-mono truncate">{item.value}</p>
                   </div>
                 </div>
               </motion.div>

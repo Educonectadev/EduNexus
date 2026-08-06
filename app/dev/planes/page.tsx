@@ -163,14 +163,14 @@ export default function PlanesPage() {
         )}
       </AnimatePresence>
 
-      <motion.div variants={fadeUp} className="flex items-center justify-between">
+      <motion.div variants={fadeUp} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Planes</h2>
-          <p className="text-[14px] text-sb-on-surface/60 mt-1">Gestionar planes de suscripción</p>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Planes</h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Gestionar planes de suscripción</p>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all shadow-lg shadow-sb-on-surface/10"
+          className="h-10 px-4 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all flex-1 sm:flex-none items-center justify-center flex gap-2"
         >
           <Plus className="h-4 w-4" />
           Nuevo plan
@@ -192,43 +192,43 @@ export default function PlanesPage() {
                 variants={fadeUp}
                 whileHover={{ y: -3, transition: { duration: 0.2 } }}
                 onClick={() => openView(plan)}
-                className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10 flex flex-col hover:border-sb-on-surface/30 transition-all cursor-pointer"
+                className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10 flex flex-col hover:border-sb-outline-variant/30 transition-all cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="h-12 w-12 rounded-2xl bg-sb-primary/10 flex items-center justify-center">
                     <CreditCard className="h-6 w-6 text-sb-primary" />
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); openView(plan) }} className="p-2 rounded-xl hover:bg-sb-surface-container-high text-sb-on-surface/30 hover:text-sb-primary transition-colors">
+                    <button onClick={(e) => { e.stopPropagation(); openView(plan) }} className="p-2 rounded-xl hover:bg-sb-surface-container-high text-sb-on-surface/60 hover:text-sb-primary transition-colors">
                       <Eye className="h-4 w-4" />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); openEdit(plan) }} className="p-2 rounded-xl hover:bg-sb-surface-container-high text-sb-on-surface/30 hover:text-sb-on-surface/60 transition-colors">
+                    <button onClick={(e) => { e.stopPropagation(); openEdit(plan) }} className="p-2 rounded-xl hover:bg-sb-surface-container-high text-sb-on-surface/60 hover:text-sb-on-surface transition-colors">
                       <Pencil className="h-4 w-4" />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(plan.id) }} className="p-2 rounded-xl hover:bg-red-500/10 text-sb-on-surface/30 hover:text-red-500 transition-colors">
+                    <button onClick={(e) => { e.stopPropagation(); handleDelete(plan.id) }} className="p-2 rounded-xl hover:bg-red-500/10 text-sb-on-surface/60 hover:text-red-500 transition-colors">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
                 <h3 className="text-[16px] font-bold text-sb-on-surface">{plan.name}</h3>
-                {plan.description && <p className="text-[12px] text-sb-on-surface/50 mt-1">{plan.description}</p>}
+                {plan.description && <p className="text-[12px] text-sb-on-surface/70 mt-1">{plan.description}</p>}
                 <div className="mt-3 flex items-baseline gap-1">
                   <span className="text-[28px] font-bold text-sb-on-surface">{priceFormat(plan.price)}</span>
-                  <span className="text-[12px] text-sb-on-surface/40">/mes</span>
+                  <span className="text-[12px] text-sb-on-surface/60">/mes</span>
                 </div>
                 <div className="mt-3 space-y-1.5 flex-1">
                   {labels.slice(0, 4).map((f: string, fi: number) => (
-                    <div key={fi} className="flex items-center gap-2 text-[12px] text-sb-on-surface/60">
+                    <div key={fi} className="flex items-center gap-2 text-[12px] text-sb-on-surface/80">
                       <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> {f}
                     </div>
                   ))}
                 </div>
                 <div className="mt-4 pt-3 border-t border-sb-outline-variant/10 flex items-center justify-between text-[11px]">
-                  <div className="flex items-center gap-1.5 text-sb-on-surface/40">
+                  <div className="flex items-center gap-1.5 text-sb-on-surface/60">
                     <GraduationCap className="h-3 w-3" />
                     {plan.max_students.toLocaleString()} estudiantes
                   </div>
-                  <div className="flex items-center gap-1.5 text-sb-on-surface/40">
+                  <div className="flex items-center gap-1.5 text-sb-on-surface/60">
                     <Users className="h-3 w-3" />
                     {plan.max_users} usuarios
                   </div>
@@ -242,13 +242,13 @@ export default function PlanesPage() {
       {/* Edit Modal */}
       <AnimatePresence>
         {editOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setEditOpen(false)}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setEditOpen(false)}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-sb-surface rounded-2xl max-w-[500px] w-full shadow-2xl border border-sb-outline-variant/10 overflow-hidden"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
@@ -257,51 +257,51 @@ export default function PlanesPage() {
                   <X className="h-4 w-4 text-sb-on-surface/60" />
                 </button>
               </div>
-              <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              <div className="px-6 py-5 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/50">Nombre *</label>
+                  <label className="text-[12px] text-sb-on-surface/70">Nombre *</label>
                   <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Básico"
-                    className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all" />
+                    className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/50">Descripción</label>
+                  <label className="text-[12px] text-sb-on-surface/70">Descripción</label>
                   <input value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Para instituciones pequeñas"
-                    className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all" />
+                    className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/50">Precio mensual (S/)</label>
+                    <label className="text-[12px] text-sb-on-surface/70">Precio mensual (S/)</label>
                     <input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: parseFloat(e.target.value) || 0})}
-                      className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all" />
+                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/50">Estado</label>
+                    <label className="text-[12px] text-sb-on-surface/70">Estado</label>
                     <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}
-                      className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all">
+                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
                       <option value="active">Activo</option>
                       <option value="inactive">Inactivo</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/50">Máx. estudiantes</label>
+                    <label className="text-[12px] text-sb-on-surface/70">Máx. estudiantes</label>
                     <input type="number" min="1" value={form.max_students} onChange={e => setForm({...form, max_students: parseInt(e.target.value) || 1})}
-                      className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all" />
+                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/50">Máx. usuarios</label>
+                    <label className="text-[12px] text-sb-on-surface/70">Máx. usuarios</label>
                     <input type="number" min="1" value={form.max_users} onChange={e => setForm({...form, max_users: parseInt(e.target.value) || 1})}
-                      className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all" />
+                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/50">Funcionalidades habilitadas</label>
+                  <label className="text-[12px] text-sb-on-surface/70">Funcionalidades habilitadas</label>
                   <div className="grid grid-cols-2 gap-1.5 bg-sb-surface-container-high rounded-xl p-3">
                     {ALL_PERMISSIONS.map(p => (
                       <button key={p.key} type="button" onClick={() => togglePermission(p.key)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition-all ${
                           form.permissions[p.key]
                             ? 'bg-sb-primary/10 text-sb-primary'
-                            : 'text-sb-on-surface/40 hover:bg-sb-surface-container'
+                            : 'text-sb-on-surface/70 hover:bg-sb-surface-container'
                         }`}>
                         {form.permissions[p.key]
                           ? <Shield className="h-3.5 w-3.5 shrink-0" />
@@ -313,18 +313,18 @@ export default function PlanesPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/50">Descripción visual (una por línea)</label>
+                  <label className="text-[12px] text-sb-on-surface/70">Descripción visual (una por línea)</label>
                   <textarea value={form.labels} onChange={e => setForm({...form, labels: e.target.value})}
-                    className="w-full h-20 px-3 py-2 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[13px] text-sb-on-surface resize-none focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all"
+                    className="w-full h-20 px-4 py-2 rounded-xl bg-sb-surface-container text-[13px] text-sb-on-surface placeholder:text-sb-on-surface/50 resize-none border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all"
                     placeholder={"Gestión académica\nReportes básicos"} />
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex gap-2">
-                <button onClick={() => setEditOpen(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors">
+              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row gap-2">
+                <button onClick={() => setEditOpen(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
                   Cancelar
                 </button>
                 <button onClick={handleSave} disabled={saving || !form.name}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50 shadow-lg shadow-sb-on-surface/10">
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all disabled:opacity-50">
                   {saving ? "Guardando..." : editing ? "Guardar" : "Crear"}
                 </button>
               </div>
@@ -336,36 +336,36 @@ export default function PlanesPage() {
       {/* View Modal */}
       <AnimatePresence>
         {viewing && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setViewing(null)}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setViewing(null)}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
-              className="bg-sb-surface rounded-2xl max-w-[480px] w-full shadow-2xl border border-sb-outline-variant/10 overflow-hidden"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between px-6 py-5 border-b border-sb-outline-variant/10">
                 <div>
                   <h3 className="text-[18px] font-bold text-sb-on-surface">{viewing.name}</h3>
-                  {viewing.description && <p className="text-[12px] text-sb-on-surface/50 mt-1">{viewing.description}</p>}
+                  {viewing.description && <p className="text-[12px] text-sb-on-surface/70 mt-1">{viewing.description}</p>}
                 </div>
                 <button onClick={() => setViewing(null)} className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors">
                   <X className="h-4 w-4 text-sb-on-surface/60" />
                 </button>
               </div>
-              <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+              <div className="px-6 py-5 space-y-5">
                 <div className="flex items-baseline gap-1">
                   <span className="text-[32px] font-bold text-sb-on-surface">{priceFormat(viewing.price)}</span>
-                  <span className="text-[13px] text-sb-on-surface/40">/mes</span>
+                  <span className="text-[13px] text-sb-on-surface/60">/mes</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-xl bg-sb-surface-container-high p-3">
-                    <div className="flex items-center gap-1.5 text-sb-on-surface/40 text-[11px]"><Users className="h-3.5 w-3.5" /> Usuarios</div>
+                    <div className="flex items-center gap-1.5 text-sb-on-surface/60 text-[11px]"><Users className="h-3.5 w-3.5" /> Usuarios</div>
                     <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing.max_users.toLocaleString()}</p>
                   </div>
                   <div className="rounded-xl bg-sb-surface-container-high p-3">
-                    <div className="flex items-center gap-1.5 text-sb-on-surface/40 text-[11px]"><GraduationCap className="h-3.5 w-3.5" /> Estudiantes</div>
+                    <div className="flex items-center gap-1.5 text-sb-on-surface/60 text-[11px]"><GraduationCap className="h-3.5 w-3.5" /> Estudiantes</div>
                     <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing.max_students.toLocaleString()}</p>
                   </div>
                 </div>
@@ -373,19 +373,19 @@ export default function PlanesPage() {
                   const { labels, permissions } = parseFeatures(viewing.features)
                   return (
                     <div className="space-y-2">
-                      <p className="text-[12px] font-semibold text-sb-on-surface/60">Incluye</p>
+                      <p className="text-[12px] font-semibold text-sb-on-surface/70">Incluye</p>
                       <div className="space-y-1.5">
                         {labels.length > 0 ? labels.map((f, fi) => (
                           <div key={fi} className="flex items-center gap-2 text-[13px] text-sb-on-surface/70">
                             <Check className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
                           </div>
                         )) : (
-                          <p className="text-[12px] text-sb-on-surface/40">Sin funciones listadas</p>
+                          <p className="text-[12px] text-sb-on-surface/60">Sin funciones listadas</p>
                         )}
                       </div>
                       {Object.keys(permissions).length > 0 && (
                         <>
-                          <p className="text-[12px] font-semibold text-sb-on-surface/60 pt-3 mt-1 border-t border-sb-outline-variant/10">Permisos técnicos</p>
+                          <p className="text-[12px] font-semibold text-sb-on-surface/70 pt-3 mt-1 border-t border-sb-outline-variant/10">Permisos técnicos</p>
                           <div className="flex flex-wrap gap-1.5">
                             {Object.entries(permissions).filter(([, v]) => v).map(([k]) => (
                               <span key={k} className="px-2.5 py-1 rounded-lg bg-sb-primary/10 text-sb-primary text-[11px] font-medium">{k.replace("can_", "")}</span>
@@ -397,14 +397,14 @@ export default function PlanesPage() {
                   )
                 })()}
               </div>
-              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex gap-2">
+              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row gap-2">
                 <button
                   onClick={() => { setViewing(null); openEdit(viewing) }}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all shadow-lg shadow-sb-on-surface/10"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all"
                 >
                   Editar plan
                 </button>
-                <button onClick={() => setViewing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors">
+                <button onClick={() => setViewing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
                   Cerrar
                 </button>
               </div>

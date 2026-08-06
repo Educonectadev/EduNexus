@@ -39,58 +39,63 @@ export default function DevDashboard() {
   ]
 
   return (
-    <div className="w-full space-y-6 py-1">
-      <h2 className="text-lg font-semibold text-sb-on-surface tracking-tight">Overview</h2>
+    <div className="w-full space-y-6 py-2 md:py-4">
+      <div>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Overview</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Resumen del sistema Educonecta</p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {statCards.map((stat) => (
           <div
             key={stat.label}
-            className="bg-sb-surface rounded-xl p-3 border border-sb-outline-variant/10 sm:p-4"
+            className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10"
           >
-            <stat.icon className={`h-4 w-4 ${stat.color} mb-2`} />
+            <div className="w-10 h-10 rounded-xl bg-sb-surface-container flex items-center justify-center mb-3">
+              <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
+            </div>
             <p className="text-xl font-bold text-sb-on-surface sm:text-2xl">
               {loading ? "—" : stat.value.toLocaleString()}
             </p>
-            <p className="text-[11px] text-sb-on-surface/50 mt-0.5">{stat.label}</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="sm:col-span-2">
-          <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2">Acciones</p>
-          <div className="bg-sb-surface rounded-xl border border-sb-outline-variant/10 divide-y divide-sb-outline-variant/8">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Acciones</p>
+          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 divide-y divide-sb-outline-variant/8 overflow-hidden">
             {actions.map((action) => (
               <Link
                 key={action.href}
                 href={action.href}
-                className="flex items-center gap-3 p-3 hover:bg-sb-surface-container-low/40 transition-colors group"
+                className="flex items-center gap-3 p-4 hover:bg-sb-surface-container-low/50 transition-colors group"
               >
-                <div className="h-8 w-8 rounded-lg bg-sb-surface-container-high flex items-center justify-center shrink-0 group-hover:bg-sb-primary/10 transition-colors">
-                  <action.icon className="h-4 w-4 text-sb-on-surface/40 group-hover:text-sb-primary transition-colors" />
+                <div className="h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0 group-hover:bg-sb-surface-container-high transition-colors">
+                  <action.icon className="h-4 w-4 text-sb-on-surface/70 group-hover:text-sb-on-surface transition-colors" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-sb-on-surface/80">{action.label}</p>
-                  <p className="text-[11px] text-sb-on-surface/40 truncate">{action.desc}</p>
+                  <p className="text-[13px] font-medium text-sb-on-surface">{action.label}</p>
+                  <p className="text-[12px] text-sb-on-surface/70 truncate">{action.desc}</p>
                 </div>
-                <ChevronRight className="h-3.5 w-3.5 text-sb-on-surface/20 shrink-0" />
+                <ChevronRight className="h-4 w-4 text-sb-on-surface/40 shrink-0 group-hover:translate-x-0.5 group-hover:text-sb-on-surface/70 transition-all" />
               </Link>
             ))}
           </div>
         </div>
 
         <div>
-          <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2">Estado</p>
-          <div className="bg-sb-surface rounded-xl border border-sb-outline-variant/10 p-3 space-y-3">
+          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Estado</p>
+          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Server className="h-4 w-4 text-emerald-500" />
-                <span className="text-[12px] text-sb-on-surface/70">PostgreSQL</span>
+                <span className="text-[13px] text-sb-on-surface">PostgreSQL</span>
               </div>
-              <span className="text-[10px] text-emerald-600 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">Online</span>
+              <span className="text-[11px] text-emerald-600 font-medium bg-emerald-500/10 px-2.5 py-1 rounded-full">Online</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {[
                 { label: "DB", value: "postgres" },
                 { label: "Host", value: "Supabase" },
@@ -98,14 +103,14 @@ export default function DevDashboard() {
                 { label: "Entorno", value: "dev" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-[11px] text-sb-on-surface/40">{item.label}</span>
-                  <span className="text-[11px] font-mono text-sb-on-surface/60">{item.value}</span>
+                  <span className="text-[12px] text-sb-on-surface/70">{item.label}</span>
+                  <span className="text-[12px] font-mono text-sb-on-surface">{item.value}</span>
                 </div>
               ))}
             </div>
-            <div className="pt-2 border-t border-sb-outline-variant/10 space-y-1.5">
-              <p className="text-[10px] font-semibold text-sb-on-surface/30 uppercase tracking-wider">Stack</p>
-              <div className="space-y-1">
+            <div className="pt-3 border-t border-sb-outline-variant/10 space-y-2.5">
+              <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider">Stack</p>
+              <div className="space-y-2">
                 {[
                   { label: "Framework", value: "Next.js 16" },
                   { label: "UI", value: "Tailwind + MD3" },
@@ -113,8 +118,8 @@ export default function DevDashboard() {
                   { label: "Version", value: "v1.1.1" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center justify-between">
-                    <span className="text-[10px] text-sb-on-surface/35">{item.label}</span>
-                    <span className="text-[10px] font-mono text-sb-on-surface/50">{item.value}</span>
+                    <span className="text-[12px] text-sb-on-surface/70">{item.label}</span>
+                    <span className="text-[12px] font-mono text-sb-on-surface">{item.value}</span>
                   </div>
                 ))}
               </div>

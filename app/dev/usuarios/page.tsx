@@ -240,31 +240,29 @@ export default function DevUsuariosPage() {
       variants={stagger}
       initial="hidden"
       animate="show"
-      className="w-full space-y-6 py-1"
+      className="w-full space-y-6 py-2 md:py-4"
     >
       {/* Header */}
-      <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl bg-black dark:bg-white p-6 md:p-8 text-white dark:text-black">
-        <div className="relative flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Usuarios</h1>
-            <p className="text-sm mt-1 opacity-80">Gestión de usuarios del sistema Educonecta</p>
-            <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 dark:bg-black/15 backdrop-blur-sm text-xs font-medium">
-                <CircleDot className="h-3 w-3" />
-                {totalUsers} total
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 dark:bg-black/15 backdrop-blur-sm text-xs font-medium">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-600" />
-                {activeCount} activos
-              </div>
+      <motion.div variants={fadeUp} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Usuarios</h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Gestión de usuarios del sistema Educonecta</p>
+          <div className="flex items-center gap-3 mt-3">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sb-surface-container text-[11px] font-medium text-sb-on-surface/80">
+              <CircleDot className="h-3 w-3 text-sb-on-surface/70" />
+              {totalUsers} total
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sb-surface-container text-[11px] font-medium text-sb-on-surface/80">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-600" />
+              {activeCount} activos
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
           <SbBtn
-            variant="tonal"
-            size="sm"
-            rounded
+            variant="filled"
             onClick={() => setDialogOpen(true)}
-            className="!bg-white/15 dark:!bg-black/15 !text-white dark:!text-black hover:!bg-white/25 dark:hover:!bg-black/25 backdrop-blur-sm shadow-lg"
+            className="h-10 px-4 rounded-xl flex-1 sm:flex-none"
           >
             <Plus className="h-4 w-4" />
             Nuevo Usuario
@@ -287,17 +285,17 @@ export default function DevUsuariosPage() {
             <button
               key={item.role}
               onClick={() => setRoleFilter(active ? "all" : item.role)}
-              className={`group relative overflow-hidden rounded-2xl p-3.5 border transition-all duration-200 text-left md-anim-card-in ${
+              className={`group relative overflow-hidden rounded-2xl p-4 border transition-all duration-200 text-left md-anim-card-in ${
                 active
-                  ? "border-[var(--sb-primary)] bg-[var(--sb-primary)]/5 shadow-md"
-                  : "border-[var(--sb-outline-variant)]/10 bg-[var(--sb-surface-container)] hover:border-[var(--sb-outline-variant)]/25 hover:shadow-md hover:shadow-black/5"
+                  ? "border-[var(--sb-primary)] bg-[var(--sb-primary)]/5"
+                  : "border-[var(--sb-outline-variant)]/10 bg-[var(--sb-surface)] hover:border-[var(--sb-outline-variant)]/20"
               }`}
             >
-              <div className={`h-8 w-8 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-2 shadow-sm`}>
-                <item.icon className="h-4 w-4 text-white" />
+              <div className="h-8 w-8 rounded-xl bg-[var(--sb-surface-container)] flex items-center justify-center mb-2">
+                <item.icon className="h-4 w-4 text-[var(--sb-on-surface-variant)]/70" />
               </div>
               <p className="text-lg font-bold text-[var(--sb-on-surface)]">{count}</p>
-              <p className="text-[10px] text-[var(--sb-on-surface-variant)]/50 font-medium uppercase tracking-wider">{item.label}</p>
+              <p className="text-[11px] text-[var(--sb-on-surface-variant)]/70 font-medium uppercase tracking-wider">{item.label}</p>
               {active && (
                 <div className="absolute top-2 right-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-[var(--sb-primary)]" />
@@ -314,38 +312,38 @@ export default function DevUsuariosPage() {
         <SbModalBody>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/60">Nombre</SbLabel>
+              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/80">Nombre</SbLabel>
               <SbInput
                 placeholder="Nombre completo"
                 value={formData.full_name}
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                className="h-10 rounded-2xl bg-[var(--sb-surface-container-high)]/80 border-[var(--sb-outline-variant)]/30 text-sm text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/30"
+                className="h-11 w-full rounded-xl bg-[var(--sb-surface-container)] px-4 text-[14px] text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--sb-primary)]/30"
               />
             </div>
             <div className="space-y-2">
-              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/60">Email</SbLabel>
+              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/80">Email</SbLabel>
               <SbInput
                 type="email"
                 placeholder="email@ejemplo.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-10 rounded-2xl bg-[var(--sb-surface-container-high)]/80 border-[var(--sb-outline-variant)]/30 text-sm text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/30"
+                className="h-11 w-full rounded-xl bg-[var(--sb-surface-container)] px-4 text-[14px] text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--sb-primary)]/30"
               />
             </div>
             <div className="space-y-2">
-              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/60">Contraseña</SbLabel>
+              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/80">Contraseña</SbLabel>
               <SbInput
                 type="password"
                 placeholder="Mínimo 6 caracteres"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="h-10 rounded-2xl bg-[var(--sb-surface-container-high)]/80 border-[var(--sb-outline-variant)]/30 text-sm text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/30"
+                className="h-11 w-full rounded-xl bg-[var(--sb-surface-container)] px-4 text-[14px] text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--sb-primary)]/30"
               />
             </div>
             <div className="space-y-2">
-              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/60">Rol</SbLabel>
+              <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/80">Rol</SbLabel>
               <select
-                className="sb-select h-10 rounded-2xl bg-[var(--sb-surface-container-high)]/80 border-[var(--sb-outline-variant)]/30 text-sm text-[var(--sb-on-surface)]"
+                className="sb-select h-11 rounded-xl bg-[var(--sb-surface-container)] border border-transparent text-[14px] text-[var(--sb-on-surface)]"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
@@ -358,9 +356,9 @@ export default function DevUsuariosPage() {
             </div>
             {formData.role !== "super_admin" && (
               <div className="space-y-2">
-                <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/60">Institución</SbLabel>
+                <SbLabel className="text-xs text-[var(--sb-on-surface-variant)]/80">Institución</SbLabel>
                 <select
-                  className="sb-select h-10 rounded-2xl bg-[var(--sb-surface-container-high)]/80 border-[var(--sb-outline-variant)]/30 text-sm text-[var(--sb-on-surface)]"
+                  className="sb-select h-11 rounded-xl bg-[var(--sb-surface-container)] border border-transparent text-[14px] text-[var(--sb-on-surface)]"
                   value={formData.institution_id}
                   onChange={(e) => setFormData({ ...formData, institution_id: e.target.value })}
                 >
@@ -373,7 +371,7 @@ export default function DevUsuariosPage() {
             )}
           </div>
         </SbModalBody>
-        <SbModalFooter className="flex flex-row gap-2">
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
           <SbBtn variant="outlined" size="sm" rounded onClick={() => setDialogOpen(false)} className="flex-1">
             Cancelar
           </SbBtn>
@@ -395,18 +393,18 @@ export default function DevUsuariosPage() {
         <div className="bg-[var(--sb-surface-container)] rounded-2xl p-3 border border-[var(--sb-outline-variant)]/10">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--sb-on-surface-variant)]/40 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--sb-on-surface-variant)]/50 pointer-events-none" />
               <input
                 placeholder="Buscar por nombre, email, DNI..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-11 pl-11 pr-10 rounded-xl bg-[var(--sb-surface)] border border-[var(--sb-outline-variant)]/20 text-sm text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/35 focus:outline-none focus:border-[var(--sb-primary)]/50 focus:ring-2 focus:ring-[var(--sb-primary)]/10 transition-all"
+                className="w-full h-11 pl-11 pr-10 rounded-xl bg-[var(--sb-surface-container)] text-[14px] text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--sb-primary)]/30 transition-all"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-[var(--sb-on-surface-variant)]/50 hover:bg-[var(--sb-surface-container-high)] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-[var(--sb-on-surface-variant)]/60 hover:bg-[var(--sb-surface-container-high)] transition-colors"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -463,7 +461,7 @@ export default function DevUsuariosPage() {
 
                         {/* Rol */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sb-on-surface-variant)]/40 mb-2">Rol</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sb-on-surface-variant)]/60 mb-2">Rol</p>
                           <div className="grid grid-cols-2 gap-1.5">
                             {[
                               { value: "all", label: "Todos", icon: Users },
@@ -483,7 +481,7 @@ export default function DevUsuariosPage() {
                                   className={`flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-medium transition-colors border ${
                                     active
                                       ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                                      : "text-[var(--sb-on-surface-variant)]/60 border-transparent hover:bg-[var(--sb-surface-container-high)]"
+                                      : "text-[var(--sb-on-surface-variant)]/70 border-transparent hover:bg-[var(--sb-surface-container-high)]"
                                   }`}
                                 >
                                   <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -501,7 +499,7 @@ export default function DevUsuariosPage() {
 
                         {/* Estado */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sb-on-surface-variant)]/40 mb-2">Estado</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sb-on-surface-variant)]/60 mb-2">Estado</p>
                           <div className="grid grid-cols-3 gap-1.5">
                             {[
                               { value: "all", label: "Todos" },
@@ -518,7 +516,7 @@ export default function DevUsuariosPage() {
                                   className={`relative px-2.5 py-2 rounded-xl text-xs font-medium transition-colors border ${
                                     active
                                       ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                                      : "text-[var(--sb-on-surface-variant)]/60 border-transparent hover:bg-[var(--sb-surface-container-high)]"
+                                      : "text-[var(--sb-on-surface-variant)]/70 border-transparent hover:bg-[var(--sb-surface-container-high)]"
                                   }`}
                                 >
                                   {label}
@@ -536,7 +534,7 @@ export default function DevUsuariosPage() {
                         {/* Footer */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="flex gap-2 pt-2 border-t border-[var(--sb-outline-variant)]/10">
                           {activeFilterCount > 0 && (
-                            <button onClick={() => { setRoleFilter("all"); setStatusFilter("all") }} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-[var(--sb-on-surface-variant)]/60 hover:bg-[var(--sb-surface-container-high)] transition-colors border border-[var(--sb-outline-variant)]/20">
+                            <button onClick={() => { setRoleFilter("all"); setStatusFilter("all") }} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-[var(--sb-on-surface-variant)]/70 hover:bg-[var(--sb-surface-container-high)] transition-colors border border-[var(--sb-outline-variant)]/20">
                               Limpiar
                             </button>
                           )}
@@ -555,7 +553,7 @@ export default function DevUsuariosPage() {
 
         {(search || activeFilterCount > 0) && (
           <div className="flex items-center justify-between px-1">
-            <p className="text-xs text-[var(--sb-on-surface-variant)]/50">
+            <p className="text-xs text-[var(--sb-on-surface-variant)]/70">
               <span className="text-[var(--sb-on-surface)]/80 font-medium">{filteredUsers.length}</span> de {totalUsers} usuarios
             </p>
             <button
@@ -584,19 +582,19 @@ export default function DevUsuariosPage() {
               className="w-full group bg-[var(--sb-surface-container)] rounded-2xl p-4 border border-[var(--sb-outline-variant)]/10 hover:border-[var(--sb-outline-variant)]/20 hover:bg-[var(--sb-surface-container-high)] transition-all duration-200 text-left"
             >
               <div className="flex items-center gap-4">
-                <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
-                  <span className="text-xs font-bold text-white">
+                <div className={`h-11 w-11 rounded-xl ${roleColors[user.role] || "bg-[var(--sb-surface-container-high)]"} flex items-center justify-center shrink-0`}>
+                  <span className="text-xs font-bold">
                     {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[var(--sb-on-surface)] truncate">{highlight(user.full_name, search)}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-[var(--sb-on-surface-variant)]/40 font-mono truncate">{highlight(user.email, search)}</span>
+                    <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 font-mono truncate">{highlight(user.email, search)}</span>
                     {user.institution_name && (
                       <>
-                        <span className="text-[var(--sb-on-surface-variant)]/15">·</span>
-                        <span className="text-[11px] text-[var(--sb-on-surface-variant)]/35 truncate flex items-center gap-1">
+                        <span className="text-[var(--sb-on-surface-variant)]/30">·</span>
+                        <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 truncate flex items-center gap-1">
                           <Building2 className="h-3 w-3 shrink-0" />
                           {user.institution_name}
                         </span>
@@ -612,12 +610,12 @@ export default function DevUsuariosPage() {
                   <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${
                     user.status === "active"
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/40"
+                      : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/70"
                   }`}>
-                    <div className={`h-1.5 w-1.5 rounded-full ${user.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/30"}`} />
+                    <div className={`h-1.5 w-1.5 rounded-full ${user.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/50"}`} />
                     {user.status === "active" ? "Activo" : "Inactivo"}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-[var(--sb-on-surface-variant)]/15 group-hover:text-[var(--sb-on-surface-variant)]/30 transition-colors" />
+                  <ChevronRight className="h-4 w-4 text-[var(--sb-on-surface-variant)]/50 group-hover:text-[var(--sb-on-surface-variant)]/60 transition-colors" />
                 </div>
               </div>
             </motion.button>
@@ -626,14 +624,14 @@ export default function DevUsuariosPage() {
         {!loading && filteredUsers.length === 0 && (
           <div className="bg-[var(--sb-surface-container)] rounded-3xl border border-[var(--sb-outline-variant)]/10 px-5 py-16 text-center">
             <div className="h-14 w-14 rounded-2xl bg-[var(--sb-surface-container-high)] flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 text-[var(--sb-on-surface-variant)]/25" />
+              <Users className="h-6 w-6 text-[var(--sb-on-surface-variant)]/60" />
             </div>
-            <p className="text-sm font-medium text-[var(--sb-on-surface-variant)]/60">
+            <p className="text-sm font-medium text-[var(--sb-on-surface-variant)]/70">
               {search || activeFilterCount > 0
                 ? "Sin resultados para tu búsqueda"
                 : "Sin usuarios registrados"}
             </p>
-            <p className="text-xs text-[var(--sb-on-surface-variant)]/35 mt-1.5 max-w-xs mx-auto">
+            <p className="text-xs text-[var(--sb-on-surface-variant)]/60 mt-1.5 max-w-xs mx-auto">
               {search || activeFilterCount > 0 ? "Intenta con otros filtros" : "Crea tu primer usuario para comenzar"}
             </p>
             {!(search || activeFilterCount > 0) && (
@@ -653,14 +651,14 @@ export default function DevUsuariosPage() {
             <SbModalHeader title={selectedUser.full_name} onClose={() => setSelectedUser(null)} />
             <SbModalBody className="max-h-[90vh] overflow-y-auto">
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-xs text-[var(--sb-on-surface-variant)]/50 font-mono">{selectedUser.email}</p>
+                <p className="text-xs text-[var(--sb-on-surface-variant)]/70 font-mono">{selectedUser.email}</p>
               </div>
 
               <div className="space-y-3 py-3">
                 {/* Avatar + Role + Status */}
                 <div className="flex items-center gap-4 md-anim-card-in">
-                  <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${roleGradients[selectedUser.role] || "from-gray-500 to-gray-600"} flex items-center justify-center shrink-0 shadow-lg`}>
-                    <span className="text-xl font-bold text-white">
+                  <div className={`h-16 w-16 rounded-2xl ${roleColors[selectedUser.role] || "bg-[var(--sb-surface-container-high)]"} flex items-center justify-center shrink-0`}>
+                    <span className="text-xl font-bold">
                       {selectedUser.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                     </span>
                   </div>
@@ -670,9 +668,9 @@ export default function DevUsuariosPage() {
                       {roleLabels[selectedUser.role]}
                     </div>
                     <div className={`flex items-center gap-1.5 mt-1.5 text-xs ${
-                      selectedUser.status === "active" ? "text-emerald-500 font-semibold" : "text-[var(--sb-on-surface-variant)]/40"
+                      selectedUser.status === "active" ? "text-emerald-500 font-semibold" : "text-[var(--sb-on-surface-variant)]/70"
                     }`}>
-                      <div className={`h-1.5 w-1.5 rounded-full ${selectedUser.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/30"}`} />
+                      <div className={`h-1.5 w-1.5 rounded-full ${selectedUser.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/50"}`} />
                       {selectedUser.status === "active" ? "Activo" : "Inactivo"}
                     </div>
                   </div>
@@ -684,7 +682,7 @@ export default function DevUsuariosPage() {
                     <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                       <Mail className="h-3.5 w-3.5 text-emerald-500" />
                     </div>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Contacto</p>
+                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/60 uppercase tracking-wider font-semibold">Contacto</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-[var(--sb-on-surface-variant)]/70">
@@ -692,13 +690,13 @@ export default function DevUsuariosPage() {
                     </div>
                     {selectedUser.dni && (
                       <div className="flex items-center gap-2 text-sm text-[var(--sb-on-surface-variant)]/70">
-                        <Hash className="h-3 w-3 text-[var(--sb-on-surface-variant)]/40" />
+                        <Hash className="h-3 w-3 text-[var(--sb-on-surface-variant)]/60" />
                         <span className="text-xs">DNI: <span className="font-mono">{selectedUser.dni}</span></span>
                       </div>
                     )}
                     {selectedUser.phone && (
                       <div className="flex items-center gap-2 text-sm text-[var(--sb-on-surface-variant)]/70">
-                        <Phone className="h-3 w-3 text-[var(--sb-on-surface-variant)]/40" />
+                        <Phone className="h-3 w-3 text-[var(--sb-on-surface-variant)]/60" />
                         <span className="text-xs">{selectedUser.phone}</span>
                       </div>
                     )}
@@ -712,18 +710,18 @@ export default function DevUsuariosPage() {
                       <div className="h-6 w-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
                         <BookOpen className="h-3.5 w-3.5 text-blue-500" />
                       </div>
-                      <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Académico</p>
+                      <p className="text-[10px] text-[var(--sb-on-surface-variant)]/60 uppercase tracking-wider font-semibold">Académico</p>
                     </div>
                     <div className="space-y-2">
                       {selectedUser.subject && (
                         <div className="text-xs text-[var(--sb-on-surface-variant)]/70 flex items-center gap-2">
-                          <BookOpen className="h-3 w-3 text-[var(--sb-on-surface-variant)]/30" />
+                          <BookOpen className="h-3 w-3 text-[var(--sb-on-surface-variant)]/50" />
                           Materia: {selectedUser.subject}
                         </div>
                       )}
                       {selectedUser.institution_name && (
                         <div className="text-xs text-[var(--sb-on-surface-variant)]/70 flex items-center gap-2">
-                          <Building2 className="h-3 w-3 text-[var(--sb-on-surface-variant)]/30" />
+                          <Building2 className="h-3 w-3 text-[var(--sb-on-surface-variant)]/50" />
                           {selectedUser.institution_name}
                         </div>
                       )}
@@ -737,16 +735,16 @@ export default function DevUsuariosPage() {
                     <div className="h-6 w-6 rounded-lg bg-gray-700/20 flex items-center justify-center">
                       <Clock className="h-3.5 w-3.5 text-gray-500" />
                     </div>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Registro</p>
+                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/60 uppercase tracking-wider font-semibold">Registro</p>
                   </div>
                   <p className="text-xs text-[var(--sb-on-surface-variant)]/70 mt-2 flex items-center gap-2">
-                    <Calendar className="h-3 w-3 text-[var(--sb-on-surface-variant)]/30" />
+                    <Calendar className="h-3 w-3 text-[var(--sb-on-surface-variant)]/50" />
                     {new Date(selectedUser.created_at).toLocaleDateString("es-PE", { year: "numeric", month: "long", day: "numeric" })}
                   </p>
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-1">
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
                   <SbBtn
                     variant={selectedUser.status === "active" ? "outlined" : "tonal"}
                     size="sm"
@@ -784,7 +782,7 @@ export default function DevUsuariosPage() {
             Se eliminará permanentemente este usuario y todos sus datos asociados.
           </p>
         </SbModalBody>
-        <SbModalFooter className="flex flex-row gap-2">
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
           <SbBtn variant="outlined" size="sm" rounded onClick={() => setDeleteConfirm(null)} className="flex-1">Cancelar</SbBtn>
           <SbBtn variant="danger" size="sm" rounded onClick={() => deleteConfirm && deleteUser(deleteConfirm)} className="flex-1">Eliminar</SbBtn>
         </SbModalFooter>

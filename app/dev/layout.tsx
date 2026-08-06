@@ -288,17 +288,18 @@ export default function DevLayout({
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Minimal Header */}
-        <header className="flex items-center justify-between h-12 px-4 shrink-0 md:px-6">
+        <header className="flex items-center justify-between h-14 px-4 shrink-0 md:px-8 border-b border-sb-outline-variant/6">
           <div className="flex items-center gap-2">
-            <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageTitle}</h1>
+            <h1 className="text-[15px] font-semibold text-sb-on-surface">{pageTitle}</h1>
+            <span className="hidden sm:inline-block text-[11px] text-sb-on-surface/60 px-2 py-0.5 rounded-full bg-sb-surface-container font-medium">Dev</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10">
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[10px] text-emerald-600 font-medium">Live</span>
+              <span className="text-[11px] text-emerald-600 font-medium">Live</span>
             </div>
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex items-center justify-center p-2 rounded-lg text-sb-on-surface-variant hover:bg-sb-surface-container-high transition-colors"
+              className="hidden md:flex items-center justify-center p-2 rounded-lg text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors"
               title="Toggle theme">
               <Sun className="h-[16px] w-[16px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[16px] w-[16px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -307,17 +308,19 @@ export default function DevLayout({
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-auto px-4 pb-24 md:px-6 md:pb-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}>
-              {children}
-            </motion.div>
-          </AnimatePresence>
+        <main className="flex-1 overflow-auto px-4 pb-28 md:px-8 md:pb-8">
+          <div className="mx-auto w-full max-w-[1200px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}>
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </main>
 
         {/* ===== MOBILE BOTTOM NAV ===== */}

@@ -34,7 +34,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[var(--sb-surface-container)] border border-sb-outline-variant/20 rounded-2xl px-4 py-3 shadow-2xl backdrop-blur-xl">
-        <p className="text-[10px] text-sb-on-surface/40 mb-1">{label}</p>
+        <p className="text-[10px] text-sb-on-surface/60 mb-1">{label}</p>
         <p className="text-sm font-semibold text-sb-on-surface">
           {typeof payload[0].value === "number" ? payload[0].value.toLocaleString() : payload[0].value}
         </p>
@@ -133,19 +133,19 @@ export default function ReportesPage() {
   const formatCurrency = (n: number) => `S/ ${n.toLocaleString("es-PE")}`
 
   return (
-    <div className="space-y-5">
+    <div className="w-full space-y-6 py-2 md:py-4">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Reportes</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-1">Analiticas y reportes globales de la plataforma</p>
+          <h1 className="text-[22px] md:text-[24px] font-bold text-sb-on-surface tracking-tight">Reportes</h1>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Analiticas y reportes globales de la plataforma</p>
         </div>
-        <div className="flex items-center gap-2">
-          <SbBtn variant="outlined" size="sm" rounded onClick={handleRefresh} className="h-9 px-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SbBtn variant="outlined" size="sm" rounded onClick={handleRefresh} className="h-10 px-4 flex-1 sm:flex-none">
             <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
             Actualizar
           </SbBtn>
-          <SbBtn variant="filled" size="sm" rounded className="h-9 px-4">
+          <SbBtn variant="filled" size="sm" rounded className="h-10 px-4 flex-1 sm:flex-none">
             <Download className="h-3.5 w-3.5" />
             Exportar Reportes
           </SbBtn>
@@ -154,7 +154,7 @@ export default function ReportesPage() {
 
       {/* Stats Row */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Total Instituciones", value: institutions.length, icon: Building2, color: "text-violet-500", bg: "bg-violet-500/8" },
           { label: "Total Estudiantes", value: stats.totalStudents.toLocaleString(), icon: GraduationCap, color: "text-blue-500", bg: "bg-blue-500/8" },
@@ -163,11 +163,11 @@ export default function ReportesPage() {
         ].map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.03 }}
             className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10">
-            <div className={`h-8 w-8 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
+            <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
-            <p className="text-2xl font-bold text-sb-on-surface">{stat.value}</p>
-            <p className="text-[11px] text-sb-on-surface-variant/40 mt-0.5">{stat.label}</p>
+            <p className="text-xl font-bold text-sb-on-surface">{stat.value}</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -178,7 +178,7 @@ export default function ReportesPage() {
           className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <BarChart3 className="h-4 w-4 text-sb-on-surface/50" />
               <h3 className="text-sm font-semibold text-sb-on-surface">Crecimiento de Instituciones</h3>
             </div>
             <div className="flex items-center gap-1 text-[10px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
@@ -205,7 +205,7 @@ export default function ReportesPage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
           className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
           <div className="flex items-center gap-2 mb-4">
-            <PieChartIcon className="h-4 w-4 text-sb-on-surface-variant/40" />
+            <PieChartIcon className="h-4 w-4 text-sb-on-surface/50" />
             <h3 className="text-sm font-semibold text-sb-on-surface">Distribucion por Planes</h3>
           </div>
           {loading ? (
@@ -237,7 +237,7 @@ export default function ReportesPage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
           className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
           <div className="flex items-center gap-2 mb-4">
-            <School className="h-4 w-4 text-sb-on-surface-variant/40" />
+            <School className="h-4 w-4 text-sb-on-surface/50" />
             <h3 className="text-sm font-semibold text-sb-on-surface">Por Nivel Educativo</h3>
           </div>
           <div className="space-y-2.5">
@@ -245,8 +245,8 @@ export default function ReportesPage() {
               [1, 2, 3].map(i => <div key={i} className="h-10 bg-sb-surface-container/30 rounded-xl animate-pulse" />)
             ) : levelDistribution.length === 0 ? (
               <div className="text-center py-8">
-                <School className="h-8 w-8 text-sb-on-surface-variant/15 mx-auto mb-2" />
-                <p className="text-xs text-sb-on-surface-variant/40">Sin datos</p>
+                <School className="h-8 w-8 text-sb-on-surface/50 mx-auto mb-2" />
+                <p className="text-xs text-sb-on-surface/70">Sin datos</p>
               </div>
             ) : levelDistribution.map((item, i) => {
               const max = levelDistribution[0]?.value || 1
@@ -278,7 +278,7 @@ export default function ReportesPage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
           className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
           <div className="flex items-center gap-2 mb-4">
-            <Building2 className="h-4 w-4 text-sb-on-surface-variant/40" />
+            <Building2 className="h-4 w-4 text-sb-on-surface/50" />
             <h3 className="text-sm font-semibold text-sb-on-surface">Por Tipo de Institucion</h3>
           </div>
           <div className="space-y-2.5">
@@ -286,8 +286,8 @@ export default function ReportesPage() {
               [1, 2, 3].map(i => <div key={i} className="h-10 bg-sb-surface-container/30 rounded-xl animate-pulse" />)
             ) : typeDistribution.length === 0 ? (
               <div className="text-center py-8">
-                <Building2 className="h-8 w-8 text-sb-on-surface-variant/15 mx-auto mb-2" />
-                <p className="text-xs text-sb-on-surface-variant/40">Sin datos</p>
+                <Building2 className="h-8 w-8 text-sb-on-surface/50 mx-auto mb-2" />
+                <p className="text-xs text-sb-on-surface/70">Sin datos</p>
               </div>
             ) : typeDistribution.map((item, i) => {
               const max = typeDistribution[0]?.value || 1
@@ -318,7 +318,7 @@ export default function ReportesPage() {
 
       {/* Summary Cards */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Estudiantes Totales", value: stats.totalStudents.toLocaleString(), icon: GraduationCap, color: "text-blue-500", bg: "bg-blue-500/8" },
           { label: "Docentes Totales", value: stats.totalTeachers.toLocaleString(), icon: UserCheck, color: "text-emerald-500", bg: "bg-emerald-500/8" },
@@ -327,11 +327,11 @@ export default function ReportesPage() {
         ].map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.03 }}
             className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10">
-            <div className={`h-8 w-8 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
+            <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
-            <p className="text-2xl font-bold text-sb-on-surface">{stat.value}</p>
-            <p className="text-[11px] text-sb-on-surface-variant/40 mt-0.5">{stat.label}</p>
+            <p className="text-xl font-bold text-sb-on-surface">{stat.value}</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>

@@ -60,10 +60,10 @@ export default function DevDatabasePage() {
   const copyQuery = (text: string) => { navigator.clipboard.writeText(text) }
 
   return (
-    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
+    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2 md:py-4">
       <motion.div variants={fadeUp}>
-        <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Base de Datos</h2>
-        <p className="text-[14px] text-sb-on-surface/60 mt-1">Ejecuta consultas SQL directamente</p>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Base de Datos</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Ejecuta consultas SQL directamente</p>
       </motion.div>
 
       {/* SQL Console */}
@@ -73,7 +73,7 @@ export default function DevDatabasePage() {
             <div className="h-9 w-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
               <Terminal className="h-4 w-4 text-emerald-500" />
             </div>
-            <p className="text-[14px] font-medium text-sb-on-surface/80">SQL Console</p>
+            <p className="text-[14px] font-medium text-sb-on-surface">SQL Console</p>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10">
             <Database className="h-3 w-3 text-emerald-600" />
@@ -87,7 +87,7 @@ export default function DevDatabasePage() {
               <button
                 key={preset.label}
                 onClick={() => setQuery(preset.query)}
-                className="px-3 py-1.5 rounded-lg bg-sb-surface-container-high text-[12px] font-mono text-sb-on-surface/60 hover:text-sb-on-surface hover:bg-sb-on-surface/5 transition-colors border border-sb-outline-variant/10"
+                className="px-3 h-9 rounded-xl bg-sb-surface-container text-[12px] text-sb-on-surface/80 font-mono hover:text-sb-on-surface hover:bg-sb-surface-container-high transition-colors"
               >
                 {preset.label}
               </button>
@@ -98,7 +98,7 @@ export default function DevDatabasePage() {
             <textarea
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-36 p-4 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 font-mono text-[13px] resize-none focus:outline-none focus:ring-2 focus:ring-sb-primary/20 text-sb-on-surface placeholder:text-sb-on-surface/30 transition-all"
+              className="w-full h-36 p-4 rounded-xl bg-sb-surface-container-high border border-transparent font-mono text-[13px] resize-none focus:outline-none focus:ring-2 focus:ring-sb-primary/30 text-sb-on-surface placeholder:text-sb-on-surface/50 transition-all"
               placeholder="Escribe tu consulta SQL aquí..."
               onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) executeQuery() }}
             />
@@ -106,7 +106,7 @@ export default function DevDatabasePage() {
               <button
                 onClick={executeQuery}
                 disabled={loading || !query.trim()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50 shadow-lg shadow-sb-on-surface/10"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50"
               >
                 {loading ? <Clock className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
                 Ejecutar
@@ -114,7 +114,7 @@ export default function DevDatabasePage() {
             </div>
           </div>
 
-          <p className="text-[12px] text-sb-on-surface/40">
+          <p className="text-[12px] text-sb-on-surface/70">
             Presiona <kbd className="px-1.5 py-0.5 rounded bg-sb-surface-container-high text-[11px] font-mono">Ctrl+Enter</kbd> para ejecutar
           </p>
         </div>
@@ -141,7 +141,7 @@ export default function DevDatabasePage() {
                 </>
               )}
             </div>
-            <span className="text-[12px] text-sb-on-surface/40 font-mono">{result.duration}ms</span>
+            <span className="text-[12px] text-sb-on-surface/60 font-mono">{result.duration}ms</span>
           </div>
 
           {result.error ? (
@@ -149,21 +149,21 @@ export default function DevDatabasePage() {
           ) : (
             <>
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-[13px]">
+                <table className="w-full min-w-[640px] text-[13px]">
                   <thead>
                     <tr className="border-b border-sb-outline-variant/15">
                       {result.columns.map((col) => (
-                        <th key={col} className="text-left py-2.5 px-3 text-[11px] font-semibold text-sb-on-surface/50 uppercase tracking-wider">{col}</th>
+                        <th key={col} className="text-left py-2.5 px-3 text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider">{col}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-sb-outline-variant/8">
                     {result.rows.map((row, i) => (
-                      <tr key={i} className="hover:bg-sb-surface-container-low/30 transition-colors">
+                      <tr key={i} className="hover:bg-sb-surface-container-low/50 transition-colors">
                         {result.columns.map((col) => (
                           <td key={col} className="py-2.5 px-3 font-mono text-[12px] text-sb-on-surface/70">
                             {row[col] === null ? (
-                              <span className="text-sb-on-surface/30 italic">NULL</span>
+                              <span className="text-sb-on-surface/50 italic">NULL</span>
                             ) : typeof row[col] === 'object' ? JSON.stringify(row[col]) : String(row[col])}
                           </td>
                         ))}
@@ -178,10 +178,10 @@ export default function DevDatabasePage() {
                   <div key={i} className="rounded-xl bg-sb-surface-container-high/50 p-3 space-y-1.5">
                     {result.columns.map((col) => (
                       <div key={col} className="flex items-start gap-2 text-[12px]">
-                        <span className="font-mono text-sb-on-surface/40 shrink-0 min-w-[80px]">{col}</span>
+                        <span className="font-mono text-sb-on-surface/60 shrink-0 min-w-[80px]">{col}</span>
                         <span className="font-mono text-sb-on-surface/70 break-all">
                           {row[col] === null ? (
-                            <span className="text-sb-on-surface/30 italic">NULL</span>
+                            <span className="text-sb-on-surface/50 italic">NULL</span>
                           ) : typeof row[col] === 'object' ? JSON.stringify(row[col]) : String(row[col])}
                         </span>
                       </div>
@@ -190,7 +190,7 @@ export default function DevDatabasePage() {
                 ))}
               </div>
 
-              {result.rows.length === 0 && <p className="text-center text-sb-on-surface/30 py-8 text-[13px]">Sin resultados</p>}
+              {result.rows.length === 0 && <p className="text-center text-sb-on-surface/60 py-8 text-[13px]">Sin resultados</p>}
             </>
           )}
         </motion.div>
@@ -204,13 +204,13 @@ export default function DevDatabasePage() {
             {history.map((item, i) => (
               <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-sb-surface-container-high/50 group transition-colors">
                 {item.success ? <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> : <XCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />}
-                <code className="text-[12px] font-mono text-sb-on-surface/50 flex-1 truncate">{item.query}</code>
-                <span className="text-[11px] text-sb-on-surface/30 font-mono shrink-0">{item.time}</span>
+                <code className="text-[12px] font-mono text-sb-on-surface/70 flex-1 truncate">{item.query}</code>
+                <span className="text-[11px] text-sb-on-surface/60 font-mono shrink-0">{item.time}</span>
                 <button
                   onClick={() => copyQuery(item.query)}
-                  className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-sb-on-surface/5 transition-all shrink-0"
+                  className="p-1.5 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-sb-on-surface/5 transition-all shrink-0"
                 >
-                  <Copy className="h-3 w-3 text-sb-on-surface/40" />
+                  <Copy className="h-3 w-3 text-sb-on-surface/60" />
                 </button>
               </div>
             ))}

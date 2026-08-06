@@ -85,17 +85,18 @@ export default function FacturacionPage() {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
       {/* Header */}
-      <motion.div variants={fadeUp} className="flex items-start justify-between">
+      <motion.div variants={fadeUp} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Facturación</h2>
-          <p className="text-[14px] text-sb-on-surface/60 mt-1">Ingresos y suscripciones de colegios</p>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Facturación</h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Ingresos y suscripciones de colegios</p>
         </div>
-        <div className="flex items-center gap-2">
-          <SbBtn variant="outlined" size="sm" rounded onClick={handleRefresh} className="h-9 px-4">
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+        <div className="flex flex-wrap items-center gap-2">
+          <SbBtn variant="outlined" onClick={handleRefresh} className="h-10 px-4 rounded-xl flex-1 sm:flex-none">
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            Actualizar
           </SbBtn>
-          <SbBtn variant="filled" size="sm" rounded className="h-9 px-4">
-            <Download className="h-3.5 w-3.5" />
+          <SbBtn variant="filled" className="h-10 px-4 rounded-xl flex-1 sm:flex-none">
+            <Download className="h-4 w-4" />
             Exportar
           </SbBtn>
         </div>
@@ -111,11 +112,11 @@ export default function FacturacionPage() {
         ].map((stat, i) => (
           <motion.div key={stat.label} variants={fadeUp}
             className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10">
-            <div className={`h-9 w-9 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
-              <stat.icon className={`h-4.5 w-4.5 ${stat.color}`} />
+            <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
+              <stat.icon className={`h-5 w-5 ${stat.color}`} />
             </div>
             <p className="text-[22px] font-bold text-sb-on-surface leading-none">{stat.value}</p>
-            <p className="text-[11px] text-sb-on-surface/45 mt-1">{stat.label}</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-1">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -123,7 +124,7 @@ export default function FacturacionPage() {
       {/* Plan Cards */}
       <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
         <div className="flex items-center gap-2 mb-4">
-          <CreditCard className="h-4 w-4 text-sb-on-surface-variant/40" />
+          <CreditCard className="h-4 w-4 text-sb-on-surface-variant/50" />
           <h3 className="text-[13px] font-semibold text-sb-on-surface">Distribución por Planes</h3>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -141,11 +142,11 @@ export default function FacturacionPage() {
                 <div className={`h-9 w-9 rounded-xl flex items-center justify-center mb-3 ${
                   isActive ? colors.bg : "bg-sb-surface-container-high"
                 }`}>
-                  <CreditCard className={`h-4 w-4 ${isActive ? colors.icon : "text-sb-on-surface/30"}`} />
+                  <CreditCard className={`h-4 w-4 ${isActive ? colors.icon : "text-sb-on-surface/50"}`} />
                 </div>
                 <p className="text-[20px] font-bold text-sb-on-surface leading-none">{data.count}</p>
-                <p className="text-[11px] text-sb-on-surface/45 mt-1">{plan}</p>
-                <p className={`text-[12px] font-semibold mt-1.5 ${isActive ? colors.text : "text-sb-on-surface/50"}`}>
+                <p className="text-[11px] text-sb-on-surface/70 mt-1">{plan}</p>
+                <p className={`text-[12px] font-semibold mt-1.5 ${isActive ? colors.text : "text-sb-on-surface/70"}`}>
                   {formatCurrency(data.revenue)}/mes
                 </p>
               </motion.button>
@@ -153,8 +154,8 @@ export default function FacturacionPage() {
           })}
           {Object.keys(planStats).length === 0 && !loading && (
             <div className="col-span-full text-center py-8">
-              <Wallet className="h-10 w-10 text-sb-on-surface-variant/10 mx-auto mb-2" />
-              <p className="text-[13px] text-sb-on-surface/40">Sin datos de planes</p>
+              <Wallet className="h-10 w-10 text-sb-on-surface-variant/50 mx-auto mb-2" />
+              <p className="text-[13px] text-sb-on-surface/70">Sin datos de planes</p>
             </div>
           )}
         </div>
@@ -165,7 +166,7 @@ export default function FacturacionPage() {
         <motion.div variants={fadeUp} className="lg:col-span-2 bg-sb-surface rounded-2xl border border-sb-outline-variant/10 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-sb-outline-variant/10">
             <div className="flex items-center gap-2">
-              <Receipt className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <Receipt className="h-4 w-4 text-sb-on-surface-variant/50" />
               <h3 className="text-[13px] font-semibold text-sb-on-surface">Detalle por Colegio</h3>
               {filterPlan && (
                 <button onClick={() => setFilterPlan("")}
@@ -174,7 +175,7 @@ export default function FacturacionPage() {
                 </button>
               )}
             </div>
-            <span className="text-[11px] text-sb-on-surface/35">{filteredInstitutions.length} colegios</span>
+            <span className="text-[11px] text-sb-on-surface/60">{filteredInstitutions.length} colegios</span>
           </div>
 
           {loading ? (
@@ -183,8 +184,8 @@ export default function FacturacionPage() {
             </div>
           ) : filteredInstitutions.length === 0 ? (
             <div className="py-12 text-center">
-              <Building2 className="h-10 w-10 text-sb-on-surface-variant/10 mx-auto mb-2" />
-              <p className="text-[13px] text-sb-on-surface/40">Sin colegios para este plan</p>
+              <Building2 className="h-10 w-10 text-sb-on-surface-variant/50 mx-auto mb-2" />
+              <p className="text-[13px] text-sb-on-surface/70">Sin colegios para este plan</p>
             </div>
           ) : (
             <div className="divide-y divide-sb-outline-variant/5">
@@ -201,9 +202,9 @@ export default function FacturacionPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-sb-on-surface truncate">{inst.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] font-mono text-sb-on-surface/35">{inst.code}</span>
-                        <span className="text-[10px] text-sb-on-surface/15">·</span>
-                        <span className="text-[10px] text-sb-on-surface/35">{inst.total_students || 0} alumnos</span>
+                        <span className="text-[10px] font-mono text-sb-on-surface/70">{inst.code}</span>
+                        <span className="text-[10px] text-sb-on-surface/40">·</span>
+                        <span className="text-[10px] text-sb-on-surface/70">{inst.total_students || 0} alumnos</span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -224,12 +225,12 @@ export default function FacturacionPage() {
           {/* Revenue Summary */}
           <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <TrendingUp className="h-4 w-4 text-sb-on-surface-variant/50" />
               <h3 className="text-[13px] font-semibold text-sb-on-surface">Resumen Mensual</h3>
             </div>
             <div className="space-y-3">
               <div className="bg-sb-on-surface rounded-2xl p-4">
-                <p className="text-[11px] text-sb-surface/50 mb-1">Facturación Mensual Est.</p>
+                <p className="text-[11px] text-sb-surface/70 mb-1">Facturación Mensual Est.</p>
                 <p className="text-[28px] font-bold text-sb-surface leading-none">{formatCurrency(totalRevenue)}</p>
                 <div className="flex items-center gap-1 mt-2">
                   <ArrowUpRight className="h-3 w-3 text-emerald-400" />
@@ -239,11 +240,11 @@ export default function FacturacionPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-sb-surface-container-low/50 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface/40 mb-1">Anual Proy.</p>
+                  <p className="text-[10px] text-sb-on-surface/60 mb-1">Anual Proy.</p>
                   <p className="text-[18px] font-bold text-sb-on-surface">{formatCurrency(totalRevenue * 12)}</p>
                 </div>
                 <div className="bg-sb-surface-container-low/50 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface/40 mb-1">Por Colegio</p>
+                  <p className="text-[10px] text-sb-on-surface/60 mb-1">Por Colegio</p>
                   <p className="text-[18px] font-bold text-sb-on-surface">{formatCurrency(avgRevenue)}</p>
                 </div>
               </div>
@@ -253,7 +254,7 @@ export default function FacturacionPage() {
           {/* Recent Activity */}
           <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <Clock className="h-4 w-4 text-sb-on-surface-variant/50" />
               <h3 className="text-[13px] font-semibold text-sb-on-surface">Actividad Reciente</h3>
             </div>
             <div className="space-y-0">
@@ -274,12 +275,12 @@ export default function FacturacionPage() {
                       <p className="text-[12px] text-sb-on-surface/80 leading-relaxed truncate">{inst.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className={`text-[10px] font-medium ${colors.text}`}>{plan}</span>
-                        <span className="text-[10px] text-sb-on-surface/15">·</span>
-                        <span className="text-[10px] text-sb-on-surface/30">{formatCurrency(inst.plan_price || 0)}/mes</span>
+                        <span className="text-[10px] text-sb-on-surface/40">·</span>
+                        <span className="text-[10px] text-sb-on-surface/60">{formatCurrency(inst.plan_price || 0)}/mes</span>
                       </div>
                     </div>
                     <span className={`text-[10px] font-medium px-2 py-1 rounded-md shrink-0 ${
-                      inst.status === "active" ? "bg-emerald-500/10 text-emerald-500" : "bg-sb-surface-container-high text-sb-on-surface/40"
+                      inst.status === "active" ? "bg-emerald-500/10 text-emerald-500" : "bg-sb-surface-container-high text-sb-on-surface/70"
                     }`}>
                       {inst.status === "active" ? "Activo" : "Inactivo"}
                     </span>
@@ -288,8 +289,8 @@ export default function FacturacionPage() {
               })}
               {institutions.length === 0 && (
                 <div className="py-6 text-center">
-                  <Clock className="h-8 w-8 text-sb-on-surface/10 mx-auto mb-2" />
-                  <p className="text-[12px] text-sb-on-surface/40">Sin actividad</p>
+                  <Clock className="h-8 w-8 text-sb-on-surface/40 mx-auto mb-2" />
+                  <p className="text-[12px] text-sb-on-surface/70">Sin actividad</p>
                 </div>
               )}
             </div>

@@ -11,18 +11,24 @@ export default function UiPreviewPage() {
   const [type, setType] = React.useState("")
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-sb-on-surface">Vista previa de cambios</h1>
-        <p className="text-sm text-sb-on-surface-variant/70">Diseño nuevo de selects aplicado en los paneles internos (secretario, director, docente, super-admin).</p>
+    <div className="w-full space-y-6 py-2 md:py-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">
+            Vista previa de cambios
+          </h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">
+            Diseño nuevo de selects aplicado en los paneles internos (secretario, director, docente, super-admin).
+          </p>
+        </div>
       </div>
 
       {/* Antes vs Después */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-sb-on-surface">Antes vs Después</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-sb-outline-variant/40 p-4 space-y-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">ANTES (estilo viejo)</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-sb-on-surface/60">ANTES (estilo viejo)</p>
             <div className="flex items-center gap-2">
               <select className="sb-select w-full rounded-xl text-sm h-10">
                 <option value="">Seleccionar grado</option>
@@ -30,7 +36,7 @@ export default function UiPreviewPage() {
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <select className="px-4 py-3 bg-sb-background border border-sb-on-surface/10 rounded-xl text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 w-full">
+              <select className="px-4 py-3 bg-sb-surface-container border border-sb-outline-variant/10 rounded-xl text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 w-full">
                 <option value="">Seleccionar tipo</option>
                 <option>Público</option>
                 <option>Privado</option>
@@ -38,8 +44,8 @@ export default function UiPreviewPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-sb-outline-variant/40 p-4 space-y-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">DESPUÉS (nuevo diseño)</p>
+          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-1">DESPUÉS (nuevo diseño)</p>
             <select
               value={grade}
               onChange={e => setGrade(e.target.value)}
@@ -65,15 +71,15 @@ export default function UiPreviewPage() {
       {/* Variantes del nuevo diseño */}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-sb-on-surface">Nuevo diseño — variantes</h2>
-        <div className="rounded-2xl border border-sb-outline-variant/40 p-4 space-y-4">
+        <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40 mb-1.5">Con valor seleccionado (estado .has-value)</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-1.5">Con valor seleccionado (estado .has-value)</p>
             <select className="sbf-native-select w-full has-value">
               <option>5to grado - Sección A</option>
             </select>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40 mb-1.5">Vacío (placeholder)</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-1.5">Vacío (placeholder)</p>
             <select className="sbf-native-select w-full">
               <option value="">Seleccionar curso...</option>
               <option>Matemáticas</option>
@@ -81,33 +87,33 @@ export default function UiPreviewPage() {
             </select>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40 mb-1.5">Compacto en línea (sin w-full)</p>
-            <div className="flex items-center gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-1.5">Compacto en línea (sin w-full)</p>
+            <div className="flex flex-wrap items-center gap-3">
               <select className="sbf-native-select">
                 <option value="">Todos los grados</option>
                 {grades.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
-              <span className="text-xs text-sb-on-surface-variant/50">← así se ve en el filtro de Cursos</span>
+              <span className="text-xs text-sb-on-surface/70">← así se ve en el filtro de Cursos</span>
             </div>
           </div>
         </div>
       </section>
 
-      <p className="text-xs text-sb-on-surface-variant/50">
-        URL: <code className="bg-sb-surface px-1.5 py-0.5 rounded">/secretario/cursos</code>, <code className="bg-sb-surface px-1.5 py-0.5 rounded">/secretario/padres</code>, <code className="bg-sb-surface px-1.5 py-0.5 rounded">/director/personal</code>, <code className="bg-sb-surface px-1.5 py-0.5 rounded">/docente/tareas</code>, <code className="bg-sb-surface px-1.5 py-0.5 rounded">/super-admin/instituciones</code>…
+      <p className="text-xs text-sb-on-surface/70">
+        URL: <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">/secretario/cursos</code>, <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">/secretario/padres</code>, <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">/director/personal</code>, <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">/docente/tareas</code>, <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">/super-admin/instituciones</code>…
       </p>
 
       {/* Botón negro (filled) */}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-sb-on-surface">Botón negro "Nuevo curso"</h2>
-        <div className="rounded-2xl border border-sb-outline-variant/40 p-4 space-y-4">
+        <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <SbBtn variant="filled" rounded>Nuevo curso</SbBtn>
             <SbBtn variant="filled" rounded>Guardar</SbBtn>
             <SbBtn variant="default">Cancelar</SbBtn>
           </div>
-          <p className="text-xs text-sb-on-surface-variant/50">
-            Los <code className="bg-sb-surface px-1.5 py-0.5 rounded">variant="filled"</code> deben verse NEGROS con texto blanco en cualquier tema. Si acá los ves blancos, avisame qué dice el diagnóstico de abajo.
+          <p className="text-xs text-sb-on-surface/70">
+            Los <code className="bg-sb-surface-container px-1.5 py-0.5 rounded">variant="filled"</code> deben verse NEGROS con texto blanco en cualquier tema. Si acá los ves blancos, avisame qué dice el diagnóstico de abajo.
           </p>
         </div>
       </section>
@@ -137,14 +143,14 @@ function ThemeDiagnostic() {
   }, [])
 
   return (
-    <div className="rounded-2xl border border-sb-outline-variant/40 p-4 space-y-1.5 font-mono text-xs">
+    <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-1.5 font-mono text-xs">
       {Object.entries(vals).map(([k, v]) => (
         <div key={k} className="flex justify-between gap-4">
-          <span className="text-sb-on-surface-variant/70">{k}</span>
+          <span className="text-sb-on-surface/70">{k}</span>
           <span className="text-sb-on-surface">{v}</span>
         </div>
       ))}
-      <p className="text-[10px] text-sb-on-surface-variant/50 pt-1">
+      <p className="text-[11px] text-sb-on-surface/70 pt-1">
         Si acá dice <code>var(--sb-on-surface) = #ffffff</code>, tu navegador está en tema oscuro con caché vieja.
       </p>
     </div>

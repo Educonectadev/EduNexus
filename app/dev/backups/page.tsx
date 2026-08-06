@@ -95,19 +95,19 @@ export default function BackupsPage() {
     : backups
 
   return (
-    <div className="space-y-5">
+    <div className="w-full space-y-6 py-2 md:py-4">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Backups</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-1">Gestion de copias de seguridad de la plataforma</p>
+          <h1 className="text-[22px] md:text-[24px] font-bold text-sb-on-surface tracking-tight">Backups</h1>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Gestion de copias de seguridad de la plataforma</p>
         </div>
-        <div className="flex items-center gap-2">
-          <SbBtn variant="outlined" size="sm" rounded onClick={() => setShowSchedule(!showSchedule)} className="h-9 px-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SbBtn variant="outlined" size="sm" rounded onClick={() => setShowSchedule(!showSchedule)} className="h-10 px-4 flex-1 sm:flex-none">
             <CloudCog className="h-3.5 w-3.5" />
             Programar
           </SbBtn>
-          <SbBtn variant="filled" size="sm" rounded onClick={handleCreateBackup} disabled={isRunning} className="h-9 px-4">
+          <SbBtn variant="filled" size="sm" rounded onClick={handleCreateBackup} disabled={isRunning} className="h-10 px-4 flex-1 sm:flex-none">
             {isRunning ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {isRunning ? "Creando..." : "Crear Backup"}
           </SbBtn>
@@ -142,7 +142,7 @@ export default function BackupsPage() {
 
       {/* Stats */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Ultimo Backup", value: timeAgo(backups[0]?.timestamp || new Date()), icon: Clock, color: "text-violet-500", bg: "bg-violet-500/8" },
           { label: "Tamano Total", value: `${totalSizeGB} GB`, icon: HardDrive, color: "text-blue-500", bg: "bg-blue-500/8" },
@@ -151,11 +151,11 @@ export default function BackupsPage() {
         ].map((stat, i) => (
           <motion.div key={stat.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.03 }}
             className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10">
-            <div className={`h-8 w-8 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
+            <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
-            <p className="text-2xl font-bold text-sb-on-surface">{stat.value}</p>
-            <p className="text-[11px] text-sb-on-surface-variant/40 mt-0.5">{stat.label}</p>
+            <p className="text-xl font-bold text-sb-on-surface">{stat.value}</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -167,13 +167,13 @@ export default function BackupsPage() {
             className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Database className="h-4 w-4 text-sb-on-surface-variant/40" />
+                <Database className="h-4 w-4 text-sb-on-surface/50" />
                 <h3 className="text-sm font-semibold text-sb-on-surface">Historial de Backups</h3>
               </div>
               <div className="flex items-center gap-1.5">
                 {Object.entries(backupTypes).map(([key, bt]) => (
                   <button key={key} onClick={() => setSelectedType(selectedType === key ? "" : key)}
-                    className={`text-[10px] font-medium px-2 py-1 rounded-lg transition-all ${selectedType === key ? `${bt.bg} ${bt.color}` : "text-sb-on-surface-variant/35 hover:bg-sb-surface-container/30"}`}>
+                    className={`text-[10px] font-medium px-3 h-9 rounded-xl transition-all ${selectedType === key ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface/80 hover:bg-sb-surface-container-high"}`}>
                     {bt.label}
                   </button>
                 ))}
@@ -200,21 +200,21 @@ export default function BackupsPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-sb-on-surface-variant/35">{backup.size}</span>
+                        <span className="text-[11px] text-sb-on-surface/70">{backup.size}</span>
                         {backup.rows > 0 && (
                           <>
-                            <span className="text-[10px] text-sb-on-surface-variant/20">·</span>
-                            <span className="text-[10px] text-sb-on-surface-variant/35">{backup.rows.toLocaleString()} registros</span>
+                            <span className="text-[10px] text-sb-on-surface/50">·</span>
+                            <span className="text-[11px] text-sb-on-surface/70">{backup.rows.toLocaleString()} registros</span>
                           </>
                         )}
-                        <span className="text-[10px] text-sb-on-surface-variant/20">·</span>
-                        <span className="text-[10px] text-sb-on-surface-variant/35">{timeAgo(backup.timestamp)}</span>
+                        <span className="text-[10px] text-sb-on-surface/50">·</span>
+                        <span className="text-[11px] text-sb-on-surface/70">{timeAgo(backup.timestamp)}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span className={`h-2 w-2 rounded-full ${backup.status === "completed" ? "bg-emerald-500" : backup.status === "running" ? "bg-amber-500 animate-pulse" : "bg-red-500"}`} />
-                      <button className="h-8 w-8 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-sb-surface-container transition-all">
-                        <Download className="h-3.5 w-3.5 text-sb-on-surface-variant/50" />
+                      <button className="h-8 w-8 rounded-xl flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-sb-surface-container transition-all">
+                        <Download className="h-3.5 w-3.5 text-sb-on-surface/60" />
                       </button>
                     </div>
                   </motion.div>
@@ -230,22 +230,22 @@ export default function BackupsPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
             className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center gap-2 mb-4">
-              <Server className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <Server className="h-4 w-4 text-sb-on-surface/50" />
               <h3 className="text-sm font-semibold text-sb-on-surface">Base de Datos</h3>
             </div>
             <div className="space-y-3">
               <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl p-4 border border-blue-500/15">
-                <p className="text-[11px] text-blue-500/70 mb-1">Motor de BD</p>
+                <p className="text-[11px] text-blue-500/80 mb-1">Motor de BD</p>
                 <p className="text-lg font-bold text-sb-on-surface">MySQL 8.0</p>
-                <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">educonecta</p>
+                <p className="text-[10px] text-sb-on-surface/70 mt-1">educonecta</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-sb-surface-container/30 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mb-1">Tablas</p>
+                  <p className="text-[10px] text-sb-on-surface/70 mb-1">Tablas</p>
                   <p className="text-lg font-bold text-sb-on-surface">34</p>
                 </div>
                 <div className="bg-sb-surface-container/30 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mb-1">Registros</p>
+                  <p className="text-[10px] text-sb-on-surface/70 mb-1">Registros</p>
                   <p className="text-lg font-bold text-sb-on-surface">847K</p>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function BackupsPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
             className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <Clock className="h-4 w-4 text-sb-on-surface/50" />
               <h3 className="text-sm font-semibold text-sb-on-surface">Programacion</h3>
             </div>
             <div className="space-y-2.5">
@@ -270,7 +270,7 @@ export default function BackupsPage() {
                   className="flex items-center justify-between p-3 rounded-2xl bg-sb-surface-container/30">
                   <div>
                     <p className="text-xs font-medium text-sb-on-surface">{item.label}</p>
-                    <p className="text-[10px] text-sb-on-surface-variant/35 mt-0.5">{item.schedule}</p>
+                    <p className="text-[11px] text-sb-on-surface/70 mt-0.5">{item.schedule}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] font-medium text-violet-500">{item.next}</span>
@@ -288,13 +288,13 @@ export default function BackupsPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
             className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
             <div className="flex items-center gap-2 mb-4">
-              <HardDrive className="h-4 w-4 text-sb-on-surface-variant/40" />
+              <HardDrive className="h-4 w-4 text-sb-on-surface/50" />
               <h3 className="text-sm font-semibold text-sb-on-surface">Almacenamiento</h3>
             </div>
             <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] text-sb-on-surface-variant/50">Usado</span>
+                  <span className="text-[11px] text-sb-on-surface/70">Usado</span>
                   <span className="text-[11px] font-semibold text-sb-on-surface">{totalSizeGB} / 10 GB</span>
                 </div>
                 <div className="h-2 bg-sb-surface-container/50 rounded-full overflow-hidden">
@@ -308,11 +308,11 @@ export default function BackupsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-sb-surface-container/30 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mb-1">Disponible</p>
+                  <p className="text-[10px] text-sb-on-surface/70 mb-1">Disponible</p>
                   <p className="text-lg font-bold text-sb-on-surface">{(10 - parseFloat(totalSizeGB)).toFixed(1)} GB</p>
                 </div>
                 <div className="bg-sb-surface-container/30 rounded-2xl p-3">
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mb-1">Archivos</p>
+                  <p className="text-[10px] text-sb-on-surface/70 mb-1">Archivos</p>
                   <p className="text-lg font-bold text-sb-on-surface">{backups.length}</p>
                 </div>
               </div>

@@ -99,10 +99,10 @@ function PipelineHeader() {
         <React.Fragment key={step.key}>
           <div className="flex flex-col items-center gap-1 shrink-0">
             <div className="h-8 w-8 rounded-full bg-sb-surface-container-high border border-sb-outline-variant/20 flex items-center justify-center">
-              <span className="text-[11px] font-bold text-sb-on-surface/60">{i + 1}</span>
+              <span className="text-[11px] font-bold text-sb-on-surface/80">{i + 1}</span>
             </div>
-            <span className="text-[10px] font-medium text-sb-on-surface/50 text-center leading-tight">{step.label}</span>
-            <span className="text-[9px] text-sb-on-surface/30">{step.sublabel}</span>
+            <span className="text-[10px] font-medium text-sb-on-surface/70 text-center leading-tight">{step.label}</span>
+            <span className="text-[9px] text-sb-on-surface/50">{step.sublabel}</span>
           </div>
           {i < SEQUENCE_STEPS.length - 1 && (
             <div className="flex-1 h-px bg-sb-outline-variant/20 mx-1 mb-6" />
@@ -135,7 +135,7 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
         {/* Name */}
         <div className="flex-1 min-w-0">
           <p className="text-[13px] font-medium text-sb-on-surface truncate">{inst.name}</p>
-          <p className="text-[10px] text-sb-on-surface/40 font-mono">{inst.code}</p>
+          <p className="text-[10px] text-sb-on-surface/60 font-mono">{inst.code}</p>
         </div>
 
         {/* Steps mini indicators */}
@@ -163,7 +163,7 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
         {/* Progress */}
         <div className="flex items-center gap-2 shrink-0">
           <span className={`text-[11px] font-bold ${
-            progress === 100 ? "text-emerald-500" : progress >= 60 ? "text-amber-500" : "text-sb-on-surface/40"
+            progress === 100 ? "text-emerald-500" : progress >= 60 ? "text-amber-500" : "text-sb-on-surface/70"
           }`}>
             {completed}/7
           </span>
@@ -181,7 +181,7 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
               }`}
             />
           </div>
-          <ChevronDown className={`h-3.5 w-3.5 text-sb-on-surface/30 transition-transform ${expanded ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-3.5 w-3.5 text-sb-on-surface/50 transition-transform ${expanded ? "rotate-180" : ""}`} />
         </div>
       </button>
 
@@ -207,7 +207,7 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
                           <div className={`h-7 w-7 rounded-full flex items-center justify-center transition-all ${
                             done
                               ? "bg-emerald-500 text-white"
-                              : "bg-sb-surface-container-high text-sb-on-surface/20"
+                              : "bg-sb-surface-container-high text-sb-on-surface/50"
                           }`}>
                             {done ? (
                               <Check className="h-3.5 w-3.5" />
@@ -215,11 +215,11 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
                               <span className="text-[10px] font-bold">{i + 1}</span>
                             )}
                           </div>
-                          <span className={`text-[10px] font-medium ${done ? "text-emerald-500" : "text-sb-on-surface/30"}`}>
+                          <span className={`text-[10px] font-medium ${done ? "text-emerald-500" : "text-sb-on-surface/50"}`}>
                             {step.label}
                           </span>
                           {count !== null && count > 0 && (
-                            <span className="text-[9px] text-sb-on-surface/40">{count}</span>
+                            <span className="text-[9px] text-sb-on-surface/60">{count}</span>
                           )}
                         </div>
                         {i < SEQUENCE_STEPS.length - 1 && (
@@ -240,14 +240,14 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
               <div className="flex items-center gap-4 mt-3 pt-2 border-t border-sb-outline-variant/8">
                 {inst.district && (
                   <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-sb-on-surface/25" />
-                    <span className="text-[10px] text-sb-on-surface/40">{inst.district}</span>
+                    <MapPin className="h-3 w-3 text-sb-on-surface/50" />
+                    <span className="text-[10px] text-sb-on-surface/70">{inst.district}</span>
                   </div>
                 )}
                 {inst.plan_name && (
-                  <span className="text-[10px] font-medium text-sb-primary/60 bg-sb-primary/5 px-1.5 py-0.5 rounded">{inst.plan_name}</span>
+                  <span className="text-[10px] font-medium text-sb-primary/70 bg-sb-primary/5 px-1.5 py-0.5 rounded">{inst.plan_name}</span>
                 )}
-                <span className={`text-[10px] font-medium ${inst.status === "active" ? "text-emerald-500" : "text-sb-on-surface/30"}`}>
+                <span className={`text-[10px] font-medium ${inst.status === "active" ? "text-emerald-500" : "text-sb-on-surface/60"}`}>
                   {inst.status}
                 </span>
               </div>
@@ -306,19 +306,19 @@ export default function DevAuditPage() {
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-sb-primary/20 border-t-sb-primary rounded-full animate-spin" />
-          <p className="text-[13px] text-sb-on-surface/50">Cargando datos...</p>
+          <p className="text-[13px] text-sb-on-surface/70">Cargando datos...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-5 py-2">
+    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
       {/* Header */}
       <motion.div variants={fadeUp} className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Auditoría</h2>
-          <p className="text-[14px] text-sb-on-surface/60 mt-1">Secuencia de creación de colegios</p>
+          <p className="text-[14px] text-sb-on-surface/70 mt-1">Secuencia de creación de colegios</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -326,15 +326,15 @@ export default function DevAuditPage() {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-medium transition-all ${
               isAutoRefresh
                 ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                : "bg-sb-surface-container-high text-sb-on-surface/50 border border-sb-outline-variant/15"
+                : "bg-sb-surface-container-high text-sb-on-surface/70 border border-sb-outline-variant/15"
             }`}
           >
-            <div className={`h-1.5 w-1.5 rounded-full ${isAutoRefresh ? "bg-emerald-500 animate-pulse" : "bg-sb-on-surface/30"}`} />
+            <div className={`h-1.5 w-1.5 rounded-full ${isAutoRefresh ? "bg-emerald-500 animate-pulse" : "bg-sb-on-surface/50"}`} />
             {isAutoRefresh ? "Live" : "Paused"}
           </button>
           <button
             onClick={fetchData}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/15 text-[12px] text-sb-on-surface/60 hover:text-sb-on-surface transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/15 text-[12px] text-sb-on-surface/80 hover:text-sb-on-surface transition-colors"
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
@@ -342,7 +342,7 @@ export default function DevAuditPage() {
       </motion.div>
 
       {/* Summary Stats */}
-      <motion.div variants={fadeUp} className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {[
           { label: "Colegios", value: stats.institutions, icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
           { label: "Con Director", value: withDirector, icon: UserCheck, color: "text-emerald-500", bg: "bg-emerald-500/10" },
@@ -355,12 +355,12 @@ export default function DevAuditPage() {
             variants={fadeUp}
             className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 flex items-center gap-3"
           >
-            <div className={`h-9 w-9 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
+            <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center shrink-0`}>
               <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
             <div>
-              <p className="text-[20px] font-bold text-sb-on-surface leading-none">{stat.value}</p>
-              <p className="text-[10px] text-sb-on-surface/45 mt-0.5">{stat.label}</p>
+              <p className="text-xl font-bold text-sb-on-surface leading-none">{stat.value}</p>
+              <p className="text-[11px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
             </div>
           </motion.div>
         ))}
@@ -369,8 +369,8 @@ export default function DevAuditPage() {
       {/* Pipeline Legend */}
       <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 px-4 py-3">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] font-medium text-sb-on-surface/50">Secuencia de Creación</span>
-          <span className="text-[10px] text-sb-on-surface/30">{lastUpdate.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}</span>
+          <span className="text-[11px] font-medium text-sb-on-surface/70">Secuencia de Creación</span>
+          <span className="text-[10px] text-sb-on-surface/60">{lastUpdate.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}</span>
         </div>
         <div className="overflow-x-auto">
           <PipelineHeader />
@@ -380,12 +380,12 @@ export default function DevAuditPage() {
       {/* Institutions List */}
       <motion.div variants={fadeUp} className="space-y-2">
         <div className="flex items-center justify-between px-1">
-          <span className="text-[12px] font-medium text-sb-on-surface/50">Colegios ({institutions.length})</span>
+          <span className="text-[12px] font-medium text-sb-on-surface/70">Colegios ({institutions.length})</span>
         </div>
         {institutions.length === 0 ? (
           <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 py-12 text-center">
-            <Building2 className="h-10 w-10 text-sb-on-surface/10 mx-auto mb-2" />
-            <p className="text-[13px] text-sb-on-surface/40">Sin colegios registrados</p>
+            <Building2 className="h-10 w-10 text-sb-on-surface/50 mx-auto mb-2" />
+            <p className="text-[13px] text-sb-on-surface/70">Sin colegios registrados</p>
           </div>
         ) : (
           institutions.map((inst, i) => (

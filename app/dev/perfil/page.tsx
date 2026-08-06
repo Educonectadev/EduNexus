@@ -127,7 +127,7 @@ export default function DevPerfilPage() {
   )
 
   return (
-    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full max-w-[900px] mx-auto space-y-6 py-2">
+    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full max-w-[900px] mx-auto space-y-6 py-2 md:py-4">
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg text-center sm:text-left ${
@@ -138,8 +138,8 @@ export default function DevPerfilPage() {
       )}
 
       <motion.div variants={fadeUp}>
-        <h2 className="text-[20px] sm:text-[26px] font-bold tracking-tight text-sb-on-surface">Mi Perfil</h2>
-        <p className="text-[12px] sm:text-[14px] text-sb-on-surface/60 mt-1">Información personal y configuración de cuenta</p>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Mi Perfil</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Información personal y configuración de cuenta</p>
       </motion.div>
 
       {/* Profile Header */}
@@ -148,12 +148,12 @@ export default function DevPerfilPage() {
           <img src={profile.avatarUrl} alt="" className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover shrink-0" />
         ) : (
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
-            <span className="text-[20px] sm:text-[22px] font-bold text-sb-on-surface/40">{initials}</span>
+            <span className="text-[20px] sm:text-[22px] font-bold text-sb-on-surface/70">{initials}</span>
           </div>
         )}
         <div className="flex-1 text-center sm:text-left min-w-0">
           <h3 className="text-[16px] sm:text-[18px] font-semibold text-sb-on-surface truncate">{profile?.fullName || "Sin nombre"}</h3>
-          <p className="text-[12px] sm:text-[13px] text-sb-on-surface/50 mt-0.5 truncate">{profile?.email}</p>
+          <p className="text-[12px] sm:text-[13px] text-sb-on-surface/70 mt-0.5 truncate">{profile?.email}</p>
         </div>
         <span className="px-3 py-1.5 rounded-full bg-sb-primary/10 text-sb-primary text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider shrink-0">
           {roleLabels[profile?.role || ""] || profile?.role || "—"}
@@ -163,32 +163,32 @@ export default function DevPerfilPage() {
       {/* Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
-          <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Información de cuenta</p>
+          <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-4">Información de cuenta</p>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-              <span className="text-[12px] sm:text-[13px] text-sb-on-surface/60">Miembro desde {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString("es-PE") : "—"}</span>
+              <Calendar className="h-4 w-4 text-sb-on-surface/50 shrink-0" />
+              <span className="text-[12px] sm:text-[13px] text-sb-on-surface/80">Miembro desde {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString("es-PE") : "—"}</span>
             </div>
             {profile?.role !== "dev" && profile?.institutionId && (
               <div className="flex items-center gap-3">
-                <Building2 className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-                <span className="text-[12px] sm:text-[13px] text-sb-on-surface/60 truncate">Institución: {profile.institutionId}</span>
+                <Building2 className="h-4 w-4 text-sb-on-surface/50 shrink-0" />
+                <span className="text-[12px] sm:text-[13px] text-sb-on-surface/80 truncate">Institución: {profile.institutionId}</span>
               </div>
             )}
             <div className="flex items-center gap-3">
-              <Shield className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
-              <span className="text-[11px] sm:text-[12px] text-sb-on-surface/50 font-mono truncate">ID: {profile?.id?.slice(0, 16)}...</span>
+              <Shield className="h-4 w-4 text-sb-on-surface/50 shrink-0" />
+              <span className="text-[11px] sm:text-[12px] text-sb-on-surface/70 font-mono truncate">ID: {profile?.id?.slice(0, 16)}...</span>
             </div>
           </div>
         </motion.div>
 
         <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
-          <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Sesión activa</p>
+          <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-4">Sesión activa</p>
           <div className="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl bg-sb-surface-container-high">
-            <Globe className="h-5 w-5 text-sb-on-surface/30 shrink-0" />
+            <Globe className="h-5 w-5 text-sb-on-surface/50 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-[12px] sm:text-[13px] font-medium text-sb-on-surface/80">Esta sesión</p>
-              <p className="text-[10px] sm:text-[11px] text-sb-on-surface/40 mt-0.5 truncate">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
+              <p className="text-[10px] sm:text-[11px] text-sb-on-surface/60 mt-0.5 truncate">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -202,11 +202,11 @@ export default function DevPerfilPage() {
       <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider">Datos personales</p>
-            <p className="text-[12px] text-sb-on-surface/40 mt-1">Edita tu información de perfil</p>
+            <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider">Datos personales</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-1">Edita tu información de perfil</p>
           </div>
           {!editMode && (
-            <button onClick={() => setEditMode(true)} className="px-3 py-1.5 rounded-lg text-[12px] text-sb-on-surface/50 hover:bg-sb-surface-container-high transition-colors">
+            <button onClick={() => setEditMode(true)} className="h-10 px-4 rounded-xl text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
               Editar
             </button>
           )}
@@ -220,36 +220,36 @@ export default function DevPerfilPage() {
               { label: "DNI", value: dni, set: setDni, placeholder: "12345678", icon: Fingerprint, maxLength: 8 },
             ].map((field) => (
               <div key={field.label}>
-                <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-2">{field.label}</p>
+                <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-2">{field.label}</p>
                 <div className="relative">
-                  <field.icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/30" />
+                  <field.icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50" />
                   <input
                     value={field.value}
                     onChange={e => field.set(e.target.value)}
                     placeholder={field.placeholder}
                     maxLength={field.maxLength}
-                    className="w-full h-11 pl-10 pr-4 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all"
+                    className="w-full h-11 pl-10 pr-4 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
                   />
                 </div>
               </div>
             ))}
             <div>
-              <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-2">Email</p>
+              <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-2">Email</p>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/30" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50" />
                 <input value={profile?.email || ""} disabled
-                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface/50 cursor-not-allowed" />
+                  className="w-full h-11 pl-10 pr-4 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface/70 cursor-not-allowed" />
               </div>
-              <p className="text-[10px] text-sb-on-surface/20 mt-1">El email no se puede cambiar</p>
+              <p className="text-[10px] text-sb-on-surface/60 mt-1">El email no se puede cambiar</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button onClick={handleSave} disabled={saving}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
-                {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="h-4 w-4" />}
+                className="flex-1 flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                {saving ? <div className="w-4 h-4 border-2 border-sb-surface/30 border-t-sb-surface rounded-full animate-spin" /> : <Save className="h-4 w-4" />}
                 {saving ? "Guardando..." : "Guardar cambios"}
               </button>
               <button onClick={() => { setEditMode(false); setFullName(profile?.fullName || ""); setPhone(profile?.phone || ""); setDni(profile?.dni || "") }}
-                className="px-4 py-2.5 rounded-xl text-[13px] text-sb-on-surface/50 hover:bg-sb-surface-container-high transition-colors">
+                className="h-10 px-4 rounded-xl text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
                 Cancelar
               </button>
             </div>
@@ -263,7 +263,7 @@ export default function DevPerfilPage() {
               { label: "DNI", value: profile?.dni || "—" },
             ].map((field) => (
               <div key={field.label} className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3">
-                <span className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider sm:w-20 shrink-0">{field.label}</span>
+                <span className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider sm:w-20 shrink-0">{field.label}</span>
                 <span className="text-[14px] text-sb-on-surface/80 break-all sm:break-normal">{field.value}</span>
               </div>
             ))}
@@ -275,11 +275,11 @@ export default function DevPerfilPage() {
       <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider">Contraseña</p>
-            <p className="text-[12px] text-sb-on-surface/40 mt-1">Actualiza tu contraseña de acceso</p>
+            <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider">Contraseña</p>
+            <p className="text-[12px] text-sb-on-surface/70 mt-1">Actualiza tu contraseña de acceso</p>
           </div>
           {!showPassForm && (
-            <button onClick={() => setShowPassForm(true)} className="px-3 py-1.5 rounded-lg text-[12px] text-sb-on-surface/50 hover:bg-sb-surface-container-high transition-colors">
+            <button onClick={() => setShowPassForm(true)} className="h-10 px-4 rounded-xl text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
               Cambiar
             </button>
           )}
@@ -293,33 +293,33 @@ export default function DevPerfilPage() {
               { label: "Confirmar nueva contraseña", value: confirmPassword, set: setConfirmPassword, show: showConfirm, setShow: setShowConfirm, icon: CheckCircle },
             ].map((field) => (
               <div key={field.label}>
-                <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-2">{field.label}</p>
+                <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-2">{field.label}</p>
                 <div className="relative">
-                  <field.icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/30" />
+                  <field.icon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50" />
                   <input
                     type={field.show ? "text" : "password"}
                     value={field.value}
                     onChange={e => field.set(e.target.value)}
-                    className="w-full h-11 pl-10 pr-12 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all"
+                    className="w-full h-11 pl-10 pr-12 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
                     placeholder="••••••••"
                     required
                     minLength={field.label.includes("actual") ? undefined : 6}
                   />
                   <button type="button" onClick={() => field.setShow(!field.show)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-sb-surface-container transition-colors">
-                    {field.show ? <EyeOff className="h-4 w-4 text-sb-on-surface/30" /> : <Eye className="h-4 w-4 text-sb-on-surface/30" />}
+                    {field.show ? <EyeOff className="h-4 w-4 text-sb-on-surface/50" /> : <Eye className="h-4 w-4 text-sb-on-surface/50" />}
                   </button>
                 </div>
               </div>
             ))}
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button type="submit" disabled={changingPass}
-                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50">
-                {changingPass ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Key className="h-4 w-4" />}
+                className="flex-1 flex items-center justify-center gap-2 h-11 sm:h-10 px-5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                {changingPass ? <div className="w-4 h-4 border-2 border-sb-surface/30 border-t-sb-surface rounded-full animate-spin" /> : <Key className="h-4 w-4" />}
                 {changingPass ? "Actualizando..." : "Actualizar contraseña"}
               </button>
               <button type="button" onClick={() => { setShowPassForm(false); setCurrentPassword(""); setNewPassword(""); setConfirmPassword("") }}
-                className="px-4 py-2.5 rounded-xl text-[13px] text-sb-on-surface/50 hover:bg-sb-surface-container-high transition-colors">
+                className="h-10 px-4 rounded-xl text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
                 Cancelar
               </button>
             </div>
@@ -329,7 +329,7 @@ export default function DevPerfilPage() {
 
       {/* Theme */}
       <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 sm:p-5">
-        <p className="text-[11px] text-sb-on-surface/40 uppercase tracking-wider mb-4">Tema de la app</p>
+        <p className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider mb-4">Tema de la app</p>
         <div className="flex gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-7 sm:overflow-visible sm:pb-0">
           {THEMES.map(t => {
             const isActive = (resolvedTheme === t.mode) && (themeVariant === t.variant)
@@ -356,7 +356,7 @@ export default function DevPerfilPage() {
                   <span className="absolute right-0 top-0 w-1/2 h-1/2" style={{ background: t.colors[1], borderRadius: isActive ? "0 14px 0 0" : "0 50% 0 0" }} />
                   <span className="absolute right-0 bottom-0 w-1/2 h-1/2" style={{ background: t.colors[2], borderRadius: isActive ? "0 0 14px 0" : "0 0 50% 0" }} />
                 </motion.button>
-                <span className={`text-[10px] ${isActive ? "text-sb-on-surface font-semibold" : "text-sb-on-surface/40"}`}>
+                <span className={`text-[10px] ${isActive ? "text-sb-on-surface font-semibold" : "text-sb-on-surface/70"}`}>
                   {t.name}
                 </span>
               </motion.div>

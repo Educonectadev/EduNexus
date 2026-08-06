@@ -368,18 +368,18 @@ export default function DevInstitucionesPage() {
       className="w-full space-y-6 py-1"
     >
       {/* Header */}
-      <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl bg-black dark:bg-white p-6 md:p-8 text-white dark:text-black">
-        <div className="relative flex items-start justify-between">
+      <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl bg-sb-on-surface p-6 md:p-8 text-sb-surface">
+        <div className="relative flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Instituciones</h1>
-            <p className="text-sm mt-1 opacity-80">Gestión de instituciones educativas del sistema</p>
+            <p className="text-sm mt-1 text-sb-surface/80">Gestión de instituciones educativas del sistema</p>
             <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 dark:bg-black/15 backdrop-blur-sm text-xs font-medium">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sb-surface/15 backdrop-blur-sm text-xs font-medium">
                 <CircleDot className="h-3 w-3" />
                 {institutions.length} total
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 dark:bg-black/15 backdrop-blur-sm text-xs font-medium">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-600" />
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sb-surface/15 backdrop-blur-sm text-xs font-medium">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 {activeCount} activas
               </div>
             </div>
@@ -389,7 +389,7 @@ export default function DevInstitucionesPage() {
             size="sm"
             rounded
             onClick={() => { fetchNextCode(); setDialogOpen(true) }}
-            className="!bg-white/15 dark:!bg-black/15 !text-white dark:!text-black hover:!bg-white/25 dark:hover:!bg-black/25 backdrop-blur-sm shadow-lg"
+            className="!bg-sb-surface/15 !text-sb-surface hover:!bg-sb-surface/25 backdrop-blur-sm"
           >
             <Plus className="h-4 w-4" />
             Nueva Institución
@@ -405,35 +405,35 @@ export default function DevInstitucionesPage() {
           { label: "Alumnos", value: totalStudents.toLocaleString(), icon: Users, color: "text-violet-500", bg: "bg-violet-500/10" },
           { label: "Con Plan", value: withPlan, icon: FileText, color: "text-amber-500", bg: "bg-amber-500/10" },
         ].map((stat) => (
-          <div key={stat.label} className="bg-[var(--sb-surface-container)] rounded-2xl p-4 border border-[var(--sb-outline-variant)]/10 md-anim-card-in">
+          <div key={stat.label} className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10 md-anim-card-in">
             <div className="flex items-center gap-2 mb-2">
               <div className={`h-8 w-8 rounded-xl ${stat.bg} flex items-center justify-center`}>
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </div>
             </div>
-            <p className="text-xl font-bold text-[var(--sb-on-surface)]">{stat.value}</p>
-            <p className="text-[11px] text-[var(--sb-on-surface-variant)]/50 mt-0.5">{stat.label}</p>
+            <p className="text-xl font-bold text-sb-on-surface">{stat.value}</p>
+            <p className="text-[11px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
           </div>
         ))}
       </motion.div>
 
       {/* Search + Filters */}
       <motion.div variants={fadeUp} className="space-y-3">
-        <div className="bg-[var(--sb-surface-container)] rounded-2xl p-3 border border-[var(--sb-outline-variant)]/10">
+        <div className="bg-sb-surface rounded-2xl p-3 border border-sb-outline-variant/10">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--sb-on-surface-variant)]/40 pointer-events-none" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
               <input
                 placeholder="Buscar por nombre, código o distrito..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-11 pl-11 pr-10 rounded-xl bg-[var(--sb-surface)] border border-[var(--sb-outline-variant)]/20 text-sm text-[var(--sb-on-surface)] placeholder:text-[var(--sb-on-surface-variant)]/35 focus:outline-none focus:border-[var(--sb-primary)]/50 focus:ring-2 focus:ring-[var(--sb-primary)]/10 transition-all"
+                className="h-11 w-full pl-11 pr-10 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-[var(--sb-on-surface-variant)]/50 hover:bg-[var(--sb-surface-container-high)] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -448,13 +448,13 @@ export default function DevInstitucionesPage() {
                 className={`md-anim-click relative h-11 px-4 rounded-xl flex items-center gap-2 text-sm font-medium transition-all duration-200 border ${
                   activeFilterCount > 0
                     ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                    : "bg-[var(--sb-surface)] border-[var(--sb-outline-variant)]/20 text-[var(--sb-on-surface-variant)]/70 hover:bg-[var(--sb-surface-container-high)]"
+                    : "bg-sb-surface-container border-sb-outline-variant/20 text-sb-on-surface/80 hover:bg-sb-surface-container-high"
                 }`}
               >
                 <Filter className="h-4 w-4" />
                 <span className="hidden sm:inline">Filtros</span>
                 {activeFilterCount > 0 && (
-                  <span className="h-5 min-w-5 px-1.5 rounded-full bg-[var(--sb-primary)] text-white text-[10px] font-bold flex items-center justify-center">
+                  <span className="h-5 min-w-5 px-1.5 rounded-full bg-[var(--sb-primary)] text-[var(--sb-on-primary)] text-[10px] font-bold flex items-center justify-center">
                     {activeFilterCount}
                   </span>
                 )}
@@ -482,15 +482,15 @@ export default function DevInstitucionesPage() {
                         className="space-y-4"
                       >
                         <div className="flex items-center justify-between">
-                          <p className="text-xs font-semibold text-[var(--sb-on-surface)]">Filtros de búsqueda</p>
-                          <button onClick={() => setFiltersOpen(false)} className="h-6 w-6 rounded-lg flex items-center justify-center hover:bg-[var(--sb-surface-container-high)] transition-colors">
-                            <X className="h-3.5 w-3.5 text-[var(--sb-on-surface-variant)]/50" />
+                          <p className="text-xs font-semibold text-sb-on-surface">Filtros de búsqueda</p>
+                          <button onClick={() => setFiltersOpen(false)} className="h-6 w-6 rounded-lg flex items-center justify-center hover:bg-sb-surface-container-high transition-colors">
+                            <X className="h-3.5 w-3.5 text-sb-on-surface/60" />
                           </button>
                         </div>
 
                         {/* Estado */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sb-on-surface-variant)]/40 mb-2">Estado</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface/60 mb-2">Estado</p>
                           <div className="grid grid-cols-3 gap-1.5">
                             {[
                               { value: "all", label: "Todos" },
@@ -507,13 +507,13 @@ export default function DevInstitucionesPage() {
                                   className={`relative px-2.5 py-2 rounded-xl text-xs font-medium transition-colors border ${
                                     active
                                       ? "bg-[var(--sb-primary)]/10 text-[var(--sb-primary)] border-[var(--sb-primary)]/30"
-                                      : "text-[var(--sb-on-surface-variant)]/60 border-transparent hover:bg-[var(--sb-surface-container-high)]"
+                                      : "text-sb-on-surface/80 border-transparent hover:bg-sb-surface-container-high"
                                   }`}
                                 >
                                   {label}
                                   {active && (
                                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.8 }} className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[var(--sb-primary)] flex items-center justify-center">
-                                      <Check className="h-2.5 w-2.5 text-white" />
+                                      <Check className="h-2.5 w-2.5 text-[var(--sb-on-primary)]" />
                                     </motion.div>
                                   )}
                                 </motion.button>
@@ -523,13 +523,13 @@ export default function DevInstitucionesPage() {
                         </motion.div>
 
                         {/* Footer */}
-                        <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="flex gap-2 pt-2 border-t border-[var(--sb-outline-variant)]/10">
+                        <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="flex gap-2 pt-2 border-t border-sb-outline-variant/10">
                           {activeFilterCount > 0 && (
-                            <button onClick={() => setStatusFilter("all")} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-[var(--sb-on-surface-variant)]/60 hover:bg-[var(--sb-surface-container-high)] transition-colors border border-[var(--sb-outline-variant)]/20">
+                            <button onClick={() => setStatusFilter("all")} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium text-sb-on-surface/80 hover:bg-sb-surface-container-high transition-colors border border-sb-outline-variant/20">
                               Limpiar
                             </button>
                           )}
-                          <button onClick={() => setFiltersOpen(false)} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium bg-[var(--sb-on-surface)] text-[var(--sb-surface)] hover:opacity-90 transition-opacity">
+                          <button onClick={() => setFiltersOpen(false)} className="flex-1 px-3 py-2 rounded-xl text-xs font-medium bg-sb-on-surface text-sb-surface hover:opacity-90 transition-opacity">
                             Aplicar
                           </button>
                         </motion.div>
@@ -544,8 +544,8 @@ export default function DevInstitucionesPage() {
 
         {(search || activeFilterCount > 0) && (
           <div className="flex items-center justify-between px-1">
-            <p className="text-xs text-[var(--sb-on-surface-variant)]/50">
-              <span className="text-[var(--sb-on-surface)]/80 font-medium">{filteredInstitutions.length}</span> de {institutions.length} instituciones
+            <p className="text-xs text-sb-on-surface/70">
+              <span className="text-sb-on-surface font-medium">{filteredInstitutions.length}</span> de {institutions.length} instituciones
             </p>
             <button
               type="button"
@@ -570,26 +570,26 @@ export default function DevInstitucionesPage() {
               whileHover={{ x: 2, transition: { duration: 0.15 } }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelectedInst(inst)}
-              className="w-full group bg-[var(--sb-surface-container)] rounded-2xl p-4 border border-[var(--sb-outline-variant)]/10 hover:border-[var(--sb-outline-variant)]/25 hover:shadow-lg hover:shadow-black/5 transition-all duration-200 text-left md-anim-card-in"
+              className="w-full group bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10 hover:border-sb-outline-variant/25 transition-all duration-200 text-left md-anim-card-in"
             >
               <div className="flex items-center gap-4">
-                <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg`}>
-                  <TypeIcon className="h-5 w-5 text-white" />
+                <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
+                  <TypeIcon className="h-5 w-5 text-sb-surface" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-[var(--sb-on-surface)] truncate">{inst.name}</p>
+                    <p className="text-sm font-semibold text-sb-on-surface truncate">{inst.name}</p>
                   </div>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-[10px] font-mono text-[var(--sb-on-surface-variant)]/50 bg-[var(--sb-surface-container-high)]/80 px-1.5 py-0.5 rounded-md">{inst.code}</span>
+                    <span className="text-[10px] font-mono text-sb-on-surface/70 bg-sb-surface-container-high/80 px-1.5 py-0.5 rounded-md">{inst.code}</span>
                     {inst.district && (
-                      <span className="text-[11px] text-[var(--sb-on-surface-variant)]/40 flex items-center gap-1">
+                      <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {inst.district}
                       </span>
                     )}
                     {inst.total_students > 0 && (
-                      <span className="text-[11px] text-[var(--sb-on-surface-variant)]/40 flex items-center gap-1">
+                      <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
                         <Users className="h-3 w-3" />
                         {inst.total_students}
                       </span>
@@ -605,26 +605,26 @@ export default function DevInstitucionesPage() {
                   <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold ${
                     inst.status === "active"
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/40"
+                      : "bg-sb-surface-container-high text-sb-on-surface/60"
                   }`}>
-                    <div className={`h-1.5 w-1.5 rounded-full ${inst.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/30"}`} />
+                    <div className={`h-1.5 w-1.5 rounded-full ${inst.status === "active" ? "bg-emerald-500" : "bg-sb-on-surface/50"}`} />
                     {inst.status === "active" ? "Activa" : "Inactiva"}
                   </div>
-                  <ChevronRight className="h-4 w-4 text-[var(--sb-on-surface-variant)]/20 group-hover:text-[var(--sb-on-surface-variant)]/40 transition-colors" />
+                  <ChevronRight className="h-4 w-4 text-sb-on-surface/40 group-hover:text-sb-on-surface/70 transition-colors" />
                 </div>
               </div>
             </motion.button>
           )
         })}
         {!loading && filteredInstitutions.length === 0 && (
-          <div className="bg-[var(--sb-surface-container)] rounded-3xl border border-[var(--sb-outline-variant)]/10 px-5 py-16 text-center">
+          <div className="bg-sb-surface rounded-3xl border border-sb-outline-variant/10 px-5 py-16 text-center">
             <div className="h-16 w-16 rounded-3xl bg-gradient-to-br from-[var(--sb-primary)]/10 to-[var(--sb-primary)]/5 flex items-center justify-center mx-auto mb-4">
-              <Building2 className="h-7 w-7 text-[var(--sb-primary)]/40" />
+              <Building2 className="h-7 w-7 text-[var(--sb-primary)]/50" />
             </div>
-            <p className="text-sm font-medium text-[var(--sb-on-surface-variant)]/60">
+            <p className="text-sm font-medium text-sb-on-surface/70">
               {search ? "Sin resultados para tu búsqueda" : "Sin instituciones registradas"}
             </p>
-            <p className="text-xs text-[var(--sb-on-surface-variant)]/35 mt-1.5 max-w-xs mx-auto">
+            <p className="text-xs text-sb-on-surface/60 mt-1.5 max-w-xs mx-auto">
               {search ? "Intenta con otros términos" : "Crea tu primera institución para comenzar a gestionar el sistema"}
             </p>
             {!search && (
@@ -689,7 +689,7 @@ export default function DevInstitucionesPage() {
                     className="rounded-xl bg-sb-surface-container-high/50"
                     readOnly
                   />
-                  <p className="text-[11px] text-[var(--sb-on-surface-variant)]/60">Código automático secuencial (COL-01, COL-02...)</p>
+                  <p className="text-[11px] text-sb-on-surface-variant/70">Código automático secuencial (COL-01, COL-02...)</p>
                 </div>
                 <div className="space-y-2">
                   <SbLabel htmlFor="type">Tipo de Institución *</SbLabel>
@@ -813,7 +813,7 @@ export default function DevInstitucionesPage() {
                           className={`h-8 w-8 rounded-lg text-[11px] font-medium transition-all ${
                             active
                               ? "bg-[var(--sb-primary)] text-[var(--sb-on-primary)]"
-                              : "bg-[var(--sb-surface-container-high)] text-[var(--sb-on-surface-variant)]/50 hover:bg-[var(--sb-surface-container-highest)]"
+                              : "bg-[var(--sb-surface-container-high)] text-sb-on-surface-variant/70 hover:bg-[var(--sb-surface-container-highest)]"
                           }`}
                         >
                           {d}
@@ -840,7 +840,7 @@ export default function DevInstitucionesPage() {
                   </div>
 
                   {scheduleConfig.turnos.length === 0 && (
-                    <p className="text-[11px] text-[var(--sb-on-surface-variant)]/40 py-2">
+                    <p className="text-[11px] text-sb-on-surface-variant/60 py-2">
                       Sin turnos definidos. La jornada completa usará el horario general.
                     </p>
                   )}
@@ -857,7 +857,7 @@ export default function DevInstitucionesPage() {
                             turnos[idx] = { ...turnos[idx], name: e.target.value }
                             setScheduleConfig({ ...scheduleConfig, turnos })
                           }}
-                          className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-[var(--sb-on-surface-variant)]/30"
+                          className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-sb-on-surface-variant/50"
                         />
                         <button
                           type="button"
@@ -872,7 +872,7 @@ export default function DevInstitucionesPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
-                          <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Inicio</span>
+                          <span className="text-[10px] text-sb-on-surface-variant/60">Inicio</span>
                           <input
                             type="time"
                             value={turno.start}
@@ -885,7 +885,7 @@ export default function DevInstitucionesPage() {
                           />
                         </div>
                         <div className="space-y-1">
-                          <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Fin</span>
+                          <span className="text-[10px] text-sb-on-surface-variant/60">Fin</span>
                           <input
                             type="time"
                             value={turno.end}
@@ -899,7 +899,7 @@ export default function DevInstitucionesPage() {
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <span className="text-[10px] text-[var(--sb-on-surface-variant)]/40">Grados</span>
+                        <span className="text-[10px] text-sb-on-surface-variant/60">Grados</span>
                         <div className="flex flex-wrap gap-1">
                           {["1ro", "2do", "3ro", "4to", "5to", "6to"].map(g => {
                             const active = turno.grades.includes(g)
@@ -918,7 +918,7 @@ export default function DevInstitucionesPage() {
                                 className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
                                   active
                                     ? "bg-[var(--sb-primary)]/15 text-[var(--sb-primary)]"
-                                    : "bg-[var(--sb-surface-container-high)] text-[var(--sb-on-surface-variant)]/40"
+                                    : "bg-[var(--sb-surface-container-high)] text-sb-on-surface-variant/60"
                                 }`}
                               >
                                 {g}
@@ -1237,7 +1237,7 @@ export default function DevInstitucionesPage() {
                         {(form as any)[item.key] && <Check className="h-3 w-3 text-[var(--sb-on-surface)]" />}
                       </div>
                       <div className="flex items-center gap-2">
-                        <item.icon className="h-3.5 w-3.5 text-[var(--sb-on-surface-variant)]/50" />
+                        <item.icon className="h-3.5 w-3.5 text-sb-on-surface-variant/70" />
                         <span className="text-sm">{item.label}</span>
                       </div>
                     </label>
@@ -1273,18 +1273,18 @@ export default function DevInstitucionesPage() {
                   Resumen
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Nombre:</span> {form.name || "—"}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Tipo:</span> {institutionTypes.find(t => t.value === form.type)?.label || "—"}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Nivel:</span> {institutionLevels.find(l => l.value === form.level)?.label || "—"}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Modalidad:</span> {modalities.find(m => m.value === form.modality)?.label || "—"}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Turno:</span> {shifts.find(s => s.value === form.shift)?.label || "—"}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Horario:</span> {scheduleConfig.general_start} - {scheduleConfig.general_end}</div>
-                  <div><span className="text-[var(--sb-on-surface-variant)]/60">Días:</span> {scheduleConfig.weekdays.map(d => ["", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][d]).join(", ")}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Nombre:</span> {form.name || "—"}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Tipo:</span> {institutionTypes.find(t => t.value === form.type)?.label || "—"}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Nivel:</span> {institutionLevels.find(l => l.value === form.level)?.label || "—"}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Modalidad:</span> {modalities.find(m => m.value === form.modality)?.label || "—"}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Turno:</span> {shifts.find(s => s.value === form.shift)?.label || "—"}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Horario:</span> {scheduleConfig.general_start} - {scheduleConfig.general_end}</div>
+                  <div><span className="text-sb-on-surface-variant/70">Días:</span> {scheduleConfig.weekdays.map(d => ["", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][d]).join(", ")}</div>
                   {scheduleConfig.turnos.length > 0 && (
-                    <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Turnos:</span> {scheduleConfig.turnos.map(t => `${t.name || "Sin nombre"} (${t.start}-${t.end})`).join(", ")}</div>
+                    <div className="col-span-2"><span className="text-sb-on-surface-variant/70">Turnos:</span> {scheduleConfig.turnos.map(t => `${t.name || "Sin nombre"} (${t.start}-${t.end})`).join(", ")}</div>
                   )}
-                  <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Ubicación:</span> {form.district && form.province && form.department ? `${form.district}, ${form.province}, ${form.department}` : "—"}</div>
-                  <div className="col-span-2"><span className="text-[var(--sb-on-surface-variant)]/60">Director:</span> {form.director_name || "—"}</div>
+                  <div className="col-span-2"><span className="text-sb-on-surface-variant/70">Ubicación:</span> {form.district && form.province && form.department ? `${form.district}, ${form.province}, ${form.department}` : "—"}</div>
+                  <div className="col-span-2"><span className="text-sb-on-surface-variant/70">Director:</span> {form.director_name || "—"}</div>
                 </div>
               </div>
             </motion.div>
@@ -1329,15 +1329,15 @@ export default function DevInstitucionesPage() {
                 </div>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-[var(--sb-on-surface-variant)]/60">Nombre</p>
+                    <p className="text-xs text-sb-on-surface-variant/70">Nombre</p>
                     <p className="text-sm font-mono font-medium">{createdCredentials.name}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--sb-on-surface-variant)]/60">Email</p>
+                    <p className="text-xs text-sb-on-surface-variant/70">Email</p>
                     <p className="text-sm font-mono font-medium">{createdCredentials.email}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--sb-on-surface-variant)]/60">Contraseña</p>
+                    <p className="text-xs text-sb-on-surface-variant/70">Contraseña</p>
                     <p className="text-sm font-mono font-medium bg-black/5 dark:bg-[var(--sb-on-surface)]/5 px-2 py-1 rounded-lg inline-block">
                       {createdCredentials.password}
                     </p>
@@ -1365,18 +1365,18 @@ export default function DevInstitucionesPage() {
             <SbModalHeader title={selectedInst.name} onClose={() => setSelectedInst(null)} />
             <SbModalBody className="max-h-[90vh] overflow-y-auto">
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                <p className="text-xs text-[var(--sb-on-surface-variant)]/50 font-mono">{selectedInst.code}</p>
+                <p className="text-xs text-sb-on-surface-variant/70 font-mono">{selectedInst.code}</p>
                 <span className="text-[var(--sb-on-surface)]/10">·</span>
                 <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                   selectedInst.status === "active"
                     ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/40"
+                    : "bg-[var(--sb-on-surface)]/5 text-sb-on-surface-variant/60"
                 }`}>
-                  <div className={`h-1.5 w-1.5 rounded-full ${selectedInst.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/30"}`} />
+                  <div className={`h-1.5 w-1.5 rounded-full ${selectedInst.status === "active" ? "bg-emerald-500" : "bg-sb-on-surface-variant/50"}`} />
                   {selectedInst.status === "active" ? "Activa" : "Inactiva"}
                 </div>
                 <span className="text-[var(--sb-on-surface)]/10">·</span>
-                <span className="text-[11px] text-[var(--sb-on-surface-variant)]/50 capitalize">{selectedInst.type}</span>
+                <span className="text-[11px] text-sb-on-surface-variant/70 capitalize">{selectedInst.type}</span>
               </div>
 
               <div className="space-y-3 py-3">
@@ -1385,12 +1385,12 @@ export default function DevInstitucionesPage() {
                   <div className="bg-gradient-to-br from-violet-500/10 to-violet-500/5 rounded-2xl p-4 text-center border border-violet-500/10">
                     <Users className="h-4 w-4 text-violet-500/60 mx-auto mb-1" />
                     <p className="text-2xl font-bold text-[var(--sb-on-surface)]">{selectedInst.total_students || 0}</p>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-medium">Alumnos</p>
+                    <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-medium">Alumnos</p>
                   </div>
                   <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-2xl p-4 text-center border border-blue-500/10">
                     <GraduationCap className="h-4 w-4 text-blue-500/60 mx-auto mb-1" />
                     <p className="text-2xl font-bold text-[var(--sb-on-surface)]">{selectedInst.total_teachers || 0}</p>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-medium">Docentes</p>
+                    <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-medium">Docentes</p>
                   </div>
                 </div>
 
@@ -1401,11 +1401,11 @@ export default function DevInstitucionesPage() {
                       <div className="h-6 w-6 rounded-lg bg-rose-500/10 flex items-center justify-center">
                         <MapPin className="h-3.5 w-3.5 text-rose-500" />
                       </div>
-                      <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Ubicación</p>
+                      <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-semibold">Ubicación</p>
                     </div>
                     <p className="text-sm text-[var(--sb-on-surface-variant)]/80">{[selectedInst.district, selectedInst.province, selectedInst.department].filter(Boolean).join(", ")}</p>
                     {selectedInst.address && (
-                      <p className="text-xs text-[var(--sb-on-surface-variant)]/50 mt-1">{selectedInst.address}</p>
+                      <p className="text-xs text-sb-on-surface-variant/70 mt-1">{selectedInst.address}</p>
                     )}
                   </div>
                 )}
@@ -1416,18 +1416,18 @@ export default function DevInstitucionesPage() {
                     <div className="h-6 w-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                       <Phone className="h-3.5 w-3.5 text-emerald-500" />
                     </div>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Contacto</p>
+                    <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-semibold">Contacto</p>
                   </div>
                   <div className="space-y-1.5">
                     {selectedInst.phone && (
                       <p className="text-sm text-[var(--sb-on-surface-variant)]/80 flex items-center gap-2">
-                        <Phone className="h-3 w-3 text-[var(--sb-on-surface-variant)]/30" />
+                        <Phone className="h-3 w-3 text-sb-on-surface-variant/50" />
                         {selectedInst.phone}
                       </p>
                     )}
                     {selectedInst.email && (
-                      <p className="text-xs text-[var(--sb-on-surface-variant)]/60 font-mono flex items-center gap-2">
-                        <Mail className="h-3 w-3 text-[var(--sb-on-surface-variant)]/30" />
+                      <p className="text-xs text-sb-on-surface-variant/70 font-mono flex items-center gap-2">
+                        <Mail className="h-3 w-3 text-sb-on-surface-variant/50" />
                         {selectedInst.email}
                       </p>
                     )}
@@ -1441,11 +1441,11 @@ export default function DevInstitucionesPage() {
                       <div className="h-6 w-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
                         <GraduationCap className="h-3.5 w-3.5 text-blue-500" />
                       </div>
-                      <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Director</p>
+                      <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-semibold">Director</p>
                     </div>
                     <p className="text-sm text-[var(--sb-on-surface-variant)]/80">{selectedInst.director_name}</p>
                     {selectedInst.director_dni && (
-                      <p className="text-xs text-[var(--sb-on-surface-variant)]/50 mt-1 font-mono">DNI: {selectedInst.director_dni}</p>
+                      <p className="text-xs text-sb-on-surface-variant/70 mt-1 font-mono">DNI: {selectedInst.director_dni}</p>
                     )}
                   </div>
                 )}
@@ -1456,12 +1456,12 @@ export default function DevInstitucionesPage() {
                     <div className="h-6 w-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
                       <FileText className="h-3.5 w-3.5 text-amber-500" />
                     </div>
-                    <p className="text-[10px] text-[var(--sb-on-surface-variant)]/40 uppercase tracking-wider font-semibold">Plan contratado</p>
+                    <p className="text-[10px] text-sb-on-surface-variant/60 uppercase tracking-wider font-semibold">Plan contratado</p>
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-[var(--sb-on-surface)]">{selectedInst.plan_name || "Sin plan"}</p>
                     {selectedInst.plan_price !== undefined && selectedInst.plan_name && (
-                      <span className="text-xs text-[var(--sb-on-surface-variant)]/50 font-mono">S/ {Number(selectedInst.plan_price).toFixed(2)}/mes</span>
+                      <span className="text-xs text-sb-on-surface-variant/70 font-mono">S/ {Number(selectedInst.plan_price).toFixed(2)}/mes</span>
                     )}
                   </div>
                   <div className="mt-2">
@@ -1538,7 +1538,7 @@ export default function DevInstitucionesPage() {
             Se eliminará permanentemente la institución y todos sus datos asociados.
           </p>
         </SbModalBody>
-        <SbModalFooter className="flex flex-row gap-2">
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
           <SbBtn variant="outlined" size="sm" rounded onClick={() => setDeleteConfirm(null)} className="flex-1">Cancelar</SbBtn>
           <SbBtn variant="danger" size="sm" rounded onClick={() => deleteConfirm && deleteInstitution(deleteConfirm)} className="flex-1">Eliminar</SbBtn>
         </SbModalFooter>
@@ -1555,18 +1555,18 @@ export default function DevInstitucionesPage() {
           <p className="text-xs text-[var(--sb-on-surface-variant)]/70 mb-2">
             Se eliminarán <strong className="text-[var(--sb-on-surface)]">TODOS</strong> los datos de esta institución:
           </p>
-          <ul className="text-xs text-[var(--sb-on-surface-variant)]/50 space-y-1 list-disc list-inside">
+          <ul className="text-xs text-sb-on-surface-variant/70 space-y-1 list-disc list-inside">
             <li>Estudiantes y matrículas</li>
             <li>Padres y apoderados</li>
             <li>Usuarios (docentes, secretarios, etc.)</li>
             <li>Notificaciones y auditoría</li>
             <li>Documentos, cursos, tareas</li>
           </ul>
-          <p className="text-xs text-[var(--sb-on-surface-variant)]/50 mt-3">
+          <p className="text-xs text-sb-on-surface-variant/70 mt-3">
             La institución se mantendrá pero quedará vacía.
           </p>
         </SbModalBody>
-        <SbModalFooter className="flex flex-row gap-2">
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
           <SbBtn variant="outlined" size="sm" rounded onClick={() => setCleanConfirm(null)} className="flex-1" disabled={cleaning}>Cancelar</SbBtn>
           <SbBtn variant="danger" size="sm" rounded onClick={() => cleanConfirm && cleanInstitution(cleanConfirm)} className="flex-1" disabled={cleaning}>
             {cleaning ? "Limpiando..." : "Limpiar todo"}

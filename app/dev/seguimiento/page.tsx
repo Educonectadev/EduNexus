@@ -93,10 +93,10 @@ export default function DevSeguimientoPage() {
   ]
 
   return (
-    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
+    <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2 md:py-4">
       <motion.div variants={fadeUp}>
-        <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Seguimiento</h2>
-        <p className="text-[14px] text-sb-on-surface/60 mt-1">Actividad y uso del sistema</p>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Seguimiento</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Actividad y uso del sistema</p>
       </motion.div>
 
       {/* Tabs */}
@@ -107,8 +107,8 @@ export default function DevSeguimientoPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
               activeTab === tab.key
-                ? "bg-sb-on-surface text-sb-surface shadow-lg shadow-sb-on-surface/15"
-                : "text-sb-on-surface/50 hover:text-sb-on-surface hover:bg-sb-surface-container-high/50"
+                ? "bg-sb-on-surface text-sb-surface"
+                : "text-sb-on-surface/70 hover:text-sb-on-surface"
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default function DevSeguimientoPage() {
       {/* Overview */}
       {activeTab === "overview" && stats && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Usuarios totales", value: stats.totalUsers, icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
               { label: "Sesiones hoy", value: stats.todaySessions, icon: Activity, color: "text-emerald-500", bg: "bg-emerald-500/10" },
@@ -131,13 +131,13 @@ export default function DevSeguimientoPage() {
                 key={stat.label}
                 variants={fadeUp}
                 whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10 hover:border-sb-outline-variant/20 transition-all"
+                className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10 hover:border-sb-outline-variant/20 transition-all"
               >
-                <div className={`w-11 h-11 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
+                <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
                   <stat.icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
-                <p className="text-[28px] font-bold text-sb-on-surface">{stat.value}</p>
-                <p className="text-[12px] text-sb-on-surface/50 mt-0.5">{stat.label}</p>
+                <p className="text-xl font-bold text-sb-on-surface">{stat.value}</p>
+                <p className="text-[12px] text-sb-on-surface/70 mt-0.5">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -152,14 +152,14 @@ export default function DevSeguimientoPage() {
                   const height = (day.sessions / maxSessions) * 100
                   return (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                      <span className="text-[11px] text-sb-on-surface/50 font-mono">{day.sessions}</span>
+                      <span className="text-[11px] text-sb-on-surface/70 font-mono">{day.sessions}</span>
                       <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${Math.max(height, 8)}%` }}
                         transition={{ delay: i * 0.05, duration: 0.4 }}
                         className="w-full rounded-t-lg bg-sb-primary/20 hover:bg-sb-primary/30 transition-colors"
                       />
-                      <span className="text-[10px] text-sb-on-surface/30">
+                      <span className="text-[10px] text-sb-on-surface/50">
                         {new Date(day.day).toLocaleDateString("es-PE", { weekday: "short" })}
                       </span>
                     </div>
@@ -189,11 +189,11 @@ export default function DevSeguimientoPage() {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-sb-on-surface/80 truncate">{login.full_name}</p>
-                      <p className="text-[11px] text-sb-on-surface/40">{login.ip_address || "—"}</p>
+                      <p className="text-[13px] font-medium text-sb-on-surface truncate">{login.full_name}</p>
+                      <p className="text-[11px] text-sb-on-surface/70">{login.ip_address || "—"}</p>
                     </div>
-                    <device.icon className="w-4 h-4 text-sb-on-surface/30 shrink-0" />
-                    <span className="text-[11px] text-sb-on-surface/40 shrink-0">{timeAgo(login.logged_in_at)}</span>
+                    <device.icon className="w-4 h-4 text-sb-on-surface/50 shrink-0" />
+                    <span className="text-[11px] text-sb-on-surface/70 shrink-0">{timeAgo(login.logged_in_at)}</span>
                   </motion.div>
                 )
               })}
@@ -206,12 +206,12 @@ export default function DevSeguimientoPage() {
       {activeTab === "history" && (
         <div className="space-y-4">
           <motion.div variants={fadeUp} className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/30" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50" />
             <input
               placeholder="Buscar por nombre o email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 h-11 rounded-2xl bg-sb-surface border border-sb-outline-variant/15 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all"
+              className="w-full pl-11 pr-4 h-11 rounded-xl bg-sb-surface-container border border-transparent text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all"
             />
           </motion.div>
 
@@ -234,22 +234,22 @@ export default function DevSeguimientoPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[14px] font-medium text-sb-on-surface/80 truncate">{session.full_name}</span>
+                        <span className="text-[14px] font-medium text-sb-on-surface truncate">{session.full_name}</span>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full border ${roleColors[session.role] || "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
                           {session.role}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[12px] text-sb-on-surface/50">{session.email}</span>
-                        <span className="text-[11px] text-sb-on-surface/30">{session.ip_address || "—"}</span>
+                        <span className="text-[12px] text-sb-on-surface/70">{session.email}</span>
+                        <span className="text-[11px] text-sb-on-surface/70">{session.ip_address || "—"}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <device.icon className="w-4 h-4 text-sb-on-surface/30" />
+                      <device.icon className="w-4 h-4 text-sb-on-surface/50" />
                       <div className="text-right">
-                        <p className="text-[11px] text-sb-on-surface/40">{timeAgo(session.logged_in_at)}</p>
+                        <p className="text-[11px] text-sb-on-surface/70">{timeAgo(session.logged_in_at)}</p>
                         {session.institution_name && (
-                          <p className="text-[10px] text-sb-on-surface/25 truncate max-w-[100px]">{session.institution_name}</p>
+                          <p className="text-[10px] text-sb-on-surface/50 truncate max-w-[100px]">{session.institution_name}</p>
                         )}
                       </div>
                     </div>
@@ -257,7 +257,7 @@ export default function DevSeguimientoPage() {
                 )
               })}
               {filteredSessions.length === 0 && (
-                <div className="px-5 py-10 text-center text-[13px] text-sb-on-surface/30">
+                <div className="px-5 py-10 text-center text-[13px] text-sb-on-surface/60">
                   {search ? "Sin resultados" : "Sin sesiones registradas"}
                 </div>
               )}
@@ -283,11 +283,11 @@ export default function DevSeguimientoPage() {
                   className="flex items-center gap-4 p-3 rounded-xl bg-sb-surface-container-high/30 hover:bg-sb-surface-container-high/50 transition-colors"
                 >
                   <div className="h-10 w-10 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
-                    <span className="text-[13px] font-bold text-sb-on-surface/40">#{i + 1}</span>
+                    <span className="text-[13px] font-bold text-sb-on-surface/70">#{i + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-medium text-sb-on-surface/80 truncate">{user.full_name}</span>
+                      <span className="text-[14px] font-medium text-sb-on-surface truncate">{user.full_name}</span>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border ${roleColors[user.role] || "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
                         {user.role}
                       </span>
@@ -303,13 +303,13 @@ export default function DevSeguimientoPage() {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-[16px] font-bold text-sb-on-surface">{user.session_count}</p>
-                    <p className="text-[10px] text-sb-on-surface/30">sesiones</p>
+                    <p className="text-[10px] text-sb-on-surface/70">sesiones</p>
                   </div>
                 </motion.div>
               )
             })}
             {stats.topUsers.length === 0 && (
-              <div className="text-center py-8 text-[13px] text-sb-on-surface/30">
+              <div className="text-center py-8 text-[13px] text-sb-on-surface/60">
                 Sin datos de actividad aún
               </div>
             )}

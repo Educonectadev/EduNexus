@@ -6,11 +6,17 @@ import { LayoutDashboard, BookOpen, UserCheck, GraduationCap, CreditCard, Calend
 
 export default function NavbarTestPage() {
   return (
-    <div className="min-h-screen bg-sb-background p-6">
-      <h1 className="text-lg font-semibold text-sb-on-surface mb-4">Test navbar móvil</h1>
-      <p className="text-sm text-sb-on-surface-variant mb-10">
-        Abre DevTools en modo móvil (&lt;768px) y pulsa el botón ⋯ de la derecha.
-      </p>
+    <div className="w-full space-y-6 py-2 md:py-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">
+            Test navbar móvil
+          </h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">
+            Abre DevTools en modo móvil (&lt;768px) y pulsa el botón ⋯ de la derecha.
+          </p>
+        </div>
+      </div>
       <MobileNavbar
         role="docente"
         activeHref="/docente/dashboard"

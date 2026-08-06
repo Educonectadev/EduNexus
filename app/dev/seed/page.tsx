@@ -70,8 +70,8 @@ export default function DevSeedPage() {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-8 py-2">
       <motion.div variants={fadeUp}>
-        <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Seed de Prueba</h2>
-        <p className="text-[14px] text-sb-on-surface/60 mt-1">Genera datos de prueba para desarrollar y probar</p>
+        <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Seed de Prueba</h2>
+        <p className="text-[13px] text-sb-on-surface/70 mt-1">Genera datos de prueba para desarrollar y probar</p>
       </motion.div>
 
       {/* Config */}
@@ -80,23 +80,23 @@ export default function DevSeedPage() {
           <div className="h-9 w-9 rounded-xl bg-sb-surface-container-high flex items-center justify-center">
             <Database className="h-4 w-4 text-sb-on-surface/50" />
           </div>
-          <p className="text-[14px] font-medium text-sb-on-surface/80">Configuración del Seed</p>
+          <p className="text-[14px] font-medium text-sb-on-surface">Configuración del Seed</p>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { label: "Instituciones", value: institutionCount, set: setInstitutionCount, min: 1, max: 10 },
             { label: "Usuarios por institución", value: userCount, set: setUserCount, min: 1, max: 20 },
             { label: "Estudiantes por institución", value: studentCount, set: setStudentCount, min: 1, max: 100 },
           ].map((field) => (
             <div key={field.label} className="space-y-2">
-              <label className="text-[11px] text-sb-on-surface/50 uppercase tracking-wider">{field.label}</label>
+              <label className="text-[11px] text-sb-on-surface/60 uppercase tracking-wider">{field.label}</label>
               <input
                 type="number"
                 min={field.min}
                 max={field.max}
                 value={field.value}
                 onChange={(e) => field.set(Number(e.target.value))}
-                className="w-full h-10 px-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all font-mono"
+                className="w-full h-11 px-4 rounded-xl bg-sb-surface-container text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30 font-mono"
               />
             </div>
           ))}
@@ -116,10 +116,10 @@ export default function DevSeedPage() {
             >
               <div className="flex-1">
                 <div className="h-11 w-11 rounded-xl bg-sb-surface-container-high flex items-center justify-center mb-4">
-                  <seed.icon className="h-5 w-5 text-sb-on-surface/40" />
+                  <seed.icon className="h-5 w-5 text-sb-on-surface/50" />
                 </div>
                 <h3 className="text-[15px] font-semibold text-sb-on-surface">{seed.title}</h3>
-                <p className="text-[13px] text-sb-on-surface/50 mt-1 leading-relaxed">{seed.description}</p>
+                <p className="text-[13px] text-sb-on-surface/70 mt-1 leading-relaxed">{seed.description}</p>
               </div>
 
               {result && (
@@ -134,11 +134,11 @@ export default function DevSeedPage() {
               <button
                 onClick={() => runSeed(seed.action, seed.id)}
                 disabled={loading !== null}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50 shadow-lg shadow-sb-on-surface/10"
+                className="mt-4 w-full flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {loading === seed.id ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-sb-surface/30 border-t-sb-surface rounded-full animate-spin" />
                     Ejecutando...
                   </>
                 ) : (

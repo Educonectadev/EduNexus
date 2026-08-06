@@ -105,22 +105,22 @@ export default function DevContrasenasPage() {
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
-      <motion.div variants={fadeUp} className="flex items-center justify-between">
+      <motion.div variants={fadeUp} className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Contraseñas</h2>
-          <p className="text-[14px] text-sb-on-surface/60 mt-1">Gestiona y resetea contraseñas de usuarios</p>
+          <h2 className="text-[22px] md:text-[24px] font-bold tracking-tight text-sb-on-surface">Contraseñas</h2>
+          <p className="text-[13px] text-sb-on-surface/70 mt-1">Gestiona y resetea contraseñas de usuarios</p>
         </div>
-        <span className="text-[12px] font-mono text-sb-on-surface/40 bg-sb-surface-container-high px-3 py-1.5 rounded-full">{users.length} usuarios</span>
+        <span className="w-fit text-[12px] font-mono text-sb-on-surface/60 bg-sb-surface-container-high px-3 py-1.5 rounded-full">{users.length} usuarios</span>
       </motion.div>
 
       {/* Search */}
       <motion.div variants={fadeUp} className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/30" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50" />
         <input
           placeholder="Buscar por nombre, email o rol..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-11 pr-4 h-11 rounded-2xl bg-sb-surface border border-sb-outline-variant/15 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/40 focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all"
+          className="w-full pl-11 pr-4 h-11 rounded-xl bg-sb-surface-container text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
         />
       </motion.div>
 
@@ -133,8 +133,8 @@ export default function DevContrasenasPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center">
-            <User className="h-12 w-12 text-sb-on-surface/10 mx-auto mb-3" />
-            <p className="text-[14px] text-sb-on-surface/50">{search ? "Sin resultados" : "Sin usuarios"}</p>
+            <User className="h-12 w-12 text-sb-on-surface/50 mx-auto mb-3" />
+            <p className="text-[14px] text-sb-on-surface/70">{search ? "Sin resultados" : "Sin usuarios"}</p>
           </div>
         ) : (
           <div className="divide-y divide-sb-outline-variant/8">
@@ -154,14 +154,14 @@ export default function DevContrasenasPage() {
                   }`}
                 >
                   <div className="h-11 w-11 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
-                    <span className="text-[12px] font-medium text-sb-on-surface/50">
+                    <span className="text-[12px] font-medium text-sb-on-surface/70">
                       {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                     </span>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-medium text-sb-on-surface/80 truncate">{user.full_name}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[14px] font-medium text-sb-on-surface truncate">{user.full_name}</span>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full border ${roleColors[user.role] || "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
                         {roleLabels[user.role]}
                       </span>
@@ -171,10 +171,10 @@ export default function DevContrasenasPage() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-[12px] text-sb-on-surface/50">{user.email}</span>
+                    <div className="flex flex-wrap items-center gap-3 mt-0.5">
+                      <span className="text-[12px] text-sb-on-surface/70">{user.email}</span>
                       {user.last_login && (
-                        <span className="text-[11px] text-sb-on-surface/30 flex items-center gap-1">
+                        <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
                           <Clock className="w-2.5 h-2.5" />
                           Último login: {daysSinceLogin === 0 ? "Hoy" : daysSinceLogin === 1 ? "Ayer" : `hace ${daysSinceLogin}d`}
                         </span>
@@ -195,7 +195,7 @@ export default function DevContrasenasPage() {
                     ) : (
                       <button
                         onClick={() => { setResetModal(user); setNewPassword(""); setShowPassword(false) }}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-sb-surface-container-high text-[12px] font-medium text-sb-on-surface/60 hover:text-sb-on-surface hover:bg-sb-on-surface/5 transition-colors shrink-0"
+                        className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-sb-surface-container-high text-[12px] font-medium text-sb-on-surface/80 hover:text-sb-on-surface hover:bg-sb-surface-container-high transition-colors shrink-0"
                       >
                         <Key className="w-3.5 h-3.5" /> Resetear
                       </button>
@@ -211,37 +211,37 @@ export default function DevContrasenasPage() {
       {/* Reset Modal */}
       <AnimatePresence>
         {resetModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-sb-surface rounded-2xl max-w-[420px] w-full shadow-2xl border border-sb-outline-variant/10 overflow-hidden"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface border border-sb-outline-variant/10"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
+              <div className="sticky top-0 bg-sb-surface/95 backdrop-blur flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
                 <p className="text-[15px] font-semibold text-sb-on-surface">Resetear contraseña</p>
-                <button onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }} className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors">
-                  <X className="h-4 w-4 text-sb-on-surface/60" />
+                <button onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }} className="h-9 w-9 rounded-xl hover:bg-sb-surface-container-high flex items-center justify-center transition-colors">
+                  <X className="h-4 w-4 text-sb-on-surface/70" />
                 </button>
               </div>
               <div className="px-6 py-5 space-y-4">
                 {/* User info */}
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-sb-surface-container-high">
                   <div className="h-10 w-10 rounded-xl bg-sb-surface-container flex items-center justify-center">
-                    <User className="h-5 w-5 text-sb-on-surface/40" />
+                    <User className="h-5 w-5 text-sb-on-surface/50" />
                   </div>
-                  <div>
-                    <p className="text-[14px] font-medium text-sb-on-surface/80">{resetModal.full_name}</p>
-                    <p className="text-[12px] text-sb-on-surface/50">{resetModal.email}</p>
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium text-sb-on-surface truncate">{resetModal.full_name}</p>
+                    <p className="text-[12px] text-sb-on-surface/70 truncate">{resetModal.email}</p>
                   </div>
                 </div>
 
                 {/* Password input */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[12px] text-sb-on-surface/50">Nueva contraseña</label>
+                    <label className="text-[12px] text-sb-on-surface/70">Nueva contraseña</label>
                     <button onClick={generatePassword} className="text-[11px] text-sb-primary flex items-center gap-1 hover:underline">
                       <RefreshCw className="w-2.5 h-2.5" /> Generar
                     </button>
@@ -252,15 +252,15 @@ export default function DevContrasenasPage() {
                       placeholder="Mínimo 6 caracteres"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full h-11 px-4 pr-20 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/20 transition-all font-mono"
+                      className="w-full h-11 px-4 pr-20 rounded-xl bg-sb-surface-container text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 focus:outline-none focus:ring-2 focus:ring-sb-primary/30 font-mono"
                     />
                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                       <button onClick={() => setShowPassword(!showPassword)} className="p-1.5 rounded-lg hover:bg-sb-surface-container transition-colors">
-                        {showPassword ? <EyeOff className="w-3.5 h-3.5 text-sb-on-surface/40" /> : <Eye className="w-3.5 h-3.5 text-sb-on-surface/40" />}
+                        {showPassword ? <EyeOff className="w-3.5 h-3.5 text-sb-on-surface/50" /> : <Eye className="w-3.5 h-3.5 text-sb-on-surface/50" />}
                       </button>
                       {newPassword && (
                         <button onClick={copyPassword} className="p-1.5 rounded-lg hover:bg-sb-surface-container transition-colors">
-                          {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-sb-on-surface/40" />}
+                          {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-sb-on-surface/50" />}
                         </button>
                       )}
                     </div>
@@ -271,17 +271,17 @@ export default function DevContrasenasPage() {
                 {newPassword && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="overflow-hidden">
                     <div className="p-3 rounded-xl bg-sb-surface-container-high border border-sb-outline-variant/10">
-                      <p className="text-[12px] text-sb-on-surface/60 font-mono break-all">{newPassword}</p>
+                      <p className="text-[12px] text-sb-on-surface/70 font-mono break-all">{newPassword}</p>
                     </div>
                   </motion.div>
                 )}
               </div>
-              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex gap-2">
-                <button onClick={() => { setResetModal(null); setNewPassword("") }} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors">
+              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row gap-2">
+                <button onClick={() => { setResetModal(null); setNewPassword("") }} className="h-10 px-4 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors sm:flex-none">
                   Cancelar
                 </button>
                 <button onClick={handleReset} disabled={saving || newPassword.length < 6}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-white text-[13px] font-medium hover:bg-sb-on-surface/90 transition-all disabled:opacity-50 shadow-lg shadow-sb-on-surface/10">
+                  className="flex-1 h-10 px-4 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
                   {saving ? "Guardando..." : "Resetear"}
                 </button>
               </div>
