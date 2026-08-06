@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
+import { MobileNavbar } from "@/components/ui/mobile-navbar"
 
 interface NavItem {
   title: string
@@ -70,7 +71,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
 ]
 
 const allNav = navSections.flatMap(s => s.items)
-const mobileNav = allNav.filter(n => ["Overview", "Instituciones", "Usuarios", "Database"].includes(n.title))
 
 export default function DevLayout({
   children,
@@ -331,32 +331,12 @@ export default function DevLayout({
         </main>
 
         {/* ===== MOBILE BOTTOM NAV ===== */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40">
-          <div className="bg-sb-surface/90 backdrop-blur-xl border-t border-sb-outline-variant/10 px-4 pb-[env(safe-area-inset-bottom)]">
-            <div className="flex items-center justify-around py-1">
-              {mobileNav.map((item) => {
-                const active = isActive(item.href)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex flex-col items-center justify-center gap-px px-3 py-2 rounded-lg transition-colors min-w-[48px]",
-                      active
-                        ? "text-sb-on-surface"
-                        : "text-sb-on-surface/40"
-                    )}
-                  >
-                    <item.icon className={cn("h-[18px] w-[18px]", active && "stroke-[2.2]")} />
-                    <span className={cn("text-[10px] leading-none", active ? "font-medium" : "font-normal")}>
-                      {item.title.length > 7 ? item.title.slice(0, 7) + "…" : item.title}
-                    </span>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        </nav>
+        <MobileNavbar
+          items={allNav.map(({ badge, ...item }) => item)}
+          activeHref={pathname}
+          role="dev"
+          maxVisible={4}
+        />
 
         {/* ===== MOBILE DRAWER ===== */}
         <AnimatePresence>
