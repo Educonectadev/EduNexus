@@ -1614,93 +1614,116 @@ export default function DevInstitucionesPage() {
       </SbModal>
 
       {/* Search Institutions Modal */}
-      <SbModal open={searchOpen} onClose={() => setSearchOpen(false)} maxWidth="min(640px, 95vw)">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
-          <input
-            autoFocus
-            placeholder="Buscar por nombre, código o distrito..."
-            value={searchModalQuery}
-            onChange={(e) => setSearchModalQuery(e.target.value)}
-            className="h-12 w-full pl-11 pr-10 rounded-xl bg-sb-surface-container text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
-          />
-          <button
-            type="button"
-            onClick={() => { setSearchModalQuery(""); setSearchOpen(false) }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-sb-on-surface/60 hover:bg-sb-surface-container-high transition-colors"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-        <SbModalBody className="mt-3 overflow-hidden" noPadding>
-          <div className="max-h-[60vh] overflow-y-auto">
-            {searchResults.length === 0 ? (
-              <div className="px-5 py-14 text-center">
-                <Building2 className="h-8 w-8 text-[var(--sb-primary)]/40 mx-auto mb-3" />
-                <p className="text-sm font-medium text-sb-on-surface/70">
-                  {searchModalQuery ? "Sin resultados" : "Escribe para buscar"}
-                </p>
-                <p className="text-xs text-sb-on-surface/60 mt-1">
-                  {searchModalQuery ? "Prueba con otro término" : "Busca instituciones por nombre, código o ubicación"}
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-sb-outline-variant/10">
-                {searchResults.map((inst) => {
-                  const TypeIcon = typeIcons[inst.type] || Building2
-                  const gradient = typeColors[inst.type] || "from-gray-500 to-gray-600"
-                  return (
-                    <button
-                      key={inst.id}
-                      type="button"
-                      onClick={() => {
-                        setSearchModalQuery("")
-                        setSearchOpen(false)
-                        setSelectedInst(inst)
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-sb-surface-container/60 transition-colors md-anim-card-in"
-                    >
-                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
-                        <TypeIcon className="h-4 w-4 text-sb-surface" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-sb-on-surface truncate">{inst.name}</p>
-                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                          <span className="text-[10px] font-mono text-sb-on-surface/60 bg-sb-surface-container-high/80 px-1.5 py-0.5 rounded-md">{inst.code}</span>
-                          {inst.district && (
-                            <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {inst.district}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          inst.status === "active"
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-sb-surface-container-high text-sb-on-surface/60"
-                        }`}>
-                          <div className={`h-1.5 w-1.5 rounded-full ${inst.status === "active" ? "bg-emerald-500" : "bg-sb-on-surface/50"}`} />
-                          {inst.status === "active" ? "Activa" : "Inactiva"}
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-sb-on-surface/40" />
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-          <div className="p-3 border-t border-sb-outline-variant/10 flex items-center justify-between text-[11px] text-sb-on-surface/50 bg-sb-surface-container/50">
-            <span>{searchResults.length} resultado{searchResults.length !== 1 ? "s" : ""}</span>
-            <div className="hidden sm:flex items-center gap-1.5">
-              <kbd className="px-1.5 h-4 rounded bg-sb-surface-container-high border border-sb-outline-variant/20">Esc</kbd>
-              <span>para cerrar</span>
+      <AnimatePresence>
+        {searchOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-[70] bg-black/30 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSearchOpen(false)}
+            />
+            <div className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[8vh] md:pt-[12vh] pointer-events-none">
+              <motion.div
+                className="w-full max-w-[600px] pointer-events-auto overflow-hidden"
+                style={{
+                  transformOrigin: "top center",
+                  borderRadius: 20,
+                  backgroundColor: "var(--sb-surface)",
+                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 50%, transparent)",
+                  boxShadow: "0 24px 60px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
+                  backdropFilter: "blur(24px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(24px) saturate(160%)",
+                }}
+                initial={{ opacity: 0, scale: 0.96, y: -12 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -12 }}
+                transition={{ type: "spring", stiffness: 380, damping: 28, mass: 0.9 }}
+              >
+                <div className="relative p-3">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface/50 pointer-events-none" />
+                  <input
+                    autoFocus
+                    placeholder="Buscar por nombre, código o distrito..."
+                    value={searchModalQuery}
+                    onChange={(e) => setSearchModalQuery(e.target.value)}
+                    className="h-12 w-full pl-11 pr-4 rounded-xl bg-sb-surface-container/60 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30"
+                  />
+                </div>
+                <div className="max-h-[55vh] overflow-y-auto px-2 pb-2">
+                  {searchResults.length === 0 ? (
+                    <div className="px-4 py-14 text-center">
+                      <Building2 className="h-8 w-8 text-[var(--sb-primary)]/40 mx-auto mb-3" />
+                      <p className="text-sm font-medium text-sb-on-surface/70">
+                        {searchModalQuery ? "Sin resultados" : "Escribe para buscar"}
+                      </p>
+                      <p className="text-xs text-sb-on-surface/60 mt-1">
+                        {searchModalQuery ? "Prueba con otro término" : "Busca instituciones por nombre, código o ubicación"}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-0.5">
+                      {searchResults.map((inst) => {
+                        const TypeIcon = typeIcons[inst.type] || Building2
+                        const gradient = typeColors[inst.type] || "from-gray-500 to-gray-600"
+                        return (
+                          <button
+                            key={inst.id}
+                            type="button"
+                            onClick={() => {
+                              setSearchModalQuery("")
+                              setSearchOpen(false)
+                              setSelectedInst(inst)
+                            }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl hover:bg-sb-surface-container/70 transition-colors md-anim-card-in"
+                          >
+                            <div className={`h-10 w-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
+                              <TypeIcon className="h-4 w-4 text-sb-surface" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-semibold text-sb-on-surface truncate">{inst.name}</p>
+                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                <span className="text-[10px] font-mono text-sb-on-surface/60 bg-sb-surface-container/70 px-1.5 py-0.5 rounded-md border border-sb-outline-variant/10">
+                                  {inst.code}
+                                </span>
+                                {inst.district && (
+                                  <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    {inst.district}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                inst.status === "active"
+                                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                  : "bg-sb-surface-container text-sb-on-surface/60"
+                              }`}>
+                                <div className={`h-1.5 w-1.5 rounded-full ${inst.status === "active" ? "bg-emerald-500" : "bg-sb-on-surface/50"}`} />
+                                {inst.status === "active" ? "Activa" : "Inactiva"}
+                              </div>
+                              <ChevronRight className="h-4 w-4 text-sb-on-surface/40" />
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="px-4 py-2.5 border-t border-sb-outline-variant/10 flex items-center justify-between text-[11px] text-sb-on-surface/50">
+                  <span>{searchResults.length} resultado{searchResults.length !== 1 ? "s" : ""}</span>
+                  <div className="hidden sm:flex items-center gap-1.5">
+                    <kbd className="px-1.5 h-4 rounded bg-sb-surface-container/70 border border-sb-outline-variant/20">Esc</kbd>
+                    <span>para cerrar</span>
+                  </div>
+                </div>
+              </motion.div>
             </div>
-          </div>
-        </SbModalBody>
-      </SbModal>
+          </>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
