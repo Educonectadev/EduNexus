@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split('.').pop() || 'bin'
     const filename = `${id}-${Date.now()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
-    const file_url = saveUpload('library', filename, buffer)
+    const file_url = await saveUpload('library', filename, buffer)
 
     const fileType = file.type || 'application/octet-stream'
     const fileSize = file.size
@@ -111,7 +111,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete file from disk
-    deleteUpload(existing[0].file_url)
+    await deleteUpload(existing[0].file_url)
 
     await pool.query('DELETE FROM document_library WHERE id = ? AND institution_id = ?', [id, instId])
 

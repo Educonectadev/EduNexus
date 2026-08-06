@@ -147,7 +147,7 @@ export async function DELETE(request: NextRequest) {
 
     const fileUrl = existing[0].file_url
     if (fileUrl) {
-      deleteUpload(fileUrl)
+      await deleteUpload(fileUrl)
     }
 
     await pool.query('DELETE FROM course_materials WHERE id = ?', [id])
