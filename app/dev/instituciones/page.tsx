@@ -488,9 +488,11 @@ export default function DevInstitucionesPage() {
                   animate={{
                     left: filtersOpen ? Math.max(Math.min(filterSize.width, window.innerWidth - 32) - 18, 0) : 0,
                     top: filtersOpen ? Math.max(filterSize.height - 18, 0) : 0,
+                    width: filtersOpen ? "auto" : "100%",
+                    height: filtersOpen ? "auto" : "100%",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
-                  className="absolute flex items-center gap-2 pr-4 pl-4 h-11 text-sm font-medium z-20"
+                  className={`absolute flex items-center gap-2 pr-4 pl-4 text-sm font-medium z-20 ${filtersOpen ? "h-11 min-w-0" : "w-full h-full"}`}
                 >
                   <Filter className="h-4 w-4" />
                   <span className="hidden sm:inline">Filtros</span>
