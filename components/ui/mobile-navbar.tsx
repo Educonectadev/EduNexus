@@ -44,7 +44,7 @@ function NavButton({
         className="absolute inset-0"
         initial={false}
         animate={{
-          borderRadius: isActive ? 20 : 999,
+          borderRadius: isActive ? 20 : 16,
           backgroundColor: isActive ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
         }}
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
@@ -145,7 +145,7 @@ export function MobileNavbar({
                 animate={{
                   width: menuOpen ? Math.max(openSize.width, 56) : 56,
                   height: menuOpen ? Math.max(openSize.height, 56) : 56,
-                  borderRadius: menuOpen ? 24 : 999,
+                  borderRadius: menuOpen ? 24 : 16,
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
               >
