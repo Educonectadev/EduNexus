@@ -217,7 +217,7 @@ export default function DevContrasenasPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 40 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface border border-sb-outline-variant/10"
+              className="fixed inset-x-3 bottom-3 top-auto max-h-[92vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface border border-sb-outline-variant/10"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-sb-surface/95 backdrop-blur flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">

@@ -165,15 +165,15 @@ export default function BackupsPage() {
         <div className="lg:col-span-2">
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/10">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
-                <Database className="h-4 w-4 text-sb-on-surface/50" />
+                <Database className="h-4 w-4 text-sb-on-surface/50 shrink-0" />
                 <h3 className="text-sm font-semibold text-sb-on-surface">Historial de Backups</h3>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {Object.entries(backupTypes).map(([key, bt]) => (
                   <button key={key} onClick={() => setSelectedType(selectedType === key ? "" : key)}
-                    className={`text-[10px] font-medium px-3 h-9 rounded-xl transition-all ${selectedType === key ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface/80 hover:bg-sb-surface-container-high"}`}>
+                    className={`text-[10px] font-medium px-3 h-9 rounded-xl transition-all flex-1 sm:flex-none ${selectedType === key ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface/80 hover:bg-sb-surface-container-high"}`}>
                     {bt.label}
                   </button>
                 ))}

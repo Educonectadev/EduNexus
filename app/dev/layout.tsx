@@ -63,7 +63,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { title: "Audit", href: "/dev/audit", icon: Shield },
       { title: "Backups", href: "/dev/backups", icon: HardDrive },
-      { title: "Perfil", href: "/dev/perfil", icon: UserCircle },
       { title: "Settings", href: "/dev/config", icon: Settings },
     ],
   },

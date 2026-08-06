@@ -170,7 +170,7 @@ export default function PlanesPage() {
         </div>
         <button
           onClick={openCreate}
-          className="h-10 px-4 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all flex-1 sm:flex-none items-center justify-center flex gap-2"
+          className="w-full sm:w-auto h-11 px-5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all items-center justify-center flex gap-2"
         >
           <Plus className="h-4 w-4" />
           Nuevo plan
@@ -248,7 +248,7 @@ export default function PlanesPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 40 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
+              className="fixed inset-x-3 bottom-3 top-auto max-h-[92vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
@@ -342,7 +342,7 @@ export default function PlanesPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 40 }}
               transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-0 top-auto max-h-[92vh] overflow-y-auto rounded-t-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
+              className="fixed inset-x-3 bottom-3 top-auto max-h-[92vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between px-6 py-5 border-b border-sb-outline-variant/10">

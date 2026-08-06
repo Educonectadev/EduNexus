@@ -369,11 +369,11 @@ export default function DevInstitucionesPage() {
     >
       {/* Header */}
       <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl bg-sb-on-surface p-6 md:p-8 text-sb-surface">
-        <div className="relative flex items-start justify-between gap-4">
+        <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Instituciones</h1>
             <p className="text-sm mt-1 text-sb-surface/80">Gestión de instituciones educativas del sistema</p>
-            <div className="flex items-center gap-3 mt-3">
+            <div className="flex flex-wrap items-center gap-3 mt-3">
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sb-surface/15 backdrop-blur-sm text-xs font-medium">
                 <CircleDot className="h-3 w-3" />
                 {institutions.length} total
@@ -389,7 +389,7 @@ export default function DevInstitucionesPage() {
             size="sm"
             rounded
             onClick={() => { fetchNextCode(); setDialogOpen(true) }}
-            className="!bg-sb-surface/15 !text-sb-surface hover:!bg-sb-surface/25 backdrop-blur-sm"
+            className="!bg-sb-surface/15 !text-sb-surface hover:!bg-sb-surface/25 backdrop-blur-sm w-full sm:w-auto justify-center"
           >
             <Plus className="h-4 w-4" />
             Nueva Institución

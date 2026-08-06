@@ -279,11 +279,11 @@ export default function DevDemoPage() {
 
       {/* Detail Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center" onClick={() => setSelectedRequest(null)}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center sm:items-center p-3 sm:p-4" onClick={() => setSelectedRequest(null)}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl sm:max-w-lg bg-sb-surface shadow-2xl border border-sb-outline-variant/10"
+            className="w-full max-h-[92vh] overflow-y-auto rounded-3xl sm:rounded-2xl sm:max-w-lg bg-sb-surface shadow-2xl border border-sb-outline-variant/10"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
