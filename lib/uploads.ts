@@ -23,12 +23,18 @@ export function ensureUploadDir<T>(_category?: string): T | undefined {
 /** Saves a buffer into Supabase Storage and returns its public URL. */
 export async function saveUpload(category: string, filename: string, buffer: Buffer): Promise<string> {
   const objectPath = `${category}/${filename}`
-  const { error } = await supabase.storage.from(BUCKET).upload(objectPath, buffer, {
+  const { data, error } = await supabase.storage.from(BUCKET).upload(objectPath, buffer, {
     contentType: guessMime(filename),
     cacheControl: '3600',
     upsert: false,
   })
-  if (error) throw error
+  if (error) {
+    console.error('[saveUpload] Supabase error:', error.message, error.statusCode ?? '', error.name)
+    throw new Error(
+      `upload_storage_${error.statusCode ?? 'error'}: ${error.message}` +
+        `. Verifica que el bucket "uploads" exista y las políticas anon estén instaladas.`,
+    )
+  }
   return publicUrl(category, filename)
 }
 
