@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
-import fs from 'fs'
-import path from 'path'
 import crypto from 'crypto'
 import { getAuthPayload } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'materials')
+import { saveUpload, deleteUpload } from '@/lib/uploads'
 
 // Schema managed by migrations/
-
-function ensureUploadDir() {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,8 +74,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Materiales no disponibles en tu plan' }, { status: 403 })
     }
 
-    ensureUploadDir()
-
     const formData = await request.formData()
     const name = formData.get('name') as string
     const description = formData.get('description') as string | null
@@ -114,8 +103,7 @@ export async function POST(request: NextRequest) {
       const ext = file.name.split('.').pop() || 'bin'
       const filename = `${id}-${Date.now()}.${ext}`
       const buffer = Buffer.from(await file.arrayBuffer())
-      fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer)
-      file_url = `/uploads/materials/${filename}`
+      file_url = saveUpload('materials', filename, buffer)
       fileType = file.type || 'application/octet-stream'
       fileSize = file.size
     }
@@ -159,10 +147,7 @@ export async function DELETE(request: NextRequest) {
 
     const fileUrl = existing[0].file_url
     if (fileUrl) {
-      const filePath = path.join(process.cwd(), 'public', fileUrl)
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath)
-      }
+      deleteUpload(fileUrl)
     }
 
     await pool.query('DELETE FROM course_materials WHERE id = ?', [id])

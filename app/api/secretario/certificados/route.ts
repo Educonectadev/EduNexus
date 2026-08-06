@@ -1,21 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import crypto from 'crypto'
-import fs from 'fs'
-import path from 'path'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
 import { checkPlanFeature, checkPlanLimit } from '@/lib/checkPlanLimit'
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'certificates')
+import { saveUpload } from '@/lib/uploads'
 
 // Schema managed by migrations/
-
-function ensureUploadDir() {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -53,8 +44,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: limitCheck.message }, { status: 403 })
     }
 
-    ensureUploadDir()
-
     const formData = await request.formData()
     const student_id = formData.get('student_id') as string | null
     const student_name = formData.get('student_name') as string
@@ -72,8 +61,7 @@ export async function POST(request: NextRequest) {
       const ext = file.name.split('.').pop() || 'pdf'
       const filename = `${id}-${Date.now()}.${ext}`
       const buffer = Buffer.from(await file.arrayBuffer())
-      fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer)
-      file_url = `/uploads/certificates/${filename}`
+      file_url = saveUpload('certificates', filename, buffer)
     }
 
     await pool.query(

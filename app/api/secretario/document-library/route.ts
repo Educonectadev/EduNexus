@@ -1,20 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import crypto from 'crypto'
-import fs from 'fs'
-import path from 'path'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
-
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'library')
+import { saveUpload, deleteUpload } from '@/lib/uploads'
 
 // Schema managed by migrations/
-
-function ensureUploadDir() {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-  }
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -73,8 +64,7 @@ export async function POST(request: NextRequest) {
     const ext = file.name.split('.').pop() || 'bin'
     const filename = `${id}-${Date.now()}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
-    fs.writeFileSync(path.join(UPLOAD_DIR, filename), buffer)
-    const file_url = `/uploads/library/${filename}`
+    const file_url = saveUpload('library', filename, buffer)
 
     const fileType = file.type || 'application/octet-stream'
     const fileSize = file.size
@@ -121,13 +111,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete file from disk
-    const fileUrl = existing[0].file_url
-    if (fileUrl) {
-      const filePath = path.join(process.cwd(), 'public', fileUrl)
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath)
-      }
-    }
+    deleteUpload(existing[0].file_url)
 
     await pool.query('DELETE FROM document_library WHERE id = ? AND institution_id = ?', [id, instId])
 
