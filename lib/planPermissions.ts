@@ -6,7 +6,7 @@ export const ALL_PERMISSIONS = [
   { key: 'can_homework', label: 'Tareas y revisiones', default: true },
   { key: 'can_certificates', label: 'Certificados digitales', default: false },
   { key: 'can_virtual_classes', label: 'Clases virtuales (Zoom/Meet)', default: false },
-  { key: 'can_ai_assistant', label: 'Asistente IA del secretario', default: false },
+  { key: 'can_ai_assistant', label: 'Asistente IA del secretario', default: true },
   { key: 'can_chat', label: 'Chat en tiempo real docente-padre', default: false },
   { key: 'can_carnets', label: 'Carnets PDF descargables', default: false },
   { key: 'can_bulk_import', label: 'Importación masiva', default: false },
