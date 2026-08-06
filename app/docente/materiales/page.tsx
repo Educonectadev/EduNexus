@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { FileText, Upload, Download, Search, Image, File, X, Trash2, Library } from "lucide-react"
+import { FileText, Upload, Download, Search, Image, File, X, Trash2, Library } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbInput, SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 

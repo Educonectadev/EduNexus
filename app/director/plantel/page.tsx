@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Users, Building2, GraduationCap, UserCheck, Search, ChevronRight, Phone, Hash, Mail, BadgeCheck, BookOpen, X, Filter, Briefcase } from "lucide-react"
+import { Users, Building2, GraduationCap, UserCheck, Search, ChevronRight, Phone, Hash, Mail, BadgeCheck, BookOpen, X, Filter, Briefcase } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbInput, SbBadge } from "@/components/ui/sb"
 import { cn } from "@/lib/utils"

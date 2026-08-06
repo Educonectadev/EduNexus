@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Activity, Users, Clock, TrendingUp, Monitor, Smartphone, Globe, Search } from "lucide-react"
+import { Activity, Users, Clock, TrendingUp, Monitor, Smartphone, Globe, Search } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 interface SessionStats {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Users, Download, ChevronLeft, ChevronRight } from "lucide-react"
+import { Users, Download, ChevronLeft, ChevronRight } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbInput } from "@/components/ui/sb"
 import { cn } from "@/lib/utils"

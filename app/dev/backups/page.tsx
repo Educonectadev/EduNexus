@@ -7,7 +7,7 @@ import {
   Database, Download, Upload, RefreshCw, Clock, Server,
   HardDrive, Shield, CheckCircle2, AlertCircle, ChevronDown,
   Trash2, Play, Pause, FileArchive, CloudCog, Activity
-} from "lucide-react"
+} from "@/components/ui/proicons"
 
 interface BackupEntry {
   id: string

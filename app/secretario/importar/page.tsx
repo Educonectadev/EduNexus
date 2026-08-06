@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Table,
   Info,
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 import { SbBtn } from '@/components/ui/sb'
 
 type CsvRow = string[]

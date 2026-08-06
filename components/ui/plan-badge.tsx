@@ -1,6 +1,6 @@
 'use client'
 
-import { CreditCard } from 'lucide-react'
+import { CreditCard } from "@/components/ui/proicons"
 
 interface PlanBadgeProps {
   planName: string

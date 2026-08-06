@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, List, ListOrdered, Heading1, Heading2 } from "lucide-react"
+import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, List, ListOrdered, Heading1, Heading2 } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface MiniWordEditorProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Plus, Search, Edit3, Trash2, Users, GraduationCap, X, AlertTriangle, Command, Upload, Download, AlertCircle, CheckCircle, Table } from "lucide-react"
+import { BookOpen, Plus, Search, Edit3, Trash2, Users, GraduationCap, X, AlertTriangle, Command, Upload, Download, AlertCircle, CheckCircle, Table } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbInput } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfResultsCount } from "@/components/ui/search-filter-bar"

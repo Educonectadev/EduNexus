@@ -4,7 +4,7 @@ import { useRef, useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Upload, Download, CheckCircle, AlertCircle, Table, Info, Key, Copy, Check, Users,
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 import { SbModal, SbModalBody, SbModalHeader, SbBtn } from '@/components/ui/sb'
 
 type CsvRow = string[]

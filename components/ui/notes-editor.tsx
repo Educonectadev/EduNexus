@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Columns, LayoutGrid, List, StickyNote } from "lucide-react"
+import { Columns, LayoutGrid, List, StickyNote } from "@/components/ui/proicons"
 
 type ViewMode = "note" | "list" | "grid" | "columns"
 

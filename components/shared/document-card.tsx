@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Download, Trash2, FileText, CheckCircle2, XCircle } from "lucide-react"
+import { Download, Trash2, FileText, CheckCircle2, XCircle } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import type { Document } from "@/types"
 

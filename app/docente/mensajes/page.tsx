@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { 
   MessageCircle, Send, Search, ArrowLeft, 
   Circle, CreditCard 
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 import { connectSocket, getSocket } from '@/lib/socket'
 
 const staggerItem = {

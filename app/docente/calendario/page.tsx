@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeft, ChevronRight, Clock, BookOpen, MapPin, Video, Calendar as CalendarIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight, Clock, BookOpen, MapPin, Video, Calendar as CalendarIcon } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 

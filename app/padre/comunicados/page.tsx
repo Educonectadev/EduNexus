@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { Megaphone, Bell, Calendar } from "lucide-react"
+import { Megaphone, Bell, Calendar } from "@/components/ui/proicons"
 
 interface Comunicado {
   id: string

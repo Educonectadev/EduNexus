@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { MobileNavbar } from "@/components/ui/mobile-navbar"
-import { LayoutDashboard, BookOpen, UserCheck, GraduationCap, CreditCard, Calendar, Settings } from "lucide-react"
+import { LayoutDashboard, BookOpen, UserCheck, GraduationCap, CreditCard, Calendar, Settings } from "@/components/ui/proicons"
 
 export default function NavbarTestPage() {
   return (

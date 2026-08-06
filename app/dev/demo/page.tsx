@@ -6,7 +6,7 @@ import {
   Calendar, Mail, Phone, Building2, Users, MessageSquare, 
   Clock, CheckCircle, XCircle, AlertCircle, Search, Filter,
   MoreVertical, Eye, Trash2, ArrowUpRight, RefreshCw
-} from "lucide-react"
+} from "@/components/ui/proicons"
 
 interface DemoRequest {
   id: string

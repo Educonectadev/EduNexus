@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Upload, FileText, Download, CheckCircle, AlertCircle, Table, Info, Users, Copy, Check, Key, Mail,
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 import { SbBtn } from '@/components/ui/sb'
 import { useAuthStore } from '@/stores/auth-store'
 

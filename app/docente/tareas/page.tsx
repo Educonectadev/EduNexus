@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap, ChevronDown } from "lucide-react"
+import { ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap, ChevronDown } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 

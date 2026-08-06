@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap } from "lucide-react"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface Horario {

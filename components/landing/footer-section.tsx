@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@/components/ui/proicons";
 import { AnimatedWave } from "./animated-wave";
 
 const footerLinks = {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { SbCard, SbBtn, SbBadge, SbTable, SbStatCard } from "@/components/ui/sb"
-import { HeadphonesIcon, Plus, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { HeadphonesIcon, Plus, Clock, CheckCircle, AlertCircle } from "@/components/ui/proicons"
 
 const mockTickets = [
   { id: "T001", subject: "Error al cargar notas", institution: "Colegio San Martín", priority: "high", status: "open", created: "2024-01-15" },

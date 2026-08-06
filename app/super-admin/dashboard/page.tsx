@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Building2, Users, DollarSign, UserPlus, TrendingUp, TrendingDown, School, CreditCard, Download } from "lucide-react"
+import { Building2, Users, DollarSign, UserPlus, TrendingUp, TrendingDown, School, CreditCard, Download } from "@/components/ui/proicons"
 import {
   LineChart,
   Line,

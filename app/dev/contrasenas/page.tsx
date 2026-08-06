@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Key, Search, Eye, EyeOff, Copy, RefreshCw, Shield, Clock, AlertTriangle, Check, User, X } from "lucide-react"
+import { Key, Search, Eye, EyeOff, Copy, RefreshCw, Shield, Clock, AlertTriangle, Check, User, X } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface PasswordUser {

@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   GraduationCap, TrendingUp, ClipboardList, CreditCard, Calendar,
   BookOpen, CheckCircle2, Clock, AlertCircle,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { MinimalistDashboardView } from "@/components/dashboard/minimalist/minimalist-dashboard-view"
 import { useAuthStore } from "@/stores/auth-store"
 

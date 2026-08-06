@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { SbBtn, SbInput, SbLabel, SbSwitch, SbCard, SbTabs } from "@/components/ui/sb"
-import { Save, Mail, Database, Globe, Shield } from "lucide-react"
+import { Save, Mail, Database, Globe, Shield } from "@/components/ui/proicons"
 
 const tabs = [
   { id: "general", label: "General" },

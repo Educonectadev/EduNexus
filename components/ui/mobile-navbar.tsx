@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { MoreHorizontal, Sparkles, User } from "lucide-react"
+import { MoreHorizontal, Sparkles, User } from "@/components/ui/proicons"
 
 interface NavItem {
   title: string

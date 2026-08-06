@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Shield, Lock, Eye, FileCheck } from "lucide-react";
+import { Shield, Lock, Eye, FileCheck } from "@/components/ui/proicons";
 
 const securityFeatures = [
   {

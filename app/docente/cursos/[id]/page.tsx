@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowLeft, BookOpen, Users, UserRound, GraduationCap, Mail, BadgeCheck } from "lucide-react"
+import { ArrowLeft, BookOpen, Users, UserRound, GraduationCap, Mail, BadgeCheck } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useParams } from "next/navigation"

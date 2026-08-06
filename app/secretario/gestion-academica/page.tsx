@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Layers, Plus, Pencil, Trash2, ChevronDown, Sparkles, BookOpen, School } from "lucide-react"
+import { GraduationCap, Layers, Plus, Pencil, Trash2, ChevronDown, Sparkles, BookOpen, School } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalBody, SbModalHeader, SbModalFooter, useToast } from "@/components/ui/sb"
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { X } from "lucide-react"
+import { X } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 
 /* ===== BUTTONS ===== */

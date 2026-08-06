@@ -6,7 +6,7 @@ import { SbBtn } from "@/components/ui/sb"
 import {
   Filter, Check, X, Users, Shield, GraduationCap, BookOpen,
   UserCheck, ChevronDown,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import "@/styles/animations.css"
 
 const springTransition = {

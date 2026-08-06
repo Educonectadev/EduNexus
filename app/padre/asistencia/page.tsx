@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { UserCheck, Calendar, Clock, AlertTriangle, CheckCircle2, XCircle, TrendingUp } from "lucide-react"
+import { UserCheck, Calendar, Clock, AlertTriangle, CheckCircle2, XCircle, TrendingUp } from "@/components/ui/proicons"
 
 interface AttendanceRecord {
   date: string

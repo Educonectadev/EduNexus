@@ -9,8 +9,8 @@ import {
   ChevronRight, Bot, Zap, Plus, MessageSquare, Trash2, MoreHorizontal,
   PanelLeftClose, PanelLeft, ArrowLeft, Check, Copy, Sun, Moon,
   User as UserIcon, LogOut, Settings, X,
-} from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+} from "@/components/ui/proicons"
+import type { LucideIcon } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"

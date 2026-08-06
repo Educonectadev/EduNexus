@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { GraduationCap, BookOpen, Check, X, Search, TrendingUp, TrendingDown, Minus, Save, ChevronDown } from "lucide-react"
+import { GraduationCap, BookOpen, Check, X, Search, TrendingUp, TrendingDown, Minus, Save, ChevronDown } from "@/components/ui/proicons"
 import { SbInput, SbBtn } from "@/components/ui/sb"
 
 interface Course { id: string; name: string; code: string; grade: string; section: string; teacher_name: string }

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { ClipboardList, Clock, CheckCircle2, Star, BookOpen, Calendar, AlertTriangle } from "lucide-react"
+import { ClipboardList, Clock, CheckCircle2, Star, BookOpen, Calendar, AlertTriangle } from "@/components/ui/proicons"
 
 interface Homework {
   id: string

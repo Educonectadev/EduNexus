@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar } from "lucide-react"
+import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalBody, SbBtn, SbBadge } from "@/components/ui/sb"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Download, FileText, FileImage, File, Loader2, EyeOff } from "lucide-react"
+import { X, Download, FileText, FileImage, File, Loader2, EyeOff } from "@/components/ui/proicons"
 
 interface DocumentViewerProps {
   open: boolean

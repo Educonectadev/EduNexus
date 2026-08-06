@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import type { LucideIcon } from "lucide-react"
-import { Check, X, Sparkles } from "lucide-react"
+import type { LucideIcon } from "@/components/ui/proicons"
+import { Check, X, Sparkles } from "@/components/ui/proicons"
 import { SbModal, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 
 export interface OnboardingStep {

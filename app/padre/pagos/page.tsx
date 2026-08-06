@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CreditCard, CheckCircle2, Clock, AlertTriangle, Receipt, ArrowUpRight, TrendingDown, Eye, Download, Printer, Landmark, Smartphone, Coins, ArrowLeftRight, GraduationCap } from "lucide-react"
+import { CreditCard, CheckCircle2, Clock, AlertTriangle, Receipt, ArrowUpRight, TrendingDown, Eye, Download, Printer, Landmark, Smartphone, Coins, ArrowLeftRight, GraduationCap } from "@/components/ui/proicons"
 import { SbDropdown, SbDropdownItem } from "@/components/ui/sb"
 
 interface PaymentSummary {

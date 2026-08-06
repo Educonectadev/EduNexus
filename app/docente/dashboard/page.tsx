@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   BookOpen, GraduationCap, UserCheck, ClipboardList, MessageSquare,
   Calendar, Clock, ChevronRight, LogIn, LogOut, BookMarked, MapPin,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"

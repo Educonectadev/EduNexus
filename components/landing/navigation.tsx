@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon } from "@/components/ui/proicons";
 import { useTheme } from "next-themes";
 import { DemoModal } from "@/components/demo-modal";
 

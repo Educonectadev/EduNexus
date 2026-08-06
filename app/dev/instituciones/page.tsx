@@ -43,7 +43,7 @@ import {
   ChevronDown,
   Clock,
   CalendarDays,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { departments, type Department, type Province } from "@/lib/data/peru-geo"
 import "@/styles/animations.css"

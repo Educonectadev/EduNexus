@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { Lock, CreditCard } from 'lucide-react'
+import { Lock, CreditCard } from "@/components/ui/proicons"
 import { motion } from 'framer-motion'
 
 interface FeatureGateProps {

@@ -25,7 +25,7 @@ import {
   HardDrive,
   X,
   DollarSign,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 

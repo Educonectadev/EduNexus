@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import type { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "@/components/ui/proicons"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 

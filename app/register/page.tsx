@@ -5,7 +5,7 @@ import Link from "next/link"
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { Loader2 } from "@/components/ui/proicons"
 import { SbBtn, SbInput, SbCard } from "@/components/ui/sb"
 
 export default function RegisterPage() {

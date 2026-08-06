@@ -25,7 +25,7 @@ import {
   Settings,
   LogOut,
   Menu,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 

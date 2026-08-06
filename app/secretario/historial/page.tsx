@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Clock, User, FileText, GraduationCap, Settings, Trash2, Search, X, Filter, Plus, Upload, Download, BookOpen, CalendarDays, AlertCircle, ChevronDown, Activity, Hash, Command } from "lucide-react"
+import { Clock, User, FileText, GraduationCap, Settings, Trash2, Search, X, Filter, Plus, Upload, Download, BookOpen, CalendarDays, AlertCircle, ChevronDown, Activity, Hash, Command } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn } from "@/components/ui/sb"
 

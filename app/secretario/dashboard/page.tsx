@@ -5,7 +5,7 @@ import {
   GraduationCap, Users, FileText, ClipboardList, Plus, Search,
   BookOpen, Calendar, Clock, AlertCircle, DollarSign,
   UserPlus, CheckCircle, CreditCard, FileSignature, HelpCircle,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { MinimalistDashboardView } from "@/components/dashboard/minimalist/minimalist-dashboard-view"
 import { OnboardingModal } from "@/components/ui/onboarding-modal"
 import { useAuthStore } from "@/stores/auth-store"

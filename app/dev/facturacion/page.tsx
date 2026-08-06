@@ -7,7 +7,7 @@ import {
   DollarSign, CreditCard, TrendingUp, Download, ArrowUpRight,
   Building2, Clock, Receipt, BarChart3, Wallet, RefreshCw,
   TrendingDown, ArrowDownRight,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 
 interface Institution {
   id: string; name: string; code: string; status: string

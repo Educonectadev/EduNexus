@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { 
   Download, Users, Search, Filter, CheckSquare, Square, 
   GraduationCap, CreditCard, AlertCircle 
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 
 const staggerItem = {
   hidden: { opacity: 0, y: 20 },

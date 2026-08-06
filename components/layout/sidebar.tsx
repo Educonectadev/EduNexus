@@ -30,7 +30,7 @@ import {
   Calendar,
   UserCheck,
   BookMarked,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 
 interface NavItem {
   title: string

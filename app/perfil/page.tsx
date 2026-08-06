@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { User, Mail, Calendar, Shield, Phone, Save, Key, Eye, EyeOff, Fingerprint, Building2, LogOut, Layers, Globe, Sparkles, Check } from "lucide-react"
+import { User, Mail, Calendar, Shield, Phone, Save, Key, Eye, EyeOff, Fingerprint, Building2, LogOut, Layers, Globe, Sparkles, Check } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check } from "@/components/ui/proicons";
 import { DemoModal } from "@/components/demo-modal";
 
 const plans = [

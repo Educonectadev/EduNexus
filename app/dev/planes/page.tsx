@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CreditCard, Plus, Pencil, Trash2, Check, X, Shield, ShieldOff, Users, GraduationCap, Eye } from "lucide-react"
+import { CreditCard, Plus, Pencil, Trash2, Check, X, Shield, ShieldOff, Users, GraduationCap, Eye } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface Plan {

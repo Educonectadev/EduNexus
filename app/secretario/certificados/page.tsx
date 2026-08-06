@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, FileText, Download, Search, Trash2, X, Command, Filter, FolderOpen } from "lucide-react"
+import { Plus, FileText, Download, Search, Trash2, X, Command, Filter, FolderOpen } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter, useToast } from "@/components/ui/sb"
 import { generateCertificatePDF, downloadPDF, generateCertificateDOCX, downloadDOCX } from "@/lib/pdf"

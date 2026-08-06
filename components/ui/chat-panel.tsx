@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Send, ArrowLeft, Search } from 'lucide-react'
+import { Send, ArrowLeft, Search } from "@/components/ui/proicons"
 import { ChatMessage } from './chat-message'
 import { connectSocket, getSocket } from '@/lib/socket'
 

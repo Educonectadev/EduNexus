@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/ui/proicons";
 import { AnimatedTetrahedron } from "./animated-tetrahedron";
 import { DemoModal } from "@/components/demo-modal";
 

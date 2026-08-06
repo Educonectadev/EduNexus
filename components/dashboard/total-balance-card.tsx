@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Eye, EyeOff, TrendingUp, TrendingDown } from "lucide-react"
+import { Eye, EyeOff, TrendingUp, TrendingDown } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 interface TotalBalanceCardProps {

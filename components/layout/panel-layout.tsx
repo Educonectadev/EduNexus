@@ -14,7 +14,7 @@ import {
   MessageSquare, Calendar, UserCheck, BookMarked, Bell, Search, User,
   ArrowRight, Clock, CheckCircle2, AlertCircle, BellRing, X, Layers, Plus,
   Sparkles,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { MobileNavbar } from "@/components/ui/mobile-navbar"

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Terminal, Play, Clock, CheckCircle, XCircle, Copy, Database } from "lucide-react"
+import { Terminal, Play, Clock, CheckCircle, XCircle, Copy, Database } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 interface QueryResult {

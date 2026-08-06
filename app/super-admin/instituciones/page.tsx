@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Search, Eye, LayoutDashboard, Users, GraduationCap, Building2, X, Trash2, CreditCard, Download } from "lucide-react"
+import { Plus, Search, Eye, LayoutDashboard, Users, GraduationCap, Building2, X, Trash2, CreditCard, Download } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 import { useRouter } from "next/navigation"

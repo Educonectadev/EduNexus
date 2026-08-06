@@ -6,7 +6,7 @@ import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validation
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { motion, AnimatePresence } from "framer-motion"
-import { Loader2, Mail, ArrowRight, ChevronLeft, CheckCircle2, KeyRound, Sun, Moon } from "lucide-react"
+import { Loader2, Mail, ArrowRight, ChevronLeft, CheckCircle2, KeyRound, Sun, Moon } from "@/components/ui/proicons"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { SbBtn, SbInput } from "@/components/ui/sb"

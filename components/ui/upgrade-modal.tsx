@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, CreditCard, Zap, Building2, Star, Gem } from 'lucide-react'
+import { X, Check, CreditCard, Zap, Building2, Star, Gem } from "@/components/ui/proicons"
 
 interface UpgradeModalProps {
   isOpen: boolean

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Calendar, MapPin, Clock, BookOpen, Users, PartyPopper, AlertTriangle, GraduationCap, X } from "lucide-react"
+import { Calendar, MapPin, Clock, BookOpen, Users, PartyPopper, AlertTriangle, GraduationCap, X } from "@/components/ui/proicons"
 
 interface CalendarEvent {
   id: string

@@ -5,7 +5,7 @@ import {
   DollarSign, CreditCard, TrendingDown, AlertCircle, CheckCircle,
   Clock, Search, Plus, Trash2, Edit3, Save, User, BookOpen,
   Calendar, Settings2, X, Command, Landmark, Smartphone, Coins, ArrowLeftRight,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbBadge, SbInput, SbSelect, SbModal, SbModalBody, SbModalHeader, SbModalFooter, useToast } from "@/components/ui/sb"
 

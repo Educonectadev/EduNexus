@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { GraduationCap, TrendingUp, UserCheck, Award, BookOpen } from "lucide-react"
+import { GraduationCap, TrendingUp, UserCheck, Award, BookOpen } from "@/components/ui/proicons"
 
 interface Student {
   id: string

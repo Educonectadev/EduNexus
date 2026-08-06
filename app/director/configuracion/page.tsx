@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone } from "lucide-react"
+import { Settings, Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbBtn, SbInput, SbSwitch } from "@/components/ui/sb"

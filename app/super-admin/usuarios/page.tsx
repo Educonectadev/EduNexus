@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { SbBtn, SbInput, SbBadge, SbCard, SbTable } from "@/components/ui/sb"
-import { Plus, Search, User } from "lucide-react"
+import { Plus, Search, User } from "@/components/ui/proicons"
 
 const mockUsers = [
   { id: "1", name: "Carlos Mendoza", email: "carlos@colegiosanmartin.edu.pe", role: "director", institution: "Colegio San Martín", status: "active" },

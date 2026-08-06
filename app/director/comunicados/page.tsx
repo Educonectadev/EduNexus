@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Megaphone, Plus, Trash2, Search, Filter, Eye, EyeOff, Send, AlertTriangle, AlertCircle, Info, Clock, CalendarDays, Edit3, FileText, MessageSquare, Users, UserCheck, GraduationCap, Building2, Pin, PinOff, X } from "lucide-react"
+import { Megaphone, Plus, Trash2, Search, Filter, Eye, EyeOff, Send, AlertTriangle, AlertCircle, Info, Clock, CalendarDays, Edit3, FileText, MessageSquare, Users, UserCheck, GraduationCap, Building2, Pin, PinOff, X } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbInput, SbBadge } from "@/components/ui/sb"

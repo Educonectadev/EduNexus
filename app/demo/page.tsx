@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { 
   Send, CheckCircle, Building2, User, Mail, Phone, 
   Users, MessageSquare, ArrowLeft, GraduationCap
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import Link from "next/link"
 
 export default function DemoPage() {

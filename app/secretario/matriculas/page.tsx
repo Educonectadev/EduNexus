@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Sparkles } from "lucide-react"
+import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Sparkles } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbIconBtn, SbDropdown, SbDropdownItem, SbBadge } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfClearFilters, SbfResultsCount } from "@/components/ui/search-filter-bar"

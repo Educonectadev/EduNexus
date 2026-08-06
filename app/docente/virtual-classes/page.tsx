@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { 
   Video, Plus, ExternalLink, Calendar, Clock, 
   Monitor, CreditCard, Users 
-} from 'lucide-react'
+} from "@/components/ui/proicons"
 
 const staggerItem = {
   hidden: { opacity: 0, y: 20 },

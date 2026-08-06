@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Users, Plus, Search, Eye, Pencil, Trash2, X, Link, UserCheck, ChevronRight, Phone, Mail, MapPin, Briefcase, GraduationCap, Heart, Shield, User, Filter, UserPlus, BookOpen, Command } from "lucide-react"
+import { Users, Plus, Search, Eye, Pencil, Trash2, X, Link, UserCheck, ChevronRight, Phone, Mail, MapPin, Briefcase, GraduationCap, Heart, Shield, User, Filter, UserPlus, BookOpen, Command } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter, useToast } from "@/components/ui/sb"
 import { peruvianOccupations } from "@/lib/occupations"

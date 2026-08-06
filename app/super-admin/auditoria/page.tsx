@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Building2, Database, Users, Key, LayoutDashboard, Clock, ArrowRight, Zap, RefreshCw, Eye, ChevronDown, Server, Table2, Hash, Lock, Mail, UserCheck } from "lucide-react"
+import { Building2, Database, Users, Key, LayoutDashboard, Clock, ArrowRight, Zap, RefreshCw, Eye, ChevronDown, Server, Table2, Hash, Lock, Mail, UserCheck } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface Institution {

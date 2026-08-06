@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { SbCard, SbBtn, SbBadge } from "@/components/ui/sb"
-import { Check, X, Loader2, RefreshCw, Users, GraduationCap, HardDrive } from "lucide-react"
+import { Check, X, Loader2, RefreshCw, Users, GraduationCap, HardDrive } from "@/components/ui/proicons"
 
 interface Plan {
   id: string

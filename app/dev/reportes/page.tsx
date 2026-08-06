@@ -7,7 +7,7 @@ import {
   Building2, Users, DollarSign, TrendingUp, Download, RefreshCw,
   BarChart3, GraduationCap, UserCheck, BookOpen, FileText, School,
   ArrowUpRight, PieChart as PieChartIcon
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell

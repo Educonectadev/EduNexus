@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Terminal, Play, CheckCircle, AlertCircle, Database, Zap } from "lucide-react"
+import { Terminal, Play, CheckCircle, AlertCircle, Database, Zap } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 interface SeedResult {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers } from "lucide-react"
+import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { PrettyTabs } from "@/components/dashboard/pretty-tabs"
 

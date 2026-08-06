@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 interface StatCardProps {

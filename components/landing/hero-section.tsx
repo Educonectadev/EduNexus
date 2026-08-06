@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/ui/proicons";
 import { AnimatedSphere } from "./animated-sphere";
 
 const words = ["gestionar", "conectar", "transformar", "innovar"];

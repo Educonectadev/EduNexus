@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowLeft, Plus, LayoutDashboard, BarChart3, GraduationCap, Users, Eye, Edit, Trash2, ToggleLeft, ToggleRight, Settings, UserCheck, BookOpen, CreditCard, ClipboardList } from "lucide-react"
+import { ArrowLeft, Plus, LayoutDashboard, BarChart3, GraduationCap, Users, Eye, Edit, Trash2, ToggleLeft, ToggleRight, Settings, UserCheck, BookOpen, CreditCard, ClipboardList } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 import { useRouter, useParams } from "next/navigation"

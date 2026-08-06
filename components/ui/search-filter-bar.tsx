@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, X, Command, ChevronDown, Check, Filter } from "lucide-react"
+import { Search, X, Command, ChevronDown, Check, Filter } from "@/components/ui/proicons"
 import { AnimatePresence, motion } from "framer-motion"
 
 /* ===== Custom Select Dropdown ===== */

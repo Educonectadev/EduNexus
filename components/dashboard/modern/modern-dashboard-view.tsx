@@ -2,12 +2,12 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import type { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "@/components/ui/proicons"
 import {
   GraduationCap, Users, FileText, ClipboardList, Plus, Search,
   ArrowUpRight, BookOpen, Calendar, Clock, AlertCircle, DollarSign,
   Zap, Star, ChevronRight, MoreHorizontal, Bell,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import Link from "next/link"
 
 /* ─── Types ─── */

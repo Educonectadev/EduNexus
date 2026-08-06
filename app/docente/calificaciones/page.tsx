@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, BookMarked, TrendingUp, TrendingDown, X, Pencil, Trash2, BarChart3, ChevronDown } from "lucide-react"
+import { Plus, BookMarked, TrendingUp, TrendingDown, X, Pencil, Trash2, BarChart3, ChevronDown } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 

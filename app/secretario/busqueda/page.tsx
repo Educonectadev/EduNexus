@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, User, GraduationCap, Phone, BadgeCheck, ChevronRight, FileText, Calendar, BookOpen, Filter, X, Command, ArrowRight, Hash, CreditCard, Sparkles, Info } from "lucide-react"
+import { Search, User, GraduationCap, Phone, BadgeCheck, ChevronRight, FileText, Calendar, BookOpen, Filter, X, Command, ArrowRight, Hash, CreditCard, Sparkles, Info } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalBody } from "@/components/ui/sb"
 import { useRouter } from "next/navigation"

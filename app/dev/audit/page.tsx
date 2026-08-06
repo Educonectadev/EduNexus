@@ -5,7 +5,7 @@ import {
   Building2, Users, GraduationCap, UserCheck, BookOpen,
   Activity, RefreshCw, MapPin, Clock, Check, Circle,
   ChevronDown, ChevronRight, Sparkles, Link2, UserPlus,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import "@/styles/animations.css"
 

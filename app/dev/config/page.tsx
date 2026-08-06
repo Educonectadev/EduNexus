@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Server, Database, Shield, Globe, Code2, Zap, Palette } from "lucide-react"
+import { Settings, Server, Database, Shield, Globe, Code2, Zap, Palette } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 const stagger = {

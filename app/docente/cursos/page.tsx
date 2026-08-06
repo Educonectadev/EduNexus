@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, Clock, ChevronRight } from "lucide-react"
+import { BookOpen, Users, Clock, ChevronRight } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import Link from "next/link"
 

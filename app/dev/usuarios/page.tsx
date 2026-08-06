@@ -16,7 +16,7 @@ import {
   Filter, CheckCircle2, Circle, ChevronRight,
   AlertTriangle, CircleDot, Sparkles, Clock, Check,
   ChevronDown,
-} from "lucide-react"
+} from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import "@/styles/animations.css"
 
