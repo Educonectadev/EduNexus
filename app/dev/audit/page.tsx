@@ -94,7 +94,7 @@ const fadeUp = {
 
 function PipelineHeader() {
   return (
-    <div className="flex items-center gap-0 w-full">
+    <div className="flex items-center gap-0 w-full min-w-[560px]">
       {SEQUENCE_STEPS.map((step, i) => (
         <React.Fragment key={step.key}>
           <div className="flex flex-col items-center gap-1 shrink-0">
@@ -196,43 +196,45 @@ function InstitutionRow({ inst, index }: { inst: Institution; index: number }) {
             className="overflow-hidden"
           >
             <div className="px-4 py-3 bg-sb-surface-container-low/30 border-t border-sb-outline-variant/8">
-              <div className="flex items-center gap-0">
-                {SEQUENCE_STEPS.map((step, i) => {
-                  const done = steps[i]
-                  const count = counts[i]
-                  return (
-                    <React.Fragment key={step.key}>
-                      <div className="flex flex-col items-center gap-1.5 shrink-0 min-w-[56px]">
-                        <div className={`h-7 w-7 rounded-full flex items-center justify-center transition-all ${
-                          done
-                            ? "bg-emerald-500 text-white"
-                            : "bg-sb-surface-container-high text-sb-on-surface/20"
-                        }`}>
-                          {done ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <span className="text-[10px] font-bold">{i + 1}</span>
+              <div className="overflow-x-auto">
+                <div className="flex items-center gap-0 min-w-[520px] py-2">
+                  {SEQUENCE_STEPS.map((step, i) => {
+                    const done = steps[i]
+                    const count = counts[i]
+                    return (
+                      <React.Fragment key={step.key}>
+                        <div className="flex flex-col items-center gap-1.5 shrink-0 min-w-[56px]">
+                          <div className={`h-7 w-7 rounded-full flex items-center justify-center transition-all ${
+                            done
+                              ? "bg-emerald-500 text-white"
+                              : "bg-sb-surface-container-high text-sb-on-surface/20"
+                          }`}>
+                            {done ? (
+                              <Check className="h-3.5 w-3.5" />
+                            ) : (
+                              <span className="text-[10px] font-bold">{i + 1}</span>
+                            )}
+                          </div>
+                          <span className={`text-[10px] font-medium ${done ? "text-emerald-500" : "text-sb-on-surface/30"}`}>
+                            {step.label}
+                          </span>
+                          {count !== null && count > 0 && (
+                            <span className="text-[9px] text-sb-on-surface/40">{count}</span>
                           )}
                         </div>
-                        <span className={`text-[10px] font-medium ${done ? "text-emerald-500" : "text-sb-on-surface/30"}`}>
-                          {step.label}
-                        </span>
-                        {count !== null && count > 0 && (
-                          <span className="text-[9px] text-sb-on-surface/40">{count}</span>
+                        {i < SEQUENCE_STEPS.length - 1 && (
+                          <div className={`flex-1 h-0.5 mx-0.5 mb-5 rounded-full ${
+                            done && steps[i + 1]
+                              ? "bg-emerald-500/40"
+                              : done
+                                ? "bg-gradient-to-r from-emerald-500/40 to-sb-surface-container-high"
+                                : "bg-sb-surface-container-high"
+                          }`} />
                         )}
-                      </div>
-                      {i < SEQUENCE_STEPS.length - 1 && (
-                        <div className={`flex-1 h-0.5 mx-0.5 mb-5 rounded-full ${
-                          done && steps[i + 1]
-                            ? "bg-emerald-500/40"
-                            : done
-                              ? "bg-gradient-to-r from-emerald-500/40 to-sb-surface-container-high"
-                              : "bg-sb-surface-container-high"
-                        }`} />
-                      )}
-                    </React.Fragment>
-                  )
-                })}
+                      </React.Fragment>
+                    )
+                  })}
+                </div>
               </div>
               {/* Extra info */}
               <div className="flex items-center gap-4 mt-3 pt-2 border-t border-sb-outline-variant/8">
@@ -313,7 +315,7 @@ export default function DevAuditPage() {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-5 py-2">
       {/* Header */}
-      <motion.div variants={fadeUp} className="flex items-start justify-between">
+      <motion.div variants={fadeUp} className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-[26px] font-bold tracking-tight text-sb-on-surface">Auditoría</h2>
           <p className="text-[14px] text-sb-on-surface/60 mt-1">Secuencia de creación de colegios</p>
@@ -370,7 +372,9 @@ export default function DevAuditPage() {
           <span className="text-[11px] font-medium text-sb-on-surface/50">Secuencia de Creación</span>
           <span className="text-[10px] text-sb-on-surface/30">{lastUpdate.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}</span>
         </div>
-        <PipelineHeader />
+        <div className="overflow-x-auto">
+          <PipelineHeader />
+        </div>
       </motion.div>
 
       {/* Institutions List */}
