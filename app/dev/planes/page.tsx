@@ -3,6 +3,7 @@
 import * as React from "react"
 import { CreditCard, Plus, Pencil, Trash2, Check, X, Shield, ShieldOff, Users, GraduationCap, Eye } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
+import { SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn } from "@/components/ui/sb"
 
 interface Plan {
   id: string
@@ -240,178 +241,139 @@ export default function PlanesPage() {
       )}
 
       {/* Edit Modal */}
-      <AnimatePresence>
-        {editOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setEditOpen(false)}>
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-x-3 bottom-3 top-auto max-h-[92vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
-                <p className="text-[15px] font-semibold text-sb-on-surface">{editing ? "Editar plan" : "Nuevo plan"}</p>
-                <button onClick={() => setEditOpen(false)} className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors">
-                  <X className="h-4 w-4 text-sb-on-surface/60" />
-                </button>
+      <SbModal open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm:max-w-lg">
+        <SbModalHeader title={editing ? "Editar plan" : "Nuevo plan"} onClose={() => setEditOpen(false)} />
+        <SbModalBody>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Nombre *</label>
+              <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Básico"
+                className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Descripción</label>
+              <input value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Para instituciones pequeñas"
+                className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Precio mensual (S/)</label>
+                <input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: parseFloat(e.target.value) || 0})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
               </div>
-              <div className="px-6 py-5 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/70">Nombre *</label>
-                  <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Básico"
-                    className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/70">Descripción</label>
-                  <input value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Para instituciones pequeñas"
-                    className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/70">Precio mensual (S/)</label>
-                    <input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: parseFloat(e.target.value) || 0})}
-                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/70">Estado</label>
-                    <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}
-                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
-                      <option value="active">Activo</option>
-                      <option value="inactive">Inactivo</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/70">Máx. estudiantes</label>
-                    <input type="number" min="1" value={form.max_students} onChange={e => setForm({...form, max_students: parseInt(e.target.value) || 1})}
-                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[12px] text-sb-on-surface/70">Máx. usuarios</label>
-                    <input type="number" min="1" value={form.max_users} onChange={e => setForm({...form, max_users: parseInt(e.target.value) || 1})}
-                      className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/70">Funcionalidades habilitadas</label>
-                  <div className="grid grid-cols-2 gap-1.5 bg-sb-surface-container-high rounded-xl p-3">
-                    {ALL_PERMISSIONS.map(p => (
-                      <button key={p.key} type="button" onClick={() => togglePermission(p.key)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition-all ${
-                          form.permissions[p.key]
-                            ? 'bg-sb-primary/10 text-sb-primary'
-                            : 'text-sb-on-surface/70 hover:bg-sb-surface-container'
-                        }`}>
-                        {form.permissions[p.key]
-                          ? <Shield className="h-3.5 w-3.5 shrink-0" />
-                          : <ShieldOff className="h-3.5 w-3.5 shrink-0" />
-                        }
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[12px] text-sb-on-surface/70">Descripción visual (una por línea)</label>
-                  <textarea value={form.labels} onChange={e => setForm({...form, labels: e.target.value})}
-                    className="w-full h-20 px-4 py-2 rounded-xl bg-sb-surface-container text-[13px] text-sb-on-surface placeholder:text-sb-on-surface/50 resize-none border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all"
-                    placeholder={"Gestión académica\nReportes básicos"} />
-                </div>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Estado</label>
+                <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}
+                  className="sb-select w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
               </div>
-              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row gap-2">
-                <button onClick={() => setEditOpen(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
-                  Cancelar
-                </button>
-                <button onClick={handleSave} disabled={saving || !form.name}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all disabled:opacity-50">
-                  {saving ? "Guardando..." : editing ? "Guardar" : "Crear"}
-                </button>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Máx. estudiantes</label>
+                <input type="number" min="1" value={form.max_students} onChange={e => setForm({...form, max_students: parseInt(e.target.value) || 1})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
               </div>
-            </motion.div>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Máx. usuarios</label>
+                <input type="number" min="1" value={form.max_users} onChange={e => setForm({...form, max_users: parseInt(e.target.value) || 1})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Funcionalidades habilitadas</label>
+              <div className="grid grid-cols-2 gap-1.5 bg-sb-surface-container-high rounded-xl p-3">
+                {ALL_PERMISSIONS.map(p => (
+                  <button key={p.key} type="button" onClick={() => togglePermission(p.key)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition-all ${
+                      form.permissions[p.key]
+                        ? 'bg-sb-primary/10 text-sb-primary'
+                        : 'text-sb-on-surface/80 hover:bg-sb-surface-container'
+                    }`}>
+                    {form.permissions[p.key]
+                      ? <Shield className="h-3.5 w-3.5 shrink-0" />
+                      : <ShieldOff className="h-3.5 w-3.5 shrink-0" />
+                    }
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Descripción visual (una por línea)</label>
+              <textarea value={form.labels} onChange={e => setForm({...form, labels: e.target.value})}
+                className="w-full h-20 px-4 py-2 rounded-xl bg-sb-surface-container text-[13px] text-sb-on-surface placeholder:text-sb-on-surface/50 resize-none border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all"
+                placeholder={"Gestión académica\nReportes básicos"} />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </SbModalBody>
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
+          <SbBtn variant="outlined" size="sm" rounded onClick={() => setEditOpen(false)} className="flex-1">
+            Cancelar
+          </SbBtn>
+          <SbBtn variant="filled" size="sm" rounded onClick={handleSave} disabled={saving || !form.name} className="flex-1">
+            {saving ? "Guardando..." : editing ? "Guardar" : "Crear"}
+          </SbBtn>
+        </SbModalFooter>
+      </SbModal>
 
       {/* View Modal */}
-      <AnimatePresence>
-        {viewing && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setViewing(null)}>
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed inset-x-3 bottom-3 top-auto max-h-[92vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-lg sm:rounded-2xl bg-sb-surface w-full border border-sb-outline-variant/10 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between px-6 py-5 border-b border-sb-outline-variant/10">
-                <div>
-                  <h3 className="text-[18px] font-bold text-sb-on-surface">{viewing.name}</h3>
-                  {viewing.description && <p className="text-[12px] text-sb-on-surface/70 mt-1">{viewing.description}</p>}
-                </div>
-                <button onClick={() => setViewing(null)} className="p-2 rounded-xl hover:bg-sb-surface-container-high transition-colors">
-                  <X className="h-4 w-4 text-sb-on-surface/60" />
-                </button>
+      <SbModal open={!!viewing} onClose={() => setViewing(null)} maxWidth="sm:max-w-lg">
+        <SbModalHeader title={viewing?.name || ""} onClose={() => setViewing(null)} />
+        <SbModalBody>
+          <div className="space-y-5 py-2">
+            <div className="flex items-baseline gap-1">
+              <span className="text-[32px] font-bold text-sb-on-surface">{priceFormat(viewing?.price || 0)}</span>
+              <span className="text-[13px] text-sb-on-surface/60">/mes</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-sb-surface-container-high p-3">
+                <div className="flex items-center gap-1.5 text-sb-on-surface/70 text-[11px]"><Users className="h-3.5 w-3.5" /> Usuarios</div>
+                <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing?.max_users.toLocaleString() || "0"}</p>
               </div>
-              <div className="px-6 py-5 space-y-5">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[32px] font-bold text-sb-on-surface">{priceFormat(viewing.price)}</span>
-                  <span className="text-[13px] text-sb-on-surface/60">/mes</span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-sb-surface-container-high p-3">
-                    <div className="flex items-center gap-1.5 text-sb-on-surface/60 text-[11px]"><Users className="h-3.5 w-3.5" /> Usuarios</div>
-                    <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing.max_users.toLocaleString()}</p>
-                  </div>
-                  <div className="rounded-xl bg-sb-surface-container-high p-3">
-                    <div className="flex items-center gap-1.5 text-sb-on-surface/60 text-[11px]"><GraduationCap className="h-3.5 w-3.5" /> Estudiantes</div>
-                    <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing.max_students.toLocaleString()}</p>
-                  </div>
-                </div>
-                {(() => {
-                  const { labels, permissions } = parseFeatures(viewing.features)
-                  return (
-                    <div className="space-y-2">
-                      <p className="text-[12px] font-semibold text-sb-on-surface/70">Incluye</p>
-                      <div className="space-y-1.5">
-                        {labels.length > 0 ? labels.map((f, fi) => (
-                          <div key={fi} className="flex items-center gap-2 text-[13px] text-sb-on-surface/70">
-                            <Check className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
-                          </div>
-                        )) : (
-                          <p className="text-[12px] text-sb-on-surface/60">Sin funciones listadas</p>
-                        )}
+              <div className="rounded-xl bg-sb-surface-container-high p-3">
+                <div className="flex items-center gap-1.5 text-sb-on-surface/70 text-[11px]"><GraduationCap className="h-3.5 w-3.5" /> Estudiantes</div>
+                <p className="text-[18px] font-bold text-sb-on-surface mt-1">{viewing?.max_students.toLocaleString() || "0"}</p>
+              </div>
+            </div>
+            {viewing && (() => {
+              const { labels, permissions } = parseFeatures(viewing.features)
+              return (
+                <div className="space-y-2">
+                  <p className="text-[12px] font-semibold text-sb-on-surface/80">Incluye</p>
+                  <div className="space-y-1.5">
+                    {labels.length > 0 ? labels.map((f, fi) => (
+                      <div key={fi} className="flex items-center gap-2 text-[13px] text-sb-on-surface/80">
+                        <Check className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
                       </div>
-                      {Object.keys(permissions).length > 0 && (
-                        <>
-                          <p className="text-[12px] font-semibold text-sb-on-surface/70 pt-3 mt-1 border-t border-sb-outline-variant/10">Permisos técnicos</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {Object.entries(permissions).filter(([, v]) => v).map(([k]) => (
-                              <span key={k} className="px-2.5 py-1 rounded-lg bg-sb-primary/10 text-sb-primary text-[11px] font-medium">{k.replace("can_", "")}</span>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )
-                })()}
-              </div>
-              <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row gap-2">
-                <button
-                  onClick={() => { setViewing(null); openEdit(viewing) }}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-all"
-                >
-                  Editar plan
-                </button>
-                <button onClick={() => setViewing(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-sb-outline-variant/15 text-[13px] font-medium text-sb-on-surface/70 hover:bg-sb-surface-container-high transition-colors">
-                  Cerrar
-                </button>
-              </div>
-            </motion.div>
+                    )) : (
+                      <p className="text-[12px] text-sb-on-surface/70">Sin funciones listadas</p>
+                    )}
+                  </div>
+                  {Object.keys(permissions).length > 0 && (
+                    <>
+                      <p className="text-[12px] font-semibold text-sb-on-surface/80 pt-3 mt-1 border-t border-sb-outline-variant/10">Permisos técnicos</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {Object.entries(permissions).filter(([, v]) => v).map(([k]) => (
+                          <span key={k} className="px-2.5 py-1 rounded-lg bg-sb-primary/10 text-sb-primary text-[11px] font-medium">{k.replace("can_", "")}</span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })()}
           </div>
-        )}
-      </AnimatePresence>
+        </SbModalBody>
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
+          <SbBtn variant="filled" size="sm" rounded onClick={() => { setViewing(null); openEdit(viewing as Plan) }} className="flex-1">
+            Editar plan
+          </SbBtn>
+          <SbBtn variant="outlined" size="sm" rounded onClick={() => setViewing(null)} className="flex-1">
+            Cerrar
+          </SbBtn>
+        </SbModalFooter>
+      </SbModal>
     </motion.div>
   )
 }
