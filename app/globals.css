@@ -971,7 +971,7 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   .sb-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 50;
+    z-index: 80;
     display: flex;
     align-items: center;
     justify-content: center;
