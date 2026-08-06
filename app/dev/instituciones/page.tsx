@@ -455,8 +455,8 @@ export default function DevInstitucionesPage() {
       {/* Search + Filters */}
       <motion.div variants={fadeUp} className="space-y-3">
         <div className="bg-sb-surface rounded-2xl p-3 border border-sb-outline-variant/10">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <div className="relative w-full">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
@@ -471,12 +471,12 @@ export default function DevInstitucionesPage() {
             </div>
 
             {/* Filter Button */}
-            <div ref={filterContainerRef} className="relative">
+            <div ref={filterContainerRef} className="relative shrink-0 self-start md:self-auto">
               <motion.div
                 className="relative z-50 overflow-hidden shadow-2xl shadow-black/20"
                 style={{ transformOrigin: "top right", backgroundColor: "var(--sb-surface-container)" }}
                 animate={{
-                  width: filtersOpen ? Math.max(filterSize.width, 168) : 168,
+                  width: filtersOpen ? Math.max(Math.min(filterSize.width, window.innerWidth - 32), 168) : 168,
                   height: filtersOpen ? Math.max(filterSize.height, 44) : 44,
                   borderRadius: filtersOpen ? 16 : 12,
                 }}
@@ -486,7 +486,7 @@ export default function DevInstitucionesPage() {
                   type="button"
                   onClick={() => setFiltersOpen(!filtersOpen)}
                   animate={{
-                    left: filtersOpen ? Math.max(filterSize.width - 18, 0) : 0,
+                    left: filtersOpen ? Math.max(Math.min(filterSize.width, window.innerWidth - 32) - 18, 0) : 0,
                     top: filtersOpen ? Math.max(filterSize.height - 18, 0) : 0,
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
