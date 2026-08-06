@@ -2,7 +2,7 @@
   "name": "Educonecta - Plataforma Educativa",
   "short_name": "Educonecta",
   "description": "Plataforma de gestión educativa para el Perú",
-  "start_url": "/login",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#7c3aed",
