@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
     let query = `
       SELECT p.*, CONCAT(s.first_name, ' ', s.last_name) AS student_name,
              s.document_number AS student_dni, s.grade, s.section,
-             pc.name AS concept_name
+             pc.name AS concept_name,
+             (p.amount - p.paid_amount) AS balance
       FROM payments p
       JOIN students s ON p.student_id = s.id
       LEFT JOIN payment_concepts pc ON p.concept_id = pc.id

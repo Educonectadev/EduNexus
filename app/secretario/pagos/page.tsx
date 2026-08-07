@@ -246,7 +246,7 @@ export default function PagosPage() {
       toast("Pago registrado correctamente", "success")
       setRegisterModal(false)
       setRegSelectedStudent(null)
-      setRegStudentSearch("")
+      setStudentSearch("")
       setRegDebts([])
       setRegConceptId("")
       setRegAmount("")
