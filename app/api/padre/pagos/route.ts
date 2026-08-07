@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     const placeholders = childrenIds.map(() => '?').join(',')
 
     const [rows] = await pool.query(
-      `SELECT p.id, pc.name AS concept, p.amount, p.paid_amount, p.due_date, p.status, p.paid_date,
-              p.reference AS reference, s.id AS student_id,
+      `SELECT p.id, pc.name AS concept, p.amount, p.paid_amount, p.due_date, p.paid_date, p.status,
+              p.reference AS reference, p.notes, s.id AS student_id,
               CONCAT(s.first_name, ' ', s.last_name) AS student_name, s.grade, s.section
        FROM payments p
        JOIN students s ON s.id = p.student_id
@@ -34,7 +34,12 @@ export async function GET(request: NextRequest) {
       childrenIds
     )
 
-    const records = rows as any[]
+    const records = (rows as any[]).map(r => ({
+      ...r,
+      amount: Number(r.amount) || 0,
+      paid_amount: Number(r.paid_amount) || 0,
+      balance: Number(r.amount) - Number(r.paid_amount || 0),
+    }))
     const pending = records.filter(r => r.status === 'pending' || r.status === 'partial' || r.status === 'overdue')
     const history = records.filter(r => r.status === 'paid')
     const totalPaid = history.reduce((sum, r) => sum + (Number(r.paid_amount) || 0), 0)

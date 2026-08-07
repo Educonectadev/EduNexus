@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CreditCard, CheckCircle2, Clock, AlertTriangle, Receipt, ArrowUpRight, TrendingDown, Eye, Download, Printer, Landmark, Smartphone, Coins, ArrowLeftRight, GraduationCap } from "@/components/ui/proicons"
-import { SbDropdown, SbDropdownItem } from "@/components/ui/sb"
+import { CreditCard, CheckCircle2, Clock, AlertTriangle, Receipt, ArrowUpRight, TrendingDown, Eye, Download, Printer, Landmark, Smartphone, Coins, ArrowLeftRight, GraduationCap, X, BookOpen, Calendar, User } from "@/components/ui/proicons"
+import { SbDropdown, SbDropdownItem, SbModal, SbModalHeader, SbModalBody } from "@/components/ui/sb"
 
 interface PaymentSummary {
   total_paid: number
@@ -25,11 +25,19 @@ interface PaymentHistory {
   id: string
   concept: string
   amount: number
+  paid_amount?: number
+  balance?: number
   due_date: string
   status: string
   paid_date?: string
   payment_method?: string
   receipt_number?: string
+  reference?: string
+  notes?: string
+  student_name?: string
+  student_id?: string
+  grade?: string
+  section?: string
 }
 
 interface PaymentData {
@@ -55,6 +63,22 @@ const methodConfig: Record<MethodType, { icon: typeof Landmark; label: string; c
 
 const staggerItem = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
 
+const fmt = (n: number) => `S/ ${(Number(n) || 0).toFixed(2)}`
+
+const formatDate = (value: string | undefined | null): string => {
+  if (!value) return "—"
+  const date = new Date(value)
+  if (isNaN(date.getTime())) return "—"
+  return date.toLocaleDateString("es-PE", { day: "2-digit", month: "long", year: "numeric" })
+}
+
+const statusLabel: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: "Pendiente", color: "text-amber-600", bg: "bg-amber-500/10" },
+  partial: { label: "Pago parcial", color: "text-orange-600", bg: "bg-orange-500/10" },
+  overdue: { label: "Vencido", color: "text-red-500", bg: "bg-red-500/10" },
+  paid: { label: "Pagado", color: "text-emerald-600", bg: "bg-emerald-500/10" },
+}
+
 export default function PagosPage() {
   const [data, setData] = React.useState<PaymentData | null>(null)
   const [loading, setLoading] = React.useState(true)
@@ -62,6 +86,7 @@ export default function PagosPage() {
   const [methods, setMethods] = React.useState<PaymentMethod[]>([])
   const [dependence, setDependence] = React.useState<string>("privado")
   const [methodsOpen, setMethodsOpen] = React.useState(false)
+  const [detailPayment, setDetailPayment] = React.useState<PaymentHistory | null>(null)
 
   React.useEffect(() => {
     Promise.all([
@@ -162,7 +187,7 @@ export default function PagosPage() {
                 {(data.pending || []).map((p) => {
                   const daysLeft = Math.ceil((new Date(p.due_date).getTime() - Date.now()) / (1000*60*60*24))
                   return (
-                    <div key={p.id} className="p-5 hover:bg-sb-surface-container-low/50 transition-colors">
+                    <div key={p.id} className="p-5 hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer" onClick={() => setDetailPayment(p)}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
@@ -171,11 +196,11 @@ export default function PagosPage() {
                           <div>
                             <p className="text-sm font-semibold text-sb-on-surface">{p.concept}</p>
                             <p className="text-[10px] text-sb-on-surface-variant/40">
-                              Vence: {new Date(p.due_date + 'T12:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}
+                              Vence: {formatDate(p.due_date)}
                             </p>
                           </div>
                         </div>
-                        <p className="text-lg font-bold text-amber-600">S/ {p.amount}</p>
+                        <p className="text-lg font-bold text-amber-600">{fmt(p.amount)}</p>
                       </div>
                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-sb-outline-variant/15">
                         <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
@@ -186,11 +211,11 @@ export default function PagosPage() {
                           {daysLeft <= 0 ? 'Vencido' : daysLeft === 1 ? 'Vence mañana' : `Faltan ${daysLeft} días`}
                         </span>
                         <SbDropdown align="right" trigger={
-                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-600 text-[10px] font-semibold hover:bg-blue-500/15 transition-colors">
+                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-600 text-[10px] font-semibold hover:bg-blue-500/15 transition-colors" onClick={(e: any) => e.stopPropagation()}>
                             Ver opciones <ArrowUpRight className="h-3 w-3" />
                           </button>
                         }>
-                          <SbDropdownItem icon={Eye} onClick={() => console.log("Ver detalle", p.id)}>
+                          <SbDropdownItem icon={Eye} onClick={() => setDetailPayment(p)}>
                             Ver detalle
                           </SbDropdownItem>
                           <SbDropdownItem icon={CreditCard} onClick={() => console.log("Pagar ahora", p.id)}>
@@ -218,7 +243,7 @@ export default function PagosPage() {
           ) : (
             <div className="space-y-px">
               {(data.history || []).map((p) => (
-                <div key={p.id} className="px-5 py-4 hover:bg-sb-surface-container-low/50 transition-colors">
+                <div key={p.id} className="px-5 py-4 hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer" onClick={() => setDetailPayment(p)}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
@@ -227,21 +252,21 @@ export default function PagosPage() {
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-sb-on-surface truncate">{p.concept}</p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-sb-on-surface-variant/40">{p.payment_method}</span>
-                          {p.receipt_number && (
+                          <span className="text-[10px] text-sb-on-surface-variant/40">{p.status === "paid" ? "Pagado" : statusLabel[p.status]?.label}</span>
+                          {p.reference && (
                             <>
                               <span className="text-sb-outline-variant/30">·</span>
-                              <span className="text-[10px] text-sb-on-surface-variant/30 font-mono">{p.receipt_number}</span>
+                              <span className="text-[10px] text-sb-on-surface-variant/30 font-mono">{p.reference}</span>
                             </>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="text-sm font-bold text-sb-on-surface">S/ {p.amount}</p>
+                      <p className="text-sm font-bold text-sb-on-surface">{fmt(p.amount)}</p>
                       {p.paid_date && (
                         <p className="text-[10px] text-sb-on-surface-variant/30">
-                          {new Date(p.paid_date + 'T12:00:00').toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
+                          {formatDate(p.paid_date)}
                         </p>
                       )}
                     </div>
@@ -327,6 +352,62 @@ export default function PagosPage() {
           </AnimatePresence>
         </motion.div>
       )}
+
+      {/* Detalle de pago */}
+      <SbModal open={!!detailPayment} onClose={() => setDetailPayment(null)} maxWidth="460px">
+        <SbModalHeader title="Detalle de pago" onClose={() => setDetailPayment(null)} />
+        <SbModalBody>
+          {detailPayment && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+              <div className="flex items-center gap-3 pb-4 border-b border-sb-outline-variant/10">
+                <div className="h-11 w-11 rounded-2xl bg-sb-surface-container flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 text-sb-on-surface-variant/50" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-base font-medium text-sb-on-surface truncate">{detailPayment.student_name || "Estudiante"}</p>
+                  <p className="text-xs text-sb-on-surface-variant/50">{detailPayment.grade ? `${detailPayment.grade} ${detailPayment.section || ""}`.trim() : ""}</p>
+                </div>
+                <span className={`ml-auto shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+                  statusLabel[detailPayment.status]?.bg ?? "bg-sb-surface-container"
+                } ${statusLabel[detailPayment.status]?.color ?? "text-sb-on-surface-variant/50"}`}>
+                  {statusLabel[detailPayment.status]?.label ?? "—"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { label: "Concepto", value: detailPayment.concept || "—", icon: BookOpen },
+                  { label: "Monto total", value: fmt(detailPayment.amount), icon: CreditCard },
+                  { label: "Monto pagado", value: fmt(detailPayment.paid_amount), icon: CheckCircle2 },
+                  { label: "Saldo", value: fmt(detailPayment.balance), icon: Clock },
+                  { label: "Vencimiento", value: formatDate(detailPayment.due_date), icon: Calendar },
+                  { label: "Pagado el", value: formatDate(detailPayment.paid_date), icon: Calendar },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-sb-surface-container/50">
+                    <item.icon className="h-4 w-4 text-sb-on-surface-variant/30 shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-sb-on-surface-variant/40">{item.label}</p>
+                      <p className="text-sm font-medium text-sb-on-surface truncate">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {(detailPayment.reference || detailPayment.notes) && (
+                <div className="flex flex-col gap-1.5 text-xs text-sb-on-surface-variant/50 bg-sb-surface-container/50 rounded-xl p-3">
+                  {detailPayment.reference && (
+                    <div className="flex items-center gap-2">
+                      <Receipt className="h-3.5 w-3.5 shrink-0" />
+                      Ref: <span className="font-mono">{detailPayment.reference}</span>
+                    </div>
+                  )}
+                  {detailPayment.notes && <div className="flex items-center gap-2"><BookOpen className="h-3.5 w-3.5 shrink-0" />{detailPayment.notes}</div>}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </SbModalBody>
+      </SbModal>
 
       {/* Aviso gratuidad para colegios públicos */}
       {dependence === 'publico' && (
