@@ -643,8 +643,8 @@ export default function PagosPage() {
             </div>
           ) : (
             <div className="bg-sb-surface rounded-2xl overflow-hidden">
-              {/* Table Header */}
-              <div className="grid grid-cols-[1.5fr_1fr_100px_100px_100px_100px_110px] gap-4 px-5 py-3 border-b border-sb-outline-variant/10">
+              {/* Table Header (desktop) */}
+              <div className="hidden sm:grid grid-cols-[1.5fr_1fr_100px_100px_100px_100px_110px] gap-4 px-5 py-3 border-b border-sb-outline-variant/10">
                 <span className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Estudiante</span>
                 <span className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Concepto</span>
                 <span className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider text-right">Monto</span>
@@ -671,38 +671,64 @@ export default function PagosPage() {
                         onClick={() => { setSelectedPayment(p); setDetailModal(true) }}
                         className="grid grid-cols-[1.5fr_1fr_100px_100px_100px_100px_110px] gap-4 px-5 py-4 items-center hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer"
                       >
-                        {/* Student */}
-                        <div className="flex items-center gap-3 min-w-0">
+                        {/* Student (full width on mobile) */}
+                        <div className="col-span-7 sm:col-span-1 flex items-center gap-3 min-w-0 sm:mb-0">
                           <div className="h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0">
                             <span className="text-[11px] font-semibold text-sb-on-surface-variant/50">
                               {p.student_name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                             </span>
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium text-sb-on-surface truncate">{p.student_name}</p>
-                            <p className="text-[11px] text-sb-on-surface-variant/40">{p.student_grade}</p>
+                            <p className="text-[11px] text-sb-on-surface-variant/40 sm:hidden">{p.concept_name}</p>
+                            <p className="hidden sm:block text-[11px] text-sb-on-surface-variant/40">{p.student_grade}</p>
+                          </div>
+                          {effectiveStatus !== "paid" && (
+                            <span className={`sm:hidden inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium shrink-0 ${cfg.color}`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+                              {cfg.label}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Concept (desktop only) */}
+                        <span className="hidden sm:block text-sm text-sb-on-surface/70 truncate">{p.concept_name}</span>
+
+                        {/* Mobile metrics grid */}
+                        <div className="col-span-7 sm:hidden grid grid-cols-3 gap-2 mt-1">
+                          <div className="rounded-xl bg-sb-surface-container/50 p-2">
+                            <p className="text-[9px] text-sb-on-surface-variant/40 uppercase tracking-wider">Monto</p>
+                            <p className="text-sm font-semibold text-sb-on-surface">{fmt(p.amount)}</p>
+                          </div>
+                          <div className="rounded-xl bg-sb-surface-container/50 p-2">
+                            <p className="text-[9px] text-sb-on-surface-variant/40 uppercase tracking-wider">Pagado</p>
+                            <p className="text-sm text-sb-on-surface/60">{fmt(p.paid_amount)}</p>
+                          </div>
+                          <div className="rounded-xl bg-sb-surface-container/50 p-2">
+                            <p className="text-[9px] text-sb-on-surface-variant/40 uppercase tracking-wider">Saldo</p>
+                            <p className={`text-sm font-medium ${p.balance > 0 ? "text-sb-on-surface" : "text-emerald-600"}`}>{fmt(p.balance)}</p>
                           </div>
                         </div>
 
-                        {/* Concept */}
-                        <span className="text-sm text-sb-on-surface/70 truncate">{p.concept_name}</span>
+                        {/* Amount (desktop) */}
+                        <span className="hidden sm:block text-sm font-semibold text-sb-on-surface text-right">{fmt(p.amount)}</span>
 
-                        {/* Amount */}
-                        <span className="text-sm font-semibold text-sb-on-surface text-right">{fmt(p.amount)}</span>
+                        {/* Paid (desktop) */}
+                        <span className="hidden sm:block text-sm text-sb-on-surface/60 text-right">{fmt(p.paid_amount)}</span>
 
-                        {/* Paid */}
-                        <span className="text-sm text-sb-on-surface/60 text-right">{fmt(p.paid_amount)}</span>
-
-                        {/* Balance */}
-                        <span className={`text-sm font-medium text-right ${p.balance > 0 ? "text-sb-on-surface" : "text-emerald-600"}`}>
+                        {/* Balance (desktop) */}
+                        <span className={`hidden sm:block text-sm font-medium text-right ${p.balance > 0 ? "text-sb-on-surface" : "text-emerald-600"}`}>
                           {fmt(p.balance)}
                         </span>
 
-                        {/* Due Date */}
-                        <span className="text-xs text-sb-on-surface-variant/50">{formatDate(p.due_date)}</span>
+                        {/* Due Date (desktop + mobile line) */}
+                        <span className="hidden sm:block text-xs text-sb-on-surface-variant/50">{formatDate(p.due_date)}</span>
+                        <span className="sm:hidden col-span-7 text-[11px] text-sb-on-surface-variant/40 mt-1.5 flex items-center gap-1.5">
+                          <Calendar className="h-3 w-3" /> Vence el {formatDate(p.due_date)}
+                        </span>
 
-                        {/* Status */}
-                        <div className="flex justify-end">
+                        {/* Status (desktop) */}
+                        <div className="hidden sm:flex justify-end">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${cfg.color}`}>
                             <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
                             {cfg.label}
