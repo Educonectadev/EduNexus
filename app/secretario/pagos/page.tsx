@@ -120,6 +120,12 @@ export default function PagosPage() {
   const [searchResults, setSearchResults] = React.useState<SearchResult[]>([])
   const [searching, setSearching] = React.useState(false)
   const [studentSearch, setStudentSearch] = React.useState("")
+  const [regSelectedStudent, setRegSelectedStudent] = React.useState<SearchResult | null>(null)
+  const [regDebts, setRegDebts] = React.useState<any[]>([])
+  const [regConceptId, setRegConceptId] = React.useState("")
+  const [regAmount, setRegAmount] = React.useState("")
+  const [regPaidAmount, setRegPaidAmount] = React.useState("")
+  const [regDueDate, setRegDueDate] = React.useState("")
 
   const [grades, setGrades] = React.useState<string[]>([])
 
@@ -208,14 +214,16 @@ export default function PagosPage() {
 
   const handleRegisterPayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = new FormData(e.currentTarget)
+    const amount = parseFloat(regAmount)
+    const paid = parseFloat(regPaidAmount) || 0
+    const status: PaymentStatus = paid >= amount && amount > 0 ? "paid" : paid > 0 ? "partial" : "pending"
     const body = {
-      student_id: form.get("student_id") as string,
-      concept_id: form.get("concept_id") as string,
-      amount: parseFloat(form.get("amount") as string),
-      paid_amount: parseFloat(form.get("paid_amount") as string) || 0,
-      due_date: form.get("due_date") as string,
-      status: (form.get("status") as PaymentStatus) || "pending",
+      student_id: regSelectedStudent?.id,
+      concept_id: regConceptId,
+      amount,
+      paid_amount: paid,
+      due_date: regDueDate,
+      status,
     }
     try {
       const res = await fetch("/api/secretario/payments", {
@@ -224,10 +232,47 @@ export default function PagosPage() {
       if (!res.ok) throw new Error("Error al registrar pago")
       toast("Pago registrado correctamente", "success")
       setRegisterModal(false)
+      setRegSelectedStudent(null)
+      setRegStudentSearch("")
+      setRegDebts([])
+      setRegConceptId("")
+      setRegAmount("")
+      setRegPaidAmount("")
+      setRegDueDate("")
       fetchPayments()
     } catch (e) {
       toast(e instanceof Error ? e.message : "Error al registrar", "error")
     }
+  }
+
+  const loadStudentDebts = async (s: SearchResult) => {
+    try {
+      const res = await fetch(`/api/secretario/payments?student_id=${s.id}`)
+      if (res.ok) {
+        const data: any = await res.json()
+        const debts = (data.payments || []).filter((p: any) => p.status === "pending" || p.status === "partial" || p.status === "overdue")
+        setRegDebts(debts)
+      }
+    } catch {}
+  }
+
+  const handleSelectStudent = (r: SearchResult) => {
+    setRegSelectedStudent(r)
+    setStudentSearch(r.full_name + " - " + (r.grade_level || r.grade || ""))
+    setSearchResults([])
+    setRegConceptId("")
+    setRegAmount("")
+    setRegPaidAmount("")
+    setRegDueDate("")
+    setRegDebts([])
+    loadStudentDebts(r)
+  }
+
+  const applyDebt = (d: any) => {
+    if (d.concept_id) setRegConceptId(d.concept_id)
+    setRegAmount(String(d.amount ?? ""))
+    setRegPaidAmount(d.paid_amount > 0 ? String(d.paid_amount) : "")
+    if (d.due_date) setRegDueDate(d.due_date)
   }
 
   const handleGenerateDebt = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -764,26 +809,36 @@ export default function PagosPage() {
                       className="mt-1 border border-sb-outline-variant/15 rounded-xl overflow-hidden bg-sb-surface"
                     >
                       {searchResults.map(r => (
-                        <button key={r.id} type="button" onClick={() => {
-                          setStudentSearch(r.full_name + " - " + r.grade)
-                          setSearchResults([])
-                          const hiddenInput = document.getElementById("reg-student-id") as HTMLInputElement
-                          if (hiddenInput) hiddenInput.value = r.id
-                        }}
+                        <button key={r.id} type="button" onClick={() => handleSelectStudent(r)}
                           className="w-full text-left px-3 py-2.5 text-sm text-sb-on-surface hover:bg-sb-surface-container-low transition-colors border-b border-sb-outline-variant/10 last:border-b-0"
                         >
-                          {r.full_name} <span className="text-sb-on-surface-variant/40">· {r.grade}</span>
+                          {r.full_name} <span className="text-sb-on-surface-variant/40">· {r.grade_level || r.grade || "—"}</span>
                         </button>
                       ))}
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <input type="hidden" name="student_id" id="reg-student-id" />
               </div>
+
+              {regSelectedStudent && regDebts.length > 0 && (
+                <div>
+                  <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Deudas del estudiante</label>
+                  <div className="space-y-1.5">
+                    {regDebts.map(d => (
+                      <button key={d.id} type="button" onClick={() => applyDebt(d)}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-amber-500/8 hover:bg-amber-500/15 border border-amber-500/20 transition-colors">
+                        <span className="text-xs text-sb-on-surface/80">{d.concept_name || "Concepto"} · ven. {d.due_date || "—"}</span>
+                        <span className="text-xs font-semibold text-amber-600">{fmt(d.amount - d.paid_amount)}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-sb-on-surface-variant/40 mt-1.5">Toca una deuda para autocompletar el concepto y el monto.</p>
+                </div>
+              )}
 
               <div>
                 <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Concepto</label>
-                <select name="concept_id" required className="sbf-native-select w-full">
+                <select name="concept_id" required value={regConceptId} onChange={e => setRegConceptId(e.target.value)} className="sbf-native-select w-full">
                   <option value="">Seleccionar concepto</option>
                   {concepts.filter(c => c.is_active).map(c => (
                     <option key={c.id} value={c.id}>{c.name} ({fmt(c.amount)})</option>
@@ -794,20 +849,24 @@ export default function PagosPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Monto total</label>
-                  <input type="number" step="0.01" name="amount" required placeholder="0.00" className="sb-input rounded-xl text-sm h-10 w-full" />
+                  <input type="number" step="0.01" name="amount" required placeholder="0.00" value={regAmount} onChange={e => setRegAmount(e.target.value)} className="sb-input rounded-xl text-sm h-10 w-full" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Monto pagado</label>
-                  <input type="number" step="0.01" name="paid_amount" placeholder="0.00" className="sb-input rounded-xl text-sm h-10 w-full" />
+                  <input type="number" step="0.01" name="paid_amount" placeholder="0.00" value={regPaidAmount} onChange={e => setRegPaidAmount(e.target.value)} className="sb-input rounded-xl text-sm h-10 w-full" />
                 </div>
               </div>
 
               <div>
                 <label className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-2 block">Fecha de vencimiento</label>
-                <input type="date" name="due_date" required className="sb-input rounded-xl text-sm h-10 w-full" />
+                <input type="date" name="due_date" required value={regDueDate} onChange={e => setRegDueDate(e.target.value)} className="sb-input rounded-xl text-sm h-10 w-full" />
               </div>
 
-              <input type="hidden" name="status" value="pending" />
+              {regAmount && parseFloat(regPaidAmount) >= parseFloat(regAmount) && parseFloat(regAmount) > 0 && (
+                <div className="rounded-xl px-3 py-2 text-xs text-emerald-600 bg-emerald-500/8 flex items-center gap-2">
+                  <CheckCircle className="h-3.5 w-3.5 shrink-0" /> Se registrará como <strong>PAGADO</strong>.
+                </div>
+              )}
             </motion.div>
           </SbModalBody>
           <SbModalFooter>
