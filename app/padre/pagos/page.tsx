@@ -374,7 +374,7 @@ export default function PagosPage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-2.5">
                 {[
                   { label: "Concepto", value: detailPayment.concept || "—", icon: BookOpen },
                   { label: "Monto total", value: fmt(detailPayment.amount), icon: CreditCard },
@@ -383,9 +383,9 @@ export default function PagosPage() {
                   { label: "Vencimiento", value: formatDate(detailPayment.due_date), icon: Calendar },
                   { label: "Pagado el", value: formatDate(detailPayment.paid_date), icon: Calendar },
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-sb-surface-container/50">
-                    <item.icon className="h-4 w-4 text-sb-on-surface-variant/30 shrink-0" />
-                    <div>
+                  <div key={i} className="flex items-center gap-2.5 p-3 rounded-xl bg-sb-surface-container/50 min-w-0">
+                    <item.icon className="h-4 w-4 shrink-0 text-sb-on-surface-variant/30" />
+                    <div className="min-w-0">
                       <p className="text-[10px] text-sb-on-surface-variant/40">{item.label}</p>
                       <p className="text-sm font-medium text-sb-on-surface truncate">{item.value}</p>
                     </div>
