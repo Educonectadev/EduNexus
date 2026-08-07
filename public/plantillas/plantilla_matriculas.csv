@@ -1,3 +1,21 @@
-﻿Código del Alumno,Nombre del Alumno,DNI,Fecha Nacimiento (AAAA-MM-DD),Género (M/F),Nombre del Padre/Apoderado,DNI del Padre,Teléfono del Padre,Email del Padre,Grado,Sección
+﻿﻿Código del Alumno,Nombre del Alumno,DNI,Fecha Nacimiento (AAAA-MM-DD),Género (M/F),Nombre del Padre/Apoderado,DNI del Padre,Teléfono del Padre,Email del Padre,Grado,Sección
 ALU-20260001,María García López,12345678,2015-03-15,F,Juan García,87654321,987654321,juan@email.com,1° de Primaria,A
-ALU-20260002,Carlos Pérez Torres,23456789,2014-07-20,M,Laura Torres,76543210,976543210,laura@email.com,2° de Primaria,B
+ALU-20260002,Carlos Pérez Torres,23456789,2014-07-20,M,Laura Torres,76543210,976543210,laura@email.com,1° de Primaria,B
+ALU-20260003,Ana Quispe Rojas,34567890,2014-04-02,F,René Quispe,65432109,965432109,renne@email.com,2° de Primaria,A
+ALU-20260004,Luis Fernández Díaz,45678901,2013-05-18,M,Patricia Díaz,54321098,954321987,patricia@email.com,2° de Primaria,C
+ALU-20260005,Sofía Ramírez Castro,56789012,2013-08-30,F,Manuel Ramírez,43210987,943210876,manuel@email.com,3° de Primaria,A
+ALU-20260006,Diego Flores Mendoza,67890123,2012-02-09,M,Carla Mendoza,32109876,932109876,carla@email.com,3° de Primaria,B
+ALU-20260007,Valeria Huárez Paredes,78901234,2012-06-29,F,Jorge Huárez,21098765,932198654,jorge@email.com,4° de Primaria,A
+ALU-20260008,Andrés Ortiz Yépez,89012345,2011-06-14,M,Sylvia Yépez,10987654,931098543,sylvia@email.com,4° de Primaria,D
+ALU-20260009,Celeste Vargas Luna,90123456,2011-01-22,F,Luis Vargas,09876543,930987654,luis@email.com,5° de Primaria,A
+ALU-20260010,Marcos Gutiérrez Silva,01234567,2010-09-01,M,Paula Silva,98765432,929876543,paula@email.com,5° de Primaria,B
+ALU-20260011,Valentina Torres Núñez,11223344,2010-04-10,F,Karla Núñez,87654321,928765432,karla@email.com,6° de Primaria,A
+ALU-20260012,András Torres Salas,22334455,2009-11-19,M,Lucía Salas,76543210,927654321,lucia@email.com,6° de Primaria,C
+ALU-20260013,Cristina Paredes Quispe,33445566,2009-12-05,F,Grover Quispe,65432109,926543210,valeria@email.com,1° de Secundaria,A
+ALU-20260014,José Ramos Flores,44556677,2008-01-15,M,Eduardo Flores,54321098,925432109,eduardo@email.com,1° de Secundaria,B
+ALU-20260015,Isabela Salazar Bustos,55667788,2008-08-30,F,Fernando Salazar,43210987,920765432,fernando@email.com,2° de Secundaria,A
+ALU-20260016,Adrián Cárdenas Vega,66778899,2007-03-08,M,Verónica Vega,32109876,921654321,veronica@email.com,2° de Secundaria,D
+ALU-20260017,Penélope Contreras Ríos,77889900,2007-10-30,F,Pedro Contreras,21098765,921098765,pedro@email.com,3° de Secundaria,A
+ALU-20260018,Bruno Serrano Ríos,88990011,2006-04-25,M,Mónica Ríos,10987654,921098766,monica@email.com,3° de Secundaria,B
+ALU-20260019,Jasmín Quispe Apaza,99001122,2006-07-11,F,Amada Apaza,98765432,919876543,amada@email.com,4° de Secundaria,A
+ALU-20260020,Fernanda Pérez Gutiérrez,12398765,2005-05-17,F,Beatriz Gutiérrez,87654321,918765432,beatriz@email.com,5° de Secundaria,C
