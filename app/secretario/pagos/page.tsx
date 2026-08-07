@@ -669,10 +669,10 @@ export default function PagosPage() {
                         exit="exit"
                         transition={{ delay: i * 0.02, duration: 0.3 }}
                         onClick={() => { setSelectedPayment(p); setDetailModal(true) }}
-                        className="grid grid-cols-[1.5fr_1fr_100px_100px_100px_100px_110px] gap-4 px-5 py-4 items-center hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer"
+                        className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_100px_100px_100px_100px_110px] gap-2.5 sm:gap-4 px-5 py-4 sm:items-center hover:bg-sb-surface-container-low/50 transition-colors cursor-pointer"
                       >
                         {/* Student (full width on mobile) */}
-                        <div className="col-span-7 sm:col-span-1 flex items-center gap-3 min-w-0 sm:mb-0">
+                        <div className="flex items-center gap-3 min-w-0">
                           <div className="h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0">
                             <span className="text-[11px] font-semibold text-sb-on-surface-variant/50">
                               {p.student_name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
@@ -695,7 +695,7 @@ export default function PagosPage() {
                         <span className="hidden sm:block text-sm text-sb-on-surface/70 truncate">{p.concept_name}</span>
 
                         {/* Mobile metrics grid */}
-                        <div className="col-span-7 sm:hidden grid grid-cols-3 gap-2 mt-1">
+                        <div className="sm:hidden grid grid-cols-3 gap-2">
                           <div className="rounded-xl bg-sb-surface-container/50 p-2">
                             <p className="text-[9px] text-sb-on-surface-variant/40 uppercase tracking-wider">Monto</p>
                             <p className="text-sm font-semibold text-sb-on-surface">{fmt(p.amount)}</p>
@@ -723,7 +723,7 @@ export default function PagosPage() {
 
                         {/* Due Date (desktop + mobile line) */}
                         <span className="hidden sm:block text-xs text-sb-on-surface-variant/50">{formatDate(p.due_date)}</span>
-                        <span className="sm:hidden col-span-7 text-[11px] text-sb-on-surface-variant/40 mt-1.5 flex items-center gap-1.5">
+                        <span className="sm:hidden text-[11px] text-sb-on-surface-variant/40 flex items-center gap-1.5">
                           <Calendar className="h-3 w-3" /> Vence el {formatDate(p.due_date)}
                         </span>
 
