@@ -259,6 +259,30 @@ export default function CursosSecretarioPage() {
   const [importOpen, setImportOpen] = React.useState(false)
   const [importKey, setImportKey] = React.useState(0)
 
+  const [studentsOpen, setStudentsOpen] = React.useState(false)
+  const [studentsLoading, setStudentsLoading] = React.useState(false)
+  const [studentsCourse, setStudentsCourse] = React.useState<Course | null>(null)
+  const [studentsList, setStudentsList] = React.useState<any[]>([])
+
+  const normGrade = (c: Course) => {
+    const g = (c.grade || "").trim()
+    const year = g.match(/^(\d+°)/)?.[1] || ""
+    if (g.includes("Secundaria")) return `${year} de Secundaria`
+    if (g.includes("Primaria")) return `${year} de Primaria`
+    if (g.includes("Inicial")) return `${year} de Inicial`
+    return g
+  }
+
+  const fetchStudents = async (c: Course) => {
+    setStudentsCourse(c)
+    setStudentsOpen(true)
+    setStudentsLoading(true)
+    try {
+      const res = await fetch(`/api/secretario/academic-students?grade=${encodeURIComponent(normGrade(c))}&section=${encodeURIComponent(c.section || 'all')}`)
+      setStudentsList(res.ok ? await res.json() : [])
+    } catch { setStudentsList([]) } finally { setStudentsLoading(false) }
+  }
+
   const openImport = () => { setImportKey(k => k + 1); setImportOpen(true) }
 
   const fetchData = async () => {
@@ -433,11 +457,16 @@ export default function CursosSecretarioPage() {
                 </div>
                 <div className="flex items-center gap-3 mt-1.5 text-xs text-sb-on-surface-variant/50 flex-wrap">
                   <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" />{c.grade} {c.section}</span>
-                  <span className="flex items-center gap-1"><Users className="h-3 w-3" />{c.student_count || 0} alumno(s)</span>
+                  <button onClick={() => fetchStudents(c)} className="flex items-center gap-1 hover:text-sb-on-surface/70 transition-colors">
+                    <Users className="h-3 w-3" />{c.student_count || 0} alumno(s)
+                  </button>
                   <span className="flex items-center gap-1">{c.teacher_name || "Sin docente"}</span>
                 </div>
               </div>
               <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => fetchStudents(c)} className="p-1.5 rounded-lg hover:bg-sb-surface-container/80 text-sb-on-surface-variant/30 hover:text-sb-on-surface/60 transition-colors" title="Ver alumnos">
+                  <Users className="h-3.5 w-3.5" />
+                </button>
                 <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-sb-surface-container/80 text-sb-on-surface-variant/30 hover:text-sb-on-surface/60 transition-colors">
                   <Edit3 className="h-3.5 w-3.5" />
                 </button>
@@ -522,6 +551,39 @@ export default function CursosSecretarioPage() {
       </SbModal>
 
       <CourseImportModal key={importKey} open={importOpen} onClose={() => setImportOpen(false)} onImported={fetchData} />
+
+      {/* Course Students Modal */}
+      <SbModal open={studentsOpen} onClose={() => setStudentsOpen(false)} maxWidth="520px">
+        <SbModalHeader title={`Alumnos · ${studentsCourse?.name || ""}`} onClose={() => setStudentsOpen(false)} />
+        <SbModalBody>
+          {studentsLoading ? (
+            <div className="space-y-2">{[1, 2, 3].map(i => <div key={i} className="h-12 bg-sb-surface-container rounded-xl animate-pulse" />)}</div>
+          ) : studentsList.length === 0 ? (
+            <div className="py-10 text-center">
+              <Users className="h-10 w-10 mx-auto mb-2 text-sb-on-surface-variant/15" />
+              <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay alumnos en {studentsCourse?.name}</p>
+              <p className="text-xs text-sb-on-surface-variant/25 mt-1 capitalize">Grado {studentsCourse?.grade} · Sección {studentsCourse?.section}</p>
+            </div>
+          ) : (
+            <div className="bg-sb-surface-container/40 rounded-xl divide-y divide-sb-outline-variant/10">
+              {studentsList.map((s, i) => (
+                <div key={s.id} className="flex items-center gap-3 px-3 py-2.5">
+                  <div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0">
+                    <span className="text-[10px] font-bold text-sb-on-surface-variant/60">{String(i + 1).padStart(2, "0")}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
+                    <p className="text-[10px] text-sb-on-surface-variant/40">Sección {s.section || "—"} · DNI: {s.document_number || "—"}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SbModalBody>
+        <SbModalFooter>
+          <SbBtn rounded className="flex-1" onClick={() => setStudentsOpen(false)}>Cerrar</SbBtn>
+        </SbModalFooter>
+      </SbModal>
     </div>
   )
 }

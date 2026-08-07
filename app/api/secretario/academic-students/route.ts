@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const grade = searchParams.get('grade') || ''
+    const section = searchParams.get('section') || 'all'
 
     let query = `
       SELECT s.id, s.code, s.first_name, s.last_name, s.section, s.gender,
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
     if (grade) {
       query += ` AND s.grade = ?`
       params.push(grade)
+    }
+    if (section && section !== 'all') {
+      query += ` AND s.section = ?`
+      params.push(section)
     }
 
     query += ` ORDER BY s.section ASC, s.first_name ASC, s.last_name ASC`
