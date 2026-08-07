@@ -1046,6 +1046,12 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
     }
     .sb-modal-footer {
       padding: 14px 20px 20px 20px;
+      flex-wrap: wrap;
+    }
+    .sb-modal-footer .sb-btn {
+      flex: 1 1 auto;
+      min-width: 0;
+      justify-content: center;
     }
   }
 
