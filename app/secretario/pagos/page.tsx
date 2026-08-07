@@ -757,13 +757,13 @@ export default function PagosPage() {
                 <div className="h-12 w-12 rounded-2xl bg-sb-surface-container flex items-center justify-center">
                   <User className="h-5 w-5 text-sb-on-surface-variant/50" />
                 </div>
-                <div>
-                  <p className="text-base font-medium text-sb-on-surface">{selectedPayment.student_name}</p>
+                <div className="min-w-0">
+                  <p className="text-base font-medium text-sb-on-surface truncate">{selectedPayment.student_name}</p>
                   <p className="text-xs text-sb-on-surface-variant/50">{selectedPayment.student_grade}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2.5">
                 {[
                   { label: "Concepto", value: selectedPayment.concept_name, icon: BookOpen },
                   { label: "Monto total", value: fmt(selectedPayment.amount), icon: DollarSign },
@@ -799,7 +799,7 @@ export default function PagosPage() {
               {getEffectiveStatus(selectedPayment) !== "paid" && (
                 <div className="border-t border-sb-outline-variant/10 pt-4">
                   <p className="text-xs font-medium text-sb-on-surface-variant/60 mb-3">Registrar pago</p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input
                       type="number"
                       step="0.01"
