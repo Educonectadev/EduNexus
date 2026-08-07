@@ -13,15 +13,7 @@ export async function GET(request: NextRequest) {
              c.teacher_id, c.status, c.created_at,
              COALESCE(u.full_name, CONCAT(TRIM(t.first_name), ' ', TRIM(t.last_name)), 'Sin asignar') as teacher_name,
 (SELECT COUNT(*) FROM enrollments e
-              JOIN students s ON e.student_id = s.id
-              WHERE s.institution_id = c.institution_id
-                AND e.status = 'active'
-                AND s.section = c.section
-                AND (s.grade = c.grade
-                     OR REPLACE(s.grade, ' de Secundaria', ' Secundaria') = c.grade
-                     OR REPLACE(s.grade, ' de Primaria', ' Primaria') = c.grade
-                     OR REPLACE(s.grade, ' de Inicial', ' Inicial') = c.grade
-                )
+              WHERE e.course_id = c.id AND e.status = 'active'
              ) as student_count,
              (SELECT COUNT(*) FROM horarios h
               WHERE h.course_id = c.id AND h.status = 'active'

@@ -278,8 +278,12 @@ export default function CursosSecretarioPage() {
 
   const [studentsOpen, setStudentsOpen] = React.useState(false)
   const [studentsLoading, setStudentsLoading] = React.useState(false)
+  const [studentsSaving, setStudentsSaving] = React.useState(false)
   const [studentsCourse, setStudentsCourse] = React.useState<Course | null>(null)
-  const [studentsList, setStudentsList] = React.useState<any[]>([])
+  const [studentsAll, setStudentsAll] = React.useState<any[]>([])
+  const [studentsSelected, setStudentsSelected] = React.useState<Set<string>>(new Set())
+  const [studentsDirty, setStudentsDirty] = React.useState(false)
+  const [studentsMessage, setStudentsMessage] = React.useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
   const normGrade = (c: Course) => {
     const g = (c.grade || "").trim()
@@ -294,10 +298,48 @@ export default function CursosSecretarioPage() {
     setStudentsCourse(c)
     setStudentsOpen(true)
     setStudentsLoading(true)
+    setStudentsDirty(false)
+    setStudentsMessage(null)
     try {
-      const res = await fetch(`/api/secretario/academic-students?grade=${encodeURIComponent(normGrade(c))}&section=${encodeURIComponent(c.section || 'all')}`)
-      setStudentsList(res.ok ? await res.json() : [])
-    } catch { setStudentsList([]) } finally { setStudentsLoading(false) }
+      const res = await fetch(`/api/secretario/cursos/${c.id}/students`)
+      if (res.ok) {
+        const data = await res.json()
+        const all = [...(data.assigned || []), ...(data.candidates || [])]
+        setStudentsAll(all)
+        setStudentsSelected(new Set((data.assigned || []).map((s: any) => s.id)))
+      }
+    } catch {} finally { setStudentsLoading(false) }
+  }
+
+  const toggleStudent = (id: string) => {
+    setStudentsDirty(true)
+    setStudentsSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleSaveStudents = async () => {
+    if (!studentsCourse) return
+    setStudentsSaving(true)
+    setStudentsMessage(null)
+    try {
+      const res = await fetch(`/api/secretario/cursos/${studentsCourse.id}/students`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentIds: Array.from(studentsSelected) }),
+      })
+      if (res.ok) {
+        setStudentsDirty(false)
+        setStudentsMessage({ type: 'ok', text: 'Alumnos guardados correctamente.' })
+        fetchData()
+      } else {
+        setStudentsMessage({ type: 'err', text: 'No se pudieron guardar los alumnos.' })
+      }
+    } catch { setStudentsMessage({ type: 'err', text: 'Error de conexión al guardar.' }) }
+    finally { setStudentsSaving(false) }
   }
 
   const openImport = () => { setImportKey(k => k + 1); setImportOpen(true) }
@@ -579,30 +621,50 @@ export default function CursosSecretarioPage() {
         <SbModalBody>
           {studentsLoading ? (
             <div className="space-y-2">{[1, 2, 3].map(i => <div key={i} className="h-12 bg-sb-surface-container rounded-xl animate-pulse" />)}</div>
-          ) : studentsList.length === 0 ? (
+          ) : studentsAll.length === 0 ? (
             <div className="py-10 text-center">
               <Users className="h-10 w-10 mx-auto mb-2 text-sb-on-surface-variant/15" />
-              <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay alumnos en {studentsCourse?.name}</p>
+              <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay alumnos disponibles para {studentsCourse?.name}</p>
               <p className="text-xs text-sb-on-surface-variant/25 mt-1 capitalize">Grado {studentsCourse?.grade} · Sección {studentsCourse?.section}</p>
             </div>
           ) : (
-            <div className="bg-sb-surface-container/40 rounded-xl divide-y divide-sb-outline-variant/10">
-              {studentsList.map((s, i) => (
-                <div key={s.id} className="flex items-center gap-3 px-3 py-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0">
-                    <span className="text-[10px] font-bold text-sb-on-surface-variant/60">{String(i + 1).padStart(2, "0")}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
-                    <p className="text-[10px] text-sb-on-surface-variant/40">Sección {s.section || "—"} · DNI: {s.document_number || "—"}</p>
-                  </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <p className="text-xs text-sb-on-surface-variant/40">Alumnos del grado y sección del curso. Marca para asignar.</p>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{studentsSelected.size} asignados</span>
+              </div>
+              <div className="bg-sb-surface-container/40 rounded-xl divide-y divide-sb-outline-variant/10 max-h-[320px] overflow-y-auto">
+                {studentsAll.map((s, i) => {
+                  const isSel = studentsSelected.has(s.id)
+                  return (
+                    <label key={s.id} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors ${isSel ? 'bg-sb-primary/5' : ''}`}>
+                      <input type="checkbox" checked={isSel} onChange={() => toggleStudent(s.id)} className="h-4 w-4 accent-[var(--sb-primary)] shrink-0" />
+                      <div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-sb-on-surface-variant/60">{String(i + 1).padStart(2, "0")}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
+                        <p className="text-[10px] text-sb-on-surface-variant/40">Sección {s.section || "—"} · DNI: {s.document_number || "—"}</p>
+                      </div>
+                      {isSel && <CheckCircle className="h-4 w-4 text-sb-primary/70 shrink-0" />}
+                    </label>
+                  )
+                })}
+              </div>
+              {studentsMessage && (
+                <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-xl ${studentsMessage.type === 'ok' ? 'text-emerald-600 bg-emerald-500/8' : 'text-red-600 bg-red-500/8'}`}>
+                  {studentsMessage.type === 'ok' ? <CheckCircle className="h-3.5 w-3.5 shrink-0" /> : <AlertCircle className="h-3.5 w-3.5 shrink-0" />}
+                  {studentsMessage.text}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </SbModalBody>
         <SbModalFooter>
-          <SbBtn rounded className="flex-1" onClick={() => setStudentsOpen(false)}>Cerrar</SbBtn>
+          <SbBtn rounded className="flex-1" onClick={() => setStudentsOpen(false)}>{studentsDirty ? "Descartar" : "Cerrar"}</SbBtn>
+          <SbBtn variant="filled" rounded className="flex-1" onClick={handleSaveStudents} disabled={studentsSaving || studentsLoading || !studentsDirty}>
+            {studentsSaving ? "Guardando..." : "Guardar alumnos"}
+          </SbBtn>
         </SbModalFooter>
       </SbModal>
     </div>
