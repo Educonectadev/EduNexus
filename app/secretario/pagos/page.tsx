@@ -147,7 +147,7 @@ export default function PagosPage() {
       const res = await fetch("/api/secretario/payments")
       if (!res.ok) throw new Error("Error al cargar pagos")
       const data: PaymentsResponse = await res.json()
-      setPayments(data.payments)
+      setPayments((data.payments || []).map(p => ({ ...p, balance: Number(p.balance) || 0, amount: Number(p.amount) || 0, paid_amount: Number(p.paid_amount) || 0 })))
       setSummary(data.summary)
       setTotalDebt(data.total_debt)
       const gs = [...new Set(data.payments.map(p => p.student_grade).filter(Boolean))].sort()
