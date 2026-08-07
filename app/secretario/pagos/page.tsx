@@ -227,11 +227,16 @@ export default function PagosPage() {
 
   const handleRegisterPayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!regSelectedStudent?.id) { toast("Busca y selecciona un estudiante", "warning"); return }
+    if (!regConceptId) { toast("Selecciona un concepto", "warning"); return }
+    if (!regDueDate) { toast("Elige la fecha de vencimiento", "warning"); return }
     const amount = parseFloat(regAmount)
+    if (!amount || amount <= 0) { toast("Ingresa un monto total válido", "warning"); return }
     const paid = parseFloat(regPaidAmount) || 0
+    if (paid < 0 || paid > amount) { toast("El monto pagado no puede ser mayor que el total", "warning"); return }
     const status: PaymentStatus = paid >= amount && amount > 0 ? "paid" : paid > 0 ? "partial" : "pending"
     const body = {
-      student_id: regSelectedStudent?.id,
+      student_id: regSelectedStudent.id,
       concept_id: regConceptId,
       amount,
       paid_amount: paid,
@@ -242,7 +247,10 @@ export default function PagosPage() {
       const res = await fetch("/api/secretario/payments", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       })
-      if (!res.ok) throw new Error("Error al registrar pago")
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        throw new Error(err?.details ? `Error: ${err.details}` : "Error al registrar pago")
+      }
       toast("Pago registrado correctamente", "success")
       setRegisterModal(false)
       setRegSelectedStudent(null)

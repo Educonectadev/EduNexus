@@ -53,26 +53,49 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let conn: any = null
   try {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     const body = await request.json()
-    const { student_id, concept_id, amount, paid_amount, due_date, paid_date, status, reference, notes } = body
+    const { student_id, concept_id, amount, paid_amount, due_date, paid_date, status } = body
 
     if (!student_id || !amount) return NextResponse.json({ error: 'Estudiante y monto requeridos' }, { status: 400 })
 
+    const conceptId = concept_id ? String(concept_id) : null
+
+    // Validate the student belongs to the institution and the concept exists
+    const [studentRows] = await pool.query(
+      'SELECT id FROM students WHERE id = ? AND institution_id = ?',
+      [student_id, instId]
+    ) as any[]
+    if (!(studentRows as any[])?.length) {
+      return NextResponse.json({ error: 'Estudiante no encontrado en la institución' }, { status: 400 })
+    }
+
+    if (conceptId) {
+      const [conceptRows] = await pool.query(
+        'SELECT id FROM payment_concepts WHERE id = ? AND institution_id = ?',
+        [conceptId, instId]
+      ) as any[]
+      if (!(conceptRows as any[])?.length) {
+        return NextResponse.json({ error: 'Concepto no encontrado' }, { status: 400 })
+      }
+    }
+
     const id = crypto.randomUUID()
     await pool.query(
-      `INSERT INTO payments (id, institution_id, student_id, concept_id, amount, paid_amount, due_date, paid_date, status, reference, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO payments (id, institution_id, student_id, concept_id, amount, paid_amount, due_date, paid_date, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        id, instId, student_id, concept_id || null, Number(amount), Number(paid_amount || 0),
+        id, instId, student_id, conceptId, Number(amount), Number(paid_amount || 0),
         due_date || null, paid_date || null, status || 'pending',
-        reference || null, notes || null,
       ]
     )
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
     return NextResponse.json({ error: 'Error creating payment', details: error.message, code: error.code }, { status: 500 })
+  } finally {
+    if (conn) { try { conn.release() } catch {} }
   }
 }
