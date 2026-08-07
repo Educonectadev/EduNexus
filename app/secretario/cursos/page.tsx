@@ -403,14 +403,32 @@ export default function CursosSecretarioPage() {
     try { await fetch(`/api/secretario/cursos/${id}`, { method: "DELETE" }); setDeleteConfirm(null); fetchData() } catch {}
   }
 
+  const normGradeStr = (g: string) => {
+    const t = (g || "").trim()
+    const year = t.match(/^(\d+°)/)?.[1] || ""
+    if (t.includes("Secundaria")) return `${year} de Secundaria`
+    if (t.includes("Primaria")) return `${year} de Primaria`
+    if (t.includes("Inicial")) return `${year} de Inicial`
+    return t
+  }
+
   const q = search.toLowerCase()
   const filtered = cursos.filter(c => {
-    if (filterGrade !== "all" && c.grade !== filterGrade) return false
+    if (filterGrade !== "all" && normGradeStr(c.grade) !== normGradeStr(filterGrade)) return false
     if (q && !c.name.toLowerCase().includes(q) && !c.code.toLowerCase().includes(q) && !c.teacher_name?.toLowerCase().includes(q)) return false
     return true
   })
 
-  const grades = [...new Set(academicGrades.length > 0 ? academicGrades : cursos.map(c => c.grade))].sort()
+  const gradeRank = (g: string) => {
+    const n = normGradeStr(g)
+    const level = n.includes("Secundaria") ? 2 : n.includes("Inicial") ? 0 : 1
+    const num = parseInt(n.match(/^(\d+°)/)?.[1] || "0", 10) || 0
+    return level * 100 + num
+  }
+  const sortedGrades = [...new Set(academicGrades.length > 0 ? academicGrades : cursos.map(c => c.grade))].sort((a, b) => gradeRank(a) - gradeRank(b))
+  const sortedCourses = [...filtered].sort((a, b) => gradeRank(a.grade) - gradeRank(b.grade) || String(a.section).localeCompare(String(b.section)))
+
+  const grades = sortedGrades
 
   return (
     <div className="space-y-5">
@@ -503,7 +521,7 @@ export default function CursosSecretarioPage() {
       )}
 
       <div className="space-y-2">
-        {filtered.map((c, i) => (
+        {sortedCourses.map((c, i) => (
           <motion.div key={c.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
             className="bg-sb-surface rounded-2xl px-5 py-4 hover:bg-sb-surface-container/50 transition-colors">
             <div className="flex items-start gap-4">
