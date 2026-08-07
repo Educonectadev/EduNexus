@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
-import { getPadreUserId, getPadreInstitutionId } from '@/lib/getPadreInfo'
+import { getPadreUserId, getPadreInstitutionId, getPadreChildrenIds } from '@/lib/getPadreInfo'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
 
 export async function GET(request: NextRequest) {
@@ -14,28 +14,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Portal de padres no disponible en tu plan', upgrade_required: true }, { status: 403 })
     }
 
-    const [parents] = await pool.query(
-      `SELECT id FROM parents WHERE email = (SELECT email FROM users WHERE id = ?) LIMIT 1`,
-      [userId]
-    ) as any[]
+    const childrenIds = await getPadreChildrenIds(userId)
 
-    if (!parents || parents.length === 0) {
-      return NextResponse.json({ summary: null, pending: [], history: [] })
+    if (childrenIds.length === 0) {
+      return NextResponse.json({ summary: { total_paid: 0, total_pending: 0 }, pending: [], history: [] })
     }
 
-    const parentId = parents[0].id
+    const placeholders = childrenIds.map(() => '?').join(',')
 
     const [rows] = await pool.query(
       `SELECT p.id, pc.name AS concept, p.amount, p.paid_amount, p.due_date, p.status, p.paid_date,
               p.payment_method, p.receipt_number, s.id AS student_id,
               CONCAT(s.first_name, ' ', s.last_name) AS student_name, s.grade, s.section
        FROM payments p
-       JOIN parent_student ps ON ps.student_id = p.student_id
        JOIN students s ON s.id = p.student_id
        LEFT JOIN payment_concepts pc ON pc.id = p.concept_id
-       WHERE ps.parent_id = ? AND p.deleted_at IS NULL
+       WHERE p.student_id IN (${placeholders}) AND p.deleted_at IS NULL
        ORDER BY p.due_date DESC`,
-      [parentId]
+      childrenIds
     )
 
     const records = rows as any[]
