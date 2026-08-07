@@ -351,13 +351,8 @@ export default function SecretarioMatriculasPage() {
   }
 
   const downloadTemplate = () => {
-    const headers = ["Código del Alumno", "Nombre del Alumno", "DNI", "Fecha Nacimiento (AAAA-MM-DD)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
-    const example = ["ALU-20260001", "María García López", "12345678", "2015-03-15", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
-    
-    const csvContent = [headers.join(","), example.join(",")].join("\n")
-    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
-    link.href = URL.createObjectURL(blob)
+    link.href = "/plantillas/plantilla_matriculas.csv"
     link.download = `plantilla_matricula_${currentYear}.csv`
     link.click()
   }

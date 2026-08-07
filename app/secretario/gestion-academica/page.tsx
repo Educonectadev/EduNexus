@@ -52,19 +52,37 @@ export default function GestionAcademicaPage() {
     setStudentsOpen(true)
     setStudentsLoading(true)
     try {
-      const res = await fetch(`/api/secretario/academic-students?grade=${encodeURIComponent(grade.name)}`)
-      if (res.ok) {
-        const data = await res.json()
-        const grouped: Record<string, any[]> = {}
-        data.forEach((s: any) => {
-          const key = s.section || 'Sin sección'
-          if (!grouped[key]) grouped[key] = []
-          grouped[key].push(s)
-        })
-        setStudentsBySection(grouped)
-      } else {
-        setStudentsBySection({})
+      const [sRes, gRes] = await Promise.all([
+        fetch(`/api/secretario/academic-students?grade=${encodeURIComponent(grade.name)}`),
+        fetch(`/api/secretario/enrollments`),
+      ])
+      let data: any[] = []
+      if (sRes.ok) data = await sRes.json()
+
+      // Si no hay coincidencias por nombre, busca en enrollments por year_number + nivel
+      if (data.length === 0 && gRes.ok) {
+        const enrollments: any[] = await gRes.json()
+        const yearMark = grade.level === "Secundaria" ? `${grade.year_number}° de Secundaria` : grade.level === "Primaria" ? `${grade.year_number}° de Primaria` : `${grade.year_number}° de Inicial`
+        data = enrollments
+          .filter((e: any) => e.grade === grade.name || e.grade === yearMark)
+          .map((e: any) => ({
+            id: e.student_id,
+            first_name: e.first_name,
+            last_name: e.last_name,
+            section: e.section || "",
+            document_number: e.document_number,
+            code: e.code,
+            gender: e.gender || "",
+          }))
       }
+
+      const grouped: Record<string, any[]> = {}
+      data.forEach((s: any) => {
+        const key = s.section || 'Sin sección'
+        if (!grouped[key]) grouped[key] = []
+        grouped[key].push(s)
+      })
+      setStudentsBySection(grouped)
     } catch { setStudentsBySection({}) } finally { setStudentsLoading(false) }
   }
 
