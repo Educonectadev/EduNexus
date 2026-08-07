@@ -103,12 +103,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     // Attach selected students (keeping only the active enrollment for the current year)
     for (const sid of selectedIds) {
-      await conn.query(
-        `UPDATE enrollments SET course_id = $1
-         WHERE student_id = $2 AND institution_id = $3 AND year = $4 AND status = 'active'
+      const selRes = await conn.query(
+        `SELECT id FROM enrollments
+         WHERE student_id = $1 AND institution_id = $2 AND year = $3 AND status = 'active'
          ORDER BY created_at DESC LIMIT 1`,
-        [id, sid, instId, year]
+        [sid, instId, year]
       )
+      if (selRes.rows.length) {
+        await conn.query(
+          `UPDATE enrollments SET course_id = $1 WHERE id = $2`,
+          [id, selRes.rows[0].id]
+        )
+      }
     }
 
     await conn.query('COMMIT')
