@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Layers, Plus, Pencil, Trash2, ChevronDown, Sparkles, BookOpen, School } from "@/components/ui/proicons"
+import { GraduationCap, Layers, Plus, Pencil, Trash2, ChevronDown, Sparkles, BookOpen, School, Users, X } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalBody, SbModalHeader, SbModalFooter, useToast } from "@/components/ui/sb"
 
@@ -41,6 +41,32 @@ export default function GestionAcademicaPage() {
   const [generateLevel, setGenerateLevel] = React.useState("Primaria")
   const [selectedItem, setSelectedItem] = React.useState<Grade | Section | null>(null)
   const [saving, setSaving] = React.useState(false)
+
+  const [studentsOpen, setStudentsOpen] = React.useState(false)
+  const [studentsLoading, setStudentsLoading] = React.useState(false)
+  const [studentsBySection, setStudentsBySection] = React.useState<Record<string, any[]>>({})
+  const [studentsGrade, setStudentsGrade] = React.useState<Grade | null>(null)
+
+  const fetchStudents = async (grade: Grade) => {
+    setStudentsGrade(grade)
+    setStudentsOpen(true)
+    setStudentsLoading(true)
+    try {
+      const res = await fetch(`/api/secretario/academic-students?grade=${encodeURIComponent(grade.name)}`)
+      if (res.ok) {
+        const data = await res.json()
+        const grouped: Record<string, any[]> = {}
+        data.forEach((s: any) => {
+          const key = s.section || 'Sin sección'
+          if (!grouped[key]) grouped[key] = []
+          grouped[key].push(s)
+        })
+        setStudentsBySection(grouped)
+      } else {
+        setStudentsBySection({})
+      }
+    } catch { setStudentsBySection({}) } finally { setStudentsLoading(false) }
+  }
 
   const fetchAll = async () => {
     try {
@@ -246,6 +272,10 @@ export default function GestionAcademicaPage() {
                         <span className={`text-sm font-medium ${item.is_active ? "text-sb-on-surface" : "text-sb-on-surface-variant/50"}`}>{item.name}</span>
                         <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded-full ${LEVEL_COLORS[item.level] || ""}`}>Año {item.year_number}</span>
                       </div>
+                      <button onClick={() => fetchStudents(item)} className="h-8 flex items-center gap-1.5 px-2.5 rounded-lg text-sb-on-surface-variant/40 hover:text-sb-on-surface hover:bg-sb-surface-container transition-colors">
+                        <Users className="h-3.5 w-3.5" />
+                        <span className="text-[10px] font-medium">Alumnos</span>
+                      </button>
                       <button onClick={() => handleToggleActive(item)} className={`text-[10px] px-2.5 py-1 rounded-lg font-medium transition-all ${item.is_active ? "bg-emerald-500/8 text-emerald-600" : "bg-sb-surface-container text-sb-on-surface-variant/40"}`}>
                         {item.is_active ? "Activo" : "Inactivo"}
                       </button>
@@ -445,6 +475,56 @@ export default function GestionAcademicaPage() {
         <SbModalFooter>
           <SbBtn rounded onClick={() => setDeleteOpen(false)}>Cancelar</SbBtn>
           <SbBtn variant="danger" rounded onClick={handleDelete} disabled={saving}>{saving ? "Eliminando..." : "Eliminar"}</SbBtn>
+        </SbModalFooter>
+      </SbModal>
+      {/* Students by Grade Modal */}
+      <SbModal open={studentsOpen} onClose={() => setStudentsOpen(false)} maxWidth="560px">
+        <SbModalHeader title={`Alumnos · ${studentsGrade?.name || ""}`} onClose={() => setStudentsOpen(false)} />
+        <SbModalBody>
+          {studentsLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map(i => <div key={i} className="h-14 bg-sb-surface-container rounded-xl animate-pulse" />)}
+            </div>
+          ) : Object.keys(studentsBySection).length === 0 ? (
+            <div className="py-12 text-center">
+              <Users className="h-10 w-10 mx-auto mb-2 text-sb-on-surface-variant/15" />
+              <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay alumnos matriculados en {studentsGrade?.name}</p>
+              <p className="text-xs text-sb-on-surface-variant/25 mt-1">Los alumnos aparecerán aquí al matricularlos en este grado</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(studentsBySection).map(([section, students]) => (
+                <div key={section}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="h-7 w-7 rounded-lg bg-sb-on-surface/8 text-sb-on-surface flex items-center justify-center text-xs font-bold">{section}</span>
+                      <span className="text-[11px] font-semibold text-sb-on-surface-variant/60">Sección {section}</span>
+                    </div>
+                    <span className="text-[10px] text-sb-on-surface-variant/40">{students.length} alumno{students.length !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="bg-sb-surface-container/40 rounded-xl divide-y divide-sb-outline-variant/10">
+                    {students.map((s, i) => (
+                      <div key={s.id} className={`flex items-center gap-3 px-3 py-2 ${i === 0 ? "rounded-t-xl" : ""} ${i === students.length - 1 ? "rounded-b-xl" : ""}`}>
+                        <div className="h-8 w-8 rounded-lg bg-sb-surface flex items-center justify-center shrink-0">
+                          <span className="text-[10px] font-bold text-sb-on-surface-variant/60">{String(i + 1).padStart(2, "0")}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
+                          <p className="text-[10px] text-sb-on-surface-variant/40">DNI: {s.document_number || "—"} · Código: {s.code || "—"}</p>
+                        </div>
+                        {s.gender && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-lg bg-sb-surface-container text-sb-on-surface-variant/50">{s.gender}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SbModalBody>
+        <SbModalFooter>
+          <SbBtn rounded onClick={() => setStudentsOpen(false)}>Cerrar</SbBtn>
         </SbModalFooter>
       </SbModal>
     </div>
