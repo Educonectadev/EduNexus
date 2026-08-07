@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
     let certificatesCount = 0
     try {
       const [docs] = await pool.query('SELECT COUNT(*) as count FROM documents WHERE institution_id = ?', [instId]) as any
-      documentsCount = docs?.[0]?.count ?? 0
+      documentsCount = Number(docs?.[0]?.count ?? 0) || 0
     } catch {}
     try {
       const [certs] = await pool.query('SELECT COUNT(*) as count FROM certificates WHERE institution_id = ?', [instId]) as any
-      certificatesCount = certs?.[0]?.count ?? 0
+      certificatesCount = Number(certs?.[0]?.count ?? 0) || 0
     } catch {}
 
     const [pendingPayments] = await pool.query(
@@ -40,18 +40,18 @@ export async function GET(request: NextRequest) {
     ) as any
 
     return NextResponse.json({
-      active_students: activeStudents[0]?.count ?? 0,
-      total_students: totalStudents[0]?.count ?? 0,
-      enrollments: enrollments[0]?.count ?? 0,
-      pending: pending[0]?.count ?? 0,
-      courses: courses[0]?.count ?? 0,
-      schedules: schedules[0]?.count ?? 0,
-      parents: parents[0]?.count ?? 0,
+      active_students: Number(activeStudents[0]?.count ?? 0) || 0,
+      total_students: Number(totalStudents[0]?.count ?? 0) || 0,
+      enrollments: Number(enrollments[0]?.count ?? 0) || 0,
+      pending: Number(pending[0]?.count ?? 0) || 0,
+      courses: Number(courses[0]?.count ?? 0) || 0,
+      schedules: Number(schedules[0]?.count ?? 0) || 0,
+      parents: Number(parents[0]?.count ?? 0) || 0,
       documents: documentsCount,
-      issued_documents: issuedDocs[0]?.count ?? 0,
+      issued_documents: Number(issuedDocs[0]?.count ?? 0) || 0,
       certificates: certificatesCount,
-      total_debt: pendingPayments[0]?.total ?? 0,
-      absent_today: todayAttendance[0]?.count ?? 0,
+      total_debt: Number(pendingPayments[0]?.total ?? 0) || 0,
+      absent_today: Number(todayAttendance[0]?.count ?? 0) || 0,
       institution_name: instInfo?.[0]?.name ?? '',
       institution_code: instInfo?.[0]?.code ?? '',
     })
