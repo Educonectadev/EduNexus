@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const [rows] = await pool.query(
       `SELECT p.id, pc.name AS concept, p.amount, p.paid_amount, p.due_date, p.status, p.paid_date,
-              p.payment_method, p.receipt_number, s.id AS student_id,
+              p.reference AS reference, s.id AS student_id,
               CONCAT(s.first_name, ' ', s.last_name) AS student_name, s.grade, s.section
        FROM payments p
        JOIN students s ON s.id = p.student_id
