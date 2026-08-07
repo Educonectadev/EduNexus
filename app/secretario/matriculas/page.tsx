@@ -174,9 +174,13 @@ export default function SecretarioMatriculasPage() {
       }
       
       // Validate
+      const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       if (!rowData.student_name) rowData.errors.push("Nombre del alumno requerido")
       if (!rowData.student_dni || rowData.student_dni.length < 8) rowData.errors.push("DNI inválido")
       if (!rowData.grade) rowData.errors.push("Grado requerido")
+      else if (!grades.some(g => norm(g) === norm(rowData.grade))) rowData.errors.push(`Grado "${rowData.grade}" no existe en Gestión Académica`)
+      if (!rowData.section) rowData.errors.push("Sección requerida")
+      else if (!sections.some(s => norm(s) === norm(rowData.section))) rowData.errors.push(`Sección "${rowData.section}" no existe en Gestión Académica`)
       if (rowData.student_gender && !["M", "F", "MASCULINO", "FEMENINO"].includes(rowData.student_gender)) rowData.errors.push("Género inválido")
       if (rowData.student_birth_date) {
         const converted = convertDate(rowData.student_birth_date)
@@ -367,6 +371,9 @@ export default function SecretarioMatriculasPage() {
   }
 
   const handleCreate = async () => {
+    const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    if (form.grade && !grades.some(g => norm(g) === norm(form.grade))) { toast('El grado no existe en Gestión Académica', "error"); return }
+    if (form.section && !sections.some(s => norm(s) === norm(form.section))) { toast('La sección no existe en Gestión Académica', "error"); return }
     setSaving(true)
     try {
       const res = await fetch("/api/secretario/enrollments", {

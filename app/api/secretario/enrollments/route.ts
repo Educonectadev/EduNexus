@@ -43,6 +43,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nombre, DNI y grado son requeridos' }, { status: 400 })
     }
 
+    const [gradeRows] = await pool.query(
+      `SELECT id FROM academic_grades WHERE institution_id = ? AND LOWER(name) = LOWER(?)`,
+      [instId, grade]
+    ) as any[]
+    if ((gradeRows as any[]).length === 0) {
+      return NextResponse.json({ error: `El grado "${grade}" no existe en Gestión Académica` }, { status: 400 })
+    }
+    if (section) {
+      const [secRows] = await pool.query(
+        `SELECT id FROM academic_sections WHERE institution_id = ? AND LOWER(name) = LOWER(?)`,
+        [instId, section]
+      ) as any[]
+      if ((secRows as any[]).length === 0) {
+        return NextResponse.json({ error: `La sección "${section}" no existe en Gestión Académica` }, { status: 400 })
+      }
+    }
+
     const nameParts = student_name.trim().split(/\s+/)
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
