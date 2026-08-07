@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS payments (
   id VARCHAR(36) PRIMARY KEY,
   institution_id VARCHAR(36) NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
   student_id VARCHAR(36) NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-  concept_id VARCHAR(36) REFERENCES plans(id) ON DELETE SET NULL,
+  concept_id VARCHAR(36) REFERENCES payment_concepts(id) ON DELETE SET NULL,
   amount DECIMAL(10,2) DEFAULT 0,
   paid_amount DECIMAL(10,2) DEFAULT 0,
   due_date DATE DEFAULT NULL,
