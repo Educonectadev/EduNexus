@@ -418,6 +418,42 @@ export default function CursosSecretarioPage() {
     setDialogOpen(true)
   }
 
+  const genCode = (name: string, grade: string, section: string) => {
+    const letters = (name || "").replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ]/g, "").toUpperCase()
+    const base = letters.slice(0, 3) || "CUR"
+    const g = (grade || "").match(/^(\d+°)?/)?.[0]?.replace("°", "") || ""
+    return `${base}-${g}${(section || "A").toUpperCase()}`
+  }
+
+  const teacherCourses = React.useMemo(() => {
+    if (!formData.teacher_id) return []
+    return cursos.filter(c => c.teacher_id === formData.teacher_id)
+  }, [formData.teacher_id, cursos])
+
+  const handleTeacherChange = (id: string) => {
+    const teacher = docentes.find(d => (d.teacher_id || d.id) === id)
+    setFormData(prev => {
+      const next = { ...prev, teacher_id: id }
+      const tcs = cursos.filter(c => c.teacher_id === id)
+      if (tcs.length === 1) {
+        next.name = tcs[0].name
+        next.code = tcs[0].code
+        next.grade = tcs[0].grade
+        next.section = tcs[0].section
+      } else if (!next.name && teacher?.subject) {
+        next.name = teacher.subject
+        next.code = genCode(teacher.subject, next.grade, next.section)
+      }
+      return next
+    })
+  }
+
+  const pickTeacherCourse = (courseId: string) => {
+    const c = cursos.find(x => x.id === courseId)
+    if (!c) return
+    setFormData(prev => ({ ...prev, name: c.name, code: c.code, grade: c.grade, section: c.section }))
+  }
+
   const handleSave = async () => {
     if (!formData.name || !formData.code || !formData.grade) return
     setSaving(true)
@@ -682,7 +718,7 @@ export default function CursosSecretarioPage() {
               </div>
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Grado *</label>
-                <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value})} className="sbf-native-select w-full">
+                <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value, code: formData.name ? genCode(formData.name, e.target.value, formData.section) : formData.code})} className="sbf-native-select w-full">
                   <option value="">Seleccionar grado...</option>
                   {academicGrades.length > 0 ? academicGrades.map(g => <option key={g} value={g}>{g}</option>) : (GRADES as string[]).map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
@@ -691,13 +727,13 @@ export default function CursosSecretarioPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Sección</label>
-                <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value})} className="sbf-native-select w-full">
+                <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value, code: formData.name ? genCode(formData.name, formData.grade, e.target.value) : formData.code})} className="sbf-native-select w-full">
                   {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>Sección {s}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Docente</label>
-                <select value={formData.teacher_id} onChange={e => setFormData({...formData, teacher_id: e.target.value})} className="sbf-native-select w-full">
+                <select value={formData.teacher_id} onChange={e => handleTeacherChange(e.target.value)} className="sbf-native-select w-full">
                   <option value="">Sin asignar</option>
                   {docentes.map(d => (
                     <option key={d.id} value={d.teacher_id || d.id}>{d.full_name}</option>
@@ -705,6 +741,25 @@ export default function CursosSecretarioPage() {
                 </select>
               </div>
             </div>
+            {formData.teacher_id && (
+              <div>
+                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">
+                  {teacherCourses.length > 0 ? "Curso que dicta el docente" : "Materia del docente"}
+                </label>
+                {teacherCourses.length > 0 ? (
+                  <select value="" onChange={e => pickTeacherCourse(e.target.value)} className="sbf-native-select w-full">
+                    <option value="">Seleccionar curso para autocompletar...</option>
+                    {teacherCourses.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} · {c.code} · {c.grade} {c.section}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-xs text-sb-on-surface-variant/50 bg-sb-surface-container/40 rounded-xl px-3 py-2">
+                    Este docente no tiene cursos aún. Se usa su materia para sugerir el nombre y autogenerar el código.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </SbModalBody>
         <div className="px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
