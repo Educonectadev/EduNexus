@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       FROM payments p
       JOIN students s ON p.student_id = s.id
       LEFT JOIN payment_concepts pc ON p.concept_id = pc.id
-      WHERE p.institution_id = ?
+      WHERE p.institution_id = ? AND p.deleted_at IS NULL
     `
     const params: any[] = [instId]
 
@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
 
     const [summaryRows] = await pool.query(
       `SELECT status, COUNT(*) as count, SUM(paid_amount) as total
-       FROM payments WHERE institution_id = ? GROUP BY status`,
+       FROM payments WHERE institution_id = ? AND deleted_at IS NULL GROUP BY status`,
       [instId]
     )
 
     const [debtTotal] = await pool.query(
-      `SELECT COALESCE(SUM(amount - paid_amount), 0) as total FROM payments WHERE institution_id = ? AND status IN ('pending','partial','overdue')`,
+      `SELECT COALESCE(SUM(amount - paid_amount), 0) as total FROM payments WHERE institution_id = ? AND status IN ('pending','partial','overdue') AND deleted_at IS NULL`,
       [instId]
     )
 

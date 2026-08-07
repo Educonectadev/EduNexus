@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   try {
     const [pendingPayments] = await pool.query(
       `SELECT COALESCE(SUM(amount - paid_amount), 0) as total FROM payments
-       WHERE institution_id = ? AND status IN ('pending','partial','overdue')`,
+       WHERE institution_id = ? AND status IN ('pending','partial','overdue') AND deleted_at IS NULL`,
       [instId]
     ) as any
     total_debt = Number(pendingPayments?.[0]?.total ?? 0) || 0

@@ -52,6 +52,16 @@ const statusConfig: Record<PaymentStatus, { label: string; color: string; dot: s
 
 function fmt(n: number | string) { return "S/ " + Number(n || 0).toFixed(2) }
 
+function toDateInput(dateStr: any): string {
+  if (!dateStr) return ""
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return ""
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${m}-${day}`
+}
+
 function parseDate(dateStr: string) {
   if (!dateStr) return null
   const d = new Date(dateStr)
@@ -272,7 +282,7 @@ export default function PagosPage() {
     if (d.concept_id) setRegConceptId(d.concept_id)
     setRegAmount(String(d.amount ?? ""))
     setRegPaidAmount(d.paid_amount > 0 ? String(d.paid_amount) : "")
-    if (d.due_date) setRegDueDate(d.due_date)
+    if (d.due_date) setRegDueDate(toDateInput(d.due_date))
   }
 
   const handleGenerateDebt = async (e: React.FormEvent<HTMLFormElement>) => {

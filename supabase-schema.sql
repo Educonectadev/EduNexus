@@ -206,6 +206,8 @@ CREATE TABLE IF NOT EXISTS payments (
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending','partial','paid','overdue')),
   reference VARCHAR(100) DEFAULT '',
   notes TEXT DEFAULT '',
+  deleted_at TIMESTAMP DEFAULT NULL,
+  delete_reason TEXT DEFAULT '',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

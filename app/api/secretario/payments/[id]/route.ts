@@ -47,7 +47,11 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const payment = (existing as any[])[0]
     if (!payment) return NextResponse.json({ error: 'Pago no encontrado' }, { status: 404 })
 
-    await pool.query(`DELETE FROM payments WHERE id = ? AND institution_id = ?`, [id, instId])
+    // Logical delete: keep the row, mark as deleted with a reason
+    const [result, meta] = await pool.query(
+      `UPDATE payments SET deleted_at = ?, delete_reason = ? WHERE id = ? AND institution_id = ? AND deleted_at IS NULL`,
+      [new Date().toISOString(), reason || '', id, instId]
+    ) as any[]
 
     const authUser = await getAuthPayload(request)
     logAudit({
@@ -62,10 +66,11 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         amount: Number(payment.amount),
         paid_amount: Number(payment.paid_amount),
         reason: reason || 'Sin motivo especificado',
+        soft_delete: true,
       },
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, softDelete: (meta?.rowCount ?? 0) > 0 })
   } catch (error) {
     return NextResponse.json({ error: 'Error deleting payment' }, { status: 500 })
   }
