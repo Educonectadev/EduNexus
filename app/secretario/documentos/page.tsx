@@ -630,7 +630,6 @@ export default function DocumentosPage() {
             </motion.div>
           </SbModalBody>
           <SbModalFooter>
-            <SbBtn rounded onClick={() => setCreateOpen(false)}>Cancelar</SbBtn>
             {formData.type && (
               <>
                 <SbBtn variant="outlined" rounded onClick={() => handleDownloadPDF({ id: "preview", type: formData.type, student_id: "", student_name: "", status: formData.status, notes: formData.notes, created_at: new Date().toISOString() } as Document)}>
