@@ -11,14 +11,24 @@ export async function GET(request: NextRequest) {
     let query = `
       SELECT c.id, c.institution_id, c.name, c.code, c.grade, c.section,
              c.teacher_id, c.status, c.created_at,
-             COALESCE(CONCAT(TRIM(t.first_name), ' ', TRIM(t.last_name)), 'Sin asignar') as teacher_name,
-             (SELECT COUNT(*) FROM enrollments e
+             COALESCE(u.full_name, CONCAT(TRIM(t.first_name), ' ', TRIM(t.last_name)), 'Sin asignar') as teacher_name,
+(SELECT COUNT(*) FROM enrollments e
               JOIN students s ON e.student_id = s.id
               WHERE s.institution_id = c.institution_id
-                AND s.grade = c.grade AND s.section = c.section AND e.status = 'active'
-             ) as student_count
+                AND e.status = 'active'
+                AND s.section = c.section
+                AND (s.grade = c.grade
+                     OR REPLACE(s.grade, ' de Secundaria', ' Secundaria') = c.grade
+                     OR REPLACE(s.grade, ' de Primaria', ' Primaria') = c.grade
+                     OR REPLACE(s.grade, ' de Inicial', ' Inicial') = c.grade
+                )
+             ) as student_count,
+             (SELECT COUNT(*) FROM horarios h
+              WHERE h.course_id = c.id AND h.status = 'active'
+             ) as schedule_count
       FROM courses c
       LEFT JOIN teachers t ON c.teacher_id = t.id
+      LEFT JOIN users u ON t.user_id = u.id
       WHERE c.institution_id = ?
     `
     const params: any[] = [instId]

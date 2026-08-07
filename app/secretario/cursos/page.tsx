@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Plus, Search, Edit3, Trash2, Users, GraduationCap, X, AlertTriangle, Command, Upload, Download, AlertCircle, CheckCircle, Table } from "@/components/ui/proicons"
+import { BookOpen, Plus, Search, Edit3, Trash2, Users, GraduationCap, X, AlertTriangle, Command, Upload, Download, AlertCircle, CheckCircle, Table, Clock } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbInput } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfResultsCount } from "@/components/ui/search-filter-bar"
@@ -9,7 +9,7 @@ import "@/frontend.css"
 
 interface Course {
   id: string; name: string; code: string; grade: string; section: string
-  teacher_id: string; teacher_name: string; student_count: number; status: string; created_at: string
+  teacher_id: string; teacher_name: string; student_count: number; schedule_count?: number; status: string; created_at: string
 }
 
 const GRADES = [
@@ -259,6 +259,23 @@ export default function CursosSecretarioPage() {
   const [importOpen, setImportOpen] = React.useState(false)
   const [importKey, setImportKey] = React.useState(0)
 
+  const [academicGrades, setAcademicGrades] = React.useState<string[]>([])
+  const [academicSections, setAcademicSections] = React.useState<string[]>([])
+  const [docentes, setDocentes] = React.useState<any[]>([])
+
+  const fetchCascades = async () => {
+    try {
+      const [g, s, p] = await Promise.all([
+        fetch("/api/secretario/academic-grades"),
+        fetch("/api/secretario/academic-sections"),
+        fetch("/api/secretario/personal"),
+      ])
+      if (g.ok) { const rows = await g.json(); setAcademicGrades(rows.map((x: any) => x.name)) }
+      if (s.ok) { const rows = await s.json(); setAcademicSections(rows.map((x: any) => x.name)) }
+      if (p.ok) { const rows = await p.json(); setDocentes(rows.filter((x: any) => x.role === "docente")) }
+    } catch {}
+  }
+
   const [studentsOpen, setStudentsOpen] = React.useState(false)
   const [studentsLoading, setStudentsLoading] = React.useState(false)
   const [studentsCourse, setStudentsCourse] = React.useState<Course | null>(null)
@@ -299,6 +316,7 @@ export default function CursosSecretarioPage() {
       } catch {}
       finally { if (!cancelled) setLoading(false) }
     })()
+    fetchCascades()
     return () => { cancelled = true }
   }, [])
 
@@ -350,7 +368,7 @@ export default function CursosSecretarioPage() {
     return true
   })
 
-  const grades = [...new Set(cursos.map(c => c.grade))].sort()
+  const grades = [...new Set(academicGrades.length > 0 ? academicGrades : cursos.map(c => c.grade))].sort()
 
   return (
     <div className="space-y-5">
@@ -460,6 +478,7 @@ export default function CursosSecretarioPage() {
                   <button onClick={() => fetchStudents(c)} className="flex items-center gap-1 hover:text-sb-on-surface/70 transition-colors">
                     <Users className="h-3 w-3" />{c.student_count || 0} alumno(s)
                   </button>
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{c.schedule_count || 0} horario(s)</span>
                   <span className="flex items-center gap-1">{c.teacher_name || "Sin docente"}</span>
                 </div>
               </div>
@@ -501,7 +520,7 @@ export default function CursosSecretarioPage() {
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Grado *</label>
                 <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value})} className="sbf-native-select w-full">
                   <option value="">Seleccionar grado...</option>
-                  {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
+                  {academicGrades.length > 0 ? academicGrades.map(g => <option key={g} value={g}>{g}</option>) : (GRADES as string[]).map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
               </div>
             </div>
@@ -509,14 +528,16 @@ export default function CursosSecretarioPage() {
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Sección</label>
                 <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value})} className="sbf-native-select w-full">
-                  {SECTIONS.map(s => <option key={s} value={s}>Sección {s}</option>)}
+                  {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>Sección {s}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Docente</label>
                 <select value={formData.teacher_id} onChange={e => setFormData({...formData, teacher_id: e.target.value})} className="sbf-native-select w-full">
                   <option value="">Sin asignar</option>
-                  <option disabled>— Cargar docentes desde Personal —</option>
+                  {docentes.map(d => (
+                    <option key={d.id} value={d.teacher_id || d.id}>{d.full_name}</option>
+                  ))}
                 </select>
               </div>
             </div>
