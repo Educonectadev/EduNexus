@@ -24,12 +24,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     if (fields.length === 0) return NextResponse.json({ error: 'Sin cambios' }, { status: 400 })
 
-    const [result] = await pool.query(
+    const [result, meta] = await pool.query(
       `UPDATE payment_methods SET ${fields.join(', ')} WHERE id = ? AND institution_id = ?`,
       [...values, id, instId]
     ) as any[]
 
-    if (!result.affectedRows) return NextResponse.json({ error: 'Método no encontrado' }, { status: 404 })
+    if (!meta.affectedRows) return NextResponse.json({ error: 'Método no encontrado' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Error al actualizar método de pago' }, { status: 500 })
@@ -42,12 +42,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (!instId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     const { id } = await params
 
-    const [result] = await pool.query(
+    const [result, meta] = await pool.query(
       `DELETE FROM payment_methods WHERE id = ? AND institution_id = ?`,
       [id, instId]
     ) as any[]
 
-    if (!result.affectedRows) return NextResponse.json({ error: 'Método no encontrado' }, { status: 404 })
+    if (!meta.affectedRows) return NextResponse.json({ error: 'Método no encontrado' }, { status: 404 })
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Error al eliminar método de pago' }, { status: 500 })

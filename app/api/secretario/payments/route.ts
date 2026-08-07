@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       ]
     )
     return NextResponse.json({ success: true, id })
-  } catch (error) {
-    return NextResponse.json({ error: 'Error creating payment' }, { status: 500 })
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Error creating payment', details: error.message, code: error.code }, { status: 500 })
   }
 }
