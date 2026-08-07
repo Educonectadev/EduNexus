@@ -285,6 +285,11 @@ export default function CursosSecretarioPage() {
   const [studentsDirty, setStudentsDirty] = React.useState(false)
   const [studentsMessage, setStudentsMessage] = React.useState<{ type: 'ok' | 'err'; text: string } | null>(null)
 
+  const [missingGrades, setMissingGrades] = React.useState<any[]>([])
+  const [missingChecking, setMissingChecking] = React.useState(false)
+  const [generating, setGenerating] = React.useState(false)
+  const [generateMsg, setGenerateMsg] = React.useState<string | null>(null)
+
   const normGrade = (c: Course) => {
     const g = (c.grade || "").trim()
     const year = g.match(/^(\d+°)/)?.[1] || ""
@@ -349,6 +354,31 @@ export default function CursosSecretarioPage() {
     finally { setLoading(false) }
   }
 
+  const fetchMissing = async () => {
+    setMissingChecking(true)
+    try {
+      const r = await fetch("/api/secretario/cursos/generate")
+      if (r.ok) { const d = await r.json(); setMissingGrades(d.missing || []) }
+    } catch {} finally { setMissingChecking(false) }
+  }
+
+  const handleGenerate = async () => {
+    setGenerating(true)
+    try {
+      const res = await fetch("/api/secretario/cursos/generate", { method: "POST" })
+      if (res.ok) {
+        const d = await res.json()
+        setMissingGrades([])
+        if (d.created > 0) {
+          setGenerateMsg(`Se crearon ${d.created} curso(s) automáticamente.`)
+          fetchData()
+        } else {
+          setGenerateMsg("No había grados pendientes.")
+        }
+      }
+    } catch {} finally { setGenerating(false) }
+  }
+
   React.useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -359,6 +389,7 @@ export default function CursosSecretarioPage() {
       finally { if (!cancelled) setLoading(false) }
     })()
     fetchCascades()
+    fetchMissing()
     return () => { cancelled = true }
   }, [])
 
@@ -444,6 +475,32 @@ export default function CursosSecretarioPage() {
           </div>
         }
       />
+
+      {(missingGrades.length > 0 || generateMsg) && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}
+          className={`rounded-2xl px-4 py-3 flex items-center gap-3 ${generateMsg && missingGrades.length === 0 ? 'bg-emerald-500/8' : 'bg-amber-500/8'}`}>
+          {missingGrades.length > 0 ? <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" /> : <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0" />}
+          <div className="flex-1 min-w-0">
+            {missingGrades.length > 0 ? (
+              <>
+                <p className="text-sm font-medium text-sb-on-surface/80">
+                  {missingGrades.length} grado(s) con alumnos pero sin curso
+                </p>
+                <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">
+                  {missingGrades.slice(0, 4).map(m => `${m.grade} ${m.section}`).join(' · ')}{missingGrades.length > 4 ? ` y ${missingGrades.length - 4} más` : ''}
+                </p>
+              </>
+            ) : (
+              <p className="text-sm font-medium text-emerald-600">{generateMsg}</p>
+            )}
+          </div>
+          {missingGrades.length > 0 && (
+            <SbBtn variant="filled" rounded size="sm" className="flex items-center gap-2 shrink-0" onClick={handleGenerate} disabled={generating || missingChecking}>
+              {generating ? "Creando..." : missingChecking ? "Verificando..." : "Crear cursos"}
+            </SbBtn>
+          )}
+        </motion.div>
+      )}
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
         className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
