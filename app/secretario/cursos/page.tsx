@@ -520,42 +520,89 @@ export default function CursosSecretarioPage() {
         </div>
       )}
 
-      <div className="space-y-2">
-        {sortedCourses.map((c, i) => (
-          <motion.div key={c.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
-            className="bg-sb-surface rounded-2xl px-5 py-4 hover:bg-sb-surface-container/50 transition-colors">
-            <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-2xl bg-sb-primary/10 flex items-center justify-center shrink-0">
-                <BookOpen className="h-4 w-4 text-sb-primary/60" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-sm font-semibold text-sb-on-surface/90">{c.name}</h3>
-                  <span className="text-[10px] font-mono text-sb-on-surface-variant/30">{c.code}</span>
+      <div className="space-y-6">
+        {(() => {
+          const levels = [
+            { key: 'Inicial', label: 'Inicial' },
+            { key: 'Primaria', label: 'Primaria' },
+            { key: 'Secundaria', label: 'Secundaria' },
+          ]
+          const byLevel = (lvl: string) => sortedCourses.filter(c => (normGradeStr(c.grade) || '').includes(lvl))
+          const hasAny = sortedCourses.length > 0
+          return (
+            <>
+              {levels.map((lvl) => {
+                const list = byLevel(lvl.key)
+                if (list.length === 0) return null
+                return (
+                  <div key={lvl.key}>
+                    <div className="flex items-center gap-2.5 mb-3">
+                      <div className={`h-6 w-6 rounded-lg flex items-center justify-center ${lvl.key === 'Primaria' ? 'bg-emerald-400/10' : lvl.key === 'Secundaria' ? 'bg-sb-primary/10' : 'bg-amber-400/10'}`}>
+                        {lvl.key === 'Primaria' ? <GraduationCap className="h-3.5 w-3.5 text-emerald-400/80" /> : lvl.key === 'Secundaria' ? <GraduationCap className="h-3.5 w-3.5 text-sb-primary/70" /> : <BookOpen className="h-3.5 w-3.5 text-amber-400/80" />}
+                      </div>
+                      <h2 className="text-sm font-semibold text-sb-on-surface/80">{lvl.label}</h2>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-sb-surface text-sb-on-surface-variant/40">{list.length} curso(s)</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                      {list.map((c, i) => (
+                        <motion.div key={c.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
+                          className="bg-sb-surface rounded-2xl p-4 hover:bg-sb-surface-container/50 hover:shadow-lg transition-all border border-transparent hover:border-sb-outline-variant/20 group">
+                          <div className="flex items-start gap-3">
+                            <div className={`h-11 w-11 rounded-2xl flex items-center justify-center shrink-0 ${lvl.key === 'Primaria' ? 'bg-emerald-400/10' : lvl.key === 'Secundaria' ? 'bg-sb-primary/10' : 'bg-amber-400/10'}`}>
+                              <BookOpen className={`h-5 w-5 ${lvl.key === 'Primaria' ? 'text-emerald-400/80' : lvl.key === 'Secundaria' ? 'text-sb-primary/70' : 'text-amber-400/80'}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h3 className="text-sm font-semibold text-sb-on-surface/90 truncate">{c.name}</h3>
+                              </div>
+                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sb-surface-container text-sb-on-surface-variant/50">{c.code}</span>
+                                <span className="text-[10px] text-sb-on-surface-variant/40">{c.grade} · Sección {c.section}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-3 gap-1.5 mt-3">
+                            <div className="rounded-xl bg-sb-surface-container/50 p-2 text-center">
+                              <p className="text-sm font-bold text-sb-on-surface/80">{c.student_count || 0}</p>
+                              <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Alumnos</p>
+                            </div>
+                            <div className="rounded-xl bg-sb-surface-container/50 p-2 text-center">
+                              <p className="text-sm font-bold text-sb-on-surface/80">{c.schedule_count || 0}</p>
+                              <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Horarios</p>
+                            </div>
+                            <div className="rounded-xl bg-sb-surface-container/50 p-2 text-center">
+                              <p className="text-sm font-bold text-sb-on-surface/80 truncate" title={c.teacher_name || ''}>{(c.teacher_name || 'Sin').split(' ')[0]}</p>
+                              <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Docente</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-sb-outline-variant/10">
+                            <button onClick={() => fetchStudents(c)} className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-xl bg-sb-surface-container/60 hover:bg-sb-surface-container text-sb-on-surface/70 transition-colors">
+                              <Users className="h-3.5 w-3.5" /> Alumnos
+                            </button>
+                            <button onClick={() => openEdit(c)} className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-xl bg-sb-surface-container/60 hover:bg-sb-surface-container text-sb-on-surface/70 transition-colors">
+                              <Edit3 className="h-3.5 w-3.5" /> Editar
+                            </button>
+                            <button onClick={() => setDeleteConfirm(c)} className="flex items-center justify-center px-3 py-2 rounded-xl bg-red-500/8 hover:bg-red-500/15 text-red-400/80 transition-colors">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+              {!hasAny && !loading && (
+                <div className="bg-sb-surface rounded-2xl py-20 text-center">
+                  <div className="h-16 w-16 rounded-2xl bg-sb-surface-container flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="h-7 w-7 text-sb-on-surface-variant/20" />
+                  </div>
+                  <p className="text-sm font-medium text-sb-on-surface-variant/40">No hay cursos registrados</p>
                 </div>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-sb-on-surface-variant/50 flex-wrap">
-                  <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" />{c.grade} {c.section}</span>
-                  <button onClick={() => fetchStudents(c)} className="flex items-center gap-1 hover:text-sb-on-surface/70 transition-colors">
-                    <Users className="h-3 w-3" />{c.student_count || 0} alumno(s)
-                  </button>
-                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{c.schedule_count || 0} horario(s)</span>
-                  <span className="flex items-center gap-1">{c.teacher_name || "Sin docente"}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => fetchStudents(c)} className="p-1.5 rounded-lg hover:bg-sb-surface-container/80 text-sb-on-surface-variant/30 hover:text-sb-on-surface/60 transition-colors" title="Ver alumnos">
-                  <Users className="h-3.5 w-3.5" />
-                </button>
-                <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-sb-surface-container/80 text-sb-on-surface-variant/30 hover:text-sb-on-surface/60 transition-colors">
-                  <Edit3 className="h-3.5 w-3.5" />
-                </button>
-                <button onClick={() => setDeleteConfirm(c)} className="p-1.5 rounded-lg hover:bg-sb-surface-container/80 text-sb-on-surface-variant/30 hover:text-red-400/60 transition-colors">
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+              )}
+            </>
+          )
+        })()}
       </div>
 
       <SbModal open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} maxWidth="520px">
