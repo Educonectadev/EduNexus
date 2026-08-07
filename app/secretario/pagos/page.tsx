@@ -136,6 +136,9 @@ export default function PagosPage() {
   const [regAmount, setRegAmount] = React.useState("")
   const [regPaidAmount, setRegPaidAmount] = React.useState("")
   const [regDueDate, setRegDueDate] = React.useState("")
+  const [deleteModalPayment, setDeleteModalPayment] = React.useState<Payment | null>(null)
+  const [deleteReason, setDeleteReason] = React.useState("")
+  const [deletingPayment, setDeletingPayment] = React.useState(false)
 
   const [grades, setGrades] = React.useState<string[]>([])
 
@@ -332,24 +335,28 @@ export default function PagosPage() {
     }
   }
 
-  const handleDeletePayment = async (payment: Payment) => {
-    const reason = window.prompt(
-      `¿Por qué se elimina este pago de ${payment.student_name} (${fmt(payment.amount)})? Esta acción quedará registrada en el historial.`,
-      ""
-    )
-    if (reason === null) return
+  const openDeleteModal = (payment: Payment) => {
+    setDeleteModalPayment(payment)
+    setDeleteReason("")
+    setDetailModal(false)
+  }
+
+  const handleDeletePayment = async () => {
+    if (!deleteModalPayment) return
+    if (!deleteReason.trim()) { toast("Escribe el motivo de la eliminación", "warning"); return }
+    setDeletingPayment(true)
     try {
-      const res = await fetch(`/api/secretario/payments/${payment.id}`, {
+      const res = await fetch(`/api/secretario/payments/${deleteModalPayment.id}`, {
         method: "DELETE", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason: reason.trim() }),
+        body: JSON.stringify({ reason: deleteReason.trim() }),
       })
       if (!res.ok) throw new Error("Error al eliminar pago")
       toast("Pago eliminado. Motivo guardado en el historial.", "success")
-      setDetailModal(false)
+      setDeleteModalPayment(null)
       fetchPayments()
     } catch (e) {
       toast(e instanceof Error ? e.message : "Error al eliminar", "error")
-    }
+    } finally { setDeletingPayment(false) }
   }
 
   const handleSaveConcept = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -806,7 +813,7 @@ export default function PagosPage() {
               {selectedPayment && (
                 <div className="border-t border-sb-outline-variant/10 pt-3 mt-1">
                   <button
-                    onClick={() => { setDetailModal(false); handleDeletePayment(selectedPayment) }}
+                    onClick={() => openDeleteModal(selectedPayment)}
                     className="w-full flex items-center justify-center gap-2 text-xs py-2.5 rounded-xl bg-red-500/8 hover:bg-red-500/15 text-red-400 transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -916,6 +923,51 @@ export default function PagosPage() {
             <SbBtn variant="filled" rounded type="submit">Registrar pago</SbBtn>
           </SbModalFooter>
         </form>
+      </SbModal>
+
+      {/* ===== DELETE PAYMENT MODAL ===== */}
+      <SbModal open={!!deleteModalPayment} onClose={() => { if (!deletingPayment) setDeleteModalPayment(null) }} maxWidth="460px">
+        <SbModalBody noPadding>
+          <div className="p-6">
+            <div className="h-14 w-14 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-red-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-sb-on-surface">Eliminar pago</h3>
+            <p className="text-sm text-sb-on-surface-variant/50 mt-1">Esta acción es reversible solo para auditoría: el pago quedará anulado y oculto, pero su registro y el motivo se conservarán en el historial.</p>
+
+            <div className="mt-4 rounded-2xl bg-sb-surface-container/50 p-3.5 flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-sb-on-surface truncate">{deleteModalPayment?.student_name}</p>
+                <p className="text-[11px] text-sb-on-surface-variant/40 mt-0.5">{deleteModalPayment?.concept_name || "Concepto"} · {deleteModalPayment?.due_date ? formatDate(deleteModalPayment.due_date) : "—"}</p>
+              </div>
+              <div className="text-right shrink-0 ml-3">
+                <p className="text-sm font-bold text-red-500">{deleteModalPayment ? fmt(deleteModalPayment.amount) : ""}</p>
+                <p className="text-[10px] text-sb-on-surface-variant/40">Monto total</p>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="text-[11px] font-semibold text-sb-on-surface-variant/60 mb-1.5 block">Motivo de la eliminación *</label>
+              <textarea
+                value={deleteReason}
+                onChange={e => setDeleteReason(e.target.value)}
+                placeholder="Ej: El pago fue registrado por error, el estudiante no asistió, se duplicó..."
+                rows={3}
+                autoFocus
+                className="sb-input rounded-xl text-sm w-full resize-none"
+              />
+              <p className="text-[10px] text-sb-on-surface-variant/35 mt-1.5 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3 shrink-0" /> Este motivo quedará visible en el Historial de la institución.
+              </p>
+            </div>
+          </div>
+        </SbModalBody>
+        <SbModalFooter>
+          <SbBtn rounded className="flex-1" onClick={() => setDeleteModalPayment(null)} disabled={deletingPayment}>Cancelar</SbBtn>
+          <SbBtn variant="danger" rounded className="flex-1 flex items-center justify-center gap-2" onClick={handleDeletePayment} disabled={deletingPayment || !deleteReason.trim()}>
+            {deletingPayment ? "Eliminando..." : <><Trash2 className="h-3.5 w-3.5" /> Eliminar pago</>}
+          </SbBtn>
+        </SbModalFooter>
       </SbModal>
 
       {/* ===== GENERATE DEBT MODAL ===== */}
