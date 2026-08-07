@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
-import { resolveInstId } from '@/lib/resolveInstId'
+import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
+import { logAudit } from '@/lib/audit'
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -30,7 +31,40 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     const { id } = await params
+
+    const body = await request.json().catch(() => null)
+    const reason = (body?.reason || '').trim()
+
+    const [existing] = await pool.query(
+      `SELECT p.*, CONCAT(s.first_name, ' ', s.last_name) AS student_name, pc.name AS concept_name
+       FROM payments p
+       LEFT JOIN students s ON p.student_id = s.id
+       LEFT JOIN payment_concepts pc ON p.concept_id = pc.id
+       WHERE p.id = ? AND p.institution_id = ?`,
+      [id, instId]
+    ) as any[]
+
+    const payment = (existing as any[])[0]
+    if (!payment) return NextResponse.json({ error: 'Pago no encontrado' }, { status: 404 })
+
     await pool.query(`DELETE FROM payments WHERE id = ? AND institution_id = ?`, [id, instId])
+
+    const authUser = await getAuthPayload(request)
+    logAudit({
+      userId: (authUser?.userId as string) || (authUser?.id as string) || '',
+      institutionId: instId,
+      action: 'delete',
+      entity: 'payment',
+      entityId: id,
+      details: {
+        student: payment.student_name,
+        concept: payment.concept_name,
+        amount: Number(payment.amount),
+        paid_amount: Number(payment.paid_amount),
+        reason: reason || 'Sin motivo especificado',
+      },
+    })
+
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Error deleting payment' }, { status: 500 })

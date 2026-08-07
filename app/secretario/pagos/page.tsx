@@ -322,6 +322,26 @@ export default function PagosPage() {
     }
   }
 
+  const handleDeletePayment = async (payment: Payment) => {
+    const reason = window.prompt(
+      `¿Por qué se elimina este pago de ${payment.student_name} (${fmt(payment.amount)})? Esta acción quedará registrada en el historial.`,
+      ""
+    )
+    if (reason === null) return
+    try {
+      const res = await fetch(`/api/secretario/payments/${payment.id}`, {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: reason.trim() }),
+      })
+      if (!res.ok) throw new Error("Error al eliminar pago")
+      toast("Pago eliminado. Motivo guardado en el historial.", "success")
+      setDetailModal(false)
+      fetchPayments()
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Error al eliminar", "error")
+    }
+  }
+
   const handleSaveConcept = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = new FormData(e.currentTarget)
@@ -771,6 +791,18 @@ export default function PagosPage() {
                       Pagar
                     </button>
                   </div>
+                </div>
+              )}
+              {selectedPayment && (
+                <div className="border-t border-sb-outline-variant/10 pt-3 mt-1">
+                  <button
+                    onClick={() => { setDetailModal(false); handleDeletePayment(selectedPayment) }}
+                    className="w-full flex items-center justify-center gap-2 text-xs py-2.5 rounded-xl bg-red-500/8 hover:bg-red-500/15 text-red-400 transition-colors"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Eliminar pago
+                  </button>
+                  <p className="text-[10px] text-sb-on-surface-variant/35 text-center mt-1.5">Se pedirá un motivo y quedará en el historial.</p>
                 </div>
               )}
             </motion.div>
