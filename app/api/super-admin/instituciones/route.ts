@@ -32,7 +32,9 @@ export async function GET(request: NextRequest) {
     const [{ total }] = await pool.query('SELECT COUNT(*)::int as total FROM institutions') as any[]
 
     const [rows] = await pool.query(
-      `SELECT i.id, i.name, i.code, i.status, i.total_students, i.total_teachers,
+      `SELECT i.id, i.name, i.code, i.status,
+              COALESCE((SELECT COUNT(*)::int FROM students s WHERE s.institution_id = i.id), 0) AS total_students,
+              COALESCE((SELECT COUNT(*)::int FROM teachers t WHERE t.institution_id = i.id), 0) AS total_teachers,
               i.type, i.level, i.modality, i.shift,
               i.department, i.province, i.district, i.address,
               i.phone, i.email, i.director_name,
