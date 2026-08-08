@@ -48,7 +48,10 @@ function generateEmail(name: string, code: string): string {
 export async function GET() {
   try {
     const [rows] = await pool.query(
-      `SELECT i.*, p.name as plan_name, p.price as plan_price
+      `SELECT i.*,
+              COALESCE((SELECT COUNT(*)::int FROM students s WHERE s.institution_id = i.id), 0) AS total_students,
+              COALESCE((SELECT COUNT(*)::int FROM teachers t WHERE t.institution_id = i.id), 0) AS total_teachers,
+              p.name as plan_name, p.price as plan_price
        FROM institutions i
        LEFT JOIN plans p ON p.id = i.plan_id
        ORDER BY i.created_at DESC`

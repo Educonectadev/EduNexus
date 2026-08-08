@@ -43,6 +43,7 @@ import {
   ChevronDown,
   Clock,
   CalendarDays,
+  Pencil,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { departments, type Department, type Province } from "@/lib/data/peru-geo"
@@ -241,6 +242,13 @@ export default function DevInstitucionesPage() {
   const [deleteConfirm, setDeleteConfirm] = React.useState<string | null>(null)
   const [cleanConfirm, setCleanConfirm] = React.useState<string | null>(null)
   const [cleaning, setCleaning] = React.useState(false)
+  const [editOpen, setEditOpen] = React.useState(false)
+  const [savingEdit, setSavingEdit] = React.useState(false)
+  const [editForm, setEditForm] = React.useState({
+    name: "", code: "", type: "", level: "", modality: "", shift: "",
+    department: "", province: "", district: "", address: "",
+    phone: "", email: "", director_name: "", director_dni: "",
+  })
 
   React.useEffect(() => { fetchInstitutions() }, [])
 
@@ -264,6 +272,54 @@ export default function DevInstitucionesPage() {
       console.error(e)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const openEdit = (inst: Institution) => {
+    setEditForm({
+      name: inst.name || "",
+      code: inst.code || "",
+      type: inst.type || "",
+      level: inst.level || "",
+      modality: inst.modality || "",
+      shift: inst.shift || "",
+      department: inst.department || "",
+      province: inst.province || "",
+      district: inst.district || "",
+      address: inst.address || "",
+      phone: inst.phone || "",
+      email: inst.email || "",
+      director_name: inst.director_name || "",
+      director_dni: inst.director_dni || "",
+    })
+    setEditOpen(true)
+  }
+
+  const saveEdit = async () => {
+    if (!selectedInst) return
+    if (!editForm.name) { toast("El nombre es obligatorio", "warning"); return }
+    setSavingEdit(true)
+    try {
+      const res = await fetch(`/api/dev/institutions/${selectedInst.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      })
+      if (res.ok) {
+        toast("Institución actualizada", "success")
+        setEditOpen(false)
+        const updated = await fetch("/api/dev/institutions").then(r => r.json())
+        setInstitutions(updated)
+        setSelectedInst(updated.find((i: Institution) => i.id === selectedInst.id) || null)
+      } else {
+        const err = await res.json().catch(() => null)
+        toast(err?.error || "Error al actualizar", "error")
+      }
+    } catch (e) {
+      console.error("Error updating institution:", e)
+      toast("Error de conexión", "error")
+    } finally {
+      setSavingEdit(false)
     }
   }
 
@@ -1405,6 +1461,11 @@ export default function DevInstitucionesPage() {
           <>
             <SbModalHeader title={selectedInst.name} onClose={() => setSelectedInst(null)} />
             <SbModalBody className="max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center gap-2 mb-2">
+                <SbBtn variant="tonal" onClick={() => openEdit(selectedInst)} className="!text-xs !py-1.5 flex-1">
+                  <Pencil className="h-3.5 w-3.5" /> Editar institución
+                </SbBtn>
+              </div>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
                 <p className="text-xs text-sb-on-surface-variant/70 font-mono">{selectedInst.code}</p>
                 <span className="text-[var(--sb-on-surface)]/10">·</span>
@@ -1726,6 +1787,99 @@ export default function DevInstitucionesPage() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Edit institution modal */}
+      <SbModal open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm:max-w-[560px]">
+        <SbModalHeader title={`Editar: ${editForm.name || "Institución"}`} onClose={() => setEditOpen(false)} />
+        <SbModalBody className="max-h-[90vh] overflow-y-auto">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <SbLabel htmlFor="ed-name">Nombre</SbLabel>
+                <SbInput id="ed-name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-code">Código</SbLabel>
+                <SbInput id="ed-code" value={editForm.code} onChange={e => setEditForm({ ...editForm, code: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-type">Tipo</SbLabel>
+                <select id="ed-type" className="sb-select w-full rounded-xl text-sm" value={editForm.type}
+                  onChange={e => setEditForm({ ...editForm, type: e.target.value })}>
+                  <option value="">Seleccionar</option>
+                  {institutionTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-level">Nivel</SbLabel>
+                <select id="ed-level" className="sb-select w-full rounded-xl text-sm" value={editForm.level}
+                  onChange={e => setEditForm({ ...editForm, level: e.target.value })}>
+                  <option value="">Seleccionar</option>
+                  {institutionLevels.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-modality">Modalidad</SbLabel>
+                <select id="ed-modality" className="sb-select w-full rounded-xl text-sm" value={editForm.modality}
+                  onChange={e => setEditForm({ ...editForm, modality: e.target.value })}>
+                  <option value="">Seleccionar</option>
+                  {modalities.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-shift">Turno</SbLabel>
+                <SbInput id="ed-shift" value={editForm.shift} onChange={e => setEditForm({ ...editForm, shift: e.target.value })} />
+              </div>
+            </div>
+
+            <div>
+              <SbLabel htmlFor="ed-address">Dirección</SbLabel>
+              <SbInput id="ed-address" value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <SbLabel htmlFor="ed-department">Departamento</SbLabel>
+                <SbInput id="ed-department" value={editForm.department} onChange={e => setEditForm({ ...editForm, department: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-province">Provincia</SbLabel>
+                <SbInput id="ed-province" value={editForm.province} onChange={e => setEditForm({ ...editForm, province: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-district">Distrito</SbLabel>
+                <SbInput id="ed-district" value={editForm.district} onChange={e => setEditForm({ ...editForm, district: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <SbLabel htmlFor="ed-phone">Teléfono</SbLabel>
+                <SbInput id="ed-phone" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-email">Email</SbLabel>
+                <SbInput id="ed-email" type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <SbLabel htmlFor="ed-director">Director</SbLabel>
+                <SbInput id="ed-director" value={editForm.director_name} onChange={e => setEditForm({ ...editForm, director_name: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-dni">DNI Director</SbLabel>
+                <SbInput id="ed-dni" value={editForm.director_dni} onChange={e => setEditForm({ ...editForm, director_dni: e.target.value })} />
+              </div>
+            </div>
+          </div>
+        </SbModalBody>
+        <SbModalFooter>
+          <SbBtn variant="outlined" onClick={() => setEditOpen(false)}>Cancelar</SbBtn>
+          <SbBtn disabled={savingEdit} onClick={saveEdit}>{savingEdit ? "Guardando..." : "Guardar cambios"}</SbBtn>
+        </SbModalFooter>
+      </SbModal>
     </motion.div>
   )
 }
