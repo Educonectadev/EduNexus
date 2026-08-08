@@ -119,7 +119,7 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { name, code, plan_id, status, type, level, modality, shift } = body
+    const { name, code, plan_id, status, type, level, modality, shift, department, province, district, address, phone, email, director_name, director_dni, dependence } = body
 
     const [[inst]] = await pool.query('SELECT id FROM institutions WHERE id = ?', [id]) as any[]
     if (!inst) {
@@ -137,6 +137,15 @@ export async function PUT(
     if (level !== undefined) { updates.push('level = ?'); values.push(level) }
     if (modality !== undefined) { updates.push('modality = ?'); values.push(modality) }
     if (shift !== undefined) { updates.push('shift = ?'); values.push(shift) }
+    if (department !== undefined) { updates.push('department = ?'); values.push(department) }
+    if (province !== undefined) { updates.push('province = ?'); values.push(province) }
+    if (district !== undefined) { updates.push('district = ?'); values.push(district) }
+    if (address !== undefined) { updates.push('address = ?'); values.push(address) }
+    if (phone !== undefined) { updates.push('phone = ?'); values.push(phone) }
+    if (email !== undefined) { updates.push('email = ?'); values.push(email) }
+    if (director_name !== undefined) { updates.push('director_name = ?'); values.push(director_name) }
+    if (director_dni !== undefined) { updates.push('director_dni = ?'); values.push(director_dni) }
+    if (dependence !== undefined) { updates.push('dependence = ?'); values.push(dependence) }
 
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
