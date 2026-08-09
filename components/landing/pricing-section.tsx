@@ -22,7 +22,7 @@ export function PricingSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dev/planes")
+    fetch("/api/public/plans")
       .then(r => r.json())
       .then(data => {
         const active = (Array.isArray(data) ? data : []).filter((p: PlanFromDB) => p.status === "active");
@@ -97,7 +97,7 @@ export function PricingSection() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-px bg-foreground/10">
+        <div className={`grid gap-px bg-foreground/10 ${plans.length >= 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3"}`}>
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="p-8 lg:p-12 bg-background animate-pulse">
