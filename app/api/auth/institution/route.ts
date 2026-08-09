@@ -68,27 +68,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ id: null, name: '' }, { status: 401 })
     }
 
-    let inst: any
-    try {
-      const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.trial_ends_at, i.notes, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
-         FROM institutions i
-         LEFT JOIN plans p ON p.id = i.plan_id
-         WHERE i.id = ?`,
-        [payload.institutionId]
-      )
-      inst = (rows as any[])[0]
-    } catch (qErr: any) {
-      if (qErr?.code !== 'ER_NO_SUCH_COLUMN') throw qErr
-      const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.notes, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
-         FROM institutions i
-         LEFT JOIN plans p ON p.id = i.plan_id
-         WHERE i.id = ?`,
-        [payload.institutionId]
-      )
-      inst = (rows as any[])[0]
-    }
+    const [instColRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'institutions'`
+    ) as any[]
+    const instCols = (instColRows || []).map((c: any) => c.column_name)
+    const has = (col: string) => instCols.includes(col)
+
+    const sel: string[] = ['i.id', 'i.name', 'i.email', 'i.phone', 'i.created_at', 'p.id as plan_id', 'p.name as plan_name', 'p.price as plan_price', 'p.max_users', 'p.max_students', 'p.features as plan_features']
+    if (has('trial_ends_at')) sel.push('i.trial_ends_at')
+    if (has('notes')) sel.push('i.notes')
+
+    const [rows] = await pool.query(
+      `SELECT ${sel.join(', ')}
+       FROM institutions i
+       LEFT JOIN plans p ON p.id = i.plan_id
+       WHERE i.id = ?`,
+      [payload.institutionId]
+    )
+    const inst = (rows as any[])[0]
 
     const isDemo = !!(inst?.notes && String(inst.notes).toUpperCase().includes('DEMO'))
     const trialEndsAt = await effectiveTrialEnds(inst)
