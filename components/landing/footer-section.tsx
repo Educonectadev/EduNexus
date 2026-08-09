@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/ui/proicons";
 import { AnimatedWave } from "./animated-wave";
+import { Logo } from "@/components/ui/logo";
 
 const footerLinks = {
   Producto: [
@@ -49,6 +50,7 @@ export function FooterSection() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
+                <Logo className="h-8 w-8" />
                 <span className="text-2xl font-display">EduNexus</span>
                 <span className="text-xs text-muted-foreground font-mono">PE</span>
               </a>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon } from "@/components/ui/proicons";
 import { useTheme } from "next-themes";
 import { DemoModal } from "@/components/demo-modal";
+import { Logo } from "@/components/ui/logo";
 
 const navLinks = [
   { name: "Plataforma", href: "#features" },
@@ -48,9 +49,7 @@ export function Navigation() {
           }`}
         >
           <a href="#" className="flex items-center gap-2.5 group">
-            <div className={`bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center shadow-lg shadow-primary/20 transition-all duration-500 ${isScrolled ? "h-7 w-7 rounded-lg" : "h-8 w-8 rounded-xl"}`}>
-              <span className="text-white font-bold transition-all duration-500 ${isScrolled ? 'text-xs' : 'text-sm'}">EN</span>
-            </div>
+            <Logo className={`transition-all duration-500 ${isScrolled ? "h-7 w-7" : "h-8 w-8"}`} />
             <span className={`font-semibold tracking-tight transition-all duration-500 ${isScrolled ? "text-lg" : "text-xl"}`}>EduNexus</span>
           </a>
 
