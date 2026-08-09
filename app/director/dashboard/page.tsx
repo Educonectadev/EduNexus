@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers } from "@/components/ui/proicons"
+import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers, Sparkles } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { PrettyTabs } from "@/components/dashboard/pretty-tabs"
+import { useToast } from "@/components/ui/sb"
 
 interface Stats {
   students: number; teachers: number; enrollments: number; pending: number
@@ -20,17 +21,34 @@ const tabs = [
 ]
 
 export default function DirectorDashboard() {
+  const { toast } = useToast()
   const [stats, setStats] = React.useState<Stats>({
     students: 0, teachers: 0, enrollments: 0, pending: 0,
     documents: 0, courses: 0, parents: 0, secretary: 0,
     horarios: 0, activeCourses: 0, weekHorarios: [],
   })
   const [loading, setLoading] = React.useState(true)
+  const [seeding, setSeeding] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState("general")
 
-  React.useEffect(() => {
-    fetch("/api/director/stats").then(r => r.json()).then(setStats).catch(() => {}).finally(() => setLoading(false))
+  const loadStats = React.useCallback(() => {
+    return fetch("/api/director/stats").then(r => r.json()).then(d => setStats(d)).catch(() => {}).finally(() => setLoading(false))
   }, [])
+
+  React.useEffect(() => { loadStats() }, [loadStats])
+
+  const handleSeed = async () => {
+    if (!window.confirm("Esto creará 20 estudiantes, 6 docentes, 6 cursos, matrículas y horarios de ejemplo en esta institución. ¿Continuar?")) return
+    setSeeding(true)
+    try {
+      const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ students: 20 }) })
+      const result = await res.json()
+      if (!res.ok) { toast(result.error || "Error al cargar datos", "error"); return }
+      toast(`Datos de ejemplo creados: ${result.students} alumnos, ${result.teachers} docentes, ${result.courses} cursos`, "success")
+      setLoading(true)
+      await loadStats()
+    } catch { toast("Error de conexión", "error") } finally { setSeeding(false) }
+  }
 
   const statCards = [
     { label: "Alumnos", value: loading ? "—" : stats.students, icon: GraduationCap, href: "/director/plantel", trend: "+12%" },
@@ -62,18 +80,50 @@ export default function DirectorDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-[22px] font-bold tracking-tight text-sb-on-surface">Panel de Director</h1>
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Vista general de tu institución</p>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sb-on-surface/[0.04]">
-          <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] text-sb-on-surface-variant font-medium">
-            {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
-          </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          {!loading && stats.students === 0 && stats.teachers === 0 && (
+            <button
+              onClick={handleSeed}
+              disabled={seeding}
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-medium bg-amber-500/10 border border-amber-500/25 text-amber-600 hover:bg-amber-500/15 transition-colors disabled:opacity-50"
+            >
+              <Sparkles className="h-4 w-4" />
+              {seeding ? "Cargando datos..." : "Cargar datos de ejemplo"}
+            </button>
+          )}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sb-on-surface/[0.04]">
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] text-sb-on-surface-variant font-medium">
+              {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          </div>
         </div>
       </motion.div>
+
+      {!loading && stats.students === 0 && stats.teachers === 0 && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="h-9 w-9 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+            <Sparkles className="h-4 w-4 text-amber-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-[13px] font-medium text-sb-on-surface">Tu institución aún no tiene datos</p>
+            <p className="text-[12px] text-sb-on-surface-variant/60 mt-0.5">Pulsa "Cargar datos de ejemplo" para ver el panel en acción, o agrega tu información desde los módulos de Personal, Matrículas y Cursos.</p>
+          </div>
+          <button
+            onClick={handleSeed}
+            disabled={seeding}
+            className="shrink-0 px-4 py-2 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {seeding ? "Cargando..." : "Cargar datos de ejemplo"}
+          </button>
+        </motion.div>
+      )}
 
       {/* Hero Stats */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}
