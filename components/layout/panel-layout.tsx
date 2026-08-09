@@ -227,7 +227,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const searchRef = React.useRef<HTMLInputElement>(null)
 
   const [trialExpired, setTrialExpired] = React.useState(false)
-  const [trialInfo, setTrialInfo] = React.useState<{ isExpired: boolean; remainingBusinessDays: number } | null>(null)
+  const [trialInfo, setTrialInfo] = React.useState<{ isExpired: boolean; remainingBusinessDays: number; isDemo?: boolean; trialDays?: number | null } | null>(null)
   const [trialMessage, setTrialMessage] = React.useState("")
   const [trialSubmitted, setTrialSubmitted] = React.useState(false)
   const [trialSubmitting, setTrialSubmitting] = React.useState(false)
@@ -286,7 +286,12 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             const inst = await instRes.json()
             if (inst.trial?.isExpired) setTrialExpired(true)
             else if (inst.trial?.remainingBusinessDays > 0) {
-              setTrialInfo({ isExpired: inst.trial.isExpired, remainingBusinessDays: inst.trial.remainingBusinessDays })
+              setTrialInfo({
+                isExpired: inst.trial.isExpired,
+                remainingBusinessDays: inst.trial.remainingBusinessDays,
+                isDemo: !!inst.isDemo,
+                trialDays: inst.trialDays,
+              })
             }
           }
         }
@@ -662,7 +667,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               title={role === "director" ? "Ver periodo de prueba en Configuración" : "Periodo de prueba"}
             >
               <Clock className="h-3.5 w-3.5" />
-              Prueba gratuita · {trialInfo.remainingBusinessDays} día(s) hábil(es) restantes
+              {trialInfo.isDemo ? "Demo · Prueba de 15 días" : "Prueba gratuita · 20 días"} — {trialInfo.remainingBusinessDays} día(s) hábil(es) restantes
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>

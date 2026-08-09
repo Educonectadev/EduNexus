@@ -5,15 +5,18 @@ import { computeTrialStatus, addBusinessDays } from '@/lib/trial'
 
 // Base del trial: si la columna trial_ends_at no existe (migración pendiente),
 // se calcula desde el created_at de la institución para que el conteo funcione igual.
+// Demo (notes = DEMO) usa 15 días hábiles; gratis usa 20.
 async function effectiveTrialEnds(inst: any): Promise<string | null> {
   if (!inst) return null
   if (inst.plan_id) return null
   if (inst.trial_ends_at) return inst.trial_ends_at
-  // Columna no existe o NULL: calcula 20 días hábiles desde created_at.
+  // Columna no existe o NULL: calcula desde created_at según demo o gratis.
+  const isDemo = !!(inst.notes && String(inst.notes).toUpperCase().includes('DEMO'))
+  const days = isDemo ? 15 : 20
   const base = inst.created_at ? new Date(inst.created_at) : new Date()
-  const end = addBusinessDays(base, 20)
+  const end = addBusinessDays(base, days)
   // Si esa fecha ya venció (institución vieja), reinicia desde ahora la primera vez.
-  return end > new Date() ? end.toISOString() : addBusinessDays(new Date(), 20).toISOString()
+  return end > new Date() ? end.toISOString() : addBusinessDays(new Date(), days).toISOString()
 }
 
 export async function PATCH(request: NextRequest) {
@@ -68,7 +71,7 @@ export async function GET(request: NextRequest) {
     let inst: any
     try {
       const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.trial_ends_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
+        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.trial_ends_at, i.notes, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
          FROM institutions i
          LEFT JOIN plans p ON p.id = i.plan_id
          WHERE i.id = ?`,
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
     } catch (qErr: any) {
       if (qErr?.code !== 'ER_NO_SUCH_COLUMN') throw qErr
       const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.email, i.phone, i.created_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
+        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.notes, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
          FROM institutions i
          LEFT JOIN plans p ON p.id = i.plan_id
          WHERE i.id = ?`,
@@ -87,6 +90,7 @@ export async function GET(request: NextRequest) {
       inst = (rows as any[])[0]
     }
 
+    const isDemo = !!(inst?.notes && String(inst.notes).toUpperCase().includes('DEMO'))
     const trialEndsAt = await effectiveTrialEnds(inst)
 
     return NextResponse.json({
@@ -94,6 +98,8 @@ export async function GET(request: NextRequest) {
       name: inst?.name || '',
       email: inst?.email || '',
       phone: inst?.phone || '',
+      isDemo,
+      trialDays: inst?.plan_id ? null : (isDemo ? 15 : 20),
       plan: inst?.plan_id ? {
         id: inst.plan_id,
         name: inst.plan_name,

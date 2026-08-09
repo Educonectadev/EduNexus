@@ -18,6 +18,8 @@ export default function ConfiguracionPage() {
   const [preview, setPreview] = React.useState<typeof config>(config)
   const [plan, setPlan] = React.useState<{ name: string; price: number; max_users: number; max_students: number; features: string[] | string } | null>(null)
   const [trial, setTrial] = React.useState<{ isExpired: boolean; remainingBusinessDays: number; daysLabel: string } | null>(null)
+  const [isDemo, setIsDemo] = React.useState(false)
+  const [trialDays, setTrialDays] = React.useState<number | null>(20)
 
   const load = React.useCallback(() => {
     return fetch("/api/auth/institution").then(r => r.json()).then(data => {
@@ -29,6 +31,8 @@ export default function ConfiguracionPage() {
       setConfig(c => ({ ...c, ...next }))
       setPreview(p => ({ ...p, ...next }))
       if (data.plan) setPlan(data.plan)
+      if (data.isDemo !== undefined) setIsDemo(data.isDemo)
+      if (data.trialDays !== undefined) setTrialDays(data.trialDays)
       if (data.trial && !data.trial.hasPaidPlan) setTrial(data.trial)
       return data
     })
@@ -106,14 +110,16 @@ export default function ConfiguracionPage() {
                 <Clock className="h-4.5 w-4.5 text-emerald-500" />
               </div>
               <div>
-                <p className="text-[13px] font-medium text-sb-on-surface">Periodo de prueba gratuito</p>
+                <p className="text-[13px] font-medium text-sb-on-surface">
+                  {isDemo ? "Cuenta Demo · Prueba de 15 días" : "Periodo de prueba gratuito"}
+                </p>
                 <p className="text-[12px] text-sb-on-surface-variant/60 mt-0.5">
-                  {trial.remainingBusinessDays} día(s) hábil(es) restantes · contrata un plan cuando quieras
+                  {trial.remainingBusinessDays} de {trialDays || "20"} día(s) hábil(es) restantes · contrata un plan cuando quieras
                 </p>
               </div>
             </div>
             <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 bg-emerald-500/10 px-3 py-1.5 rounded-full">
-              <Clock className="h-3 w-3" /> {trial.remainingBusinessDays} días
+              <Clock className="h-3 w-3" /> {trial.remainingBusinessDays}/{trialDays || "20"} días
             </span>
           </div>
         </motion.div>
