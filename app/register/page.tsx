@@ -180,6 +180,9 @@ export default function RegisterPage() {
       if (!res.ok) { setError(result.error); setLoading(false); return }
       setInstCode(result.institutionCode || null)
       setSuccess(true); setLoading(false)
+      if (result.redirectTo) {
+        setTimeout(() => { window.location.href = result.redirectTo }, 2500)
+      }
     } catch { setError("Error de conexión"); setLoading(false) }
   }
 
@@ -202,7 +205,8 @@ export default function RegisterPage() {
               <p className="mt-1 text-xl font-mono font-semibold text-[var(--sb-primary)]">{instCode}</p>
             </div>
           )}
-          <Link href="/login" className="sb-btn filled rounded w-full mt-6 text-center"><span className="inline-flex items-center justify-center gap-2">Ir al Login</span></Link>
+          <Link href="/login" className="sb-btn filled rounded w-full mt-6 text-center"><span className="inline-flex items-center justify-center gap-2">Ir al Panel</span></Link>
+          <p className="text-[11px] text-[var(--sb-on-surface-variant)]/40 mt-3">Te redirigiremos automáticamente a tu panel en unos segundos...</p>
         </SbCard>
       </div>
     )
