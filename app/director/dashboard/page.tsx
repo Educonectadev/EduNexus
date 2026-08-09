@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers, Sparkles } from "@/components/ui/proicons"
+import Link from "next/link"
+import { GraduationCap, Users, BookOpen, ClipboardList, Calendar, FileText, UserCheck, Building2, TrendingUp, School, BarChart3, Layers, Sparkles, Clock, ArrowRight, BadgeCheck } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { PrettyTabs } from "@/components/dashboard/pretty-tabs"
 import { useToast } from "@/components/ui/sb"
@@ -10,6 +11,12 @@ interface Stats {
   students: number; teachers: number; enrollments: number; pending: number
   documents: number; courses: number; parents: number; secretary: number
   horarios: number; activeCourses: number; weekHorarios: { day_of_week: number; count: number }[]
+}
+
+interface TrialInfo {
+  isExpired: boolean
+  remainingBusinessDays: number
+  daysLabel: string
 }
 
 const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
@@ -31,12 +38,19 @@ export default function DirectorDashboard() {
   const [seeding, setSeeding] = React.useState(false)
   const [demoAccess, setDemoAccess] = React.useState<{ role: string; email: string; password: string }[]>([])
   const [activeTab, setActiveTab] = React.useState("general")
+  const [trial, setTrial] = React.useState<{ isDemo: boolean; trialDays: number | null; info: TrialInfo | null }>({ isDemo: false, trialDays: null, info: null })
+
+  const loadTrial = React.useCallback(() => {
+    return fetch("/api/auth/institution").then(r => r.json()).then(d => {
+      setTrial({ isDemo: !!d.isDemo, trialDays: d.trialDays, info: d.trial || null })
+    }).catch(() => {})
+  }, [])
 
   const loadStats = React.useCallback(() => {
     return fetch("/api/director/stats").then(r => r.json()).then(d => setStats(d)).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
-  React.useEffect(() => { loadStats() }, [loadStats])
+  React.useEffect(() => { loadStats(); loadTrial() }, [loadStats, loadTrial])
 
   const handleSeed = async () => {
     if (!window.confirm("Esto creará 20 estudiantes, 6 docentes, 6 cursos, matrículas y horarios de ejemplo en esta institución. ¿Continuar?")) return
@@ -88,7 +102,34 @@ const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { 
           <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Vista general de tu institución</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {!loading && stats.students === 0 && stats.teachers === 0 && (
+{/* Trial / plan banner */}
+      {trial.info && !trial.info.isExpired && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <Link
+            href="/director/configuracion"
+            className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl p-4 border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <BadgeCheck className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-sb-on-surface">
+                  {trial.isDemo ? "Cuenta Demo · Prueba de 15 días" : "Prueba gratuita · 20 días"}
+                </p>
+                <p className="text-[12px] text-sb-on-surface-variant/60 mt-0.5">
+                  {trial.info.remainingBusinessDays} de {trial.trialDays || 20} día(s) hábil(es) restantes · contrata un plan cuando quieras
+                </p>
+              </div>
+            </div>
+            <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+              <Clock className="h-3 w-3" /> {trial.info.remainingBusinessDays}/{trial.trialDays || 20} días
+            </span>
+          </Link>
+        </motion.div>
+      )}
+
+      {!loading && stats.students === 0 && stats.teachers === 0 && (
             <button
               onClick={handleSeed}
               disabled={seeding}
