@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Check if already submitted recently (same email in last 24h)
     const [existing] = await pool.query(
-      `SELECT id FROM demo_requests WHERE email = ? AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)`,
+      `SELECT id FROM demo_requests WHERE email = ? AND created_at > NOW() - INTERVAL '24 hours'`,
       [email]
     ) as any[]
 
