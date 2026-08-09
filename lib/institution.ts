@@ -22,24 +22,42 @@ export async function generateInstitutionCode(): Promise<string> {
   return 'COL-01'
 }
 
-// Crea una institución gratuita con trial de 20 días hábiles y su usuario director.
-export async function createFreeInstitution(info: {
+export interface PublicInstitutionInfo {
   name: string
-  code?: string
   fullName: string
   email: string
-  phone?: string
   passwordHash: string
-}): Promise<{ institutionId: string; code: string }> {
+  code?: string
+  phone?: string
+  website?: string
+  director_phone?: string
+  director_dni?: string
+  type?: string
+  level?: string
+  modality?: string
+  shift?: string
+  department?: string
+  province?: string
+  district?: string
+  address?: string
+  reference?: string
+  trialDays?: number
+  isDemo?: boolean
+}
+
+// Crea una institución gratuita con trial de N días hábiles y su usuario director.
+// Por defecto 20 días (registro gratis); para demo se pasan 15 días y isDemo: true
+// marca la institución (notes = 'DEMO') para que el dev la distinga.
+export async function createFreeInstitution(info: PublicInstitutionInfo): Promise<{ institutionId: string; code: string }> {
   const instId = crypto.randomUUID()
   const code = info.code || await generateInstitutionCode()
+  const trialDays = info.trialDays ?? 20
 
-  const [colRows] = await pool.query(
+  const [instColRows] = await pool.query(
     `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'institutions'`
   ) as any[]
-  const instCols = (colRows || []).map((c: any) => c.column_name)
-  const hasEmail = instCols.includes('email')
-  const hasPhone = instCols.includes('phone')
+  const instCols = (instColRows || []).map((c: any) => c.column_name)
+  const has = (col: string) => instCols.includes(col)
 
   const [userColRows] = await pool.query(
     `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'users'`
@@ -48,23 +66,42 @@ export async function createFreeInstitution(info: {
   const hasPasswordHash = colNames.includes('password_hash')
   const hasStatus = colNames.includes('status')
 
+  const inserts: Record<string, any> = {
+    id: instId,
+    code,
+    name: info.name,
+    type: info.type || 'colegio',
+    status: 'active',
+    trial_ends_at: addBusinessDays(new Date(), trialDays).toISOString(),
+  }
+
+  if (has('email') && info.email) inserts.email = info.email
+  if (has('phone') && info.phone) inserts.phone = info.phone
+  if (has('website') && info.website) inserts.website = info.website
+  if (has('director_name') && info.fullName) inserts.director_name = info.fullName
+  if (has('director_dni') && info.director_dni) inserts.director_dni = info.director_dni
+  if (has('director_phone') && info.director_phone) inserts.director_phone = info.director_phone
+  if (has('level') && info.level) inserts.level = info.level
+  if (has('modality') && info.modality) inserts.modality = info.modality
+  if (has('shift') && info.shift) inserts.shift = info.shift
+  if (has('department') && info.department) inserts.department = info.department
+  if (has('province') && info.province) inserts.province = info.province
+  if (has('district') && info.district) inserts.district = info.district
+  if (has('address') && info.address) inserts.address = info.address
+  if (has('reference') && info.reference) inserts.reference = info.reference
+  if (has('notes') && info.isDemo) inserts.notes = 'DEMO'
+
   const conn = await pool.getConnection()
   try {
     await conn.query('BEGIN')
 
-    if (hasEmail && hasPhone) {
-      await conn.query(
-        `INSERT INTO institutions (id, code, name, type, status, email, phone, trial_ends_at)
-         VALUES ($1, $2, $3, 'private', 'active', $4, $5, $6)`,
-        [instId, code, info.name, info.email, info.phone || '', addBusinessDays(new Date(), 20).toISOString()]
-      )
-    } else {
-      await conn.query(
-        `INSERT INTO institutions (id, code, name, type, status, trial_ends_at)
-         VALUES ($1, $2, $3, 'private', 'active', $4)`,
-        [instId, code, info.name, addBusinessDays(new Date(), 20).toISOString()]
-      )
-    }
+    const columns = Object.keys(inserts)
+    const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ')
+    const values = columns.map((c) => inserts[c])
+    await conn.query(
+      `INSERT INTO institutions (${columns.join(', ')}) VALUES (${placeholders})`,
+      values
+    )
 
     const userId = crypto.randomUUID()
     if (hasPasswordHash && hasStatus) {
