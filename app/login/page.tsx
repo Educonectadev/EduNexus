@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, Mail, Lock, ArrowRight, Eye, EyeOff, ChevronLeft, Sun, Moon } from "@/components/ui/proicons"
+import { Logo } from "@/components/ui/logo"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { SbBtn, SbInput } from "@/components/ui/sb"
@@ -56,9 +57,7 @@ export default function LoginPage() {
 
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}>
             <Link href="/" className="inline-flex items-center gap-2.5 mb-12 group">
-              <div className="h-10 w-10 rounded-xl bg-[var(--sb-primary)] flex items-center justify-center shadow-lg shadow-[var(--sb-primary)]/25 group-hover:shadow-[var(--sb-primary)]/40 transition-shadow">
-                <span className="text-[var(--sb-on-primary)] font-bold text-sm">EC</span>
-              </div>
+              <Logo className="h-10 w-10" />
               <span className="text-lg font-bold tracking-tight text-[var(--sb-on-surface)]">EduNexus</span>
             </Link>
           </motion.div>
