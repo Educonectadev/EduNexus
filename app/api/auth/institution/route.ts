@@ -3,17 +3,17 @@ import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 import { computeTrialStatus, addBusinessDays } from '@/lib/trial'
 
-// Backfill: si la institución existía antes del sistema de trial (trial_ends_at NULL)
-// y no tiene plan pagado, se le asigna 20 días hábiles desde ahora.
-async function ensureTrial(institutionId: string) {
-  try {
-    await pool.query(
-      `UPDATE institutions
-       SET trial_ends_at = $1
-       WHERE id = $2 AND plan_id IS NULL AND trial_ends_at IS NULL`,
-      [addBusinessDays(new Date(), 20).toISOString(), institutionId]
-    )
-  } catch { /* trial_ends_at may not exist yet */ }
+// Base del trial: si la columna trial_ends_at no existe (migración pendiente),
+// se calcula desde el created_at de la institución para que el conteo funcione igual.
+async function effectiveTrialEnds(inst: any): Promise<string | null> {
+  if (!inst) return null
+  if (inst.plan_id) return null
+  if (inst.trial_ends_at) return inst.trial_ends_at
+  // Columna no existe o NULL: calcula 20 días hábiles desde created_at.
+  const base = inst.created_at ? new Date(inst.created_at) : new Date()
+  const end = addBusinessDays(base, 20)
+  // Si esa fecha ya venció (institución vieja), reinicia desde ahora la primera vez.
+  return end > new Date() ? end.toISOString() : addBusinessDays(new Date(), 20).toISOString()
 }
 
 export async function PATCH(request: NextRequest) {
@@ -65,12 +65,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ id: null, name: '' }, { status: 401 })
     }
 
-    await ensureTrial(payload.institutionId)
-
     let inst: any
     try {
       const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.email, i.phone, i.trial_ends_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
+        `SELECT i.id, i.name, i.email, i.phone, i.created_at, i.trial_ends_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
          FROM institutions i
          LEFT JOIN plans p ON p.id = i.plan_id
          WHERE i.id = ?`,
@@ -80,7 +78,7 @@ export async function GET(request: NextRequest) {
     } catch (qErr: any) {
       if (qErr?.code !== 'ER_NO_SUCH_COLUMN') throw qErr
       const [rows] = await pool.query(
-        `SELECT i.id, i.name, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
+        `SELECT i.id, i.name, i.email, i.phone, i.created_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
          FROM institutions i
          LEFT JOIN plans p ON p.id = i.plan_id
          WHERE i.id = ?`,
@@ -88,6 +86,8 @@ export async function GET(request: NextRequest) {
       )
       inst = (rows as any[])[0]
     }
+
+    const trialEndsAt = await effectiveTrialEnds(inst)
 
     return NextResponse.json({
       id: inst?.id || null,
@@ -102,9 +102,7 @@ export async function GET(request: NextRequest) {
         max_students: inst.max_students,
         features: inst.plan_features,
       } : null,
-      trial: inst ? (inst.trial_ends_at !== undefined
-        ? computeTrialStatus({ planId: inst.plan_id || null, trialEndsAt: inst.trial_ends_at || null })
-        : null) : null,
+      trial: computeTrialStatus({ planId: inst?.plan_id || null, trialEndsAt: trialEndsAt }),
     })
   } catch (error: any) {
     if (error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json({ id: null, name: '' })

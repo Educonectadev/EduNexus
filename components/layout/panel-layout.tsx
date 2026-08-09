@@ -227,6 +227,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const searchRef = React.useRef<HTMLInputElement>(null)
 
   const [trialExpired, setTrialExpired] = React.useState(false)
+  const [trialInfo, setTrialInfo] = React.useState<{ isExpired: boolean; remainingBusinessDays: number } | null>(null)
   const [trialMessage, setTrialMessage] = React.useState("")
   const [trialSubmitted, setTrialSubmitted] = React.useState(false)
   const [trialSubmitting, setTrialSubmitting] = React.useState(false)
@@ -284,6 +285,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           if (instRes.ok) {
             const inst = await instRes.json()
             if (inst.trial?.isExpired) setTrialExpired(true)
+            else if (inst.trial?.remainingBusinessDays > 0) {
+              setTrialInfo({ isExpired: inst.trial.isExpired, remainingBusinessDays: inst.trial.remainingBusinessDays })
+            }
           }
         }
       } catch { router.push("/login") } finally { setLoading(false) }
@@ -648,6 +652,21 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             </button>
           </div>
         </header>
+
+        {/* Trial banner (free institutions) */}
+        {trialInfo && !trialInfo.isExpired && role && (
+          <div className="px-6 pt-3 flex justify-center">
+            <button
+              onClick={() => { if (role === "director") router.push("/director/configuracion") }}
+              className="flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-4 py-1.5 text-[11px] font-medium text-emerald-600 transition-colors hover:bg-emerald-500/15"
+              title={role === "director" ? "Ver periodo de prueba en Configuración" : "Periodo de prueba"}
+            >
+              <Clock className="h-3.5 w-3.5" />
+              Prueba gratuita · {trialInfo.remainingBusinessDays} día(s) hábil(es) restantes
+              <ArrowRight className="h-3 w-3" />
+            </button>
+          </div>
+        )}
 
         {/* Content */}
         <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6">
