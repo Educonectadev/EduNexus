@@ -48,27 +48,28 @@ export async function createFreeInstitution(info: {
 
     await conn.query(
       `INSERT INTO institutions (id, code, name, type, status, trial_ends_at)
-       VALUES (?, ?, ?, 'private', 'active', ?)`,
+       VALUES ($1, $2, $3, 'private', 'active', $4)`,
       [instId, code, info.name, addBusinessDays(new Date(), 20).toISOString()]
     )
 
+    const userId = crypto.randomUUID()
     if (hasPasswordHash && hasStatus) {
       await conn.query(
         `INSERT INTO users (id, email, full_name, password_hash, role, institution_id, status)
-         VALUES (?, ?, ?, ?, 'director', ?, 'active')`,
-        [crypto.randomUUID(), info.email, info.fullName, info.passwordHash, instId]
+         VALUES ($1, $2, $3, $4, 'director', $5, 'active')`,
+        [userId, info.email, info.fullName, info.passwordHash, instId]
       )
     } else if (hasPasswordHash) {
       await conn.query(
         `INSERT INTO users (id, email, full_name, password_hash, role, institution_id)
-         VALUES (?, ?, ?, ?, 'director', ?)`,
-        [crypto.randomUUID(), info.email, info.fullName, info.passwordHash, instId]
+         VALUES ($1, $2, $3, $4, 'director', $5)`,
+        [userId, info.email, info.fullName, info.passwordHash, instId]
       )
     } else {
       await conn.query(
         `INSERT INTO users (id, email, full_name, password, role, institution_id)
-         VALUES (?, ?, ?, ?, 'director', ?)`,
-        [crypto.randomUUID(), info.email, info.fullName, info.passwordHash, instId]
+         VALUES ($1, $2, $3, $4, 'director', $5)`,
+        [userId, info.email, info.fullName, info.passwordHash, instId]
       )
     }
 
