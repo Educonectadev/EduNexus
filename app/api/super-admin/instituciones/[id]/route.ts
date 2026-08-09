@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload } from '@/lib/resolveInstId'
+import { addBusinessDays } from '@/lib/trial'
 
 export async function GET(
   request: NextRequest,
@@ -131,7 +132,10 @@ export async function PUT(
 
     if (name !== undefined) { updates.push('name = ?'); values.push(name) }
     if (code !== undefined) { updates.push('code = ?'); values.push(code) }
-    if (plan_id !== undefined) { updates.push('plan_id = ?'); values.push(plan_id) }
+    if (plan_id !== undefined) {
+      updates.push('plan_id = ?'); values.push(plan_id)
+      updates.push('trial_ends_at = ?'); values.push(plan_id ? null : addBusinessDays(new Date(), 20).toISOString())
+    }
     if (status !== undefined) { updates.push('status = ?'); values.push(status) }
     if (type !== undefined) { updates.push('type = ?'); values.push(type) }
     if (level !== undefined) { updates.push('level = ?'); values.push(level) }

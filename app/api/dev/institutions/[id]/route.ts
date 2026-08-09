@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
+import { addBusinessDays } from '@/lib/trial'
 
 export async function PATCH(
   request: NextRequest,
@@ -17,7 +18,10 @@ export async function PATCH(
     const values: any[] = []
 
     if (body.status) { updates.push('status = ?'); values.push(body.status) }
-    if (body.plan_id !== undefined) { updates.push('plan_id = ?'); values.push(body.plan_id || null) }
+    if (body.plan_id !== undefined) {
+      updates.push('plan_id = ?'); values.push(body.plan_id || null)
+      updates.push('trial_ends_at = ?'); values.push(body.plan_id ? null : addBusinessDays(new Date(), 20).toISOString())
+    }
     if (body.name !== undefined) { updates.push('name = ?'); values.push(body.name) }
     if (body.code !== undefined) { updates.push('code = ?'); values.push(body.code) }
     if (body.type !== undefined) { updates.push('type = ?'); values.push(body.type) }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
+import { addBusinessDays } from '@/lib/trial'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 
@@ -93,8 +94,8 @@ export async function POST(request: NextRequest) {
         director_name, director_dni, director_phone, director_email,
         total_students, total_teachers, total_classrooms,
         has_lab, has_library, has_computer_room, has_playground,
-        notes, plan_id, schedule_config, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+        notes, plan_id, schedule_config, status, trial_ends_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`,
       [
         instId, instCode, name, type || '', level || '', modality || '', shift || '', dependence || '',
         department || '', province || '', district || '', address || '', reference || '',
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
         total_students || 0, total_teachers || 0, total_classrooms || 0,
         has_lab ? true : false, has_library ? true : false, has_computer_room ? true : false, has_playground ? true : false,
         notes || '', plan_id || null, schedule_config ? JSON.stringify(schedule_config) : null,
+        plan_id ? null : addBusinessDays(new Date(), 20).toISOString(),
       ]
     )
 

@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Building2, Users, Database, Terminal, ChevronRight, Server, CreditCard, GraduationCap, Shield, Settings } from "@/components/ui/proicons"
+import { Building2, Users, Database, Terminal, ChevronRight, Server, CreditCard, GraduationCap, Shield, Settings, Handshake } from "@/components/ui/proicons"
+import { cn } from "@/lib/utils"
 
 interface Stats {
   institutions: number
@@ -11,15 +12,32 @@ interface Stats {
   tables: number
 }
 
+interface TrialRequest {
+  id: string
+  institution_name: string
+  full_name: string
+  email: string
+  phone: string
+  message: string
+  status: string
+  created_at: string
+}
+
 export default function DevDashboard() {
   const [stats, setStats] = React.useState<Stats>({ institutions: 0, users: 0, students: 0, tables: 0 })
   const [loading, setLoading] = React.useState(true)
+  const [requests, setRequests] = React.useState<TrialRequest[]>([])
 
   React.useEffect(() => {
     fetch("/api/dev/stats")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setStats(d) })
       .finally(() => setLoading(false))
+
+    fetch("/api/dev/trial-requests")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setRequests(d.requests || []) })
+      .catch(() => {})
   }, [])
 
   const statCards = [
@@ -85,6 +103,41 @@ export default function DevDashboard() {
           </div>
         </div>
 
+        <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Solicitudes de contratación</p>
+          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-3">
+            {requests.length === 0 ? (
+              <p className="text-[12px] text-sb-on-surface/60">Sin solicitudes pendientes.</p>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <Handshake className="h-4 w-4 text-amber-500" />
+                  <span className="text-[13px] text-sb-on-surface font-medium">
+                    {requests.filter(r => r.status === 'pending').length} pendiente(s)
+                  </span>
+                </div>
+                <div className="divide-y divide-sb-outline-variant/8 max-h-64 overflow-auto">
+                  {requests.map(r => (
+                    <div key={r.id} className="py-2.5 first:pt-0 last:pb-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[13px] font-medium text-sb-on-surface truncate">{r.institution_name || r.full_name || 'Instituto'}</p>
+                        <span className={cn(
+                          "shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full",
+                          r.status === 'pending' ? "bg-amber-500/10 text-amber-600" : "bg-emerald-500/10 text-emerald-600"
+                        )}>{r.status}</span>
+                      </div>
+                      {r.email && <p className="text-[11px] text-sb-on-surface/60 truncate">{r.full_name} · {r.email}</p>}
+                      {r.message && <p className="text-[11px] text-sb-on-surface/50 mt-0.5 line-clamp-2">{r.message}</p>}
+                      <p className="text-[10px] text-sb-on-surface/40 mt-1">{new Date(r.created_at).toLocaleString('es-PE')}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
         <div>
           <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Estado</p>
           <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-4">
@@ -126,6 +179,7 @@ export default function DevDashboard() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

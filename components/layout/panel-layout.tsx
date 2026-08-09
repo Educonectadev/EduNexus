@@ -226,6 +226,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [importPersonalOpen, setImportPersonalOpen] = React.useState(false)
   const searchRef = React.useRef<HTMLInputElement>(null)
 
+  const [trialExpired, setTrialExpired] = React.useState(false)
+  const [trialMessage, setTrialMessage] = React.useState("")
+  const [trialSubmitted, setTrialSubmitted] = React.useState(false)
+  const [trialSubmitting, setTrialSubmitting] = React.useState(false)
+
   const navItems = role ? navByRole[role] || [] : []
   const navSections = role ? navSectionsByRole[role] || [] : []
 
@@ -273,6 +278,14 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         })
         setRole(data.user.role)
         setInstitutionId(data.user.institutionId)
+
+        if (data.user.role !== "super_admin" && data.user.institutionId) {
+          const instRes = await fetch("/api/auth/institution")
+          if (instRes.ok) {
+            const inst = await instRes.json()
+            if (inst.trial?.isExpired) setTrialExpired(true)
+          }
+        }
       } catch { router.push("/login") } finally { setLoading(false) }
     }
     getUser()
@@ -307,6 +320,64 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return <div className="flex h-screen" style={{ background: "var(--sb-background)" }} />
+  }
+
+  // ===== TRIAL EXPIRADO: bloquea acceso a todos los portales internos =====
+  if (trialExpired) {
+    const submitRequest = async () => {
+      setTrialSubmitting(true)
+      try {
+        await fetch("/api/trial/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: trialMessage }),
+        })
+        setTrialSubmitted(true)
+      } catch { /* keep form */ } finally { setTrialSubmitting(false) }
+    }
+    return (
+      <div className="flex h-screen items-center justify-center p-6" style={{ background: "var(--sb-background)" }}>
+        <div className="w-full max-w-md rounded-3xl border border-sb-outline-variant/20 bg-sb-surface p-8 text-center shadow-xl">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--sb-primary)]/10">
+            <AlertCircle className="h-7 w-7 text-[var(--sb-primary)]" />
+          </div>
+          <h1 className="text-lg font-semibold text-[var(--sb-on-surface)]">Tu periodo de prueba ha vencido</h1>
+          <p className="mt-2 text-sm text-[var(--sb-on-surface-variant)]">
+            Para seguir usando EduNexus, contrata un plan. Un asesor se pondrá en contacto contigo para activarlo.
+          </p>
+
+          {!trialSubmitted ? (
+            <div className="mt-6 space-y-3">
+              <textarea
+                value={trialMessage}
+                onChange={e => setTrialMessage(e.target.value)}
+                placeholder="Comentario opcional (cantidad de estudiantes, servicios de interés...)"
+                className="w-full min-h-[90px] resize-none rounded-xl border border-sb-outline-variant/30 bg-[var(--sb-background)] px-3 py-2.5 text-sm text-[var(--sb-on-surface)] outline-none focus:border-sb-primary"
+              />
+              <button
+                onClick={submitRequest}
+                disabled={trialSubmitting}
+                className="w-full rounded-xl bg-[var(--sb-primary)] py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                {trialSubmitting ? "Enviando..." : "Solicitar contratación"}
+              </button>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl bg-emerald-500/10 p-4">
+              <p className="text-sm font-medium text-emerald-600">Solicitud enviada</p>
+              <p className="mt-1 text-xs text-[var(--sb-on-surface-variant)]">Nos pondremos en contacto contigo para activar tu plan.</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="mt-4 text-xs text-[var(--sb-on-surface-variant)] underline-offset-2 hover:underline"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

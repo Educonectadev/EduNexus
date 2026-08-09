@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload } from '@/lib/resolveInstId'
+import { addBusinessDays } from '@/lib/trial'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 
@@ -97,9 +98,9 @@ export async function POST(request: NextRequest) {
     await conn.query('BEGIN')
 
     await conn.query(
-      `INSERT INTO institutions (id, code, name, type, level, modality, shift, department, province, district, address, phone, email, director_name, director_dni, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'active')`,
-      [instId, instCode, name, type || '', level || '', modality || '', shift || '', department || '', province || '', district || '', address || '', phone || '', email || '', director_name || '', director_dni || '']
+      `INSERT INTO institutions (id, code, name, type, level, modality, shift, department, province, district, address, phone, email, director_name, director_dni, status, trial_ends_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'active', $16)`,
+      [instId, instCode, name, type || '', level || '', modality || '', shift || '', department || '', province || '', district || '', address || '', phone || '', email || '', director_name || '', director_dni || '', plan_id ? null : addBusinessDays(new Date(), 20).toISOString()]
     )
 
     if (plan_id) {
