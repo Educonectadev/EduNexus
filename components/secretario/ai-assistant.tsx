@@ -11,6 +11,7 @@ import {
   User as UserIcon, LogOut, Settings, X,
 } from "@/components/ui/proicons"
 import type { LucideIcon } from "@/components/ui/proicons"
+import { Logo } from "@/components/ui/logo"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
@@ -278,9 +279,7 @@ export function AIAssistantContent() {
       )}>
         {/* Logo */}
         <div className={cn("flex items-center h-12 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
-          <div className="flex items-center justify-center w-7 h-7 rounded-md bg-gradient-to-br from-violet-500 to-violet-700 shrink-0">
-            <span className="text-white font-semibold text-[10px] tracking-tight">EN</span>
-          </div>
+          <Logo className="w-7 h-7 shrink-0" />
           {sidebarOpen && (
             <span className="text-[13px] font-semibold text-sb-on-surface tracking-tight truncate">
               EduNexus

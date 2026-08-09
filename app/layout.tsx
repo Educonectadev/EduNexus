@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description: 'El sistema integral de gestión escolar para colegios públicos y privados del Perú. Administra matrículas, notas, asistencia, comunicación y más en una sola plataforma.',
   generator: 'EduNexus',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

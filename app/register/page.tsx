@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "@/components/ui/proicons"
 import { SbBtn, SbInput, SbCard } from "@/components/ui/sb"
+import { Logo } from "@/components/ui/logo"
 
 export default function RegisterPage() {
   const [loading, setLoading] = React.useState(false)
@@ -43,7 +44,7 @@ export default function RegisterPage() {
       <SbCard className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <Link href="/" className="mx-auto mb-4 inline-block">
-            <div className="h-12 w-12 rounded-xl bg-[var(--sb-primary)] flex items-center justify-center"><span className="text-[var(--sb-on-primary)] font-bold text-lg">EC</span></div>
+            <Logo className="h-12 w-12" />
           </Link>
           <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Solicitar Acceso</h2>
           <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-1">Crea tu cuenta para acceder a EduNexus</p>

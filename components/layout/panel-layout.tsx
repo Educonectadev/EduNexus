@@ -7,6 +7,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
+import { Logo } from "@/components/ui/logo"
 import {
   LayoutDashboard, Building2, Users, CreditCard, Settings, Shield,
   FileText, HeadphonesIcon, Database, BarChart3, LogOut, GraduationCap,
@@ -319,9 +320,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       )}>
         {/* Logo */}
         <div className={cn("flex items-center h-14 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
-          <Link href="/"
-            className="flex items-center justify-center w-7 h-7 rounded-[6px] bg-sb-on-surface shrink-0">
-            <span className="text-sb-surface font-semibold text-[10px] tracking-tight">EN</span>
+          <Link href="/" className="flex items-center justify-center shrink-0">
+            <Logo className="w-7 h-7" />
           </Link>
           {sidebarOpen && (
             <span className="text-[13px] font-medium text-sb-on-surface tracking-tight truncate">

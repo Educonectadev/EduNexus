@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Logo } from "@/components/ui/logo"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuthStore } from "@/stores/auth-store"
@@ -145,16 +146,12 @@ export function Sidebar() {
       <div className="flex h-16 items-center border-b border-border/50 px-4">
         {!isCollapsed ? (
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-white font-bold text-sm">EN</span>
-            </div>
+            <Logo className="h-8 w-8" />
             <span className="font-semibold text-foreground tracking-tight">EduNexus</span>
           </Link>
         ) : (
           <Link href="/" className="mx-auto">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-white font-bold text-sm">EN</span>
-            </div>
+            <Logo className="h-8 w-8" />
           </Link>
         )}
       </div>

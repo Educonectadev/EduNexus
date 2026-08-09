@@ -10,6 +10,7 @@ import { Loader2, Mail, ArrowRight, ChevronLeft, CheckCircle2, KeyRound, Sun, Mo
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { SbBtn, SbInput } from "@/components/ui/sb"
+import { Logo } from "@/components/ui/logo"
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = React.useState(false)
@@ -44,9 +45,7 @@ export default function ForgotPasswordPage() {
 
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}>
             <Link href="/" className="inline-flex items-center gap-2.5 mb-12 group">
-              <div className="h-10 w-10 rounded-xl bg-[var(--sb-primary)] flex items-center justify-center shadow-lg shadow-[var(--sb-primary)]/25 group-hover:shadow-[var(--sb-primary)]/40 transition-shadow">
-                <span className="text-[var(--sb-on-primary)] font-bold text-sm">EC</span>
-              </div>
+              <Logo className="h-10 w-10" />
               <span className="text-lg font-bold tracking-tight text-[var(--sb-on-surface)]">EduNexus</span>
             </Link>
           </motion.div>
