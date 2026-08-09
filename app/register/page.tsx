@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [success, setSuccess] = React.useState(false)
+  const [instCode, setInstCode] = React.useState<string | null>(null)
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) })
 
@@ -22,6 +23,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
       const result = await res.json()
       if (!res.ok) { setError(result.error); setLoading(false); return }
+      setInstCode(result.institutionCode || null)
       setSuccess(true); setLoading(false)
     } catch { setError("Error de conexión"); setLoading(false) }
   }
@@ -31,8 +33,14 @@ export default function RegisterPage() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--sb-background)] p-4">
         <SbCard className="w-full max-w-md text-center p-8">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center"><span className="text-emerald-400 text-2xl">✓</span></div>
-          <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Cuenta Creada</h2>
-          <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-2">Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión.</p>
+          <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Institución Creada</h2>
+          <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-2">Tu cuenta ha sido creada exitosamente. Durante 20 días hábiles podrás usar EduNexus de forma gratuita.</p>
+          {instCode && (
+            <div className="mt-4 rounded-xl bg-sb-surface-container p-4">
+              <p className="text-[11px] text-[var(--sb-on-surface-variant)]/60 uppercase tracking-wider">Código de tu institución</p>
+              <p className="mt-1 text-xl font-mono font-semibold text-[var(--sb-primary)]">{instCode}</p>
+            </div>
+          )}
           <SbBtn variant="filled" rounded className="w-full mt-6"><Link href="/login">Ir al Login</Link></SbBtn>
         </SbCard>
       </div>
@@ -41,25 +49,25 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--sb-background)] p-4">
-      <SbCard className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <Link href="/" className="mx-auto mb-4 inline-block">
-            <Logo className="h-12 w-12" />
-          </Link>
-          <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Solicitar Acceso</h2>
-          <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-1">Crea tu cuenta para acceder a EduNexus</p>
-        </div>
+        <SbCard className="w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <Link href="/" className="mx-auto mb-4 inline-block">
+              <Logo className="h-12 w-12" />
+            </Link>
+            <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Solicitar Acceso</h2>
+            <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-1">Crea tu institución y empieza con 20 días hábiles gratis</p>
+          </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && <div className="p-3 text-sm text-red-400 bg-red-500/10 rounded-xl">{error}</div>}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && <div className="p-3 text-sm text-red-400 bg-red-500/10 rounded-xl">{error}</div>}
 
-          {[
-            { id: "fullName", label: "Nombre Completo", type: "text", placeholder: "Juan Pérez", error: errors.fullName },
-            { id: "email", label: "Correo Electrónico", type: "email", placeholder: "correo@ejemplo.com", error: errors.email },
-            { id: "institutionCode", label: "Código de Institución", type: "text", placeholder: "CSM001", error: errors.institutionCode },
-            { id: "password", label: "Contraseña", type: "password", placeholder: "••••••••", error: errors.password },
-            { id: "confirmPassword", label: "Confirmar Contraseña", type: "password", placeholder: "••••••••", error: errors.confirmPassword },
-          ].map(f => (
+            {[
+              { id: "fullName", label: "Nombre Completo", type: "text", placeholder: "Juan Pérez", error: errors.fullName },
+              { id: "institutionName", label: "Nombre de la Institución", type: "text", placeholder: "Colegio San Martín", error: errors.institutionName },
+              { id: "email", label: "Correo Electrónico", type: "email", placeholder: "correo@ejemplo.com", error: errors.email },
+              { id: "password", label: "Contraseña", type: "password", placeholder: "••••••••", error: errors.password },
+              { id: "confirmPassword", label: "Confirmar Contraseña", type: "password", placeholder: "••••••••", error: errors.confirmPassword },
+            ].map(f => (
             <div key={f.id}>
               <label className="text-[11px] text-[var(--sb-on-surface-variant)]/40 mb-1 block">{f.label}</label>
               <SbInput id={f.id} type={f.type} placeholder={f.placeholder} {...register(f.id as keyof RegisterInput)} />
