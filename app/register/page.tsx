@@ -202,7 +202,7 @@ export default function RegisterPage() {
               <p className="mt-1 text-xl font-mono font-semibold text-[var(--sb-primary)]">{instCode}</p>
             </div>
           )}
-          <SbBtn variant="filled" rounded className="w-full mt-6"><Link href="/login">Ir al Login</Link></SbBtn>
+          <Link href="/login" className="sb-btn filled rounded w-full mt-6 text-center"><span className="inline-flex items-center justify-center gap-2">Ir al Login</span></Link>
         </SbCard>
       </div>
     )

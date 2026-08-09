@@ -374,10 +374,19 @@ export default function DevDemoPage() {
                   <p className="text-[10px] text-emerald-700/70 uppercase tracking-wider mb-1">Institución demo creada</p>
                   <p className="text-[13px] font-medium text-emerald-800">Código: {createdCreds.code}</p>
                   <div className="mt-2 space-y-0.5 text-[12px] text-emerald-800">
-                    <p>URL: <span className="font-mono font-semibold">{window.location.origin}/login</span></p>
+                    <p>URL: <a href={`${window.location.origin}/login`} className="font-mono font-semibold underline hover:opacity-80">{window.location.origin}/login</a></p>
                     <p>Email: <span className="font-mono font-semibold">{createdCreds.email}</span></p>
                     <p>Password: <span className="font-mono font-semibold">{createdCreds.password}</span></p>
                   </div>
+                  <a
+                    href={`${window.location.origin}/login`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-[13px] font-semibold hover:bg-emerald-700 transition-colors"
+                  >
+                    <ArrowUpRight className="h-4 w-4" />
+                    Ir al Login
+                  </a>
                 </div>
               )}
 
