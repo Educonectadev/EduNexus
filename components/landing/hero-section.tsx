@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "@/components/ui/proicons";
 import { AnimatedSphere } from "./animated-sphere";
+import { DemoModal } from "@/components/demo-modal";
 
 const words = ["gestionar", "conectar", "transformar", "innovar"];
 
@@ -13,6 +14,7 @@ export function HeroSection() {
   const [mounted, setMounted] = useState(false);
   const [isVisible] = useState(true);
   const [wordIndex, setWordIndex] = useState(0);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -118,16 +120,17 @@ export function HeroSection() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-14 text-base rounded-full group shadow-lg shadow-primary/20"
+            <a
+              href="/register"
+              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-14 text-base rounded-full group shadow-lg shadow-primary/20 transition-colors"
             >
               Comenzar gratis
               <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            </a>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => setDemoOpen(true)}
               className="h-14 px-8 text-base rounded-full border-border hover:bg-muted/50 text-foreground"
             >
               Agendar demostración
@@ -164,6 +167,7 @@ export function HeroSection() {
         </div>
       </div>
       
+      <DemoModal open={demoOpen} onOpenChange={setDemoOpen} />
     </section>
   );
 }
