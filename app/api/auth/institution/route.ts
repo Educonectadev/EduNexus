@@ -3,6 +3,43 @@ import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 import { computeTrialStatus } from '@/lib/trial'
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
+    const { payload } = await jwtVerify(token, secret)
+
+    if (!payload.institutionId) {
+      return NextResponse.json({ error: 'Sin institución asociada' }, { status: 400 })
+    }
+
+    const body = await request.json()
+    const updates: string[] = []
+    const values: any[] = []
+
+    if (body.name !== undefined) { updates.push('name = ?'); values.push(body.name) }
+    if (body.email !== undefined) { updates.push('email = ?'); values.push(body.email) }
+    if (body.phone !== undefined) { updates.push('phone = ?'); values.push(body.phone) }
+
+    if (updates.length === 0) {
+      return NextResponse.json({ error: 'Sin campos para actualizar' }, { status: 400 })
+    }
+
+    values.push(payload.institutionId)
+    await pool.query(
+      `UPDATE institutions SET ${updates.join(', ')} WHERE id = ?`,
+      values
+    )
+
+    return NextResponse.json({ success: true, message: 'Institución actualizada' })
+  } catch (error) {
+    console.error('PATCH institution error:', error)
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
@@ -18,7 +55,7 @@ export async function GET(request: NextRequest) {
     let inst: any
     try {
       const [rows] = await pool.query(
-        `SELECT i.id, i.name, i.trial_ends_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
+        `SELECT i.id, i.name, i.email, i.phone, i.trial_ends_at, p.id as plan_id, p.name as plan_name, p.price as plan_price, p.max_users, p.max_students, p.features as plan_features
          FROM institutions i
          LEFT JOIN plans p ON p.id = i.plan_id
          WHERE i.id = ?`,
@@ -40,6 +77,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       id: inst?.id || null,
       name: inst?.name || '',
+      email: inst?.email || '',
+      phone: inst?.phone || '',
       plan: inst?.plan_id ? {
         id: inst.plan_id,
         name: inst.plan_name,

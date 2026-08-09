@@ -35,10 +35,16 @@ export async function createFreeInstitution(info: {
   const code = info.code || await generateInstitutionCode()
 
   const [colRows] = await pool.query(
-    `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = $1`,
-    ['users']
+    `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'institutions'`
   ) as any[]
-  const colNames = (colRows || []).map((c: any) => c.column_name)
+  const instCols = (colRows || []).map((c: any) => c.column_name)
+  const hasEmail = instCols.includes('email')
+  const hasPhone = instCols.includes('phone')
+
+  const [userColRows] = await pool.query(
+    `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'users'`
+  ) as any[]
+  const colNames = (userColRows || []).map((c: any) => c.column_name)
   const hasPasswordHash = colNames.includes('password_hash')
   const hasStatus = colNames.includes('status')
 
@@ -46,11 +52,19 @@ export async function createFreeInstitution(info: {
   try {
     await conn.query('BEGIN')
 
-    await conn.query(
-      `INSERT INTO institutions (id, code, name, type, status, trial_ends_at)
-       VALUES ($1, $2, $3, 'private', 'active', $4)`,
-      [instId, code, info.name, addBusinessDays(new Date(), 20).toISOString()]
-    )
+    if (hasEmail && hasPhone) {
+      await conn.query(
+        `INSERT INTO institutions (id, code, name, type, status, email, phone, trial_ends_at)
+         VALUES ($1, $2, $3, 'private', 'active', $4, $5, $6)`,
+        [instId, code, info.name, info.email, info.phone || '', addBusinessDays(new Date(), 20).toISOString()]
+      )
+    } else {
+      await conn.query(
+        `INSERT INTO institutions (id, code, name, type, status, trial_ends_at)
+         VALUES ($1, $2, $3, 'private', 'active', $4)`,
+        [instId, code, info.name, addBusinessDays(new Date(), 20).toISOString()]
+      )
+    }
 
     const userId = crypto.randomUUID()
     if (hasPasswordHash && hasStatus) {

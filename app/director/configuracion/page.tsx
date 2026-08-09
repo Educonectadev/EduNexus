@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone } from "@/components/ui/proicons"
+import { Settings, Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone, Clock } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbBtn, SbInput, SbSwitch } from "@/components/ui/sb"
@@ -9,20 +9,37 @@ import { parsePlanFeatures } from "@/lib/planPermissions"
 
 export default function ConfiguracionPage() {
   const [saving, setSaving] = React.useState(false)
+  const [saved, setSaved] = React.useState(false)
   const [config, setConfig] = React.useState({
     institution_name: "", institution_email: "", institution_phone: "",
     notification_email: true, notification_sms: false, auto_approve_enrollment: false,
   })
   const [plan, setPlan] = React.useState<{ name: string; price: number; max_users: number; max_students: number; features: string[] | string } | null>(null)
+  const [trial, setTrial] = React.useState<{ isExpired: boolean; remainingBusinessDays: number; daysLabel: string } | null>(null)
 
   React.useEffect(() => {
     fetch("/api/auth/institution").then(r => r.json()).then(data => {
-      setConfig(c => ({ ...c, institution_name: data.name || "" }))
+      setConfig(c => ({ ...c, institution_name: data.name || "", institution_email: data.email || "", institution_phone: data.phone || "" }))
       if (data.plan) setPlan(data.plan)
+      if (data.trial && !data.trial.hasPaidPlan) setTrial(data.trial)
     }).catch(() => {})
   }, [])
 
-  const handleSave = async () => { setSaving(true); await new Promise(r => setTimeout(r, 1000)); setSaving(false) }
+  const handleSave = async () => {
+    setSaving(true); setSaved(false)
+    try {
+      const res = await fetch("/api/auth/institution", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: config.institution_name,
+          email: config.institution_email,
+          phone: config.institution_phone,
+        }),
+      })
+      if (res.ok) setSaved(true)
+    } finally { setSaving(false) }
+  }
 
   return (
     <div className="space-y-5">
@@ -35,6 +52,35 @@ export default function ConfiguracionPage() {
           <Save className="h-4 w-4" /> {saving ? "Guardando..." : "Guardar"}
         </SbBtn>
       </motion.div>
+
+      {trial && !trial.isExpired && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <Clock className="h-4 w-4 text-green-600" />
+            </div>
+            <h3 className="text-sm font-semibold text-sb-on-surface">Periodo de prueba</h3>
+          </div>
+          <div className="bg-sb-surface rounded-xl p-4 border border-sb-outline-variant/8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-sm text-sb-on-surface/80">Estás usando EduNexus de forma gratuita</p>
+              <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">{trial.remainingBusinessDays} día(s) hábil(es) restantes</p>
+            </div>
+            <button
+              onClick={() => window.location.href = "/director/configuracion"}
+              className="text-xs font-medium text-sb-on-surface bg-sb-surface-container-high hover:bg-sb-surface-container-highest px-4 py-2 rounded-lg transition-colors"
+            >
+              Ver días restantes
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {saved && (
+        <div className="flex items-center gap-2 text-sm text-emerald-600">
+          <Check className="h-4 w-4" /> Cambios guardados correctamente
+        </div>
+      )}
 
       {plan && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
