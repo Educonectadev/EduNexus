@@ -32,12 +32,23 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
+
+    const [instColRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'institutions'`
+    ) as any[]
+    const instCols = (instColRows || []).map((c: any) => c.column_name)
+    const has = (col: string) => instCols.includes(col)
+
     const updates: string[] = []
     const values: any[] = []
+    const map: Record<string, string> = { name: 'name', email: 'email', phone: 'phone' }
 
-    if (body.name !== undefined) { updates.push('name = ?'); values.push(body.name) }
-    if (body.email !== undefined) { updates.push('email = ?'); values.push(body.email) }
-    if (body.phone !== undefined) { updates.push('phone = ?'); values.push(body.phone) }
+    for (const [key, col] of Object.entries(map)) {
+      if (body[key] !== undefined && has(col)) {
+        updates.push(`${col} = ?`)
+        values.push(body[key])
+      }
+    }
 
     if (updates.length === 0) {
       return NextResponse.json({ error: 'Sin campos para actualizar' }, { status: 400 })
@@ -74,7 +85,11 @@ export async function GET(request: NextRequest) {
     const instCols = (instColRows || []).map((c: any) => c.column_name)
     const has = (col: string) => instCols.includes(col)
 
-    const sel: string[] = ['i.id', 'i.name', 'i.email', 'i.phone', 'i.created_at', 'p.id as plan_id', 'p.name as plan_name', 'p.price as plan_price', 'p.max_users', 'p.max_students', 'p.features as plan_features']
+    const sel: string[] = ['i.id', 'p.id as plan_id', 'p.name as plan_name', 'p.price as plan_price', 'p.max_users', 'p.max_students', 'p.features as plan_features']
+    if (has('name')) sel.push('i.name')
+    if (has('email')) sel.push('i.email')
+    if (has('phone')) sel.push('i.phone')
+    if (has('created_at')) sel.push('i.created_at')
     if (has('trial_ends_at')) sel.push('i.trial_ends_at')
     if (has('notes')) sel.push('i.notes')
 
