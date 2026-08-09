@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
-import { computeTrialStatus } from '@/lib/trial'
+import { computeTrialStatus, addBusinessDays } from '@/lib/trial'
+
+// Backfill: si la institución existía antes del sistema de trial (trial_ends_at NULL)
+// y no tiene plan pagado, se le asigna 20 días hábiles desde ahora.
+async function ensureTrial(institutionId: string) {
+  try {
+    await pool.query(
+      `UPDATE institutions
+       SET trial_ends_at = $1
+       WHERE id = $2 AND plan_id IS NULL AND trial_ends_at IS NULL`,
+      [addBusinessDays(new Date(), 20).toISOString(), institutionId]
+    )
+  } catch { /* trial_ends_at may not exist yet */ }
+}
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -51,6 +64,8 @@ export async function GET(request: NextRequest) {
     if (!payload.institutionId) {
       return NextResponse.json({ id: null, name: '' }, { status: 401 })
     }
+
+    await ensureTrial(payload.institutionId)
 
     let inst: any
     try {
