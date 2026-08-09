@@ -1,32 +1,48 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone, Clock } from "@/components/ui/proicons"
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { SbBtn, SbInput, SbSwitch } from "@/components/ui/sb"
+import { Save, Building2, Bell, Shield, CreditCard, Check, Mail, Phone, Clock, Pencil, X, Settings } from "@/components/ui/proicons"
+import { motion, AnimatePresence } from "framer-motion"
+import { SbBtn, SbInput, SbSwitch, useToast } from "@/components/ui/sb"
 import { parsePlanFeatures } from "@/lib/planPermissions"
 
 export default function ConfiguracionPage() {
+  const { toast } = useToast()
   const [saving, setSaving] = React.useState(false)
-  const [saved, setSaved] = React.useState(false)
+  const [loadingForm, setLoadingForm] = React.useState(true)
+  const [editing, setEditing] = React.useState(false)
   const [config, setConfig] = React.useState({
     institution_name: "", institution_email: "", institution_phone: "",
     notification_email: true, notification_sms: false, auto_approve_enrollment: false,
   })
+  const [preview, setPreview] = React.useState<typeof config>(config)
   const [plan, setPlan] = React.useState<{ name: string; price: number; max_users: number; max_students: number; features: string[] | string } | null>(null)
   const [trial, setTrial] = React.useState<{ isExpired: boolean; remainingBusinessDays: number; daysLabel: string } | null>(null)
 
-  React.useEffect(() => {
-    fetch("/api/auth/institution").then(r => r.json()).then(data => {
-      setConfig(c => ({ ...c, institution_name: data.name || "", institution_email: data.email || "", institution_phone: data.phone || "" }))
+  const load = React.useCallback(() => {
+    return fetch("/api/auth/institution").then(r => r.json()).then(data => {
+      const next = {
+        institution_name: data.name || "",
+        institution_email: data.email || "",
+        institution_phone: data.phone || "",
+      }
+      setConfig(c => ({ ...c, ...next }))
+      setPreview(p => ({ ...p, ...next }))
       if (data.plan) setPlan(data.plan)
       if (data.trial && !data.trial.hasPaidPlan) setTrial(data.trial)
-    }).catch(() => {})
+      return data
+    })
   }, [])
 
+  React.useEffect(() => {
+    load().finally(() => setLoadingForm(false)).catch(() => {})
+  }, [load])
+
+  const startEditing = () => { setPreview({...config}); setEditing(true) }
+  const cancelEditing = () => { setConfig({...preview}); setEditing(false) }
+
   const handleSave = async () => {
-    setSaving(true); setSaved(false)
+    setSaving(true)
     try {
       const res = await fetch("/api/auth/institution", {
         method: "PATCH",
@@ -37,49 +53,70 @@ export default function ConfiguracionPage() {
           phone: config.institution_phone,
         }),
       })
-      if (res.ok) setSaved(true)
+      const result = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast(result.error || "No se pudo guardar", "error")
+        return
+      }
+      setPreview({ ...config })
+      setEditing(false)
+      toast("Cambios guardados correctamente", "success")
+    } catch {
+      toast("Error de conexión al guardar", "error")
     } finally { setSaving(false) }
   }
 
+  if (loadingForm) {
+    return <div className="flex h-[60vh] items-center justify-center text-sb-on-surface-variant/40">Cargando...</div>
+  }
+
   return (
-    <div className="space-y-5">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-sb-on-surface">Configuración</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Ajustes generales de la institución</p>
+    <div className="mx-auto max-w-3xl space-y-5">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-2xl bg-sb-primary/10 flex items-center justify-center">
+            <Settings className="h-5 w-5 text-sb-primary" />
+          </div>
+          <div>
+            <h1 className="text-[20px] font-bold tracking-tight text-sb-on-surface">Configuración</h1>
+            <p className="text-[13px] text-sb-on-surface-variant/50">Ajustes generales de tu institución</p>
+          </div>
         </div>
-        <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={handleSave} disabled={saving}>
-          <Save className="h-4 w-4" /> {saving ? "Guardando..." : "Guardar"}
-        </SbBtn>
+        {!editing ? (
+          <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={startEditing}>
+            <Pencil className="h-4 w-4" /> Editar
+          </SbBtn>
+        ) : (
+          <div className="flex items-center gap-2">
+            <SbBtn variant="outlined" rounded className="flex items-center gap-2" onClick={cancelEditing} disabled={saving}>
+              <X className="h-4 w-4" /> Cancelar
+            </SbBtn>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={handleSave} disabled={saving}>
+              <Save className="h-4 w-4" /> {saving ? "Guardando..." : "Guardar"}
+            </SbBtn>
+          </div>
+        )}
       </motion.div>
 
       {trial && !trial.isExpired && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <Clock className="h-4 w-4 text-green-600" />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="rounded-2xl p-4 border border-emerald-500/20 bg-emerald-500/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <Clock className="h-4.5 w-4.5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-[13px] font-medium text-sb-on-surface">Periodo de prueba gratuito</p>
+                <p className="text-[12px] text-sb-on-surface-variant/60 mt-0.5">
+                  {trial.remainingBusinessDays} día(s) hábil(es) restantes · contrata un plan cuando quieras
+                </p>
+              </div>
             </div>
-            <h3 className="text-sm font-semibold text-sb-on-surface">Periodo de prueba</h3>
-          </div>
-          <div className="bg-sb-surface rounded-xl p-4 border border-sb-outline-variant/8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <p className="text-sm text-sb-on-surface/80">Estás usando EduNexus de forma gratuita</p>
-              <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">{trial.remainingBusinessDays} día(s) hábil(es) restantes</p>
-            </div>
-            <button
-              onClick={() => window.location.href = "/director/configuracion"}
-              className="text-xs font-medium text-sb-on-surface bg-sb-surface-container-high hover:bg-sb-surface-container-highest px-4 py-2 rounded-lg transition-colors"
-            >
-              Ver días restantes
-            </button>
+            <span className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+              <Clock className="h-3 w-3" /> {trial.remainingBusinessDays} días
+            </span>
           </div>
         </motion.div>
-      )}
-
-      {saved && (
-        <div className="flex items-center gap-2 text-sm text-emerald-600">
-          <Check className="h-4 w-4" /> Cambios guardados correctamente
-        </div>
       )}
 
       {plan && (
@@ -98,7 +135,7 @@ export default function ConfiguracionPage() {
               </div>
               <div className="text-right text-xs text-sb-on-surface-variant/40">
                 <p>Hasta {plan.max_students.toLocaleString()} estudiantes</p>
-                <p>{plan.max_users} usuarios administrativos</p>
+                <p>{plan.max_users} usuarios admin</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mt-2 pt-3 border-t border-sb-outline-variant/10">
@@ -119,28 +156,51 @@ export default function ConfiguracionPage() {
           </div>
           <h3 className="text-sm font-semibold text-sb-on-surface">Institución</h3>
         </div>
-        <div className="bg-sb-surface rounded-xl p-4 space-y-4 border border-sb-outline-variant/8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Nombre</label>
-              <SbInput value={config.institution_name} onChange={e => setConfig({...config, institution_name: e.target.value})} placeholder="Nombre de la institución" />
-            </div>
-            <div>
-              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Email</label>
-              <div className="relative">
-                <SbInput value={config.institution_email} onChange={e => setConfig({...config, institution_email: e.target.value})} placeholder="email@colegio.pe" style={{ paddingLeft: "36px" }} />
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
+
+        <AnimatePresence mode="wait">
+          {!editing ? (
+            <motion.div key="view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-sb-surface rounded-xl border border-sb-outline-variant/8 divide-y divide-sb-outline-variant/6 overflow-hidden">
+              {[
+                { icon: Building2, label: "Nombre", value: preview.institution_name || "—" },
+                { icon: Mail, label: "Email", value: preview.institution_email || "—" },
+                { icon: Phone, label: "Teléfono", value: preview.institution_phone || "—" },
+              ].map((row, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3">
+                  <div className="h-8 w-8 rounded-lg bg-sb-surface-container-high flex items-center justify-center shrink-0">
+                    <row.icon className="h-3.5 w-3.5 text-sb-on-surface-variant/50" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{row.label}</p>
+                    <p className="text-sm text-sb-on-surface truncate mt-0.5">{row.value}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="bg-sb-surface rounded-xl p-4 space-y-4 border border-sb-outline-variant/8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Nombre</label>
+                  <SbInput value={config.institution_name} onChange={e => setConfig({...config, institution_name: e.target.value})} placeholder="Nombre de la institución" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Email</label>
+                  <div className="relative">
+                    <SbInput value={config.institution_email} onChange={e => setConfig({...config, institution_email: e.target.value})} placeholder="email@colegio.pe" style={{ paddingLeft: "36px" }} />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div>
-            <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Teléfono</label>
-            <div className="relative" style={{ maxWidth: "320px" }}>
-              <SbInput value={config.institution_phone} onChange={e => setConfig({...config, institution_phone: e.target.value})} placeholder="999 888 777" style={{ paddingLeft: "36px" }} />
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
-            </div>
-          </div>
-        </div>
+              <div>
+                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Teléfono</label>
+                <div className="relative" style={{ maxWidth: "320px" }}>
+                  <SbInput value={config.institution_phone} onChange={e => setConfig({...config, institution_phone: e.target.value})} placeholder="999 888 777" style={{ paddingLeft: "36px" }} />
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="space-y-3">
