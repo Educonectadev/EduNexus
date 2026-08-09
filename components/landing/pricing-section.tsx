@@ -1,65 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Check } from "@/components/ui/proicons";
 import { DemoModal } from "@/components/demo-modal";
 
-const plans = [
-  {
-    name: "Básico",
-    description: "Para colegios pequeños (hasta 200 alumnos)",
-    price: { monthly: 199, annual: 149 },
-    features: [
-      "Hasta 200 estudiantes",
-      "Gestión de notas y asistencia",
-      "Portal de padres básico",
-      "Reportes del MINEDU",
-      "Soporte por correo",
-      "Actualizaciones incluidas",
-    ],
-    cta: "Comenzar gratis",
-    popular: false,
-  },
-  {
-    name: "Profesional",
-    description: "Para colegios medianos (hasta 1,500 alumnos)",
-    price: { monthly: 599, annual: 449 },
-    features: [
-      "Hasta 1,500 estudiantes",
-      "Todos los módulos académicos",
-      "Gestión financiera completa",
-      "Comunicación integrada",
-      "Integración con SUNAT",
-      "Soporte prioritario 24/7",
-      "API para desarrolladores",
-      "Capacitación incluida",
-    ],
-    cta: "Solicitar demo",
-    popular: true,
-  },
-  {
-    name: "Institucional",
-    description: "Para UGELES y redes de colegios",
-    price: { monthly: null, annual: null },
-    features: [
-      "Estudiantes ilimitados",
-      "Todo en Profesional",
-      "Panel de control multi-colegio",
-      "Integración directa con MINEDU",
-      "Servidor dedicado en Perú",
-      "Soporte con gerente asignado",
-      "Personalización completa",
-      "Capacitación presencial",
-      "SLA garantizado 99.99%",
-    ],
-    cta: "Contactar ventas",
-    popular: false,
-  },
-];
+interface PlanFromDB {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  max_users: number;
+  max_students: number;
+  features: any;
+  status: string;
+}
 
 export function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [plans, setPlans] = useState<PlanFromDB[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/dev/planes")
+      .then(r => r.json())
+      .then(data => {
+        const active = (Array.isArray(data) ? data : []).filter((p: PlanFromDB) => p.status === "active");
+        setPlans(active.sort((a: PlanFromDB, b: PlanFromDB) => a.price - b.price));
+      })
+      .catch(() => setPlans([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getFeatures = (plan: PlanFromDB): string[] => {
+    const f = plan.features;
+    try {
+      const parsed = typeof f === "string" ? JSON.parse(f) : f;
+      const labels = parsed?.labels ?? parsed?.permissions ?? null;
+      if (Array.isArray(labels)) return labels;
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return ["Gestion de notas y asistencia", "Portal de padres", "Soporte incluido"];
+  };
+
+  const displayPrice = (price: number) => (isAnnual ? Math.round(price * 0.75) : price);
+
+  const popularIndex = plans.length > 1 ? Math.floor(plans.length / 2) : 0;
 
   return (
     <section id="pricing" className="relative py-32 lg:py-40 border-t border-foreground/10">
@@ -112,70 +98,89 @@ export function PricingSection() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-px bg-foreground/10">
-          {plans.map((plan, idx) => (
-            <div
-              key={plan.name}
-              className={`relative p-8 lg:p-12 bg-background ${
-                plan.popular ? "md:-my-4 md:py-12 lg:py-16 border-2 border-foreground" : ""
-              }`}
-            >
-              {plan.popular && (
-                <span className="absolute -top-3 left-8 px-3 py-1 bg-foreground text-primary-foreground text-xs font-mono uppercase tracking-widest">
-                  Más Popular
-                </span>
-              )}
-
-              <div className="mb-8">
-                <span className="font-mono text-xs text-muted-foreground">
-                  {String(idx + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-display text-3xl text-foreground mt-2">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
-              </div>
-
-              <div className="mb-8 pb-8 border-b border-foreground/10">
-                {plan.price.monthly !== null ? (
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-sm text-muted-foreground">S/.</span>
-                    <span className="font-display text-5xl lg:text-6xl text-foreground">
-                      {isAnnual ? plan.price.annual : plan.price.monthly}
-                    </span>
-                    <span className="text-muted-foreground">/mes</span>
-                  </div>
-                ) : (
-                  <span className="font-display text-4xl text-foreground">Personalizado</span>
-                )}
-              </div>
-
-              <ul className="space-y-4 mb-10">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 text-foreground mt-0.5 shrink-0" />
-                    <span className="text-sm text-muted-foreground">{feature}</span>
-                  </li>
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="p-8 lg:p-12 bg-background animate-pulse">
+                <div className="h-3 w-8 bg-foreground/10 mb-6" />
+                <div className="h-8 w-32 bg-foreground/10 mb-3" />
+                <div className="h-4 w-48 bg-foreground/10 mb-8" />
+                <div className="h-14 w-40 bg-foreground/10 mb-8" />
+                {[0, 1, 2, 3].map(j => (
+                  <div key={j} className="h-4 w-full bg-foreground/10 mb-3" />
                 ))}
-              </ul>
-
-              <button
-                onClick={() => setDemoOpen(true)}
-                className={`w-full py-4 flex items-center justify-center gap-2 text-sm font-medium transition-all group ${
-                  plan.popular
-                    ? "bg-foreground text-primary-foreground hover:bg-foreground/90"
-                    : "border border-foreground/20 text-foreground hover:border-foreground hover:bg-foreground/5"
-                }`}
-              >
-                {plan.cta}
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
+              </div>
+            ))
+          ) : plans.length === 0 ? (
+            <div className="col-span-full p-12 text-center text-muted-foreground text-sm bg-background">
+              No hay planes configurados por el momento.
             </div>
-          ))}
+          ) : (
+            plans.map((plan, idx) => {
+              const popularPlan = idx === popularIndex;
+              const features = getFeatures(plan);
+              return (
+                <div
+                  key={plan.id}
+                  className={`relative p-8 lg:p-12 bg-background ${
+                    popularPlan ? "md:-my-4 md:py-12 lg:py-16 border-2 border-foreground" : ""
+                  }`}
+                >
+                  {popularPlan && (
+                    <span className="absolute -top-3 left-8 px-3 py-1 bg-foreground text-primary-foreground text-xs font-mono uppercase tracking-widest">
+                      Más Popular
+                    </span>
+                  )}
+
+                  <div className="mb-8">
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="font-display text-3xl text-foreground mt-2">{plan.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-2">{plan.description || "Plan de EduNexus"}</p>
+                  </div>
+
+                  <div className="mb-8 pb-8 border-b border-foreground/10">
+                    {plan.price > 0 ? (
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-mono text-sm text-muted-foreground">S/.</span>
+                        <span className="font-display text-5xl lg:text-6xl text-foreground">
+                          {displayPrice(plan.price).toLocaleString("es-PE")}
+                        </span>
+                        <span className="text-muted-foreground">/mes</span>
+                      </div>
+                    ) : (
+                      <span className="font-display text-4xl text-foreground">Personalizado</span>
+                    )}
+                  </div>
+
+                  <ul className="space-y-4 mb-10">
+                    {features.map((feature, fIdx) => (
+                      <li key={fIdx} className="flex items-start gap-3">
+                        <Check className="w-4 h-4 text-foreground mt-0.5 shrink-0" />
+                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => setDemoOpen(true)}
+                    className={`w-full py-4 flex items-center justify-center gap-2 text-sm font-medium transition-all group ${
+                      popularPlan
+                        ? "bg-foreground text-primary-foreground hover:bg-foreground/90"
+                        : "border border-foreground/20 text-foreground hover:border-foreground hover:bg-foreground/5"
+                    }`}
+                  >
+                    Solicitar demo
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                </div>
+              );
+            })
+          )}
         </div>
 
         <p className="mt-12 text-center text-sm text-muted-foreground">
-          Todos los planes incluyen actualizaciones automáticas, certificados SSL y protección DDoS.{" "}
-          <a href="#" className="underline underline-offset-4 hover:text-foreground transition-colors">
-            Comparar todos los planes
-          </a>
+          Todos los planes incluyen actualizaciones automáticas, certificados SSL y protección DDoS.
         </p>
       </div>
 
