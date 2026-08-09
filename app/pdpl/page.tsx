@@ -7,9 +7,9 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "PDPL - Ley de Protección de Datos Personales - Educonecta",
+  title: "PDPL - Ley de Protección de Datos Personales - EduNexus",
   description:
-    "Cómo Educonecta cumple con la Ley N° 29733 de Protección de Datos Personales y sus normas reglamentarias.",
+    "Cómo EduNexus cumple con la Ley N° 29733 de Protección de Datos Personales y sus normas reglamentarias.",
 };
 
 const articles = [
@@ -17,7 +17,7 @@ const articles = [
     id: "I",
     title: "Disposiciones Generales",
     description:
-      "La Ley N° 29733 tiene por finalidad proteger los datos personales, así como los derechos de las personas a su autodeterminación informativa y privacidad. Educonecta cumple plenamente con todos los principios establecidos en esta ley.",
+      "La Ley N° 29733 tiene por finalidad proteger los datos personales, así como los derechos de las personas a su autodeterminación informativa y privacidad. EduNexus cumple plenamente con todos los principios establecidos en esta ley.",
     details: [
       "Principio de legalidad: todo tratamiento de datos tiene base legal.",
       "Principio de finalidad: los datos se recopilan para fines específicos y legítimos.",
@@ -31,21 +31,21 @@ const articles = [
     id: "II",
     title: "Derechos ARCO",
     description:
-      "La ley establece los derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO). Educonecta facilita el ejercicio de estos derechos a todos los titulares de datos.",
+      "La ley establece los derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO). EduNexus facilita el ejercicio de estos derechos a todos los titulares de datos.",
     details: [
       "Derecho de Acceso: los usuarios pueden solicitar información sobre sus datos tratados.",
       "Derecho de Rectificación: los usuarios pueden corregir datos inexactos.",
       "Derecho de Cancelación: los usuarios pueden solicitar la eliminación de datos innecesarios.",
       "Derecho de Oposición: los usuarios pueden oponerse al tratamiento de sus datos.",
       "Plazo de respuesta: máximo 8 días hábiles para atender solicitudes.",
-      "Canal de contacto: privacidad@educonecta.pe para todos los reclamos.",
+      "Canal de contacto: privacidad@edunexus.pe para todos los reclamos.",
     ],
   },
   {
     id: "III",
     title: "Consentimiento",
     description:
-      "El consentimiento es la base fundamental del tratamiento de datos en Educonecta. Recopilamos consentimiento expreso, informado y específico de cada titular.",
+      "El consentimiento es la base fundamental del tratamiento de datos en EduNexus. Recopilamos consentimiento expreso, informado y específico de cada titular.",
     details: [
       "Consentimiento explícito: los usuarios aceptan expresamente el tratamiento.",
       "Información clara: se describe detalladamente qué datos se recopilan y para qué.",
@@ -59,13 +59,13 @@ const articles = [
     id: "IV",
     title: "Responsable del Tratamiento",
     description:
-      "Educonecta S.A.C. actúa como Responsable del Tratamiento de datos personales. Hemos designado un oficial de protección de datos responsable de supervisar el cumplimiento de la ley.",
+      "EduNexus S.A.C. actúa como Responsable del Tratamiento de datos personales. Hemos designado un oficial de protección de datos responsable de supervisar el cumplimiento de la ley.",
     details: [
-      "Razón social: Educonecta S.A.C.",
+      "Razón social: EduNexus S.A.C.",
       "RUC: 20XXXXXXXXX",
       "Domicilio: Av. Javier Prado Este 4600, Santiago de Surco, Lima.",
-      "Oficial de Protección de Datos: privacidad@educonecta.pe.",
-      "Delegado de seguridad: seguridad@educonecta.pe.",
+      "Oficial de Protección de Datos: privacidad@edunexus.pe.",
+      "Delegado de seguridad: seguridad@edunexus.pe.",
       "Registro en la Autoridad Nacional de Protección de Datos: activo.",
     ],
   },
@@ -73,7 +73,7 @@ const articles = [
     id: "V",
     title: "Transferencias Internacionales",
     description:
-      "Educonecta NO realiza transferencias internacionales de datos personales. Toda la información se almacena y procesa exclusivamente en servidores ubicados dentro del territorio peruano.",
+      "EduNexus NO realiza transferencias internacionales de datos personales. Toda la información se almacena y procesa exclusivamente en servidores ubicados dentro del territorio peruano.",
     details: [
       "Servidores: exclusivamente en data centers certificados en Perú.",
       "No hay transferencia a terceros países bajo ninguna circunstancia.",
@@ -87,7 +87,7 @@ const articles = [
     id: "VI",
     title: "Medidas de Seguridad",
     description:
-      "La ley exige medidas de seguridad técnicas y administrativas para proteger los datos. Educonecta implementa un marco de seguridad robusto y certificado.",
+      "La ley exige medidas de seguridad técnicas y administrativas para proteger los datos. EduNexus implementa un marco de seguridad robusto y certificado.",
     details: [
       "Cifrado AES-256 para datos en reposo en todas las bases de datos.",
       "Cifrado TLS 1.3 para toda comunicación en tránsito.",
@@ -101,7 +101,7 @@ const articles = [
     id: "VII",
     title: "Registro de Operaciones",
     description:
-      "Educonecta mantiene un registro detallado de todas las operaciones de tratamiento de datos, cumpliendo con el deber de documentación exigido por la ley.",
+      "EduNexus mantiene un registro detallado de todas las operaciones de tratamiento de datos, cumpliendo con el deber de documentación exigido por la ley.",
     details: [
       "Registro de actividades de tratamiento por cada categoría de datos.",
       "Historial completo de accesos por usuario y período.",
@@ -115,7 +115,7 @@ const articles = [
     id: "VIII",
     title: "Notificación de Incidentes",
     description:
-      "En caso de incidentes de seguridad que afecten datos personales, Educonecta cumple con los protocolos de notificación establecidos en la ley y su reglamento.",
+      "En caso de incidentes de seguridad que afecten datos personales, EduNexus cumple con los protocolos de notificación establecidos en la ley y su reglamento.",
     details: [
       "Notificación a la Autoridad Nacional: dentro de las 72 horas del incidente.",
       "Notificación a los titulares: cuando el incidente pueda afectar sus derechos.",
@@ -133,7 +133,7 @@ export default function PDPLPage() {
       <PageHeader
         label="PDPL"
         title="Protección de Datos Personales"
-        description="Educonecta cumple plenamente con la Ley N° 29733 de Protección de Datos Personales y su Reglamento, adoptando las más altas medidas para resguardar la información de la comunidad educativa."
+        description="EduNexus cumple plenamente con la Ley N° 29733 de Protección de Datos Personales y su Reglamento, adoptando las más altas medidas para resguardar la información de la comunidad educativa."
       />
 
       {/* Resumen */}
@@ -245,10 +245,10 @@ export default function PDPLPage() {
               Responderemos en un máximo de 8 días hábiles.
             </p>
             <a
-              href="mailto:privacidad@educonecta.pe"
+              href="mailto:privacidad@edunexus.pe"
               className="inline-flex px-8 py-4 bg-background text-foreground font-medium hover:bg-background/90 transition-colors"
             >
-              privacidad@educonecta.pe
+              privacidad@edunexus.pe
             </a>
           </div>
         </PageSection>

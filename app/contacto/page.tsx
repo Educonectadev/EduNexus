@@ -7,7 +7,7 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Contacto - Educonecta",
+  title: "Contacto - EduNexus",
   description:
     "Contáctanos para solicitar una demostración, resolver dudas o conocer más sobre nuestra plataforma educativa.",
 };
@@ -17,21 +17,21 @@ const offices = [
     city: "Lima (Sede Central)",
     address: "Av. Javier Prado Este 4600, Santiago de Surco, Lima",
     phone: "+51 (01) 555-0199",
-    email: "contacto@educonecta.pe",
+    email: "contacto@edunexus.pe",
     hours: "Lunes a viernes: 8:00 a.m. - 6:00 p.m.",
   },
   {
     city: "Arequipa",
     address: "Calle Mercado 201, Cercado, Arequipa",
     phone: "+51 (054) 555-0199",
-    email: "arequipa@educonecta.pe",
+    email: "arequipa@edunexus.pe",
     hours: "Lunes a viernes: 8:00 a.m. - 5:00 p.m.",
   },
   {
     city: "Trujillo",
     address: "Av. España 680, Trujillo, La Libertad",
     phone: "+51 (044) 555-0199",
-    email: "trujillo@educonecta.pe",
+    email: "trujillo@edunexus.pe",
     hours: "Lunes a viernes: 8:00 a.m. - 5:00 p.m.",
   },
 ];
@@ -47,16 +47,16 @@ const contactReasons = [
 
 const faq = [
   {
-    q: "¿Cuánto tiempo toma implementar Educonecta en un colegio?",
+    q: "¿Cuánto tiempo toma implementar EduNexus en un colegio?",
     a: "Un colegio puede estar operativo en menos de 24 horas. La importación de datos existentes toma entre 1 y 3 días dependiendo del volumen. Ofrecemos capacitación gratuita para todo el personal.",
   },
   {
     q: "¿Funciona para colegios públicos y privados?",
-    a: "Sí, Educonecta está diseñado para ambos tipos de institución. Los colegios públicos tienen acceso a precios subsidiados y funcionalidades específicas para reportes al MINEDU.",
+    a: "Sí, EduNexus está diseñado para ambos tipos de institución. Los colegios públicos tienen acceso a precios subsidiados y funcionalidades específicas para reportes al MINEDU.",
   },
   {
     q: "¿Necesitamos infraestructura tecnológica propia?",
-    a: "No. Educonecta es 100% en la nube. Solo necesitas una computadora con acceso a internet. Todo el almacenamiento y procesamiento está en nuestros servidores dentro del Perú.",
+    a: "No. EduNexus es 100% en la nube. Solo necesitas una computadora con acceso a internet. Todo el almacenamiento y procesamiento está en nuestros servidores dentro del Perú.",
   },
   {
     q: "¿Cómo se protegen los datos de los estudiantes?",
@@ -194,7 +194,7 @@ export default function ContactoPage() {
                 Si eres un colegio ya registrado y necesitas soporte inmediato:
               </p>
               <div className="space-y-2">
-                <p className="font-mono text-sm">soporte@educonecta.pe</p>
+                <p className="font-mono text-sm">soporte@edunexus.pe</p>
                 <p className="font-mono text-sm">+51 (01) 555-0100</p>
                 <p className="text-sm text-muted-foreground">Línea gratuita para colegios públicos</p>
               </div>

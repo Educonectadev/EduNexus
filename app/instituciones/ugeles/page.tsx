@@ -8,7 +8,7 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "UGELES - Educonecta",
+  title: "UGELES - EduNexus",
   description:
     "Panel de gestión para Unidades de Gestión Educativa Local. Monitoreo en tiempo real de todos los colegios de tu jurisdicción.",
 };
@@ -118,7 +118,7 @@ export default function UgelesPage() {
             Una UGEL típica supervisa entre 50 y 300 instituciones educativas. Cada una reporta 
             información de forma diferente, en diferentes formatos y plazos. Sin una herramienta 
             centralizada, la supervisión depende de visitas presenciales y llamadas telefónicas. 
-            Educonecta transforma esta realidad: un solo panel para monitorear, comunicar y 
+            EduNexus transforma esta realidad: un solo panel para monitorear, comunicar y 
             supervisar todas las instituciones de tu jurisdicción.
           </p>
         </div>
@@ -166,7 +166,7 @@ export default function UgelesPage() {
             Transformación
           </span>
           <h2 className="font-display text-4xl lg:text-6xl tracking-tight mb-16">
-            Antes y después de Educonecta
+            Antes y después de EduNexus
           </h2>
 
           <div className="space-y-0">
@@ -203,7 +203,7 @@ export default function UgelesPage() {
 
         <div className="grid md:grid-cols-4 gap-8">
           {[
-            { step: "01", title: "Convenio", desc: "Firma del convenio UGEL-Educonecta y designación del coordinador." },
+            { step: "01", title: "Convenio", desc: "Firma del convenio UGEL-EduNexus y designación del coordinador." },
             { step: "02", title: "Migración", desc: "Importación de datos de todas las instituciones de la jurisdicción." },
             { step: "03", title: "Capacitación", desc: "Capacitación a supervisores y personal de la UGEL. Onboarding de IE." },
             { step: "04", title: "Operación", desc: "Sistema en producción. Soporte dedicado y seguimiento mensual." },

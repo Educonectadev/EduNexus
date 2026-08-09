@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 
 const testimonials = [
   {
-    quote: "Educonecta transformó completamente la gestión de nuestro colegio. Lo que antes tomaba horas de trabajo manual ahora se resuelve en minutos. Los padres están encantados con el portal de seguimiento.",
+    quote: "EduNexus transformó completamente la gestión de nuestro colegio. Lo que antes tomaba horas de trabajo manual ahora se resuelve en minutos. Los padres están encantados con el portal de seguimiento.",
     author: "María Elena Condori",
     role: "Directora",
     company: "IEP San Martín de Porres, Lima",
     metric: "Reducción del 80% en carga administrativa",
   },
   {
-    quote: "Como UGEL, necesitábamos una solución que pudiera centralizar la información de todos los colegios de nuestra jurisdicción. Educonecta nos dio visibilidad en tiempo real del rendimiento académico regional.",
+    quote: "Como UGEL, necesitábamos una solución que pudiera centralizar la información de todos los colegios de nuestra jurisdicción. EduNexus nos dio visibilidad en tiempo real del rendimiento académico regional.",
     author: "Carlos Mendoza Quispe",
     role: "Jefe de UGEL",
     company: "UGEL Trujillo, La Libertad",
@@ -132,7 +132,7 @@ export function TestimonialsSection() {
 
         <div className="mt-24 pt-12 border-t border-foreground/10">
           <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase mb-8 text-center">
-            Instituciones que confían en Educonecta
+            Instituciones que confían en EduNexus
           </p>
         </div>
       </div>

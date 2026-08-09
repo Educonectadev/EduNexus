@@ -8,7 +8,7 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "MINEDU - Educonecta",
+  title: "MINEDU - EduNexus",
   description:
     "Plataforma de soporte para el Ministerio de Educación del Perú. Datos consolidados de todo el sistema educativo nacional en tiempo real.",
 };
@@ -102,7 +102,7 @@ export default function MineduPage() {
       <PageHeader
         label="MINEDU"
         title="Tecnología al servicio de la política educativa"
-        description="Educonecta proporciona al Ministerio de Educación datos confiables, actualizados y auditables del sistema educativo nacional para fundamentar las decisiones de política pública."
+        description="EduNexus proporciona al Ministerio de Educación datos confiables, actualizados y auditables del sistema educativo nacional para fundamentar las decisiones de política pública."
       />
 
       {/* Datos */}
@@ -129,7 +129,7 @@ export default function MineduPage() {
             Una plataforma para todo el sistema educativo
           </h2>
           <p className="text-muted-foreground leading-relaxed max-w-3xl">
-            Educonecta conecta cada colegio del Perú con el MINEDU a través de las UGELES. 
+            EduNexus conecta cada colegio del Perú con el MINEDU a través de las UGELES. 
             Los datos fluyen desde el aula hasta el despacho ministerial de forma automática, 
             confiable y segura. Cada directivo, docente y estudiante es un punto de información 
             que alimenta las decisiones que afectan a millones de peruanos.

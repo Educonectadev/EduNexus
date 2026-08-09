@@ -8,9 +8,9 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Sobre Nosotros - Educonecta",
+  title: "Sobre Nosotros - EduNexus",
   description:
-    "Conoce la historia, misión y equipo detrás de Educonecta, la plataforma educativa que está transformando la gestión escolar en todo el Perú.",
+    "Conoce la historia, misión y equipo detrás de EduNexus, la plataforma educativa que está transformando la gestión escolar en todo el Perú.",
 };
 
 const timeline = [
@@ -18,7 +18,7 @@ const timeline = [
     year: "2019",
     title: "El origen",
     description:
-      "Un grupo de educadores y tecnólogos peruanos identificó la necesidad urgente de digitalizar la gestión escolar. Nació Educonecta como un proyecto piloto en 12 colegios de Lima.",
+      "Un grupo de educadores y tecnólogos peruanos identificó la necesidad urgente de digitalizar la gestión escolar. Nació EduNexus como un proyecto piloto en 12 colegios de Lima.",
   },
   {
     year: "2020",
@@ -42,7 +42,7 @@ const timeline = [
     year: "2023",
     title: "Liderazgo nacional",
     description:
-      "Educonecta se consolidó como la plataforma educativa #1 del Perú con 15,000+ colegios. Recibimos certificación ISO 27001 y comenzamos operaciones en Latinoamérica.",
+      "EduNexus se consolidó como la plataforma educativa #1 del Perú con 15,000+ colegios. Recibimos certificación ISO 27001 y comenzamos operaciones en Latinoamérica.",
   },
   {
     year: "2024",
@@ -193,7 +193,7 @@ export default function SobreNosotrosPage() {
             Equipo
           </span>
           <h2 className="font-display text-4xl lg:text-6xl tracking-tight mb-16">
-            Las personas detrás de Educonecta
+            Las personas detrás de EduNexus
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-background/10">

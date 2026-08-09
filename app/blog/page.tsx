@@ -7,7 +7,7 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Blog Educativo - Educonecta",
+  title: "Blog Educativo - EduNexus",
   description:
     "Noticias, guías y recursos sobre tecnología educativa, gestión escolar y la transformación digital de la educación en el Perú.",
 };
@@ -34,7 +34,7 @@ const posts = [
     category: "Caso de éxito",
     title: "IEP San Martín de Porres: de 0 a 100% digital en 3 meses",
     excerpt:
-      "Cómo una institución educativa de Lima Norte logró transformar completamente su gestión administrativa y académica con Educonecta.",
+      "Cómo una institución educativa de Lima Norte logró transformar completamente su gestión administrativa y académica con EduNexus.",
     readTime: "5 min de lectura",
   },
   {
@@ -42,7 +42,7 @@ const posts = [
     category: "Legislación",
     title: "Nuevo reglamento MINEDU 2025: lo que todo director debe saber",
     excerpt:
-      "Análisis de las principales cambios en el reglamento de gestión institucional y cómo Educonecta se adapta automáticamente a los nuevos requisitos.",
+      "Análisis de las principales cambios en el reglamento de gestión institucional y cómo EduNexus se adapta automáticamente a los nuevos requisitos.",
     readTime: "10 min de lectura",
   },
   {

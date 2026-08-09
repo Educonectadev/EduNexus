@@ -8,9 +8,9 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Seguridad - Educonecta",
+  title: "Seguridad - EduNexus",
   description:
-    "Conoce las medidas de seguridad que protegen la información de estudiantes, docentes e instituciones en Educonecta.",
+    "Conoce las medidas de seguridad que protegen la información de estudiantes, docentes e instituciones en EduNexus.",
 };
 
 const measures = [
@@ -197,16 +197,16 @@ export default function SeguridadPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="mailto:seguridad@educonecta.pe"
+              href="mailto:seguridad@edunexus.pe"
               className="px-8 py-4 bg-foreground text-background font-medium hover:bg-foreground/90 transition-colors"
             >
               Reportar vulnerabilidad
             </a>
             <a
-              href="mailto:seguridad@educonecta.pe"
+              href="mailto:seguridad@edunexus.pe"
               className="px-8 py-4 border border-foreground/20 text-foreground hover:border-foreground hover:bg-foreground/5 transition-all"
             >
-              seguridad@educonecta.pe
+              seguridad@edunexus.pe
             </a>
           </div>
         </div>

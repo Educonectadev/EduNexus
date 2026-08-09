@@ -125,7 +125,7 @@ export default function ReportesPage() {
       <h1>${reportData?.title || "Reporte"}</h1>
       <p class="meta">Generado el ${new Date().toLocaleDateString("es-PE", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
       ${printContent.innerHTML}
-      <p class="footer">Educonecta — Reporte generado automáticamente</p>
+      <p class="footer">EduNexus — Reporte generado automáticamente</p>
       </body></html>
     `)
     win.document.close()

@@ -81,7 +81,7 @@ export function InfrastructureSection() {
           >
             <div className="border border-foreground/10">
               <div className="px-6 py-4 border-b border-foreground/10 flex items-center justify-between">
-                <span className="text-sm font-mono text-muted-foreground">Red Educonecta</span>
+                <span className="text-sm font-mono text-muted-foreground">Red EduNexus</span>
                 <span className="flex items-center gap-2 text-xs font-mono text-green-600">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                   Todo operativo

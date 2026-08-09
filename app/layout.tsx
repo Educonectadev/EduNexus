@@ -17,14 +17,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Educonecta - Plataforma Educativa Nacional del Perú',
+  title: 'EduNexus - Plataforma Educativa Nacional del Perú',
   description: 'El sistema integral de gestión escolar para colegios públicos y privados del Perú. Administra matrículas, notas, asistencia, comunicación y más en una sola plataforma.',
-  generator: 'Educonecta',
+  generator: 'EduNexus',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Educonecta',
+    title: 'EduNexus',
   },
   formatDetection: {
     telephone: false,

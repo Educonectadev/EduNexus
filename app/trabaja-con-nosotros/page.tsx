@@ -8,7 +8,7 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Trabaja con Nosotros - Educonecta",
+  title: "Trabaja con Nosotros - EduNexus",
   description:
     "Únete al equipo que está transformando la educación en el Perú. Buscamos personas apasionadas por la tecnología y la educación.",
 };
@@ -80,7 +80,7 @@ const positions = [
     location: "Lima, Perú",
     type: "Tiempo completo",
     description:
-      "Representarán Educonecta ante las UGELES, ministerios y grandes redes de colegios. Venderás soluciones que transforman la educación, no solo software.",
+      "Representarán EduNexus ante las UGELES, ministerios y grandes redes de colegios. Venderás soluciones que transforman la educación, no solo software.",
     requirements: [
       "3+ años de experiencia en ventas B2B o institucional",
       "Experiencia en el sector educación o gobierno",
@@ -113,7 +113,7 @@ const benefits = [
   { title: "Salud completa", description: "Seguro de salud integral para ti y tu familia" },
   { title: "Vacaciones flexibles", description: "Más allá de lo legal: 25 días de vacaciones al año" },
   { title: "Impacto real", description: "Tu trabajo llega a millones de estudiantes peruanos" },
-  { title: "Acciones de la empresa", description: "Todos los empleados son parte de Educonecta" },
+  { title: "Acciones de la empresa", description: "Todos los empleados son parte de EduNexus" },
   { title: "Crecimiento", description: "Plan de carrera claro con revisiones semestrales" },
 ];
 
@@ -133,7 +133,7 @@ export default function TrabajaPage() {
           Beneficios
         </span>
         <h2 className="font-display text-4xl lg:text-6xl tracking-tight mb-12">
-          Por qué trabajar en Educonecta
+          Por qué trabajar en EduNexus
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/10">
@@ -213,7 +213,7 @@ export default function TrabajaPage() {
 
         <div className="grid md:grid-cols-4 gap-8">
           {[
-            { step: "01", title: "Aplicación", desc: "Envía tu CV y cuéntanos por qué te interesa Educonecta." },
+            { step: "01", title: "Aplicación", desc: "Envía tu CV y cuéntanos por qué te interesa EduNexus." },
             { step: "02", title: "Entrevista inicial", desc: "Conversamos 30 minutos sobre tu experiencia y expectativas." },
             { step: "03", title: "Desafío técnico", desc: "Un caso práctico relevante al puesto (sin trampas ni tiempo imposible)." },
             { step: "04", title: "Oferta", desc: "Si todo va bien, te hacemos una oferta en menos de 48 horas." },

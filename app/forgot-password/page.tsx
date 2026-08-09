@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
               <div className="h-10 w-10 rounded-xl bg-[var(--sb-primary)] flex items-center justify-center shadow-lg shadow-[var(--sb-primary)]/25 group-hover:shadow-[var(--sb-primary)]/40 transition-shadow">
                 <span className="text-[var(--sb-on-primary)] font-bold text-sm">EC</span>
               </div>
-              <span className="text-lg font-bold tracking-tight text-[var(--sb-on-surface)]">Educonecta</span>
+              <span className="text-lg font-bold tracking-tight text-[var(--sb-on-surface)]">EduNexus</span>
             </Link>
           </motion.div>
 

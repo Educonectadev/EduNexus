@@ -95,7 +95,7 @@ export default function DemoPage() {
           </Link>
           <h1 className="text-2xl font-bold text-sb-on-surface">Solicitar Demostración</h1>
           <p className="text-sb-on-surface/60 mt-2 text-[14px]">
-            Descubre cómo Educonecta puede transformar la gestión de tu institución educativa
+            Descubre cómo EduNexus puede transformar la gestión de tu institución educativa
           </p>
         </div>
 

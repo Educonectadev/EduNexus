@@ -7,29 +7,29 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones - Educonecta",
+  title: "Términos y Condiciones - EduNexus",
   description:
-    "Términos y condiciones de uso de la plataforma Educonecta para instituciones educativas, docentes, padres y estudiantes.",
+    "Términos y condiciones de uso de la plataforma EduNexus para instituciones educativas, docentes, padres y estudiantes.",
 };
 
 const sections = [
   {
     id: "1",
     title: "Aceptación de los términos",
-    content: `Al acceder y utilizar la plataforma Educonecta, las instituciones educativas, sus representantes, docentes, personal administrativo, padres de familia y estudiantes aceptan íntegramente los presentes Términos y Condiciones.
+    content: `Al acceder y utilizar la plataforma EduNexus, las instituciones educativas, sus representantes, docentes, personal administrativo, padres de familia y estudiantes aceptan íntegramente los presentes Términos y Condiciones.
 
-Si no estás de acuerdo con alguno de estos términos, no debes utilizar la plataforma. El uso continuado de Educonecta constituye la aceptación de estos términos y de nuestra Política de Privacidad.
+Si no estás de acuerdo con alguno de estos términos, no debes utilizar la plataforma. El uso continuado de EduNexus constituye la aceptación de estos términos y de nuestra Política de Privacidad.
 
-Educonecta S.A.C. se reserva el derecho de modificar estos términos en cualquier momento, notificando a los usuarios con al menos 30 días de anticipación.`,
+EduNexus S.A.C. se reserva el derecho de modificar estos términos en cualquier momento, notificando a los usuarios con al menos 30 días de anticipación.`,
   },
   {
     id: "2",
     title: "Definiciones",
     content: `Para efectos de estos Términos:
 
-**Plataforma:** El sistema integral de gestión escolar Educonecta, incluyendo todas sus funcionalidades, módulos, API y servicios asociados.
+**Plataforma:** El sistema integral de gestión escolar EduNexus, incluyendo todas sus funcionalidades, módulos, API y servicios asociados.
 
-**Institución:** La institución educativa (colegio público o privado) que contrata los servicios de Educonecta.
+**Institución:** La institución educativa (colegio público o privado) que contrata los servicios de EduNexus.
 
 **Administrador:** El representante de la institución con acceso de administrador a la plataforma.
 
@@ -42,7 +42,7 @@ Educonecta S.A.C. se reserva el derecho de modificar estos términos en cualquie
   {
     id: "3",
     title: "Registro y cuentas",
-    content: `Para utilizar Educonecta, la institución debe completar un proceso de registro que incluye:
+    content: `Para utilizar EduNexus, la institución debe completar un proceso de registro que incluye:
 
 - Datos de la institución (nombre, RUC, código UGEL, dirección).
 - Datos del representante legal o director.
@@ -60,7 +60,7 @@ La institución es responsable de todas las actividades realizadas bajo sus cuen
   {
     id: "4",
     title: "Uso de la plataforma",
-    content: `Educonecta se proporciona para fines educativos y de gestión institucional. Está prohibido:
+    content: `EduNexus se proporciona para fines educativos y de gestión institucional. Está prohibido:
 
 - Utilizar la plataforma para fines distintos a la gestión educativa.
 - Intentar acceder a información de otras instituciones.
@@ -75,16 +75,16 @@ El incumplimiento de estas condiciones puede resultar en la suspensión o termin
   {
     id: "5",
     title: "Propiedad intelectual",
-    content: `Todo el contenido, diseño, código fuente, algoritmos, bases de datos, interfaz de usuario y documentación de Educonecta son propiedad exclusiva de Educonecta S.A.C. y están protegidos por las leyes de propiedad intelectual del Perú e internacionales.
+    content: `Todo el contenido, diseño, código fuente, algoritmos, bases de datos, interfaz de usuario y documentación de EduNexus son propiedad exclusiva de EduNexus S.A.C. y están protegidos por las leyes de propiedad intelectual del Perú e internacionales.
 
 La plataforma concede una licencia limitada, no exclusiva, intransferible y revocable para utilizar el servicio según estos términos.
 
-Los contenidos cargados por las instituciones (calificaciones, documentos, etc.) permanecen propiedad de la institución. Educonecta no reclama propiedad sobre dichos contenidos.`,
+Los contenidos cargados por las instituciones (calificaciones, documentos, etc.) permanecen propiedad de la institución. EduNexus no reclama propiedad sobre dichos contenidos.`,
   },
   {
     id: "6",
     title: "Disponibilidad del servicio",
-    content: `Educonecta se compromete a mantener un nivel de disponibilidad del 99.9% mensual, excluyendo:
+    content: `EduNexus se compromete a mantener un nivel de disponibilidad del 99.9% mensual, excluyendo:
 
 - Mantenimiento programado notificado con 48 horas de anticipación.
 - Fuerza mayor o circunstancias fuera de nuestro control.
@@ -96,7 +96,7 @@ En caso de incumplimiento del SLA, la institución podrá solicitar un crédito 
   {
     id: "7",
     title: "Pagos y facturación",
-    content: `Los precios de Educonecta están expresados en Soles (PEN) y pueden ser consultados en la sección de Precios de nuestra plataforma.
+    content: `Los precios de EduNexus están expresados en Soles (PEN) y pueden ser consultados en la sección de Precios de nuestra plataforma.
 
 - Los pagos se realizan mensual o anualmente según el plan contratado.
 - La facturación electrónica se emite automáticamente vía SUNAT.
@@ -104,12 +104,12 @@ En caso de incumplimiento del SLA, la institución podrá solicitar un crédito 
 - La institución puede cancelar el servicio con 30 días de anticipación.
 - No se realizan reembolsos por meses parciales ya facturados.
 
-Educonecta se reserva el derecho de modificar los precios con 60 días de anticipación, aplicándose a renovaciones futuras.`,
+EduNexus se reserva el derecho de modificar los precios con 60 días de anticipación, aplicándose a renovaciones futuras.`,
   },
   {
     id: "8",
     title: "Limitación de responsabilidad",
-    content: `Educonecta no será responsable por:
+    content: `EduNexus no será responsable por:
 
 - Pérdida de datos causada por problemas de conectividad del usuario.
 - Decisiones académicas o administrativas tomadas basándose en la plataforma.
@@ -117,14 +117,14 @@ Educonecta se reserva el derecho de modificar los precios con 60 días de antici
 - Interrupciones del servicio por mantenimiento o causas de fuerza mayor.
 - El uso indebido de la plataforma por parte de los usuarios.
 
-La responsabilidad total de Educonecta en ningún caso excederá el monto pagado por la institución en los 12 meses anteriores al reclamo.`,
+La responsabilidad total de EduNexus en ningún caso excederá el monto pagado por la institución en los 12 meses anteriores al reclamo.`,
   },
   {
     id: "9",
     title: "Terminación del servicio",
     content: `Cualquiera de las partes puede terminar el contrato con 30 días de anticipación por escrito.
 
-Educonecta puede suspender o terminar el servicio inmediatamente en caso de:
+EduNexus puede suspender o terminar el servicio inmediatamente en caso de:
 
 - Incumplimiento grave de estos términos.
 - Uso fraudulento o ilegal de la plataforma.
@@ -153,7 +153,7 @@ export default function TerminosPage() {
       <PageHeader
         label="Términos"
         title="Términos y Condiciones"
-        description="Lee detenidamente los términos que rigen el uso de la plataforma Educonecta."
+        description="Lee detenidamente los términos que rigen el uso de la plataforma EduNexus."
       />
 
       <PageSection>

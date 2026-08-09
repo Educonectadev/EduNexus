@@ -8,9 +8,9 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Colegios Privados - Educonecta",
+  title: "Colegios Privados - EduNexus",
   description:
-    "Educonecta para instituciones educativas privadas del Perú. Gestión académica, financiera y administrativa integral con integración SUNAT.",
+    "EduNexus para instituciones educativas privadas del Perú. Gestión académica, financiera y administrativa integral con integración SUNAT.",
 };
 
 const modules = [
@@ -89,12 +89,12 @@ const benefits = [
   {
     title: "Cumplimiento MINEDU",
     description:
-      "Aunque seas privado, también debes reportar al MINEDU. Educonecta genera automáticamente todos los reportes requeridos.",
+      "Aunque seas privado, también debes reportar al MINEDU. EduNexus genera automáticamente todos los reportes requeridos.",
   },
   {
     title: "Escalabilidad",
     description:
-      "Desde un colegio de 50 alumnos hasta una red de 5,000. Educonecta crece con tu institución sin necesidad de cambiar de plataforma.",
+      "Desde un colegio de 50 alumnos hasta una red de 5,000. EduNexus crece con tu institución sin necesidad de cambiar de plataforma.",
   },
 ];
 
@@ -129,7 +129,7 @@ export default function ColegiosPrivadosPage() {
       <PageHeader
         label="Colegios privados"
         title="Potencia tu colegio con tecnología de vanguardia"
-        description="Educonecta ofrece a los colegios privados del Perú una plataforma integral que combina gestión académica, financiera y comunicacional en un solo sistema."
+        description="EduNexus ofrece a los colegios privados del Perú una plataforma integral que combina gestión académica, financiera y comunicacional en un solo sistema."
       />
 
       {/* Reto */}
@@ -142,7 +142,7 @@ export default function ColegiosPrivadosPage() {
             Los colegios privados compiten por atraer y retener estudiantes. Los padres esperan 
             tecnología de vanguardia, transparencia en las calificaciones y facilidades de pago. 
             Al mismo tiempo, la carga administrativa de pensiones, facturación SUNAT y reportes 
-            al MINEDU consume horas valiosas del personal. Educonecta resuelve ambos desafíos: 
+            al MINEDU consume horas valiosas del personal. EduNexus resuelve ambos desafíos: 
             impressiona a los padres y libera a tu equipo del trabajo repetitivo.
           </p>
         </div>

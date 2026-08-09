@@ -211,7 +211,7 @@ export function DemoModal({ open, onOpenChange }: DemoModalProps) {
             </div>
             <h3 className="font-display text-2xl mb-3">¡Solicitud enviada!</h3>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Un asesor de Educonecta se contactará contigo en las próximas 24 horas 
+              Un asesor de EduNexus se contactará contigo en las próximas 24 horas 
               para agendar tu demostración personalizada.
             </p>
             <button

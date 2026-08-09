@@ -49,7 +49,7 @@ export function FooterSection() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display">Educonecta</span>
+                <span className="text-2xl font-display">EduNexus</span>
                 <span className="text-xs text-muted-foreground font-mono">PE</span>
               </a>
 
@@ -99,7 +99,7 @@ export function FooterSection() {
 
         <div className="py-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            2025 Educonecta. Todos los derechos reservados. Hecho en el Perú.
+            2025 EduNexus. Todos los derechos reservados. Hecho en el Perú.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">

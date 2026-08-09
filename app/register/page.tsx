@@ -46,7 +46,7 @@ export default function RegisterPage() {
             <div className="h-12 w-12 rounded-xl bg-[var(--sb-primary)] flex items-center justify-center"><span className="text-[var(--sb-on-primary)] font-bold text-lg">EC</span></div>
           </Link>
           <h2 className="text-2xl font-bold text-[var(--sb-on-surface)]">Solicitar Acceso</h2>
-          <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-1">Crea tu cuenta para acceder a Educonecta</p>
+          <p className="text-sm text-[var(--sb-on-surface-variant)]/60 mt-1">Crea tu cuenta para acceder a EduNexus</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -59,7 +59,7 @@ export function CtaSection() {
 
                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-xl">
                   Únete a los más de 18,000 colegios que ya transformaron su gestión 
-                  con Educonecta. Implementación en menos de 24 horas, soporte permanente.
+                  con EduNexus. Implementación en menos de 24 horas, soporte permanente.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -72,7 +72,7 @@ export function CtaSection() {
                     <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </Button>
                   <a
-                    href="https://wa.me/51999888777?text=Hola,%20quiero%20información%20sobre%20Educonecta"
+                    href="https://wa.me/51999888777?text=Hola,%20quiero%20información%20sobre%20EduNexus"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

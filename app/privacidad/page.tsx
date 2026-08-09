@@ -7,16 +7,16 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Política de Privacidad - Educonecta",
+  title: "Política de Privacidad - EduNexus",
   description:
-    "Conoce cómo Educonecta recopila, usa y protege la información de los usuarios de su plataforma educativa.",
+    "Conoce cómo EduNexus recopila, usa y protege la información de los usuarios de su plataforma educativa.",
 };
 
 const sections = [
   {
     id: "1",
     title: "Información que recopilamos",
-    content: `Educonecta recopila únicamente la información estrictamente necesaria para el funcionamiento de la plataforma:
+    content: `EduNexus recopila únicamente la información estrictamente necesaria para el funcionamiento de la plataforma:
 
 **Información de instituciones:** Nombre del colegio, código UGEL, dirección, datos de representante legal, RUC y datos de contacto.
 
@@ -46,7 +46,7 @@ En ningún caso los datos serán utilizados para fines publicitarios o comercial
   {
     id: "3",
     title: "Base legal del tratamiento",
-    content: `El tratamiento de datos personales en Educonecta se fundamenta en:
+    content: `El tratamiento de datos personales en EduNexus se fundamenta en:
 
 - **Consentimiento expreso:** Los usuarios aceptan expresamente el tratamiento de sus datos al registrarse en la plataforma.
 - **Obligación legal:** Cumplimiento de normativas del MINEDU, SUNAT y otros organismos estatales.
@@ -81,12 +81,12 @@ El tiempo de retención de datos es el período activo del servicio más 5 años
 - **Portabilidad:** Recibir los datos en un formato estructurado y de uso común.
 - **Revocación del consentimiento:** Retirar el consentimiento en cualquier momento.
 
-Para ejercer estos derechos, los usuarios pueden contactar a nuestro oficial de protección de datos a través de privacidad@educonecta.pe.`,
+Para ejercer estos derechos, los usuarios pueden contactar a nuestro oficial de protección de datos a través de privacidad@edunexus.pe.`,
   },
   {
     id: "6",
     title: "Compartición de datos",
-    content: `Educonecta NO vende, alquila ni comparte datos personales con terceros para fines comerciales.
+    content: `EduNexus NO vende, alquila ni comparte datos personales con terceros para fines comerciales.
 
 Los datos pueden ser compartidos únicamente con:
 
@@ -98,7 +98,7 @@ Los datos pueden ser compartidos únicamente con:
   {
     id: "7",
     title: "Menores de edad",
-    content: `Dado que Educonecta gestiona información de estudiantes menores de edad, adoptamos medidas especiales:
+    content: `Dado que EduNexus gestiona información de estudiantes menores de edad, adoptamos medidas especiales:
 
 - El tratamiento de datos de menores requiere autorización del padre, madre o apoderado.
 - Se aplican estándares reforzados de seguridad para datos de menores.
@@ -109,7 +109,7 @@ Los datos pueden ser compartidos únicamente con:
   {
     id: "8",
     title: "Cookies y tecnologías de rastreo",
-    content: `Educonecta utiliza cookies estrictamente necesarias para el funcionamiento de la plataforma:
+    content: `EduNexus utiliza cookies estrictamente necesarias para el funcionamiento de la plataforma:
 
 - **Cookies de sesión:** Para mantener al usuario autenticado.
 - **Cookies de preferencias:** Para recordar configuraciones del usuario.
@@ -120,7 +120,7 @@ No utilizamos cookies de rastreo publicitario ni compartimos información con re
   {
     id: "9",
     title: "Cambios en esta política",
-    content: `Educonecta se reserva el derecho de modificar esta Política de Privacidad en cualquier momento. Los cambios serán notificados:
+    content: `EduNexus se reserva el derecho de modificar esta Política de Privacidad en cualquier momento. Los cambios serán notificados:
 
 - Por correo electrónico a todos los usuarios registrados.
 - Mediante aviso visible en la plataforma.
@@ -133,10 +133,10 @@ El uso continuado de la plataforma después de los cambios constituye la aceptac
     title: "Contacto",
     content: `Para consultas sobre esta Política de Privacidad o para ejercer tus derechos:
 
-- **Correo electrónico:** privacidad@educonecta.pe
+- **Correo electrónico:** privacidad@edunexus.pe
 - **Dirección:** Av. Javier Prado Este 4600, Santiago de Surco, Lima, Perú
 - **Teléfono:** +51 (01) 555-0199
-- **Responsable:** Oficina de Protección de Datos Personales, Educonecta S.A.C.`,
+- **Responsable:** Oficina de Protección de Datos Personales, EduNexus S.A.C.`,
   },
 ];
 

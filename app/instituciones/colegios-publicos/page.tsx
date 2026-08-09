@@ -8,9 +8,9 @@ import {
 import { FooterSection } from "@/components/landing/footer-section";
 
 export const metadata: Metadata = {
-  title: "Colegios Públicos - Educonecta",
+  title: "Colegios Públicos - EduNexus",
   description:
-    "Educonecta para instituciones educativas públicas del Perú. Gestión académica gratuita, reportes al MINEDU automatizados y soporte completo.",
+    "EduNexus para instituciones educativas públicas del Perú. Gestión académica gratuita, reportes al MINEDU automatizados y soporte completo.",
 };
 
 const modules = [
@@ -68,7 +68,7 @@ const advantages = [
   {
     title: "Plan gratuito para colegios públicos",
     description:
-      "Los colegios de gestión pública acceden a Educonecta sin costo. Financiado mediante convenios con UGELES y el MINEDU.",
+      "Los colegios de gestión pública acceden a EduNexus sin costo. Financiado mediante convenios con UGELES y el MINEDU.",
   },
   {
     title: "Cumplimiento automático del MINEDU",
@@ -93,7 +93,7 @@ const advantages = [
   {
     title: "Sin inversión en infraestructura",
     description:
-      "Educonecta es 100% en la nube. Solo necesitas una computadora con internet. Sin servidores, sin mantenimiento, sin costos ocultos.",
+      "EduNexus es 100% en la nube. Solo necesitas una computadora con internet. Sin servidores, sin mantenimiento, sin costos ocultos.",
   },
 ];
 
@@ -110,7 +110,7 @@ export default function ColegiosPublicosPage() {
       <PageHeader
         label="Colegios públicos"
         title="Gestión inteligente para la educación pública"
-        description="Educonecta está diseñado para las necesidades específicas de los colegios del Estado peruano. Automatiza reportes, simplifica la gestión y cumple con el MINEDU sin esfuerzo."
+        description="EduNexus está diseñado para las necesidades específicas de los colegios del Estado peruano. Automatiza reportes, simplifica la gestión y cumple con el MINEDU sin esfuerzo."
       />
 
       {/* Stats */}
@@ -126,11 +126,11 @@ export default function ColegiosPublicosPage() {
 
         <div className="p-8 lg:p-12 bg-foreground/[0.02] border border-foreground/10">
           <h2 className="font-display text-3xl lg:text-4xl mb-4">
-            ¿Por qué colegios públicos eligen Educonecta?
+            ¿Por qué colegios públicos eligen EduNexus?
           </h2>
           <p className="text-muted-foreground leading-relaxed max-w-3xl">
             Los colegios públicos enfrentan desafíos únicos: personal reducido, presupuestos limitados 
-            y una carga administrativa enorme por los reportes del MINEDU. Educonecta fue creado para 
+            y una carga administrativa enorme por los reportes del MINEDU. EduNexus fue creado para 
             resolver exactamente estos problemas. Nuestra plataforma elimina el trabajo manual repetitivo, 
             reduce errores y garantiza el cumplimiento oportuno de todos los reportes oficiales.
           </p>

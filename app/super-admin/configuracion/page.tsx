@@ -34,11 +34,11 @@ export default function SettingsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <SbLabel>Nombre de la Aplicación</SbLabel>
-                  <SbInput id="appName" defaultValue="Educonecta" />
+                  <SbInput id="appName" defaultValue="EduNexus" />
                 </div>
                 <div className="space-y-2">
                   <SbLabel>URL de la Aplicación</SbLabel>
-                  <SbInput id="appUrl" defaultValue="https://educonecta.pe" />
+                  <SbInput id="appUrl" defaultValue="https://edunexus.pe" />
                 </div>
               </div>
 

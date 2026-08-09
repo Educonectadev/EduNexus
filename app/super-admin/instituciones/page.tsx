@@ -422,7 +422,7 @@ export default function InstitutionsPage() {
                   </div>
                   <div className="flex-1 text-left">
                     <p className="text-sm font-bold">{generatingCarnet ? 'Generando...' : 'Descargar Carnet'}</p>
-                    <p className="text-xs text-white/70">Carnet institucional con logo de Educonecta</p>
+                    <p className="text-xs text-white/70">Carnet institucional con logo de EduNexus</p>
                   </div>
                   <Download className="h-5 w-5 text-white/60 group-hover:text-white transition-colors" />
                 </button>

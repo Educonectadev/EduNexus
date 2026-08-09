@@ -89,7 +89,7 @@ export default function SuperAdminDashboard() {
   return (
     <DashboardView
       title="Dashboard"
-      description="Vista general de la plataforma Educonecta"
+      description="Vista general de la plataforma EduNexus"
       stats={stats}
     >
       <div className="grid gap-3 md:grid-cols-2">

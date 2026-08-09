@@ -7,13 +7,13 @@ const codeExamples = [
   {
     label: "API REST",
     code: `// Consultar calificaciones de un alumno
-const calificaciones = await educonecta.api.get(
+const calificaciones = await edunexus.api.get(
   '/alumnos/2024-001/calificaciones',
   { periodo: '2024-1' }
 )
 
 // Registrar asistencia
-await educonecta.api.post('/asistencia', {
+await edunexus.api.post('/asistencia', {
   alumno_id: '2024-001',
   fecha: '2024-06-15',
   estado: 'presente'
@@ -22,20 +22,20 @@ await educonecta.api.post('/asistencia', {
   {
     label: "Webhooks",
     code: `// Configurar eventos en tiempo real
-educonecta.webhooks.on('matricula:creada', (evento) => {
+edunexus.webhooks.on('matricula:creada', (evento) => {
   console.log('Nuevo alumno:', evento.alumno.nombre)
   notificarPadres(evento.padres)
 })
 
-educonecta.webhooks.on('nota:registrada', (evento) => {
+edunexus.webhooks.on('nota:registrada', (evento) => {
   console.log(evento.alumno, evento.nota)
 })`,
   },
   {
     label: "SDK",
-    code: `import { Educonecta } from '@educonecta/sdk'
+    code: `import { EduNexus } from '@edunexus/sdk'
 
-const escuela = new Educonecta({
+const escuela = new EduNexus({
   apiKey: process.env.EDUCONECTA_KEY,
   institucion: 'IEP-001'
 })
@@ -140,7 +140,7 @@ export function DevelopersSection() {
             </h2>
             <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
               API开放 y documentación completa para que las instituciones eduque 
-              integren Educonecta con sus sistemas existentes. Conecta con MINEDU, 
+              integren EduNexus con sus sistemas existentes. Conecta con MINEDU, 
               sistemas de biblioteca y herramientas de gestión escolar.
             </p>
             
