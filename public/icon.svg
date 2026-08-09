@@ -1,4 +1,14 @@
 <svg width="180" height="180" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="48" height="48" rx="10" fill="#ffffff" stroke="#111111" stroke-opacity="0.08"/>
-  <path d="M14 12 h20 v4 h-15 v5 h13 v4 h-13 v7 h15 v4 h-20 z" fill="#000000"/>
+  <style>
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #111111; }
+      .fg { fill: #ffffff; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #ffffff; }
+      .fg { fill: #000000; }
+    }
+  </style>
+  <rect class="bg" width="48" height="48" rx="10" />
+  <path class="fg" d="M14 12 h20 v4 h-15 v5 h13 v4 h-13 v7 h15 v4 h-20 z" />
 </svg>
