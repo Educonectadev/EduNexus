@@ -29,6 +29,7 @@ export default function DirectorDashboard() {
   })
   const [loading, setLoading] = React.useState(true)
   const [seeding, setSeeding] = React.useState(false)
+  const [demoAccess, setDemoAccess] = React.useState<{ role: string; email: string; password: string }[]>([])
   const [activeTab, setActiveTab] = React.useState("general")
 
   const loadStats = React.useCallback(() => {
@@ -41,10 +42,11 @@ export default function DirectorDashboard() {
     if (!window.confirm("Esto creará 20 estudiantes, 6 docentes, 6 cursos, matrículas y horarios de ejemplo en esta institución. ¿Continuar?")) return
     setSeeding(true)
     try {
-      const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ students: 20 }) })
+const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ students: 20 }) })
       const result = await res.json()
       if (!res.ok) { toast(result.error || "Error al cargar datos", "error"); return }
-      toast(`Datos de ejemplo creados: ${result.students} alumnos, ${result.teachers} docentes, ${result.courses} cursos`, "success")
+      toast(`Datos de ejemplo creados: ${result.students} estudiantes, ${result.teachers} docentes, ${result.courses} cursos`, "success")
+      setDemoAccess(result.demoAccess || [])
       setLoading(true)
       await loadStats()
     } catch { toast("Error de conexión", "error") } finally { setSeeding(false) }
@@ -121,6 +123,47 @@ export default function DirectorDashboard() {
             className="shrink-0 px-4 py-2 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {seeding ? "Cargando..." : "Cargar datos de ejemplo"}
+          </button>
+        </motion.div>
+      )}
+
+      {demoAccess.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <Users className="h-4 w-4 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-[13px] font-medium text-sb-on-surface">Usuarios demo creados (contraseña: demo1234)</p>
+              <p className="text-[11px] text-sb-on-surface-variant/60">Entra a estos portales para ver la app completa en acción</p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[12px]">
+              <thead>
+                <tr className="text-sb-on-surface-variant/50">
+                  <th className="py-1 pr-3 font-medium">Portal</th>
+                  <th className="py-1 pr-3 font-medium">Email</th>
+                  <th className="py-1 font-medium">Contraseña</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demoAccess.map((acc, i) => (
+                  <tr key={i} className="border-t border-sb-outline-variant/8">
+                    <td className="py-2 pr-3 font-medium text-sb-on-surface capitalize">{acc.role}</td>
+                    <td className="py-2 pr-3 font-mono text-sb-on-surface/80">{acc.email}</td>
+                    <td className="py-2 font-mono text-sb-on-surface/80">demo1234</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button
+            onClick={() => setDemoAccess([])}
+            className="mt-3 text-[11px] text-sb-on-surface-variant/50 hover:text-sb-on-surface-variant transition-colors underline underline-offset-2"
+          >
+            Ocultar credenciales
           </button>
         </motion.div>
       )}

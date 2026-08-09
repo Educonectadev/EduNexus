@@ -102,8 +102,58 @@ async function dumpInto(institutionId: string, studentsCount: number) {
       }
     }
 
+    // 5. Secretario (usuario con rol secretario)
+    const secFname = pick(FIRST); const secLname = pick(LAST)
+    const secretarioEmail = `secretaria@demo.edu.pe`
+    const secUserId = crypto.randomUUID()
+    await conn.query(
+      `INSERT INTO users (${userCols})
+       VALUES (${userVals})`,
+      [secUserId, secretarioEmail, `${secFname} ${secLname}`, hashedPassword, 'secretario', institutionId, 'active']
+    )
+
+    // 6. Padres (3, vinculados a estudiantes vía email en parents)
+    const parentCredentials: { email: string }[] = []
+    for (let p = 0; p < 3; p++) {
+      const pfname = pick(FIRST); const plname = pick(LAST)
+      const pid = crypto.randomUUID()
+      const pUserId = crypto.randomUUID()
+      const pEmail = `padre${p + 1}@demo.edu.pe`
+      const ptr = `${pfname} ${plname}`
+
+      await conn.query(
+        `INSERT INTO users (${userCols})
+         VALUES (${userVals})`,
+        [pUserId, pEmail, ptr, hashedPassword, 'padre', institutionId, 'active']
+      )
+      await conn.query(
+        `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation, user_id, status)
+         VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7, '', $8, $9, 'active')`,
+        [pid, institutionId, pfname, plname, genDni(), pEmail, '9' + String(Math.floor(10000000 + Math.random() * 89999999)), pick(LAST), pUserId]
+      )
+
+      // Vincula 6 estudiantes por padre
+      const start = p * 6
+      for (let k = 0; k < 6 && start + k < studentIds.length; k++) {
+        await conn.query(
+          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary)
+           VALUES ($1, $2, $3, TRUE)`,
+          [pid, studentIds[start + k], p === 0 ? 'padre' : p === 1 ? 'madre' : 'apoderado']
+        )
+      }
+      parentCredentials.push({ email: pEmail })
+    }
+
     await conn.query('COMMIT')
-    return { students: studentIds.length, teachers: teachersUserIds.length, courses: courseIds.length }
+    return {
+      students: studentIds.length,
+      teachers: teachersUserIds.length,
+      courses: courseIds.length,
+      demoAccess: [
+        { role: 'secretario', email: secretarioEmail, password: 'demo1234' },
+        ...parentCredentials.map((pc, i) => ({ role: 'padre' + (i + 1), email: pc.email, password: 'demo1234' })),
+      ],
+    }
   } catch (err) {
     await conn.query('ROLLBACK').catch(() => {})
     throw err
