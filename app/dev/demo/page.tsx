@@ -55,6 +55,8 @@ export default function DevDemoPage() {
   const [searchQuery, setSearchQuery] = React.useState('')
   const [selectedRequest, setSelectedRequest] = React.useState<DemoRequest | null>(null)
   const [updating, setUpdating] = React.useState(false)
+  const [creating, setCreating] = React.useState(false)
+  const [createdCreds, setCreatedCreds] = React.useState<{ code: string; email: string; password: string } | null>(null)
 
   React.useEffect(() => {
     fetchRequests()
@@ -93,6 +95,31 @@ export default function DevDemoPage() {
       console.error(e)
     } finally {
       setUpdating(false)
+    }
+  }
+
+  const createInstitution = async (id: string) => {
+    if (!confirm('¿Crear la institución demo (15 días) a partir de esta solicitud?')) return
+    setCreating(true)
+    setCreatedCreds(null)
+    try {
+      const res = await fetch('/api/dev/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setCreatedCreds(data.director ? { code: data.code, email: data.director.email, password: data.director.password } : null)
+        fetchRequests()
+      } else {
+        alert(data.error || 'Error al crear la institución')
+      }
+    } catch (e) {
+      console.error(e)
+      alert('Error de conexión')
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -226,7 +253,7 @@ export default function DevDemoPage() {
               </thead>
               <tbody className="divide-y divide-sb-outline-variant/10">
                 {filtered.map((req) => {
-                  const status = statusConfig[req.status]
+                  const status = statusConfig[req.status] || statusConfig.pending
                   const StatusIcon = status?.icon || Clock
                   return (
                     <tr 
@@ -342,6 +369,18 @@ export default function DevDemoPage() {
                 </div>
               )}
 
+              {createdCreds && (
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3">
+                  <p className="text-[10px] text-emerald-700/70 uppercase tracking-wider mb-1">Institución demo creada</p>
+                  <p className="text-[13px] font-medium text-emerald-800">Código: {createdCreds.code}</p>
+                  <div className="mt-2 space-y-0.5 text-[12px] text-emerald-800">
+                    <p>URL: <span className="font-mono font-semibold">{window.location.origin}/login</span></p>
+                    <p>Email: <span className="font-mono font-semibold">{createdCreds.email}</span></p>
+                    <p>Password: <span className="font-mono font-semibold">{createdCreds.password}</span></p>
+                  </div>
+                </div>
+              )}
+
               <div className="text-[11px] text-sb-on-surface/60">
                 Solicitado el {new Date(selectedRequest.created_at).toLocaleString('es-PE')}
               </div>
@@ -391,6 +430,15 @@ export default function DevDemoPage() {
                     className="flex-1 sm:flex-none px-4 py-2.5 bg-sb-surface-container text-sb-on-surface rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50"
                   >
                     Cancelar
+                  </button>
+                )}
+                {selectedRequest.status !== 'completed' && (
+                  <button
+                    onClick={() => createInstitution(selectedRequest.id)}
+                    disabled={creating || updating}
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                  >
+                    {creating ? 'Creando...' : 'Crear institución demo'}
                   </button>
                 )}
               </div>

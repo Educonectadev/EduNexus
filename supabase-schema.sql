@@ -491,6 +491,10 @@ CREATE TABLE IF NOT EXISTS demo_requests (
   level VARCHAR(50) DEFAULT 'all',
   estimated_students INTEGER DEFAULT 0,
   message TEXT DEFAULT '',
+  status VARCHAR(20) DEFAULT 'pending',
+  notes TEXT DEFAULT NULL,
+  demo_date TIMESTAMP DEFAULT NULL,
+  institution_id VARCHAR(36) REFERENCES institutions(id) ON DELETE SET NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
