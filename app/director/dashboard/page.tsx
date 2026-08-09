@@ -39,9 +39,11 @@ export default function DirectorDashboard() {
   const [demoAccess, setDemoAccess] = React.useState<{ role: string; email: string; password: string }[]>([])
   const [activeTab, setActiveTab] = React.useState("general")
   const [trial, setTrial] = React.useState<{ isDemo: boolean; trialDays: number | null; info: TrialInfo | null }>({ isDemo: false, trialDays: null, info: null })
+  const [instLabel, setInstLabel] = React.useState<string>("")
 
   const loadTrial = React.useCallback(() => {
     return fetch("/api/auth/institution").then(r => r.json()).then(d => {
+      if (d?.name) setInstLabel(d.code ? `${d.name} · ${d.code}` : d.name)
       setTrial({ isDemo: !!d.isDemo, trialDays: d.trialDays, info: d.trial || null })
     }).catch(() => {})
   }, [])
@@ -99,7 +101,9 @@ const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-[22px] font-bold tracking-tight text-sb-on-surface">Panel de Director</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">Vista general de tu institución</p>
+          <p className="text-sm text-sb-on-surface-variant/50 mt-0.5">
+            Vista general de tu institución{instLabel ? <span className="text-sb-on-surface-variant/70 font-medium"> — {instLabel}</span> : ""}
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
 {/* Trial / plan banner */}

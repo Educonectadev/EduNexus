@@ -20,6 +20,7 @@ export default function ConfiguracionPage() {
   const [trial, setTrial] = React.useState<{ isExpired: boolean; remainingBusinessDays: number; daysLabel: string } | null>(null)
   const [isDemo, setIsDemo] = React.useState(false)
   const [trialDays, setTrialDays] = React.useState<number | null>(20)
+  const [instCode, setInstCode] = React.useState("")
 
   const load = React.useCallback(() => {
     return fetch("/api/auth/institution").then(r => r.json()).then(data => {
@@ -30,6 +31,7 @@ export default function ConfiguracionPage() {
       }
       setConfig(c => ({ ...c, ...next }))
       setPreview(p => ({ ...p, ...next }))
+      setInstCode(data.code || data.id || "")
       if (data.plan) setPlan(data.plan)
       if (data.isDemo !== undefined) setIsDemo(data.isDemo)
       if (data.trialDays !== undefined) setTrialDays(data.trialDays)
@@ -83,7 +85,9 @@ export default function ConfiguracionPage() {
           </div>
           <div>
             <h1 className="text-[20px] font-bold tracking-tight text-sb-on-surface">Configuración</h1>
-            <p className="text-[13px] text-sb-on-surface-variant/50">Ajustes generales de tu institución</p>
+            <p className="text-[13px] text-sb-on-surface-variant/50">
+              Ajustes generales de tu institución{instCode ? <span className="text-sb-on-surface-variant/70 font-medium"> · {instCode}</span> : ""}
+            </p>
           </div>
         </div>
         {!editing ? (

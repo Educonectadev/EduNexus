@@ -86,6 +86,7 @@ export async function GET(request: NextRequest) {
     const has = (col: string) => instCols.includes(col)
 
     const sel: string[] = ['i.id', 'p.id as plan_id', 'p.name as plan_name', 'p.price as plan_price', 'p.max_users', 'p.max_students', 'p.features as plan_features']
+    if (has('code')) sel.push('i.code')
     if (has('name')) sel.push('i.name')
     if (has('email')) sel.push('i.email')
     if (has('phone')) sel.push('i.phone')
@@ -107,6 +108,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       id: inst?.id || null,
+      code: inst?.code || '',
       name: inst?.name || '',
       email: inst?.email || '',
       phone: inst?.phone || '',
