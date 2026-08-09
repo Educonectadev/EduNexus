@@ -387,20 +387,22 @@ export default function DevDemoPage() {
             </div>
 
             {/* Actions */}
-            <div className="px-6 py-4 border-t border-sb-outline-variant/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <button
-                onClick={() => deleteRequest(selectedRequest.id)}
-                className="flex items-center justify-center sm:justify-start gap-2 px-3 py-2.5 text-[12px] text-red-500 hover:bg-red-50 rounded-xl transition-colors order-2 sm:order-1"
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar
-              </button>
-              <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2">
+            <div className="px-6 py-4 border-t border-sb-outline-variant/10 space-y-2">
+              {selectedRequest.status !== 'completed' && (
+                <button
+                  onClick={() => createInstitution(selectedRequest.id)}
+                  disabled={creating || updating}
+                  className="w-full px-4 py-3 bg-emerald-500 text-white rounded-xl text-[13px] font-semibold hover:opacity-90 disabled:opacity-50 text-center"
+                >
+                  {creating ? 'Creando...' : 'Crear institución demo'}
+                </button>
+              )}
+              <div className="grid grid-cols-2 gap-2">
                 {selectedRequest.status === 'pending' && (
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'contacted')}
                     disabled={updating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-blue-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Marcar contactado
                   </button>
@@ -409,7 +411,7 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'scheduled')}
                     disabled={updating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-purple-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Programar demo
                   </button>
@@ -418,7 +420,7 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'completed')}
                     disabled={updating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-teal-600 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
                   >
                     Marcar completado
                   </button>
@@ -427,21 +429,28 @@ export default function DevDemoPage() {
                   <button
                     onClick={() => updateStatus(selectedRequest.id, 'cancelled')}
                     disabled={updating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-sb-surface-container text-sb-on-surface rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50"
+                    className="w-full px-4 py-2.5 bg-sb-surface-container text-sb-on-surface rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50"
                   >
                     Cancelar
                   </button>
                 )}
-                {selectedRequest.status !== 'completed' && (
+                {selectedRequest.status === 'completed' && (
                   <button
-                    onClick={() => createInstitution(selectedRequest.id)}
-                    disabled={creating || updating}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-[12px] font-medium hover:opacity-90 disabled:opacity-50"
+                    onClick={() => updateStatus(selectedRequest.id, 'cancelled')}
+                    disabled={updating}
+                    className="w-full px-4 py-2.5 bg-sb-surface-container text-sb-on-surface rounded-xl text-[12px] font-medium hover:bg-sb-surface-container-high disabled:opacity-50 col-span-2"
                   >
-                    {creating ? 'Creando...' : 'Crear institución demo'}
+                    Cancelar
                   </button>
                 )}
               </div>
+              <button
+                onClick={() => deleteRequest(selectedRequest.id)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-[12px] text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+                Eliminar solicitud
+              </button>
             </div>
           </motion.div>
         </div>
