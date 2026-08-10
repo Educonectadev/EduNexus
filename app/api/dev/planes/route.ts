@@ -9,7 +9,7 @@ export async function GET() {
     ) as any[]
     const planCols = (planColRows || []).map((c: any) => c.column_name)
     const hasTrialDays = planCols.includes('trial_days')
-    const rows = await pool.query(
+    const [rows] = await pool.query(
       `SELECT ${hasTrialDays ? 'trial_days, ' : ''}id, name, description, price, max_users, max_students, features, status, created_at
        FROM plans ORDER BY price ASC, name ASC`
     )
