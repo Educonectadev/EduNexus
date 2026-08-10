@@ -93,6 +93,14 @@ export default function DevUsuariosPage() {
   const [statusFilter, setStatusFilter] = React.useState<string>("all")
   const [filtersOpen, setFiltersOpen] = React.useState(false)
   const filterContainerRef = React.useRef<HTMLDivElement>(null)
+  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [searchModalQuery, setSearchModalQuery] = React.useState("")
+  const [selectedInstitution, setSelectedInstitution] = React.useState<{
+    id: string
+    code: string
+    name: string
+    users: User[]
+  } | null>(null)
   const [formData, setFormData] = React.useState({
     email: "",
     full_name: "",
@@ -208,6 +216,43 @@ export default function DevUsuariosPage() {
       return haystack.includes(q)
     })
   }, [users, search, roleFilter, statusFilter])
+
+  // Agrupar usuarios por institución (card principal = institución)
+  const institutionGroups = React.useMemo(() => {
+    const groups: Record<string, { id: string; code: string; name: string; users: User[] }> = {}
+    for (const u of users) {
+      const key = u.institution_id || "sin-institución"
+      if (!groups[key]) {
+        groups[key] = { id: key, code: u.institution_code || "—", name: u.institution_name || "Sin institución", users: [] }
+      }
+      groups[key].users.push(u)
+    }
+    // Super admins globales (sin institución) al final
+    return Object.values(groups).sort((a, b) => {
+      if (a.code === "—") return 1
+      if (b.code === "—") return -1
+      return a.code.localeCompare(b.code)
+    })
+  }, [users])
+
+  const filteredGroups = React.useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return institutionGroups
+      .map(g => {
+        const groupUsers = filteredUsers.filter(u => (u.institution_id || "sin-institución") === g.id)
+        return { ...g, filteredUsers: groupUsers }
+      })
+      .filter(g => {
+        if (!q) return g.filteredUsers.length > 0
+        const matches = g.filteredUsers.length > 0 &&
+          (g.name?.toLowerCase().includes(q) || g.code?.toLowerCase().includes(q))
+        return matches
+      })
+  }, [institutionGroups, filteredUsers, search])
+
+  const initGroupModal = (g: { id: string; code: string; name: string; users: User[] }) => {
+    setSelectedInstitution({ id: g.id, code: g.code, name: g.name, users: g.users })
+  }
 
   const activeFilterCount = (roleFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0)
   const totalUsers = users.length
@@ -567,62 +612,56 @@ export default function DevUsuariosPage() {
         )}
       </motion.div>
 
-      {/* User List */}
-      <motion.div variants={fadeUp} className="space-y-2">
-        {filteredUsers.map((user) => {
-          const RoleIcon = roleIcons[user.role] || Users
-          const gradient = roleGradients[user.role] || "from-gray-500 to-gray-600"
+      {/* Institution Cards */}
+      <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {filteredGroups.map((g, i) => {
+          const isGlobal = !g.id || g.id === "sin-institución"
+          const roleSummary = g.users.reduce<Record<string, number>>((acc, u) => {
+            acc[u.role] = (acc[u.role] || 0) + 1
+            return acc
+          }, {})
+          const activeUsers = g.users.filter(u => u.status === "active").length
           return (
             <motion.button
-              key={user.id}
+              key={g.id}
               variants={fadeUp}
-              whileHover={{ x: 2, transition: { duration: 0.15 } }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedUser(user)}
-              className="w-full group bg-[var(--sb-surface-container)] rounded-2xl p-4 border border-[var(--sb-outline-variant)]/10 hover:border-[var(--sb-outline-variant)]/20 hover:bg-[var(--sb-surface-container-high)] transition-all duration-200 text-left"
+              whileHover={{ y: -2, transition: { duration: 0.15 } }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => initGroupModal(g)}
+              className="group relative overflow-hidden rounded-2xl p-4 border border-[var(--sb-outline-variant)]/10 bg-[var(--sb-surface)] hover:border-[var(--sb-outline-variant)]/25 hover:bg-[var(--sb-surface-container)] transition-all duration-200 text-left md-anim-card-in"
             >
-              <div className="flex items-center gap-4">
-                <div className={`h-11 w-11 rounded-xl ${roleColors[user.role] || "bg-[var(--sb-surface-container-high)]"} flex items-center justify-center shrink-0`}>
-                  <span className="text-xs font-bold">
-                    {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+              <div
+                className={`absolute right-[-20px] top-[-20px] h-24 w-24 rounded-full blur-2xl transition-opacity opacity-40 group-hover:opacity-60 ${
+                  isGlobal ? "bg-red-500/20" : "bg-[var(--sb-primary)]/20"
+                }`}
+              />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-2">
+                  <div className={`h-11 w-11 rounded-xl ${
+                    isGlobal ? "bg-red-500/10" : "bg-[var(--sb-primary)]/10"
+                  } flex items-center justify-center shrink-0`}>
+                    {React.createElement(isGlobal ? Shield : Building2, { className: "h-5 w-5 " + (isGlobal ? "text-red-500" : "text-[var(--sb-primary)]") })}
+                  </div>
+                  <span className="text-[10px] font-mono text-[var(--sb-on-surface-variant)]/60 bg-[var(--sb-surface-container)] px-2 py-1 rounded-md">
+                    {g.code}
                   </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--sb-on-surface)] truncate">{highlight(user.full_name, search)}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 font-mono truncate">{highlight(user.email, search)}</span>
-                    {user.institution_name && (
-                      <>
-                        <span className="text-[var(--sb-on-surface-variant)]/30">·</span>
-                        <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 truncate flex items-center gap-1">
-                          <Building2 className="h-3 w-3 shrink-0" />
-                          {user.institution_name}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${roleColors[user.role] || "bg-[var(--sb-surface-container-high)]"}`}>
-                    <RoleIcon className="h-3 w-3" />
-                    <span>{roleLabels[user.role]}</span>
-                  </div>
-                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${
-                    user.status === "active"
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/70"
-                  }`}>
-                    <div className={`h-1.5 w-1.5 rounded-full ${user.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/50"}`} />
-                    {user.status === "active" ? "Activo" : "Inactivo"}
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-[var(--sb-on-surface-variant)]/50 group-hover:text-[var(--sb-on-surface-variant)]/60 transition-colors" />
+                <p className="text-sm font-semibold text-[var(--sb-on-surface)] truncate mt-3">{g.name}</p>
+                <p className="text-[11px] text-[var(--sb-on-surface-variant)]/70 mt-0.5">{g.users.length} usuarios · {activeUsers} activos</p>
+                <div className="flex flex-wrap items-center gap-1 mt-2.5">
+                  {(Object.entries(roleSummary) as [string, number][]).map(([role, count]) => (
+                    <span key={role} className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${roleColors[role] || "bg-[var(--sb-surface-container-high)] text-[var(--sb-on-surface-variant)]/70"}`}>
+                      {roleLabels[role] || role}: {count}
+                    </span>
+                  ))}
+                  <span className="text-[9px] text-[var(--sb-on-surface-variant)]/40 ml-auto">Ver usuarios</span>
                 </div>
               </div>
             </motion.button>
           )
         })}
-        {!loading && filteredUsers.length === 0 && (
-          <div className="bg-[var(--sb-surface-container)] rounded-3xl border border-[var(--sb-outline-variant)]/10 px-5 py-16 text-center">
+        {!loading && filteredGroups.length === 0 && (
+          <div className="col-span-full bg-[var(--sb-surface-container)] rounded-3xl border border-[var(--sb-outline-variant)]/10 px-5 py-16 text-center">
             <div className="h-14 w-14 rounded-2xl bg-[var(--sb-surface-container-high)] flex items-center justify-center mx-auto mb-4">
               <Users className="h-6 w-6 text-[var(--sb-on-surface-variant)]/60" />
             </div>
@@ -643,6 +682,71 @@ export default function DevUsuariosPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Institution Users Modal */}
+      <SbModal open={!!selectedInstitution} onClose={() => setSelectedInstitution(null)} maxWidth="sm:max-w-[560px]">
+        {selectedInstitution && (
+          <>
+            <SbModalHeader
+              title={`${selectedInstitution.code !== "—" ? `${selectedInstitution.code} · ` : ""}${selectedInstitution.name}`}
+              onClose={() => setSelectedInstitution(null)}
+            />
+            <SbModalBody className="max-h-[85vh] overflow-y-auto">
+              <div className="space-y-2 py-1">
+                {selectedInstitution.users.map(user => {
+                  const RoleIcon = roleIcons[user.role] || Users
+                  const gradient = roleGradients[user.role] || "from-gray-500 to-gray-600"
+                  return (
+                    <button
+                      key={user.id}
+                      onClick={() => setSelectedUser(user)}
+                      className="w-full group bg-[var(--sb-surface-container)] rounded-2xl p-3.5 border border-[var(--sb-outline-variant)]/10 hover:border-[var(--sb-outline-variant)]/20 hover:bg-[var(--sb-surface-container-high)] transition-all duration-200 text-left"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
+                          <span className="text-xs font-bold text-white">
+                            {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-medium text-[var(--sb-on-surface)] truncate">{user.full_name}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 font-mono truncate">{user.email}</span>
+                            {user.subject && (
+                              <>
+                                <span className="text-[var(--sb-on-surface-variant)]/30">·</span>
+                                <span className="text-[11px] text-[var(--sb-on-surface-variant)]/70 truncate">{user.subject}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-semibold ${roleColors[user.role] || "bg-[var(--sb-surface-container-high)]"}`}>
+                            <RoleIcon className="h-3 w-3" />
+                            <span>{roleLabels[user.role]}</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-semibold ${
+                            user.status === "active"
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "bg-[var(--sb-on-surface)]/5 text-[var(--sb-on-surface-variant)]/70"
+                          }`}>
+                            <div className={`h-1.5 w-1.5 rounded-full ${user.status === "active" ? "bg-emerald-500" : "bg-[var(--sb-on-surface-variant)]/50"}`} />
+                            {user.status === "active" ? "Activo" : "Inactivo"}
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-[var(--sb-on-surface-variant)]/50 group-hover:text-[var(--sb-on-surface-variant)]/60 transition-colors" />
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+                {selectedInstitution.users.length === 0 && (
+                  <p className="text-[13px] text-[var(--sb-on-surface-variant)]/70 py-10 text-center">Sin usuarios</p>
+                )}
+              </div>
+            </SbModalBody>
+          </>
+        )}
+      </SbModal>
 
       {/* Detail Dialog */}
       <SbModal open={!!selectedUser} onClose={() => setSelectedUser(null)} maxWidth="sm:max-w-[420px]">
