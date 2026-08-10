@@ -4,6 +4,8 @@ import crypto from 'crypto'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
 import { checkPlanLimit } from '@/lib/checkPlanLimit'
+import { ensureParentAccount } from '@/lib/parent-account'
+import { notifyUsers } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -73,6 +75,7 @@ export async function POST(request: NextRequest) {
     await conn.query('BEGIN')
 
     let studentId: string
+    let linkedParentId: string | null = null
 
     const existingStudent = await conn.query(
       'SELECT id FROM students WHERE document_number = $1 AND institution_id = $2',
@@ -118,23 +121,25 @@ export async function POST(request: NextRequest) {
         [parent_dni, instId]
       )
 
-      let parentId: string
+let parentId: string
 
-      if (existingParent.rows.length > 0) {
-        parentId = existingParent.rows[0].id
-      } else {
-        parentId = crypto.randomUUID()
-        const parentNameParts = (parent_name || '').trim().split(/\s+/)
-        const parentFirst = parentNameParts[0] || ''
-        const parentLast = parentNameParts.slice(1).join(' ') || ''
-        await conn.query(
-          `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
-           VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7)`,
-          [parentId, instId, parentFirst, parentLast, parent_dni, parent_phone || null, parent_email || null]
-        )
-      }
+    if (existingParent.rows.length > 0) {
+      parentId = existingParent.rows[0].id
+    } else {
+      parentId = crypto.randomUUID()
+      const parentNameParts = (parent_name || '').trim().split(/\s+/)
+      const parentFirst = parentNameParts[0] || ''
+      const parentLast = parentNameParts.slice(1).join(' ') || ''
+      await conn.query(
+        `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
+         VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7)`,
+        [parentId, instId, parentFirst, parentLast, parent_dni, parent_phone || null, parent_email || null]
+      )
+    }
 
-      const existingLink = await conn.query(
+    linkedParentId = parentId
+
+    const existingLink = await conn.query(
         'SELECT id FROM parent_student WHERE parent_id = $1 AND student_id = $2',
         [parentId, studentId]
       )
@@ -148,6 +153,29 @@ export async function POST(request: NextRequest) {
 
     await conn.query('COMMIT')
 
+    // Crea la cuenta del padre si aún no tiene acceso: el secretario recibe
+    // usuario/contraseña para entregárselos, y el "registro de matrícula"
+    // (ficha) queda disponible en el portal del padre con todos los detalles.
+    let parentCredentials: { email: string; password: string } | null = null
+    if (linkedParentId) {
+      try {
+        const parentName = (parent_name || '').trim() || (parent_dni || '')
+        const account = await ensureParentAccount(instId, linkedParentId, parentName, parent_dni, parent_email)
+        if (account.password) parentCredentials = { email: account.email, password: account.password }
+        if (account.userId) {
+          notifyUsers(
+            instId,
+            [account.userId],
+            'Matrícula registrada',
+            `Tu hijo(a) fue matriculado en ${grade} ${section || 'A'} (año ${year || new Date().getFullYear()}). Ingresa a tu portal para ver todos los detalles de la matrícula.`,
+            'matricula', 'matriculas', 'alta'
+          )
+        }
+      } catch (error) {
+        console.error('[enrollments] parent account:', error)
+      }
+    }
+
     const authUser = await getAuthPayload(request)
     logAudit({
       userId: (authUser?.userId as string) || '',
@@ -158,7 +186,12 @@ export async function POST(request: NextRequest) {
       details: { studentId, grade, section, year: year || new Date().getFullYear() },
     })
 
-    return NextResponse.json({ success: true, enrollmentId: studentId, studentId })
+    return NextResponse.json({
+      success: true,
+      enrollmentId: studentId,
+      studentId,
+      ...(parentCredentials ? { parent_credentials: parentCredentials } : {}),
+    })
   } catch (error: any) {
     if (conn) {
       try { await conn.query('ROLLBACK') } catch {}

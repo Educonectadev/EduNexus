@@ -85,6 +85,7 @@ const navByRole: Record<string, NavItem[]> = {
   padre: [
     { title: "Dashboard", href: "/padre/dashboard", icon: LayoutDashboard },
     { title: "Mi Hijo", href: "/padre/hijo", icon: GraduationCap },
+    { title: "Ficha Matrícula", href: "/padre/matricula", icon: FileText },
     { title: "Asistencia", href: "/padre/asistencia", icon: UserCheck },
     { title: "Tareas", href: "/padre/tareas", icon: ClipboardList },
     { title: "Pagos", href: "/padre/pagos", icon: CreditCard },
@@ -186,6 +187,7 @@ const navSectionsByRole: Record<string, { title: string; items: NavItem[] }[]> =
     ]},
     { title: "Mi hijo", items: [
       { title: "Mi Hijo", href: "/padre/hijo", icon: GraduationCap },
+      { title: "Ficha Matrícula", href: "/padre/matricula", icon: FileText },
       { title: "Asistencia", href: "/padre/asistencia", icon: UserCheck },
       { title: "Tareas", href: "/padre/tareas", icon: ClipboardList },
     ]},
