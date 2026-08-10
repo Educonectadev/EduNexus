@@ -12,13 +12,14 @@ import {
   LayoutDashboard, Building2, Users, CreditCard, Settings, Shield,
   FileText, HeadphonesIcon, Database, BarChart3, LogOut, GraduationCap,
   Sun, Moon, Megaphone, Handshake, Briefcase, BookOpen, ClipboardList,
-  MessageSquare, Calendar, UserCheck, BookMarked, Bell, Search, User,
-  ArrowRight, Clock, CheckCircle2, AlertCircle, BellRing, X, Layers, Plus,
+  MessageSquare, Calendar, UserCheck, BookMarked, Search, User,
+  ArrowRight, Clock, AlertCircle, X, Layers, Plus,
   Sparkles,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { MobileNavbar } from "@/components/ui/mobile-navbar"
+import NotificationBell from "@/components/layout/notification-bell"
 import AIAssistant from "@/components/secretario/ai-assistant"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
 import { usePlanPermissions } from "@/hooks/use-plan-permissions"
@@ -221,7 +222,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = React.useState(true)
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [notifOpen, setNotifOpen] = React.useState(false)
   const [aiOpen, setAiOpen] = React.useState(false)
   const [importPersonalOpen, setImportPersonalOpen] = React.useState(false)
   const searchRef = React.useRef<HTMLInputElement>(null)
@@ -258,13 +258,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const filteredNav = visibleNavItems.filter(item =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
-
-  const notifications = [
-    { id: 1, title: "Nueva matrícula registrada", desc: "Carlos García fue matriculado en 3° Secundaria", time: "Hace 5 min", read: false, icon: CheckCircle2, color: "text-emerald-400" },
-    { id: 2, title: "Reunión programada", desc: "Reunión de padres para el viernes 25 de julio", time: "Hace 1h", read: false, icon: BellRing, color: "text-sb-primary" },
-    { id: 3, title: "Documento pendiente", desc: "Falta firmar acta de calificaciones del bimestre", time: "Hace 3h", read: true, icon: AlertCircle, color: "text-amber-400" },
-    { id: 4, title: "Personal contratado", desc: "María López fue agregada como docente de Inglés", time: "Ayer", read: true, icon: CheckCircle2, color: "text-emerald-400" },
-  ]
 
   React.useEffect(() => {
     const getUser = async () => {
@@ -632,21 +625,19 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             )}
 
             <div className="flex md:hidden items-center gap-1 mr-1">
-              <button onClick={() => { setSearchOpen(true); setNotifOpen(false) }}
+              <button onClick={() => setSearchOpen(true)}
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
                 <Search className="h-[18px] w-[18px]" />
               </button>
-              <button onClick={() => { setNotifOpen(!notifOpen); setSearchOpen(false) }}
-                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all relative">
-                <Bell className="h-[18px] w-[18px]" />
-                {notifications.some(n => !n.read) && (
-                  <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-sb-primary" />
-                )}
-              </button>
+              <NotificationBell />
               <button onClick={handleLogout}
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
                 <LogOut className="h-[18px] w-[18px]" />
               </button>
+            </div>
+
+            <div className="hidden md:flex items-center">
+              <NotificationBell />
             </div>
 
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -766,51 +757,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         )}
       </AnimatePresence>
 
-      {/* ===== NOTIFICATIONS PANEL ===== */}
-      <AnimatePresence>
-        {notifOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 md:hidden bg-background/80 backdrop-blur-sm" onClick={() => setNotifOpen(false)} />
-            <motion.div
-              initial={{ opacity: 0, y: -8, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -8, filter: "blur(8px)" }}
-              transition={{ duration: 0.25, ease: [0.37, 0.35, 0, 1] }}
-              className="fixed top-16 right-3 left-3 z-50 md:hidden bg-sb-surface-container/90 backdrop-blur-3xl rounded-[32px] border border-sb-outline-variant/20 shadow-2xl max-h-[70vh] overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3">
-                <h3 className="text-sm font-medium text-sb-on-surface">Notificaciones</h3>
-                <button onClick={() => setNotifOpen(false)}
-                  className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 transition-all">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="overflow-auto max-h-[60vh]">
-                {notifications.map(n => (
-                  <div key={n.id} className={cn(
-                    "flex items-start gap-3 px-4 py-3 transition-colors hover:bg-sb-surface-container-highest/50",
-                    !n.read && "bg-sb-primary/5"
-                  )}>
-                    <div className={cn("h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5",
-                      !n.read ? "bg-sb-primary/10" : "bg-sb-surface-container-highest")}>
-                      <n.icon className={cn("h-4 w-4", n.color)} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={cn("text-sm", !n.read ? "text-sb-on-surface font-medium" : "text-sb-on-surface/80")}>{n.title}</p>
-                      <p className="text-xs text-sb-on-surface-variant mt-0.5 line-clamp-2">{n.desc}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Clock className="h-3 w-3 text-sb-on-surface-variant/60" />
-                        <span className="text-[10px] text-sb-on-surface-variant/60">{n.time}</span>
-                      </div>
-                    </div>
-                    {!n.read && <div className="h-2 w-2 rounded-full bg-sb-primary shrink-0 mt-2" />}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
       {/* ===== AI ASSISTANT ===== */}
       <AIAssistant open={aiOpen} onClose={() => setAiOpen(false)} />
 

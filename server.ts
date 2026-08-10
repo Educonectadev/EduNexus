@@ -2,6 +2,7 @@ import { Server } from 'socket.io'
 import { createServer } from 'http'
 import { parse } from 'cookie'
 import { jwtVerify } from 'jose'
+import { Client } from 'pg'
 import pool from './lib/db'
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3001')
@@ -42,6 +43,12 @@ io.on('connection', (socket) => {
 
   socket.join(`inst:${institutionId}`)
   socket.join(`user:${userId}`)
+
+  if (institutionId) {
+    socket.join(`notif:${institutionId}:all`)
+    const userRole = socket.data.userRole as string | undefined
+    if (userRole) socket.join(`notif:${institutionId}:${userRole}`)
+  }
 
   io.to(`inst:${institutionId}`).emit('user:online', { userId, fullName })
 
@@ -116,3 +123,59 @@ io.on('connection', (socket) => {
 httpServer.listen(PORT, () => {
   console.log(`Socket.IO server running on port ${PORT}`)
 })
+
+// ===== NOTIFICACIONES EN TIEMPO REAL =====
+// Se suscribe a Postgres LISTEN/NOTIFY ('edu_notifications') activado por el
+// trigger trg_notify_new_notification al insertar filas en la tabla notifications.
+// Al recibir el payload lo transmite a las rooms notif:{institution}:{targetRole}
+// (o notif:{institution}:all si target_role = 'all'), con un sonido/typing al cliente.
+
+function buildListenerConfig() {
+  const conn = process.env.DATABASE_URL || process.env.POSTGRES_URL
+  const ssl = process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
+    ? { rejectUnauthorized: false }
+    : false
+  if (conn) return { connectionString: conn, ssl }
+  return {
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432'),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl,
+  }
+}
+
+async function listenNotifications() {
+  const client = new Client(buildListenerConfig())
+  try {
+    await client.connect()
+    await client.query('LISTEN edu_notifications')
+    console.log('Notification listener: LISTEN edu_notifications active')
+
+    client.on('notification', (msg) => {
+      try {
+        const data = JSON.parse(msg.payload || '{}')
+        const { institution_id, target_role } = data
+        if (!institution_id) return
+        const room = target_role && target_role !== 'all'
+          ? `notif:${institution_id}:${target_role}`
+          : `notif:${institution_id}:all`
+        io.to(room).emit('notify:new', data)
+        console.log(`notify:new -> ${room} (${data.title || 'sin título'})`)
+      } catch (error) {
+        console.error('Error processing notification payload:', error)
+      }
+    })
+
+    client.on('error', (error) => {
+      console.error('Notification listener error:', error)
+      setTimeout(listenNotifications, 5000)
+    })
+  } catch (error) {
+    console.error('Notification listener failed, retrying in 5s:', error)
+    setTimeout(listenNotifications, 5000)
+  }
+}
+
+listenNotifications()
