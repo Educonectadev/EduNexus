@@ -22,11 +22,11 @@ export async function POST(request: NextRequest) {
     }
 
     const start = Date.now()
-    const [result, fields] = await pool.query(query)
+    const [result, meta] = await pool.query(query)
     const duration = Date.now() - start
 
     if (Array.isArray(result)) {
-      const columns = fields ? fields.map((f: any) => f.name) : []
+      const columns = (meta?.fields || []).map((f: any) => f.name)
       return NextResponse.json({ columns, rows: result, duration })
     }
 
