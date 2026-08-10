@@ -66,7 +66,7 @@ export default function FacturacionPage() {
       const plan = inst.plan_name || "Free"
       if (!map[plan]) map[plan] = { count: 0, revenue: 0 }
       map[plan].count++
-      map[plan].revenue += inst.plan_price || 0
+      map[plan].revenue += Number(inst.plan_price) || 0
     }
     return map
   }, [institutions])
@@ -80,7 +80,10 @@ export default function FacturacionPage() {
     return institutions.filter(i => (i.plan_name || "Free") === filterPlan)
   }, [institutions, filterPlan])
 
-  const formatCurrency = (n: number) => `S/ ${n.toLocaleString("es-PE")}`
+  const formatCurrency = (n: number | string | null | undefined) => {
+    const num = Number(n)
+    return `${isFinite(num) ? `S/ ${num.toLocaleString("es-PE")}` : "S/ 0"}`
+  }
 
   return (
     <motion.div variants={stagger} initial="hidden" animate="show" className="w-full space-y-6 py-2">
@@ -209,7 +212,7 @@ export default function FacturacionPage() {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-[13px] font-semibold text-sb-on-surface">
-                        {formatCurrency(inst.plan_price || 0)}
+                        {formatCurrency(inst.plan_price)}
                       </p>
                       <span className={`text-[10px] font-medium ${colors.text}`}>{plan}</span>
                     </div>
@@ -276,7 +279,7 @@ export default function FacturacionPage() {
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className={`text-[10px] font-medium ${colors.text}`}>{plan}</span>
                         <span className="text-[10px] text-sb-on-surface/40">·</span>
-                        <span className="text-[10px] text-sb-on-surface/60">{formatCurrency(inst.plan_price || 0)}/mes</span>
+                        <span className="text-[10px] text-sb-on-surface/60">{formatCurrency(inst.plan_price)}/mes</span>
                       </div>
                     </div>
                     <span className={`text-[10px] font-medium px-2 py-1 rounded-md shrink-0 ${
