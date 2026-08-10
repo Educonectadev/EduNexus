@@ -65,8 +65,19 @@ interface Institution {
   website: string
   director_name: string
   director_dni: string
+  director_phone?: string
+  director_email?: string
   total_students: number
   total_teachers: number
+  total_classrooms?: number
+  has_lab?: boolean
+  has_library?: boolean
+  has_computer_room?: boolean
+  has_playground?: boolean
+  reference?: string
+  phone2?: string
+  website?: string
+  notes?: string
   shift: string
   status: string
   plan_id?: string
@@ -247,9 +258,19 @@ export default function DevInstitucionesPage() {
   const [editOpen, setEditOpen] = React.useState(false)
   const [savingEdit, setSavingEdit] = React.useState(false)
   const [editForm, setEditForm] = React.useState({
-    name: "", code: "", type: "", level: "", modality: "", shift: "",
-    department: "", province: "", district: "", address: "",
-    phone: "", email: "", director_name: "", director_dni: "",
+    name: "", code: "", type: "", level: "", modality: "", shift: "", dependence: "",
+    department: "", province: "", district: "", address: "", reference: "",
+    phone: "", phone2: "", email: "", website: "",
+    director_name: "", director_dni: "", director_phone: "", director_email: "",
+    total_students: "", total_teachers: "", total_classrooms: "",
+    has_lab: false, has_library: false, has_computer_room: false, has_playground: false,
+    notes: "", plan_id: "",
+  })
+  const [editScheduleConfig, setEditScheduleConfig] = React.useState({
+    general_start: "07:00",
+    general_end: "13:00",
+    weekdays: [1, 2, 3, 4, 5],
+    turnos: [] as Turno[],
   })
 
   React.useEffect(() => { fetchInstitutions() }, [])
@@ -285,14 +306,36 @@ export default function DevInstitucionesPage() {
       level: inst.level || "",
       modality: inst.modality || "",
       shift: inst.shift || "",
+      dependence: (inst as any).dependence || "",
       department: inst.department || "",
       province: inst.province || "",
       district: inst.district || "",
       address: inst.address || "",
+      reference: inst.reference || "",
       phone: inst.phone || "",
+      phone2: inst.phone2 || "",
       email: inst.email || "",
+      website: inst.website || "",
       director_name: inst.director_name || "",
       director_dni: inst.director_dni || "",
+      director_phone: inst.director_phone || "",
+      director_email: inst.director_email || "",
+      total_students: String(inst.total_students || ""),
+      total_teachers: String(inst.total_teachers || ""),
+      total_classrooms: String(inst.total_classrooms || ""),
+      has_lab: !!inst.has_lab,
+      has_library: !!inst.has_library,
+      has_computer_room: !!inst.has_computer_room,
+      has_playground: !!inst.has_playground,
+      notes: inst.notes || "",
+      plan_id: inst.plan_id || "",
+    })
+    const sc = inst.schedule_config
+    setEditScheduleConfig({
+      general_start: sc?.general_start || "07:00",
+      general_end: sc?.general_end || "13:00",
+      weekdays: (sc?.weekdays || [1, 2, 3, 4, 5]),
+      turnos: sc?.turnos || [],
     })
     setEditOpen(true)
   }
@@ -305,7 +348,7 @@ export default function DevInstitucionesPage() {
       const res = await fetch(`/api/dev/institutions/${selectedInst.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({ ...editForm, schedule_config: editScheduleConfig }),
       })
       if (res.ok) {
         toast("Institución actualizada", "success")
@@ -1796,86 +1839,377 @@ export default function DevInstitucionesPage() {
       <SbModal open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm:max-w-[560px]">
         <SbModalHeader title={`Editar: ${editForm.name || "Institución"}`} onClose={() => setEditOpen(false)} />
         <SbModalBody className="max-h-[90vh] overflow-y-auto">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <SbLabel htmlFor="ed-name">Nombre</SbLabel>
-                <SbInput id="ed-name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+          <div className="space-y-6 py-1">
+            {/* Datos Generales */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                <Building2 className="h-3.5 w-3.5" />
+                Datos Generales
               </div>
-              <div>
-                <SbLabel htmlFor="ed-code">Código</SbLabel>
-                <SbInput id="ed-code" value={editForm.code} onChange={e => setEditForm({ ...editForm, code: e.target.value })} />
-              </div>
-              <div>
-                <SbLabel htmlFor="ed-type">Tipo</SbLabel>
-                <select id="ed-type" className="sb-select w-full rounded-xl text-sm" value={editForm.type}
-                  onChange={e => setEditForm({ ...editForm, type: e.target.value })}>
-                  <option value="">Seleccionar</option>
-                  {institutionTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <SbLabel htmlFor="ed-level">Nivel</SbLabel>
-                <select id="ed-level" className="sb-select w-full rounded-xl text-sm" value={editForm.level}
-                  onChange={e => setEditForm({ ...editForm, level: e.target.value })}>
-                  <option value="">Seleccionar</option>
-                  {institutionLevels.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <SbLabel htmlFor="ed-modality">Modalidad</SbLabel>
-                <select id="ed-modality" className="sb-select w-full rounded-xl text-sm" value={editForm.modality}
-                  onChange={e => setEditForm({ ...editForm, modality: e.target.value })}>
-                  <option value="">Seleccionar</option>
-                  {modalities.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <SbLabel htmlFor="ed-shift">Turno</SbLabel>
-                <SbInput id="ed-shift" value={editForm.shift} onChange={e => setEditForm({ ...editForm, shift: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <SbLabel htmlFor="ed-name">Nombre *</SbLabel>
+                  <SbInput id="ed-name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-code">Código</SbLabel>
+                  <SbInput id="ed-code" value={editForm.code} onChange={e => setEditForm({ ...editForm, code: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-type">Tipo de Institución</SbLabel>
+                  <select id="ed-type" className="sb-select w-full rounded-xl text-sm" value={editForm.type}
+                    onChange={e => setEditForm({ ...editForm, type: e.target.value })}>
+                    <option value="">Seleccionar tipo...</option>
+                    {institutionTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-level">Nivel Educativo</SbLabel>
+                  <select id="ed-level" className="sb-select w-full rounded-xl text-sm" value={editForm.level}
+                    onChange={e => setEditForm({ ...editForm, level: e.target.value })}>
+                    <option value="">Seleccionar nivel...</option>
+                    {institutionLevels.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-modality">Modalidad</SbLabel>
+                  <select id="ed-modality" className="sb-select w-full rounded-xl text-sm" value={editForm.modality}
+                    onChange={e => setEditForm({ ...editForm, modality: e.target.value })}>
+                    <option value="">Seleccionar modalidad...</option>
+                    {modalities.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-shift">Turno General</SbLabel>
+                  <select id="ed-shift" className="sb-select w-full rounded-xl text-sm" value={editForm.shift}
+                    onChange={e => setEditForm({ ...editForm, shift: e.target.value })}>
+                    <option value="">Seleccionar turno...</option>
+                    {shifts.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-dependence">Dependencia</SbLabel>
+                  <select id="ed-dependence" className="sb-select w-full rounded-xl text-sm" value={editForm.dependence}
+                    onChange={e => setEditForm({ ...editForm, dependence: e.target.value })}>
+                    <option value="">Seleccionar dependencia...</option>
+                    {dependenceTypes.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div>
-              <SbLabel htmlFor="ed-address">Dirección</SbLabel>
-              <SbInput id="ed-address" value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
+            {/* Ubicación */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                <MapPin className="h-3.5 w-3.5" />
+                Ubicación
+              </div>
+              <div className="space-y-2">
                 <SbLabel htmlFor="ed-department">Departamento</SbLabel>
-                <SbInput id="ed-department" value={editForm.department} onChange={e => setEditForm({ ...editForm, department: e.target.value })} />
+                <select id="ed-department" className="sb-select w-full rounded-xl text-sm" value={editForm.department}
+                  onChange={e => setEditForm({ ...editForm, department: e.target.value })}>
+                  <option value="">Seleccionar departamento...</option>
+                  {departmentsList.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
               </div>
-              <div>
+              <div className="space-y-2">
                 <SbLabel htmlFor="ed-province">Provincia</SbLabel>
-                <SbInput id="ed-province" value={editForm.province} onChange={e => setEditForm({ ...editForm, province: e.target.value })} />
+                <select id="ed-province" className="sb-select w-full rounded-xl text-sm" value={editForm.province}
+                  onChange={e => setEditForm({ ...editForm, province: e.target.value, district: "" })}>
+                  <option value="">Seleccionar provincia...</option>
+                  {departments.find(d => d.name === editForm.department)?.provinces.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+                </select>
               </div>
-              <div>
+              <div className="space-y-2">
                 <SbLabel htmlFor="ed-district">Distrito</SbLabel>
-                <SbInput id="ed-district" value={editForm.district} onChange={e => setEditForm({ ...editForm, district: e.target.value })} />
+                <select id="ed-district" className="sb-select w-full rounded-xl text-sm" value={editForm.district}
+                  onChange={e => setEditForm({ ...editForm, district: e.target.value })}>
+                  <option value="">Seleccionar distrito...</option>
+                  {departments.find(d => d.name === editForm.department)?.provinces.find(p => p.name === editForm.province)?.districts.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-address">Dirección Completa</SbLabel>
+                <SbInput id="ed-address" value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} />
+              </div>
+              <div>
+                <SbLabel htmlFor="ed-reference">Referencia</SbLabel>
+                <SbInput id="ed-reference" value={editForm.reference} onChange={e => setEditForm({ ...editForm, reference: e.target.value })} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <SbLabel htmlFor="ed-phone">Teléfono</SbLabel>
-                <SbInput id="ed-phone" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} />
+            {/* Contacto y Director */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                <Phone className="h-3.5 w-3.5" />
+                Contacto y Director(a)
               </div>
-              <div>
-                <SbLabel htmlFor="ed-email">Email</SbLabel>
-                <SbInput id="ed-email" type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <SbLabel htmlFor="ed-phone">Teléfono Principal</SbLabel>
+                  <SbInput id="ed-phone" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-phone2">Teléfono Secundario</SbLabel>
+                  <SbInput id="ed-phone2" value={editForm.phone2} onChange={e => setEditForm({ ...editForm, phone2: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-email">Email Institucional</SbLabel>
+                  <SbInput id="ed-email" type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-website">Sitio Web</SbLabel>
+                  <SbInput id="ed-website" value={editForm.website} onChange={e => setEditForm({ ...editForm, website: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div>
+                  <SbLabel htmlFor="ed-director">Nombre Completo</SbLabel>
+                  <SbInput id="ed-director" value={editForm.director_name} onChange={e => setEditForm({ ...editForm, director_name: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-dni">DNI</SbLabel>
+                  <SbInput id="ed-dni" maxLength={8} value={editForm.director_dni} onChange={e => setEditForm({ ...editForm, director_dni: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-dphone">Teléfono</SbLabel>
+                  <SbInput id="ed-dphone" value={editForm.director_phone} onChange={e => setEditForm({ ...editForm, director_phone: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-demail">Email</SbLabel>
+                  <SbInput id="ed-demail" type="email" value={editForm.director_email} onChange={e => setEditForm({ ...editForm, director_email: e.target.value })} />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <SbLabel htmlFor="ed-director">Director</SbLabel>
-                <SbInput id="ed-director" value={editForm.director_name} onChange={e => setEditForm({ ...editForm, director_name: e.target.value })} />
+            {/* Infraestructura y Capacidad */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                <FileText className="h-3.5 w-3.5" />
+                Infraestructura y Capacidad
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <SbLabel htmlFor="ed-students">Total Alumnos</SbLabel>
+                  <SbInput id="ed-students" type="number" value={editForm.total_students} onChange={e => setEditForm({ ...editForm, total_students: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-teachers">Total Docentes</SbLabel>
+                  <SbInput id="ed-teachers" type="number" value={editForm.total_teachers} onChange={e => setEditForm({ ...editForm, total_teachers: e.target.value })} />
+                </div>
+                <div>
+                  <SbLabel htmlFor="ed-classrooms">Aulas</SbLabel>
+                  <SbInput id="ed-classrooms" type="number" value={editForm.total_classrooms} onChange={e => setEditForm({ ...editForm, total_classrooms: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { key: "has_lab", label: "Laboratorio", icon: Dumbbell },
+                  { key: "has_library", label: "Biblioteca", icon: Library },
+                  { key: "has_computer_room", label: "Sala de Cómputo", icon: Monitor },
+                  { key: "has_playground", label: "Patio Deportivo", icon: Dumbbell },
+                ].map((item) => (
+                  <label
+                    key={item.key}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                      (editForm as any)[item.key]
+                        ? "border-[var(--sb-primary)] bg-[var(--sb-primary)]/5"
+                        : "border-[var(--sb-outline)] hover:border-[var(--sb-outline)]/80"
+                    }`}
+                  >
+                    <div
+                      className={`h-5 w-5 rounded-md border flex items-center justify-center transition-all ${
+                        (editForm as any)[item.key]
+                          ? "bg-[var(--sb-primary)] border-[var(--sb-primary)]"
+                          : "border-[var(--sb-outline)]"
+                      }`}
+                    >
+                      {(editForm as any)[item.key] && <Check className="h-3 w-3 text-[var(--sb-on-surface)]" />}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-3.5 w-3.5 text-sb-on-surface-variant/70" />
+                      <span className="text-sm">{item.label}</span>
+                    </div>
+                  </label>
+                ))}
               </div>
               <div>
-                <SbLabel htmlFor="ed-dni">DNI Director</SbLabel>
-                <SbInput id="ed-dni" value={editForm.director_dni} onChange={e => setEditForm({ ...editForm, director_dni: e.target.value })} />
+                <SbLabel htmlFor="ed-notes">Observaciones</SbLabel>
+                <SbTextarea id="ed-notes" value={editForm.notes} onChange={e => setEditForm({ ...editForm, notes: e.target.value })} className="rounded-xl min-h-[60px]" />
               </div>
+            </div>
+
+            {/* Configuración de Horarios */}
+            <div className="p-4 rounded-xl border border-[var(--sb-outline)]/30 bg-[var(--sb-surface-container)]/50 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--sb-primary)]">
+                <Clock className="h-3.5 w-3.5" />
+                Configuración de Horarios
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <SbLabel className="text-[11px]">Hora Inicio Jornada</SbLabel>
+                  <input
+                    type="time"
+                    value={editScheduleConfig.general_start}
+                    onChange={(e) => setEditScheduleConfig({ ...editScheduleConfig, general_start: e.target.value })}
+                    className="sb-select w-full rounded-lg text-[13px]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <SbLabel className="text-[11px]">Hora Fin Jornada</SbLabel>
+                  <input
+                    type="time"
+                    value={editScheduleConfig.general_end}
+                    onChange={(e) => setEditScheduleConfig({ ...editScheduleConfig, general_end: e.target.value })}
+                    className="sb-select w-full rounded-lg text-[13px]"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <SbLabel className="text-[11px]">Días de Clase</SbLabel>
+                <div className="flex gap-1.5">
+                  {["L", "M", "X", "J", "V", "S", "D"].map((d, i) => {
+                    const dayNum = i + 1
+                    const active = editScheduleConfig.weekdays.includes(dayNum)
+                    return (
+                      <button
+                        key={dayNum}
+                        type="button"
+                        onClick={() => {
+                          const weekdays = active
+                            ? editScheduleConfig.weekdays.filter(dd => dd !== dayNum)
+                            : [...editScheduleConfig.weekdays, dayNum].sort()
+                          setEditScheduleConfig({ ...editScheduleConfig, weekdays })
+                        }}
+                        className={`h-8 w-8 rounded-lg text-[11px] font-medium transition-all ${
+                          active
+                            ? "bg-[var(--sb-primary)] text-[var(--sb-on-primary)]"
+                            : "bg-[var(--sb-surface-container-high)] text-sb-on-surface-variant/70 hover:bg-[var(--sb-surface-container-highest)]"
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <SbLabel className="text-[11px]">Turnos (opcional)</SbLabel>
+                  <button
+                    type="button"
+                    onClick={() => setEditScheduleConfig({
+                      ...editScheduleConfig,
+                      turnos: [...editScheduleConfig.turnos, { name: "", start: "07:00", end: "13:00", grades: [] }],
+                    })}
+                    className="flex items-center gap-1 text-[11px] text-[var(--sb-primary)] hover:underline"
+                  >
+                    <Plus className="h-3 w-3" /> Agregar turno
+                  </button>
+                </div>
+                {editScheduleConfig.turnos.length === 0 && (
+                  <p className="text-[11px] text-sb-on-surface-variant/60 py-2">
+                    Sin turnos definidos. La jornada completa usará el horario general.
+                  </p>
+                )}
+                {editScheduleConfig.turnos.map((turno, idx) => (
+                  <div key={idx} className="p-3 rounded-lg border border-[var(--sb-outline)]/20 bg-[var(--sb-surface)] space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Nombre turno (ej: Mañana)"
+                        value={turno.name}
+                        onChange={(e) => {
+                          const turnos = [...editScheduleConfig.turnos]
+                          turnos[idx] = { ...turnos[idx], name: e.target.value }
+                          setEditScheduleConfig({ ...editScheduleConfig, turnos })
+                        }}
+                        className="flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-sb-on-surface-variant/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const turnos = editScheduleConfig.turnos.filter((_, i) => i !== idx)
+                          setEditScheduleConfig({ ...editScheduleConfig, turnos })
+                        }}
+                        className="p-1 rounded-md hover:bg-red-500/10 text-red-500/60 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-sb-on-surface-variant/60">Inicio</span>
+                        <input
+                          type="time"
+                          value={turno.start}
+                          onChange={(e) => {
+                            const turnos = [...editScheduleConfig.turnos]
+                            turnos[idx] = { ...turnos[idx], start: e.target.value }
+                            setEditScheduleConfig({ ...editScheduleConfig, turnos })
+                          }}
+                          className="sb-select w-full rounded-lg text-[12px] py-1"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-sb-on-surface-variant/60">Fin</span>
+                        <input
+                          type="time"
+                          value={turno.end}
+                          onChange={(e) => {
+                            const turnos = [...editScheduleConfig.turnos]
+                            turnos[idx] = { ...turnos[idx], end: e.target.value }
+                            setEditScheduleConfig({ ...editScheduleConfig, turnos })
+                          }}
+                          className="sb-select w-full rounded-lg text-[12px] py-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-sb-on-surface-variant/60">Grados</span>
+                      <div className="flex flex-wrap gap-1">
+                        {["1ro", "2do", "3ro", "4to", "5to", "6to"].map(g => {
+                          const active = turno.grades.includes(g)
+                          return (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => {
+                                const turnos = [...editScheduleConfig.turnos]
+                                const grades = active
+                                  ? turnos[idx].grades.filter(gr => gr !== g)
+                                  : [...turnos[idx].grades, g]
+                                turnos[idx] = { ...turnos[idx], grades }
+                                setEditScheduleConfig({ ...editScheduleConfig, turnos })
+                              }}
+                              className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
+                                active
+                                  ? "bg-[var(--sb-primary)]/15 text-[var(--sb-primary)]"
+                                  : "bg-[var(--sb-surface-container-high)] text-sb-on-surface-variant/60"
+                              }`}
+                            >
+                              {g}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Plan de suscripción */}
+            <div className="space-y-2">
+              <SbLabel>Plan de suscripción</SbLabel>
+              <select value={editForm.plan_id} onChange={e => setEditForm({ ...editForm, plan_id: e.target.value })} className="sb-select w-full rounded-xl">
+                <option value="">Sin plan asignado</option>
+                {plans.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} — {Number(p.price) > 0 ? `S/ ${Number(p.price).toFixed(2)}/mes` : 'Gratis'}{p.trial_days ? ` (${p.trial_days} días)` : ''}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </SbModalBody>

@@ -45,9 +45,22 @@ export async function PATCH(
     if (body.district !== undefined) { updates.push('district = ?'); values.push(body.district) }
     if (body.address !== undefined) { updates.push('address = ?'); values.push(body.address) }
     if (body.phone !== undefined) { updates.push('phone = ?'); values.push(body.phone) }
+    if (body.phone2 !== undefined) { updates.push('phone2 = ?'); values.push(body.phone2) }
     if (body.email !== undefined) { updates.push('email = ?'); values.push(body.email) }
+    if (body.website !== undefined) { updates.push('website = ?'); values.push(body.website) }
+    if (body.reference !== undefined) { updates.push('reference = ?'); values.push(body.reference) }
     if (body.director_name !== undefined) { updates.push('director_name = ?'); values.push(body.director_name) }
     if (body.director_dni !== undefined) { updates.push('director_dni = ?'); values.push(body.director_dni) }
+    if (body.director_phone !== undefined) { updates.push('director_phone = ?'); values.push(body.director_phone) }
+    if (body.director_email !== undefined) { updates.push('director_email = ?'); values.push(body.director_email) }
+    if (body.total_students !== undefined) { updates.push('total_students = ?'); values.push(Number(body.total_students) || 0) }
+    if (body.total_teachers !== undefined) { updates.push('total_teachers = ?'); values.push(Number(body.total_teachers) || 0) }
+    if (body.total_classrooms !== undefined) { updates.push('total_classrooms = ?'); values.push(Number(body.total_classrooms) || 0) }
+    for (const f of ['has_lab', 'has_library', 'has_computer_room', 'has_playground'] as const) {
+      if (body[f] !== undefined) { updates.push(`${f} = ?`); values.push(body[f] ? true : false) }
+    }
+    if (body.notes !== undefined) { updates.push('notes = ?'); values.push(body.notes) }
+    if (body.schedule_config !== undefined) { updates.push('schedule_config = ?'); values.push(JSON.stringify(body.schedule_config)) }
 
     if (updates.length === 0) {
       return NextResponse.json({ error: 'Sin campos para actualizar' }, { status: 400 })
