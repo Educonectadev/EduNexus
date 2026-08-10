@@ -4,9 +4,11 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Bell, BellRing, X, CheckIcon, Clock, Inbox, Megaphone, Handshake, Users,
+  Download, Smartphone, Info, Power, Zap, Loader2, CheckCircle,
 } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 import { useNotifications, type LiveNotification } from "@/hooks/use-notifications"
+import { usePushSettings } from "@/hooks/use-push"
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime()
@@ -32,10 +34,36 @@ function notifMeta(type: string): { icon: React.ComponentType<{ className?: stri
 
 export default function NotificationBell() {
   const { notifications, loading, unread, live, closeLive, markOneRead, markAllRead } = useNotifications()
+  const push = usePushSettings()
   const [open, setOpen] = React.useState(false)
+  const [pushBusy, setPushBusy] = React.useState(false)
   const unreadCount = Math.min(unread, 99)
 
   const toggle = () => setOpen(o => !o)
+
+  let pushStatus = "Recibe avisos aunque la app esté cerrada"
+  let pushLabel = "Activar"
+  let pushDisabled = false
+  if (push.permission === "granted" && push.subscribed) {
+    pushStatus = "Activadas en este dispositivo"
+    pushLabel = "Desactivar"
+  } else if (push.permission === "granted") {
+    pushStatus = "Listas, falta suscribirse"
+    pushLabel = "Activar"
+  } else if (push.permission === "denied") {
+    pushStatus = "Bloqueadas por el navegador"
+    pushLabel = "Bloqueada"
+    pushDisabled = true
+  }
+
+  const handlePushToggle = async () => {
+    setPushBusy(true)
+    try {
+      await push.toggle()
+    } finally {
+      setPushBusy(false)
+    }
+  }
 
   return (
     <>
@@ -163,6 +191,74 @@ export default function NotificationBell() {
                   })
                 )}
               </div>
+
+              {/* ===== CONFIG: push + instalación ===== */}
+              {(push.supported || push.canInstall || push.isIOS) && (
+                <div className="border-t border-sb-outline-variant/10 px-4 py-3 space-y-2">
+                  {push.supported && (
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-7 w-7 rounded-lg bg-sb-primary/10 flex items-center justify-center shrink-0">
+                          <BellRing className="h-3.5 w-3.5 text-sb-primary" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[12px] font-medium text-sb-on-surface">Notificaciones del dispositivo</p>
+                          <p className="text-[10px] text-sb-on-surface-variant truncate">{pushStatus}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handlePushToggle}
+                        disabled={pushDisabled || pushBusy}
+                        className={cn(
+                          "flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-[11px] font-medium shrink-0 transition-colors",
+                          push.permission === "granted" && push.subscribed
+                            ? "text-sb-on-surface-variant hover:bg-sb-surface-container-highest/60"
+                            : "bg-sb-primary text-sb-on-primary hover:opacity-90",
+                          pushDisabled && "opacity-50 cursor-not-allowed",
+                          pushBusy && "opacity-60"
+                        )}
+                      >
+                        {pushBusy
+                          ? <Loader2 className="h-3 w-3 animate-spin" />
+                          : push.permission === "granted" && push.subscribed
+                            ? <Power className="h-3 w-3" />
+                            : <Zap className="h-3 w-3" />}
+                        {pushLabel}
+                      </button>
+                    </div>
+                  )}
+
+                  {push.standalone ? (
+                    <div className="flex items-center gap-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      App instalada en este dispositivo
+                    </div>
+                  ) : push.canInstall ? (
+                    <button
+                      onClick={() => push.promptInstall()}
+                      className="flex items-center justify-between gap-3 w-full text-left rounded-xl bg-sb-surface-container-highest/50 hover:bg-sb-surface-container-highest/80 border border-sb-outline-variant/10 px-3 py-2 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-6 w-6 rounded-lg bg-sb-primary/10 flex items-center justify-center shrink-0">
+                          <Download className="h-3.5 w-3.5 text-sb-primary" />
+                        </div>
+                        <p className="text-[12px] font-medium text-sb-on-surface truncate">Instalar la app en el dispositivo</p>
+                      </div>
+                      <span className="text-[10px] font-semibold text-sb-primary shrink-0">Instalar</span>
+                    </button>
+                  ) : push.isIOS ? (
+                    <div className="flex items-start gap-2.5 px-1">
+                      <div className="h-6 w-6 rounded-lg bg-sb-surface-container-highest flex items-center justify-center shrink-0">
+                        <Smartphone className="h-3.5 w-3.5 text-sb-on-surface-variant" />
+                      </div>
+                      <p className="text-[10.5px] leading-snug text-sb-on-surface-variant">
+                        <span className="font-medium text-sb-on-surface">iPhone/iPad:</span> para recibir alertas en pantalla de bloqueo, agrega EduNexus a tu pantalla de inicio (Compartir
+                        <Info className="inline h-3 w-3 mx-0.5 -mt-0.5" /> → Añadir a pantalla de inicio), luego abre la app desde ahí.
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </motion.div>
           </>
         )}

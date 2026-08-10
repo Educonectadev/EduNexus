@@ -37,6 +37,13 @@ export async function POST(request: NextRequest) {
       [id, full_name, email, phone || null, institution_name || null, institution_type || 'private', level || 'all', estimated_students || 0, message || null]
     )
 
+    // Avisa al dev en tiempo real (sala global notif:dev)
+    await pool.query(
+      `INSERT INTO notifications (id, user_id, institution_id, title, message, type, target_role, status)
+       VALUES (?, NULL, NULL, 'Nueva solicitud de demo', ?, 'demo_request', 'dev', 'active')`,
+      [crypto.randomUUID(), `${full_name}${institution_name ? ' · ' + institution_name : ''} solicitó una demo`]
+    ).catch(() => {})
+
     return NextResponse.json({ 
       success: true, 
       message: 'Solicitud enviada correctamente. Nos contactaremos contigo pronto.',

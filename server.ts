@@ -4,9 +4,96 @@ import { parse } from 'cookie'
 import { jwtVerify } from 'jose'
 import { Client } from 'pg'
 import pool from './lib/db'
+import webpush from 'web-push'
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3001')
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
+const BASE_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+
+// ===== WEB PUSH (VAPID) =====
+const pushReady = !!(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
+if (pushReady) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:soporte@educonecta.pe',
+    process.env.VAPID_PUBLIC_KEY as string,
+    process.env.VAPID_PRIVATE_KEY as string
+  )
+  console.log('Web push habilitado (VAPID configurado)')
+} else {
+  console.warn('Web push deshabilitado: faltan VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY')
+}
+
+function pushTargetPath(role?: string, type?: string): string {
+  if (type === 'demo_request' || type === 'trial_request') return '/dev/demo'
+  if (role === 'dev' || role === 'super_admin') return '/dev'
+  if (role === 'padre') return '/padre'
+  return '/panel'
+}
+
+// Envía notificaciones push a las suscripciones que correspondan según el destino
+// de la notificación (user_id, target_role 'dev', o institución + rol).
+async function dispatchWebPush(data: any) {
+  if (!pushReady) return
+  try {
+    const { user_id, target_role, institution_id } = data
+    let rows: any[] = []
+
+    if (user_id) {
+      ;[rows] = await pool.query(
+        `SELECT s.endpoint, s.p256dh, s.auth, u.role AS "role"
+         FROM push_subscriptions s
+         JOIN users u ON u.id = s.user_id
+         WHERE s.user_id = ? AND u.status = 'active'`,
+        [user_id]
+      )
+    } else if (target_role === 'dev') {
+      ;[rows] = await pool.query(
+        `SELECT s.endpoint, s.p256dh, s.auth, u.role AS "role"
+         FROM push_subscriptions s
+         JOIN users u ON u.id = s.user_id
+         WHERE u.role = 'dev' AND u.status = 'active'`
+      )
+    } else if (institution_id) {
+      const roleClause = target_role && target_role !== 'all' ? ' AND u.role = ?' : ''
+      const params = target_role && target_role !== 'all'
+        ? [institution_id, target_role]
+        : [institution_id]
+      ;[rows] = await pool.query(
+        `SELECT s.endpoint, s.p256dh, s.auth, u.role AS "role"
+         FROM push_subscriptions s
+         JOIN users u ON u.id = s.user_id
+         WHERE u.institution_id = ? AND u.status = 'active'${roleClause}`,
+        params
+      )
+    }
+
+    if (!rows.length) return
+
+    const payload = JSON.stringify({
+      title: data.title || 'Nueva notificación',
+      message: data.message || '',
+      url: BASE_URL + pushTargetPath(data.target_role || rows[0]?.role, data.type),
+      type: data.type || 'info',
+    })
+
+    await Promise.allSettled(rows.map((r) =>
+      webpush
+        .sendNotification({ endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth } }, payload)
+        .catch((err: any) => {
+          // Suscripción obsoleta: limpiar
+          if (err && (err.statusCode === 404 || err.statusCode === 410)) {
+            pool.query('DELETE FROM push_subscriptions WHERE endpoint = ?', [r.endpoint]).catch(() => {})
+          } else if (err && err.statusCode) {
+            console.error('Push error', err.statusCode, r.endpoint)
+          }
+        })
+    ))
+
+    console.log(`push -> ${rows.length} suscripción(es) (${data.title || 'sin título'})`)
+  } catch (error) {
+    console.error('Error dispatching web push:', error)
+  }
+}
 
 const httpServer = createServer()
 const io = new Server(httpServer, {
@@ -44,10 +131,16 @@ io.on('connection', (socket) => {
   socket.join(`inst:${institutionId}`)
   socket.join(`user:${userId}`)
 
+  const userRole = socket.data.userRole as string | undefined
+
   if (institutionId) {
     socket.join(`notif:${institutionId}:all`)
-    const userRole = socket.data.userRole as string | undefined
     if (userRole) socket.join(`notif:${institutionId}:${userRole}`)
+  }
+
+  // Usuarios sin institución (dev) reciben avisos globales de solicitudes
+  if (userRole === 'dev') {
+    socket.join('notif:dev')
   }
 
   io.to(`inst:${institutionId}`).emit('user:online', { userId, fullName })
@@ -176,6 +269,15 @@ async function listenNotifications() {
         if (user_id) {
           io.to(`user:${user_id}`).emit('notify:new', data)
           console.log(`notify:new -> user:${user_id} (${data.title || 'sin título'})`)
+          dispatchWebPush(data)
+          return
+        }
+
+        // Solicitudes para el rol dev (sin institución): sala global notif:dev
+        if (target_role && target_role === 'dev') {
+          io.to('notif:dev').emit('notify:new', data)
+          console.log(`notify:new -> notif:dev (${data.title || 'sin título'})`)
+          dispatchWebPush(data)
           return
         }
 
@@ -185,6 +287,7 @@ async function listenNotifications() {
           : `notif:${institution_id}:all`
         io.to(room).emit('notify:new', data)
         console.log(`notify:new -> ${room} (${data.title || 'sin título'})`)
+        dispatchWebPush(data)
       } catch (error) {
         console.error('Error processing notification payload:', error)
       }

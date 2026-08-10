@@ -8,7 +8,10 @@ export async function PUT(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const instId = await resolveInstId(request)
-    if (!instId) return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
+    const globalRole = instId ? null : (user.role === 'dev' || user.role === 'super_admin' ? user.role : null)
+    if (!instId && !globalRole) {
+      return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
+    }
 
     const body = await request.json()
 
@@ -23,15 +26,26 @@ export async function PUT(request: NextRequest) {
     }
 
     if (body.all) {
-      await pool.query(
-        `INSERT INTO notification_reads (notification_id, user_id)
-         SELECT n.id, ?
-         FROM notifications n
-         WHERE n.institution_id = ? AND n.status = 'active'
-           AND (n.target_role = 'all' OR n.target_role = ?)
-         ON CONFLICT (notification_id, user_id) DO NOTHING`,
-        [user.id, instId, user.role || 'all']
-      )
+      if (globalRole) {
+        await pool.query(
+          `INSERT INTO notification_reads (notification_id, user_id)
+           SELECT n.id, ?
+           FROM notifications n
+           WHERE n.status = 'active' AND (n.target_role = ? OR n.user_id = ?)
+           ON CONFLICT (notification_id, user_id) DO NOTHING`,
+          [user.id, globalRole, user.id]
+        )
+      } else {
+        await pool.query(
+          `INSERT INTO notification_reads (notification_id, user_id)
+           SELECT n.id, ?
+           FROM notifications n
+           WHERE n.institution_id = ? AND n.status = 'active'
+             AND (n.target_role = 'all' OR n.target_role = ?)
+           ON CONFLICT (notification_id, user_id) DO NOTHING`,
+          [user.id, instId, user.role || 'all']
+        )
+      }
       return NextResponse.json({ success: true })
     }
 

@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
 
     // Notificación para el dev (revisar pago y activar plan)
     await pool.query(
-      `INSERT INTO notifications (id, user_id, institution_id, type, title, message, is_read)
-       VALUES (?, ?, ?, 'trial_request', ?, ?, FALSE)`,
+      `INSERT INTO notifications (id, user_id, institution_id, title, message, type, target_role, status)
+       VALUES (?, ?, ?, ?, ?, 'trial_request', 'dev', 'active')`,
       [crypto.randomUUID(), null, payload.institutionId || null, 'Nueva solicitud de contratación', (role + ' solicitó activar el plan de ' + institutionName).trim()]
     ).catch(() => {})
 

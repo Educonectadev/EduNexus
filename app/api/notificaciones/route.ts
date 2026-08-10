@@ -8,23 +8,44 @@ export async function GET(request: NextRequest) {
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const instId = await resolveInstId(request)
-    if (!instId) return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
 
-    const [rows] = await pool.query(
-      `SELECT n.id, n.title, n.message, n.type, n.target_role,
-              COALESCE(n.priority, 'media') AS priority,
-              COALESCE(n.category, 'general') AS category,
-              COALESCE(n.pinned, 0) AS pinned,
-              n.institution_id, n.status, n.created_at,
-              CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read
-       FROM notifications n
-       LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
-       WHERE n.institution_id = ? AND n.status = 'active'
-         AND (n.target_role = 'all' OR n.target_role = ? OR n.user_id = ?)
-       ORDER BY n.pinned DESC, n.created_at DESC
-       LIMIT 60`,
-      [user.id, instId, user.role || 'all', user.id]
-    )
+    // Roles sin institución (dev/super_admin): reciben avisos dirigidos a su rol
+    const globalRole = instId ? null : (user.role === 'dev' || user.role === 'super_admin' ? user.role : null)
+    if (!instId && !globalRole) {
+      return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
+    }
+
+    const [rows] = globalRole
+      ? (await pool.query(
+          `SELECT n.id, n.title, n.message, n.type, n.target_role,
+                  COALESCE(n.priority, 'media') AS priority,
+                  COALESCE(n.category, 'general') AS category,
+                  COALESCE(n.pinned, 0) AS pinned,
+                  n.institution_id, n.status, n.created_at,
+                  CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read
+           FROM notifications n
+           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
+           WHERE n.status = 'active'
+             AND (n.target_role = ? OR n.user_id = ?)
+           ORDER BY n.pinned DESC, n.created_at DESC
+           LIMIT 60`,
+          [user.id, globalRole, user.id]
+        )) as any[]
+      : (await pool.query(
+          `SELECT n.id, n.title, n.message, n.type, n.target_role,
+                  COALESCE(n.priority, 'media') AS priority,
+                  COALESCE(n.category, 'general') AS category,
+                  COALESCE(n.pinned, 0) AS pinned,
+                  n.institution_id, n.status, n.created_at,
+                  CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read
+           FROM notifications n
+           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
+           WHERE n.institution_id = ? AND n.status = 'active'
+             AND (n.target_role = 'all' OR n.target_role = ? OR n.user_id = ?)
+           ORDER BY n.pinned DESC, n.created_at DESC
+           LIMIT 60`,
+          [user.id, instId, user.role || 'all', user.id]
+        )) as any[]
 
     const notifications = (rows as any[]).map(n => ({
       id: n.id,
