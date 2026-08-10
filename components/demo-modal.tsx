@@ -158,8 +158,8 @@ export function DemoModal({ open, onOpenChange }: DemoModalProps) {
                   className="w-full px-4 py-2.5 bg-foreground/[0.02] border border-foreground/10 focus:border-foreground/30 focus:outline-none transition-colors text-sm text-foreground"
                 >
                   <option value="">Seleccionar...</option>
-                  <option value="publico">Colegio público</option>
-                  <option value="privado">Colegio privado</option>
+                  <option value="public">Colegio público</option>
+                  <option value="private">Colegio privado</option>
                   <option value="ugel">UGEL</option>
                   <option value="minedu">MINEDU</option>
                   <option value="otro">Otro</option>

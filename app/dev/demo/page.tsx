@@ -14,8 +14,8 @@ interface DemoRequest {
   email: string
   phone: string | null
   institution_name: string | null
-  institution_type: 'public' | 'private'
-  level: 'initial' | 'primary' | 'secondary' | 'all'
+  institution_type: string
+  level: string
   estimated_students: number
   message: string | null
   status: 'pending' | 'contacted' | 'scheduled' | 'completed' | 'cancelled'
@@ -30,6 +30,16 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
   scheduled: { label: 'Programado', color: 'text-purple-600', bg: 'bg-purple-50', icon: Calendar },
   completed: { label: 'Completado', color: 'text-emerald-600', bg: 'bg-emerald-50', icon: CheckCircle },
   cancelled: { label: 'Cancelado', color: 'text-red-600', bg: 'bg-red-50', icon: XCircle },
+}
+
+const typeLabels: Record<string, string> = {
+  public: 'Público',
+  private: 'Privado',
+  publico: 'Público',
+  privado: 'Privado',
+  ugel: 'UGEL',
+  minedu: 'MINEDU',
+  otro: 'Otro',
 }
 
 const levelLabels: Record<string, string> = {
@@ -336,7 +346,7 @@ export default function DevDemoPage() {
                 </div>
                 <div className="bg-sb-surface-container rounded-xl p-3">
                   <p className="text-[10px] text-sb-on-surface/60 uppercase tracking-wider mb-1">Tipo</p>
-                  <p className="text-[13px] text-sb-on-surface">{selectedRequest.institution_type === 'public' ? 'Público' : 'Privado'}</p>
+                  <p className="text-[13px] text-sb-on-surface">{typeLabels[selectedRequest.institution_type] || selectedRequest.institution_type || '—'}</p>
                 </div>
                 <div className="bg-sb-surface-container rounded-xl p-3">
                   <p className="text-[10px] text-sb-on-surface/60 uppercase tracking-wider mb-1">Nivel</p>
