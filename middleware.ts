@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const publicRoutes = ['/', '/login', '/login-padre', '/register', '/forgot-password', '/blog', '/contacto', '/sobre-nosotros', '/terminos', '/privacidad', '/seguridad', '/pdpl', '/trabaja-con-nosotros']
+const publicRoutes = ['/', '/login', '/login-padre', '/register', '/demo', '/demo/', '/forgot-password', '/blog', '/contacto', '/sobre-nosotros', '/terminos', '/privacidad', '/seguridad', '/pdpl', '/trabaja-con-nosotros']
 
 const roleRouteMap: Record<string, string> = {
   super_admin: '/super-admin/dashboard',

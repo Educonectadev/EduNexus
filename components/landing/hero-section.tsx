@@ -120,13 +120,13 @@ export function HeroSection() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <a
-              href="/register"
+            <button
+              onClick={() => setDemoOpen(true)}
               className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-14 text-base rounded-full group shadow-lg shadow-primary/20 transition-colors"
             >
-              Comenzar gratis
+              Solicitar demo
               <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-            </a>
+            </button>
             <Button
               size="lg"
               variant="outline"

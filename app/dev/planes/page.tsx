@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CreditCard, Plus, Pencil, Trash2, Check, X, Shield, ShieldOff, Users, GraduationCap, Eye } from "@/components/ui/proicons"
+import { CreditCard, Plus, Pencil, Trash2, Check, X, Shield, ShieldOff, Users, GraduationCap, Eye, Clock } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn } from "@/components/ui/sb"
 
@@ -14,6 +14,7 @@ interface Plan {
   max_students: number
   features: string[] | string
   status: string
+  trial_days?: number | null
   created_at: string
 }
 
@@ -64,6 +65,7 @@ export default function PlanesPage() {
   const [saving, setSaving] = React.useState(false)
   const [form, setForm] = React.useState({
     name: "", description: "", price: 0, max_users: 5, max_students: 50,
+    trial_days: "",
     labels: defaultLabels.join("\n"),
     permissions: Object.fromEntries(ALL_PERMISSIONS.map(p => [p.key, p.default])),
     status: "active",
@@ -92,6 +94,7 @@ export default function PlanesPage() {
     setEditing(null)
     setForm({
       name: "", description: "", price: 0, max_users: 5, max_students: 50,
+      trial_days: "",
       labels: defaultLabels.join("\n"),
       permissions: Object.fromEntries(ALL_PERMISSIONS.map(p => [p.key, p.default])),
       status: "active",
@@ -108,6 +111,7 @@ export default function PlanesPage() {
       price: Number(p.price),
       max_users: p.max_users,
       max_students: p.max_students,
+      trial_days: p.trial_days != null ? String(p.trial_days) : "",
       labels: labels.join("\n"),
       permissions: { ...Object.fromEntries(ALL_PERMISSIONS.map(p => [p.key, p.default])), ...permissions },
       status: p.status,
@@ -124,7 +128,7 @@ export default function PlanesPage() {
     try {
       const labels = form.labels.split("\n").map(f => f.trim()).filter(Boolean)
       const features = JSON.stringify({ labels, permissions: form.permissions })
-      const body = { ...form, features, labels: undefined, permissions: undefined }
+      const body = { ...form, trial_days: form.trial_days === "" ? null : form.trial_days, features, labels: undefined, permissions: undefined }
       const url = editing ? `/api/dev/planes/${editing.id}` : "/api/dev/planes"
       const method = editing ? "PUT" : "POST"
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
@@ -213,6 +217,11 @@ export default function PlanesPage() {
                 </div>
                 <h3 className="text-[16px] font-bold text-sb-on-surface">{plan.name}</h3>
                 {plan.description && <p className="text-[12px] text-sb-on-surface/70 mt-1">{plan.description}</p>}
+                {plan.trial_days != null && plan.trial_days > 0 && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-sb-primary/10 text-sb-primary text-[11px] font-semibold">
+                    <Clock className="h-3 w-3" /> Plan de prueba · {plan.trial_days} días hábiles
+                  </div>
+                )}
                 <div className="mt-3 flex items-baseline gap-1">
                   <span className="text-[28px] font-bold text-sb-on-surface">{priceFormat(plan.price)}</span>
                   <span className="text-[12px] text-sb-on-surface/60">/mes</span>
@@ -259,6 +268,11 @@ export default function PlanesPage() {
               <div className="space-y-2">
                 <label className="text-[12px] text-sb-on-surface/80">Precio mensual (S/)</label>
                 <input type="number" step="0.01" min="0" value={form.price} onChange={e => setForm({...form, price: parseFloat(e.target.value) || 0})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Días de prueba (vacío = pago)</label>
+                <input type="number" min="0" placeholder="20" value={form.trial_days} onChange={e => setForm({...form, trial_days: e.target.value})}
                   className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
               </div>
               <div className="space-y-2">
@@ -326,6 +340,11 @@ export default function PlanesPage() {
               <span className="text-[32px] font-bold text-sb-on-surface">{priceFormat(viewing?.price || 0)}</span>
               <span className="text-[13px] text-sb-on-surface/60">/mes</span>
             </div>
+            {viewing?.trial_days != null && viewing.trial_days > 0 && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sb-primary/10 text-sb-primary text-[12px] font-semibold">
+                <Clock className="h-3.5 w-3.5" /> {viewing.trial_days} días hábiles de prueba
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-sb-surface-container-high p-3">
                 <div className="flex items-center gap-1.5 text-sb-on-surface/70 text-[11px]"><Users className="h-3.5 w-3.5" /> Usuarios</div>

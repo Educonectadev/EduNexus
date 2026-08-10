@@ -72,6 +72,8 @@ interface Institution {
   plan_id?: string
   plan_name?: string
   plan_price?: number
+  plan_trial_days?: number
+  trial_ends_at?: string | null
   schedule_config?: {
     general_start: string
     general_end: string
@@ -160,7 +162,7 @@ export default function DevInstitucionesPage() {
   const { toast } = useToast()
   const [saving, setSaving] = React.useState(false)
   const [search, setSearch] = React.useState("")
-  const [plans, setPlans] = React.useState<{ id: string; name: string; price: number }[]>([])
+  const [plans, setPlans] = React.useState<{ id: string; name: string; price: number; trial_days?: number | null }[]>([])
   const [statusFilter, setStatusFilter] = React.useState<string>("all")
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [searchModalQuery, setSearchModalQuery] = React.useState("")
@@ -1358,7 +1360,9 @@ export default function DevInstitucionesPage() {
                 <select value={form.plan_id} onChange={e => setForm({...form, plan_id: e.target.value})} className="sb-select w-full rounded-xl">
                   <option value="">Sin plan asignado</option>
                   {plans.map(p => (
-                    <option key={p.id} value={p.id}>{p.name} — S/ {Number(p.price).toFixed(2)}/mes</option>
+                    <option key={p.id} value={p.id}>
+                      {p.name} — {Number(p.price) > 0 ? `S/ ${Number(p.price).toFixed(2)}/mes` : 'Gratis'}{p.trial_days ? ` (${p.trial_days} días)` : ''}
+                    </option>
                   ))}
                 </select>
               </div>

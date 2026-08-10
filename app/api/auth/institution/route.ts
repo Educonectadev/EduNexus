@@ -6,13 +6,15 @@ import { computeTrialStatus, addBusinessDays } from '@/lib/trial'
 // Base del trial: si la columna trial_ends_at no existe (migración pendiente),
 // se calcula desde el created_at de la institución para que el conteo funcione igual.
 // Demo (notes = DEMO) usa 15 días hábiles; gratis usa 20.
+// Un plan de prueba (plan trial_days > 0) también cuenta días; un plan pago no vence.
 async function effectiveTrialEnds(inst: any): Promise<string | null> {
   if (!inst) return null
-  if (inst.plan_id) return null
+  const planTrialDays = inst.plan_trial_days ? Number(inst.plan_trial_days) : 0
+  if (inst.plan_id && !(planTrialDays > 0)) return null // plan pago: sin trial
   if (inst.trial_ends_at) return inst.trial_ends_at
-  // Columna no existe o NULL: calcula desde created_at según demo o gratis.
+  // Columna no existe o NULL: calcula desde created_at según demo, gratis o plan de prueba.
   const isDemo = !!(inst.notes && String(inst.notes).toUpperCase().includes('DEMO'))
-  const days = isDemo ? 15 : 20
+  const days = planTrialDays > 0 ? planTrialDays : (isDemo ? 15 : 20)
   const base = inst.created_at ? new Date(inst.created_at) : new Date()
   const end = addBusinessDays(base, days)
   // Si esa fecha ya venció (institución vieja), reinicia desde ahora la primera vez.
@@ -86,6 +88,13 @@ export async function GET(request: NextRequest) {
     const has = (col: string) => instCols.includes(col)
 
     const sel: string[] = ['i.id', 'p.id as plan_id', 'p.name as plan_name', 'p.price as plan_price', 'p.max_users', 'p.max_students', 'p.features as plan_features']
+
+    const [planColRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'plans'`
+    ) as any[]
+    const planCols = (planColRows || []).map((c: any) => c.column_name)
+    if (planCols.includes('trial_days')) sel.push('p.trial_days as plan_trial_days')
+
     if (has('code')) sel.push('i.code')
     if (has('name')) sel.push('i.name')
     if (has('email')) sel.push('i.email')
@@ -104,6 +113,7 @@ export async function GET(request: NextRequest) {
     const inst = (rows as any[])[0]
 
     const isDemo = !!(inst?.notes && String(inst.notes).toUpperCase().includes('DEMO'))
+    const planTrialDays = inst?.plan_trial_days ? Number(inst.plan_trial_days) : 0
     const trialEndsAt = await effectiveTrialEnds(inst)
 
     return NextResponse.json({
@@ -113,7 +123,7 @@ export async function GET(request: NextRequest) {
       email: inst?.email || '',
       phone: inst?.phone || '',
       isDemo,
-      trialDays: inst?.plan_id ? null : (isDemo ? 15 : 20),
+      trialDays: inst?.plan_id ? (planTrialDays > 0 ? planTrialDays : null) : (isDemo ? 15 : 20),
       plan: inst?.plan_id ? {
         id: inst.plan_id,
         name: inst.plan_name,
@@ -121,8 +131,13 @@ export async function GET(request: NextRequest) {
         max_users: inst.max_users,
         max_students: inst.max_students,
         features: inst.plan_features,
+        trial_days: planTrialDays > 0 ? planTrialDays : null,
       } : null,
-      trial: computeTrialStatus({ planId: inst?.plan_id || null, trialEndsAt: trialEndsAt }),
+      trial: computeTrialStatus({
+        planId: inst?.plan_id || null,
+        planTrialDays: planTrialDays > 0 ? planTrialDays : null,
+        trialEndsAt: trialEndsAt,
+      }),
     })
   } catch (error: any) {
     if (error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json({ id: null, name: '' })

@@ -48,11 +48,17 @@ function generateEmail(name: string, code: string): string {
 
 export async function GET() {
   try {
+    const [planColRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'plans'`
+    ) as any[]
+    const planCols = (planColRows || []).map((c: any) => c.column_name)
+    const hasTrialDays = planCols.includes('trial_days')
+
     const [rows] = await pool.query(
       `SELECT i.*,
               COALESCE((SELECT COUNT(*)::int FROM students s WHERE s.institution_id = i.id), 0) AS total_students,
               COALESCE((SELECT COUNT(*)::int FROM teachers t WHERE t.institution_id = i.id), 0) AS total_teachers,
-              p.name as plan_name, p.price as plan_price
+              p.name as plan_name, p.price as plan_price${hasTrialDays ? ', p.trial_days as plan_trial_days' : ''}
        FROM institutions i
        LEFT JOIN plans p ON p.id = i.plan_id
        ORDER BY i.created_at DESC`
@@ -86,6 +92,18 @@ export async function POST(request: NextRequest) {
     const directorPassword = generatePassword()
     const hashedPassword = await bcrypt.hash(directorPassword, 10)
 
+    let trialEnd = null
+    if (plan_id) {
+      let tdays: any = null
+      try {
+        const [planRows] = await pool.query('SELECT trial_days FROM plans WHERE id = ?', [plan_id]) as any
+        tdays = planRows?.[0]?.trial_days
+      } catch { /* columna trial_days aún no existe */ }
+      trialEnd = tdays && Number(tdays) > 0 ? addBusinessDays(new Date(), Number(tdays)).toISOString() : null
+    } else {
+      trialEnd = addBusinessDays(new Date(), 20).toISOString()
+    }
+
     await pool.query(
       `INSERT INTO institutions (
         id, code, name, type, level, modality, shift, dependence,
@@ -104,7 +122,7 @@ export async function POST(request: NextRequest) {
         total_students || 0, total_teachers || 0, total_classrooms || 0,
         has_lab ? true : false, has_library ? true : false, has_computer_room ? true : false, has_playground ? true : false,
         notes || '', plan_id || null, schedule_config ? JSON.stringify(schedule_config) : null,
-        plan_id ? null : addBusinessDays(new Date(), 20).toISOString(),
+        trialEnd,
       ]
     )
 

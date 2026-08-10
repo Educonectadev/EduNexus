@@ -20,7 +20,18 @@ export async function PATCH(
     if (body.status) { updates.push('status = ?'); values.push(body.status) }
     if (body.plan_id !== undefined) {
       updates.push('plan_id = ?'); values.push(body.plan_id || null)
-      updates.push('trial_ends_at = ?'); values.push(body.plan_id ? null : addBusinessDays(new Date(), 20).toISOString())
+      let trialEnd = null
+      if (body.plan_id) {
+        let tdays: any = null
+        try {
+          const [planRows] = await pool.query('SELECT trial_days FROM plans WHERE id = ?', [body.plan_id]) as any
+          tdays = planRows?.[0]?.trial_days
+        } catch { /* columna trial_days aún no existe */ }
+        trialEnd = tdays && Number(tdays) > 0 ? addBusinessDays(new Date(), Number(tdays)).toISOString() : null
+      } else {
+        trialEnd = addBusinessDays(new Date(), 20).toISOString()
+      }
+      updates.push('trial_ends_at = ?'); values.push(trialEnd)
     }
     if (body.name !== undefined) { updates.push('name = ?'); values.push(body.name) }
     if (body.code !== undefined) { updates.push('code = ?'); values.push(body.code) }

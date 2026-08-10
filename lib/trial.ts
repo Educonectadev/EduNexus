@@ -35,9 +35,13 @@ export interface TrialStatus {
 
 export function computeTrialStatus(info: {
   planId: string | null
+  planTrialDays?: number | null
   trialEndsAt: string | Date | null
 }): TrialStatus {
-  const hasPaidPlan = !!info.planId
+  // Un plan con trial_days > 0 es un plan de prueba (Gratis/Demo): cuenta días hábiles
+  // hasta trial_ends_at y puede vencer. Un plan pago (sin trial_days) no vence.
+  const isTrialPlan = !!info.planId && !!info.planTrialDays && info.planTrialDays > 0
+  const hasPaidPlan = !!info.planId && !isTrialPlan
   const end = info.trialEndsAt ? new Date(info.trialEndsAt) : null
   const today = new Date()
   const isExpired = !hasPaidPlan && !!end && end < today
