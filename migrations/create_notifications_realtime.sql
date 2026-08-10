@@ -20,6 +20,7 @@ DECLARE
 BEGIN
   SELECT json_build_object(
     'id', NEW.id,
+    'user_id', COALESCE(NEW.user_id, ''),
     'institution_id', NEW.institution_id,
     'target_role', NEW.target_role,
     'type', NEW.type,

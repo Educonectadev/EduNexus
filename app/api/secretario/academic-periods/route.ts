@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
+import { notifyAll, formatDate } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,6 +35,16 @@ export async function POST(request: NextRequest) {
       `INSERT INTO academic_periods (id, institution_id, name, year, start_date, end_date, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [id, instId, name, Number(year), start_date || null, end_date || null, is_active ? 1 : 0]
     )
+
+    if (start_date) {
+      notifyAll(
+        instId,
+        'Cronograma escolar actualizado',
+        `El inicio de clases del ${name || 'periodo ' + year} está programado para el ${formatDate(start_date)}.`,
+        'academic', 'calendario', 'alta'
+      )
+    }
+
     return NextResponse.json({ success: true, id })
   } catch (error) {
     return NextResponse.json({ error: 'Error creating period' }, { status: 500 })

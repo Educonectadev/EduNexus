@@ -78,6 +78,20 @@ io.on('connection', (socket) => {
       if (receiverId) {
         io.to(`user:${receiverId}`).emit('message:new', messageData)
         socket.emit('message:new', messageData)
+
+        // Aviso en campana si el destinatario es un padre
+        try {
+          const [rRows] = await pool.query(`SELECT role FROM users WHERE id = ?`, [receiverId])
+          if (rRows[0]?.role === 'padre') {
+            await pool.query(
+              `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status, user_id)
+               VALUES (?, ?, 'Nuevo mensaje', ?, 'message', 'padre', 'mensajes', 'media', 'active', ?)`,
+              [crypto.randomUUID(), institutionId, `${fullName} te escribió: "${String(message).slice(0, 120)}"`, receiverId]
+            )
+          }
+        } catch (error) {
+          console.error('Error notifying parent:', error)
+        }
       } else if (courseId) {
         io.to(`inst:${institutionId}`).emit('message:new', messageData)
       }
@@ -156,7 +170,15 @@ async function listenNotifications() {
     client.on('notification', (msg) => {
       try {
         const data = JSON.parse(msg.payload || '{}')
-        const { institution_id, target_role } = data
+        const { institution_id, target_role, user_id } = data
+
+        // Notificación individual (ej: docentes, padres de un alumno)
+        if (user_id) {
+          io.to(`user:${user_id}`).emit('notify:new', data)
+          console.log(`notify:new -> user:${user_id} (${data.title || 'sin título'})`)
+          return
+        }
+
         if (!institution_id) return
         const room = target_role && target_role !== 'all'
           ? `notif:${institution_id}:${target_role}`

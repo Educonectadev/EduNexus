@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
+import { notifyAll, formatDate } from '@/lib/notify'
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -22,6 +23,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (updates.length === 0) return NextResponse.json({ error: 'Sin cambios' }, { status: 400 })
     values.push(id, instId)
     await pool.query(`UPDATE academic_periods SET ${updates.join(', ')} WHERE id = ? AND institution_id = ?`, values)
+
+    if (body.start_date) {
+      notifyAll(
+        instId,
+        'Cronograma escolar actualizado',
+        `La fecha de inicio de clases fue actualizada al ${formatDate(body.start_date)}.`,
+        'academic', 'calendario', 'alta'
+      )
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Error updating period' }, { status: 500 })

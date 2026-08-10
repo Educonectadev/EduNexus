@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
+import { notifyUsers, notifyRole, resolveCourseTeacherUser, getCourseName, dayName } from '@/lib/notify'
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,6 +16,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       `UPDATE horarios SET course_id = ?, day_of_week = ?, start_time = ?, end_time = ?, classroom = ?, status = ? WHERE id = ? AND institution_id = ?`,
       [course_id, day_of_week, start_time, end_time, classroom || null, status || 'active', id, instId]
     )
+
+    const courseName = await getCourseName(course_id)
+    const teacherUserId = await resolveCourseTeacherUser(course_id)
+    const message = `Tu horario de ${courseName} fue actualizado (${dayName(day_of_week)} de ${start_time} a ${end_time}).`
+    if (teacherUserId) notifyUsers(instId, [teacherUserId], 'Horario actualizado', message, 'schedule', 'horarios', 'media')
+    else notifyRole(instId, 'docente', 'Horario actualizado', message, 'schedule', 'horarios', 'media')
 
     return NextResponse.json({ success: true })
   } catch (error) {

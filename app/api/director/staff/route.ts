@@ -3,6 +3,7 @@ import pool from '@/lib/db'
 import { getAuthPayload, resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
+import { notifyUsers } from '@/lib/notify'
 
 function generatePassword(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%'
@@ -96,6 +97,16 @@ export async function POST(request: NextRequest) {
       } else {
         throw colErr
       }
+    }
+
+    if ((role || 'docente') === 'docente') {
+      notifyUsers(
+        instId,
+        [userId],
+        'Contrato docente registrado',
+        `Tu contrato fue registrado en la institución${subject ? ` como docente de ${subject}` : ''}. Bienvenido(a), ${full_name}.`,
+        'contract', 'contratos', 'alta'
+      )
     }
 
     return NextResponse.json({

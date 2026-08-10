@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload, resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
+import { notifyUsers, notifyRole, resolveCourseTeacherUser, getCourseName, dayName } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,6 +72,12 @@ export async function POST(request: NextRequest) {
        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')`,
       [id, instId, course_id, day_of_week, start_time, end_time, classroom || null]
     )
+
+    const courseName = await getCourseName(course_id)
+    const teacherUserId = await resolveCourseTeacherUser(course_id)
+    const message = `Se asignó tu horario para ${courseName} (${dayName(day_of_week)} de ${start_time} a ${end_time})${classroom ? ` en ${classroom}` : ''}.`
+    if (teacherUserId) notifyUsers(instId, [teacherUserId], 'Nuevo horario asignado', message, 'schedule', 'horarios', 'media')
+    else notifyRole(instId, 'docente', 'Nuevo horario asignado', message, 'schedule', 'horarios', 'media')
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {

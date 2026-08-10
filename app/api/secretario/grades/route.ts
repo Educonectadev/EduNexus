@@ -3,6 +3,7 @@ import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
 import crypto from 'crypto'
+import { notifyParentsOfStudents } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,6 +72,23 @@ export async function POST(request: NextRequest) {
          notes = EXCLUDED.notes`,
       [id, instId, student_id, course_id, period, Number(score), Number(max_score || 20), notes || null]
     )
+
+    try {
+      const [info] = await pool.query(
+        `SELECT CONCAT(s.first_name, ' ', s.last_name) AS student_name, c.name AS course_name
+         FROM students s, courses c
+         WHERE s.id = ? AND c.id = ?`,
+        [student_id, course_id]
+      ) as any[]
+      const row = (info as any[])[0]
+      notifyParentsOfStudents(
+        instId,
+        [student_id],
+        'Nota publicada',
+        `Se publicó la nota de ${row?.student_name || 'tu hijo(a)'} en ${row?.course_name || 'el curso'}: ${Number(score)}/${Number(max_score || 20)} (periodo ${period}).`,
+        'grade', 'notas', 'media'
+      )
+    } catch { /* el aviso es opcional */ }
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {

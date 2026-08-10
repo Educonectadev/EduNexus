@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
        FROM notifications n
        LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
        WHERE n.institution_id = ? AND n.status = 'active'
-         AND (n.target_role = 'all' OR n.target_role = ?)
+         AND (n.target_role = 'all' OR n.target_role = ? OR n.user_id = ?)
        ORDER BY n.pinned DESC, n.created_at DESC
        LIMIT 60`,
-      [user.id, instId, user.role || 'all']
+      [user.id, instId, user.role || 'all', user.id]
     )
 
     const notifications = (rows as any[]).map(n => ({

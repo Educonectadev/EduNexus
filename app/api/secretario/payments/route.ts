@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
+import { notifyParentsOfStudents } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -92,6 +93,30 @@ export async function POST(request: NextRequest) {
         due_date || null, paid_date || null, status || 'pending',
       ]
     )
+
+    try {
+      const [info] = await pool.query(
+        `SELECT CONCAT(s.first_name, ' ', s.last_name) AS student_name, pc.name AS concept_name
+         FROM students s
+         LEFT JOIN payment_concepts pc ON pc.id = ?
+         WHERE s.id = ?`,
+        [conceptId, student_id]
+      ) as any[]
+      const row = (info as any[])[0]
+      const conceptName = row?.concept_name || 'cuota'
+      const studentName = row?.student_name || 'tu hijo(a)'
+      const isPaid = status === 'paid' || Number(paid_amount || 0) > 0
+      notifyParentsOfStudents(
+        instId,
+        [student_id],
+        isPaid ? 'Pago procesado' : 'Nuevo pago registrado',
+        isPaid
+          ? `Se procesó el pago de ${conceptName} de ${studentName} por S/ ${Number(amount).toFixed(2)}.`
+          : `Se registró una ${conceptName} de S/ ${Number(amount).toFixed(2)} para ${studentName}${due_date ? ` con vencimiento el ${due_date}` : ''}.`,
+        'payment', 'pagos', isPaid ? 'alta' : 'media'
+      )
+    } catch { /* el aviso es opcional */ }
+
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
     return NextResponse.json({ error: 'Error creating payment', details: error.message, code: error.code }, { status: 500 })

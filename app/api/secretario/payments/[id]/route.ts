@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
+import { notifyParentsOfStudents } from '@/lib/notify'
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -19,7 +20,32 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (body.notes !== undefined) { updates.push('notes = ?'); values.push(body.notes || null) }
     if (updates.length === 0) return NextResponse.json({ error: 'Sin cambios' }, { status: 400 })
     values.push(id, instId)
+
+    const [existing] = await pool.query(
+      `SELECT p.student_id, p.amount, p.paid_amount,
+              CONCAT(s.first_name, ' ', s.last_name) AS student_name,
+              pc.name AS concept_name
+       FROM payments p
+       LEFT JOIN students s ON p.student_id = s.id
+       LEFT JOIN payment_concepts pc ON p.concept_id = pc.id
+       WHERE p.id = ? AND p.institution_id = ?`,
+      [id, instId]
+    ) as any[]
+    const existingPayment = (existing as any[])[0]
+
     await pool.query(`UPDATE payments SET ${updates.join(', ')} WHERE id = ? AND institution_id = ?`, values)
+
+    if (existingPayment?.student_id && body.status === 'paid') {
+      const totalPaid = body.paid_amount !== undefined ? Number(body.paid_amount) : Number(existingPayment.paid_amount || 0)
+      notifyParentsOfStudents(
+        instId,
+        [existingPayment.student_id],
+        'Pago procesado',
+        `Se procesó el pago de ${existingPayment.concept_name || 'cuota'} de ${existingPayment.student_name || 'tu hijo(a)'} por S/ ${Number(existingPayment.amount || 0).toFixed(2)}.`,
+        'payment', 'pagos', 'alta'
+      )
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: 'Error updating payment' }, { status: 500 })

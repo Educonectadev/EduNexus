@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
+import { notifyUsers } from '@/lib/notify'
 
 export async function GET(request: NextRequest) {
   try {
@@ -111,6 +112,20 @@ export async function POST(request: NextRequest) {
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [id, instId, user.id, receiver_id || null, course_id || null, message, message_type || 'text']
     )
+
+    // Aviso en campana cuando el destinatario es un padre (mensaje directo)
+    if (receiver_id) {
+      try {
+        const [rRows] = await pool.query(
+          `SELECT role, full_name FROM users WHERE id = ? AND institution_id = ?`,
+          [receiver_id, instId]
+        ) as any[]
+        const receiver = (rRows as any[])[0]
+        if (receiver && receiver.role === 'padre') {
+          notifyUsers(instId, [receiver_id], 'Nuevo mensaje', `${user.fullName || 'Docente'} te escribió: "${String(message).slice(0, 120)}"`, 'message', 'mensajes', 'media')
+        }
+      } catch { /* el aviso es opcional */ }
+    }
 
     return NextResponse.json({ success: true, id })
   } catch (error) {
