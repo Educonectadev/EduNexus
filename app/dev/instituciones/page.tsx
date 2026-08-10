@@ -414,9 +414,12 @@ export default function DevInstitucionesPage() {
         setCurrentStep(1)
         resetForm()
         fetchInstitutions()
+      } else {
+        toast(data?.error || "Error al crear la institución", "error")
       }
     } catch (e) {
       console.error(e)
+      toast("Error de conexión al crear", "error")
     } finally {
       setSaving(false)
     }

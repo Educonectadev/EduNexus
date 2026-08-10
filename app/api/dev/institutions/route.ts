@@ -48,24 +48,45 @@ function generateEmail(name: string, code: string): string {
 
 export async function GET() {
   try {
-    const [planColRows] = await pool.query(
-      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'plans'`
+    const [planTableRows] = await pool.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() AND table_name = 'plans'`
     ) as any[]
-    const planCols = (planColRows || []).map((c: any) => c.column_name)
+    const hasPlansTable = (planTableRows || []).length > 0
+
+    let planCols: string[] = []
+    if (hasPlansTable) {
+      const [planColRows] = await pool.query(
+        `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'plans'`
+      ) as any[]
+      planCols = (planColRows || []).map((c: any) => c.column_name)
+    }
     const hasTrialDays = planCols.includes('trial_days')
+
+    // Verificar que existan las tablas referenciadas en subconsultas
+    const [tables] = await pool.query(
+      `SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema() AND table_name IN ('students','teachers')`
+    ) as any[]
+    const tableSet = new Set((tables || []).map((t: any) => t.table_name))
+    const studentsCount = tableSet.has('students')
+      ? "(SELECT COUNT(*)::int FROM students s WHERE s.institution_id = i.id)"
+      : "0"
+    const teachersCount = tableSet.has('teachers')
+      ? "(SELECT COUNT(*)::int FROM teachers t WHERE t.institution_id = i.id)"
+      : "0"
 
     const [rows] = await pool.query(
       `SELECT i.*,
-              COALESCE((SELECT COUNT(*)::int FROM students s WHERE s.institution_id = i.id), 0) AS total_students,
-              COALESCE((SELECT COUNT(*)::int FROM teachers t WHERE t.institution_id = i.id), 0) AS total_teachers,
-              p.name as plan_name, p.price as plan_price${hasTrialDays ? ', p.trial_days as plan_trial_days' : ''}
+              COALESCE(${studentsCount}, 0) AS total_students,
+              COALESCE(${teachersCount}, 0) AS total_teachers,
+              ${hasPlansTable ? `p.name as plan_name, p.price as plan_price${hasTrialDays ? ', p.trial_days as plan_trial_days' : ''}` : "NULL as plan_name, NULL as plan_price, NULL as plan_trial_days"}
        FROM institutions i
-       LEFT JOIN plans p ON p.id = i.plan_id
+       ${hasPlansTable ? 'LEFT JOIN plans p ON p.id = i.plan_id' : ''}
        ORDER BY i.created_at DESC`
     )
     return NextResponse.json(rows)
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching institutions' }, { status: 500 })
+    console.error('GET /api/dev/institutions error:', error)
+    return NextResponse.json({ error: 'Error fetching institutions', details: (error as any)?.message }, { status: 500 })
   }
 }
 
@@ -104,27 +125,53 @@ export async function POST(request: NextRequest) {
       trialEnd = addBusinessDays(new Date(), 20).toISOString()
     }
 
-    await pool.query(
-      `INSERT INTO institutions (
-        id, code, name, type, level, modality, shift, dependence,
-        department, province, district, address, reference,
-        phone, phone2, email, website,
-        director_name, director_dni, director_phone, director_email,
-        total_students, total_teachers, total_classrooms,
-        has_lab, has_library, has_computer_room, has_playground,
-        notes, plan_id, schedule_config, status, trial_ends_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`,
-      [
-        instId, instCode, name, type || '', level || '', modality || '', shift || '', dependence || '',
-        department || '', province || '', district || '', address || '', reference || '',
-        phone || '', phone2 || '', directorEmail, website || '',
-        director_name || '', director_dni || '', director_phone || '', director_email || directorEmail,
-        total_students || 0, total_teachers || 0, total_classrooms || 0,
-        has_lab ? true : false, has_library ? true : false, has_computer_room ? true : false, has_playground ? true : false,
-        notes || '', plan_id || null, schedule_config ? JSON.stringify(schedule_config) : null,
-        trialEnd,
-      ]
-    )
+    // Solo insertar columnas que existen en la tabla (schema puede variar)
+    const [instColRows] = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'institutions'`
+    ) as any[]
+    const instCols = (instColRows || []).map((c: any) => c.column_name)
+
+    const inserts: Record<string, any> = {
+      id: instId,
+      code: instCode,
+      name,
+      type: type || 'colegio',
+      status: 'active',
+      trial_ends_at: trialEnd,
+    }
+    const set = (col: string, val: any) => { if (val !== undefined && instCols.includes(col)) inserts[col] = val }
+    set('level', level || '')
+    set('modality', modality || '')
+    set('shift', shift || '')
+    set('dependence', dependence || '')
+    set('department', department || '')
+    set('province', province || '')
+    set('district', district || '')
+    set('address', address || '')
+    set('reference', reference || '')
+    set('phone', phone || '')
+    set('phone2', phone2 || '')
+    set('email', directorEmail)
+    set('website', website || '')
+    set('director_name', director_name || '')
+    set('director_dni', director_dni || '')
+    set('director_phone', director_phone || '')
+    set('director_email', director_email || directorEmail)
+    set('total_students', Number(total_students) || 0)
+    set('total_teachers', Number(total_teachers) || 0)
+    set('total_classrooms', Number(total_classrooms) || 0)
+    set('has_lab', !!has_lab)
+    set('has_library', !!has_library)
+    set('has_computer_room', !!has_computer_room)
+    set('has_playground', !!has_playground)
+    set('notes', notes || '')
+    set('plan_id', plan_id || null)
+    set('schedule_config', schedule_config ? JSON.stringify(schedule_config) : null)
+
+    const columns = Object.keys(inserts)
+    const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ')
+    const values = columns.map((c) => inserts[c])
+    await pool.query(`INSERT INTO institutions (${columns.join(', ')}) VALUES (${placeholders})`, values)
 
     if (director_name) {
       const userId = generateId()
@@ -153,9 +200,10 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error: any) {
+    console.error('POST /api/dev/institutions error:', error)
     if (error?.code === '23505') {
       return NextResponse.json({ error: 'Código ya existe, intenta de nuevo' }, { status: 409 })
     }
-    return NextResponse.json({ error: 'Error creating institution' }, { status: 500 })
+    return NextResponse.json({ error: 'Error creating institution', details: error?.message }, { status: 500 })
   }
 }
