@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Key, Search, Eye, EyeOff, Copy, RefreshCw, Shield, Clock, AlertTriangle, Check, User, X } from "@/components/ui/proicons"
+import { Key, Search, Eye, EyeOff, Copy, RefreshCw, Shield, Clock, AlertTriangle, Check, User, X, Building2, ChevronRight } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface PasswordUser {
@@ -13,6 +13,9 @@ interface PasswordUser {
   last_login: string | null
   created_at: string
   password_changed_at: string | null
+  institution_id?: string | null
+  institution_code?: string | null
+  institution_name?: string | null
 }
 
 const stagger = {
@@ -34,6 +37,13 @@ export default function DevContrasenasPage() {
   const [saving, setSaving] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
   const [successId, setSuccessId] = React.useState<string | null>(null)
+  const [selectedInstitution, setSelectedInstitution] = React.useState<{
+    id: string
+    code: string
+    name: string
+    users: PasswordUser[]
+  } | null>(null)
+  const [roleFilter, setRoleFilter] = React.useState<string>("all")
 
   React.useEffect(() => { fetchUsers() }, [])
 
@@ -84,11 +94,50 @@ export default function DevContrasenasPage() {
     return diff
   }
 
-  const filtered = users.filter(u =>
-    u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    u.email?.toLowerCase().includes(search.toLowerCase()) ||
-    u.role?.toLowerCase().includes(search.toLowerCase())
-  )
+  const institutionGroups = React.useMemo(() => {
+    const groups: Record<string, { id: string; code: string; name: string; users: PasswordUser[] }> = {}
+    for (const u of users) {
+      const key = u.institution_id || "sin-institución"
+      if (!groups[key]) {
+        groups[key] = {
+          id: key,
+          code: u.institution_code || "—",
+          name: u.institution_name || (u.full_name ? `Desarrollador · ${u.full_name}` : "Sin institución"),
+          users: [],
+        }
+      }
+      groups[key].users.push(u)
+    }
+    return Object.values(groups).sort((a, b) => {
+      if (a.code === "—") return 1
+      if (b.code === "—") return -1
+      return a.code.localeCompare(b.code)
+    })
+  }, [users])
+
+  const filteredGroups = React.useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return institutionGroups
+      .map(g => {
+        const members = g.users.filter(u => {
+          if (roleFilter !== "all" && u.role !== roleFilter) return false
+          if (!q) return true
+          return (
+            u.full_name?.toLowerCase().includes(q) ||
+            u.email?.toLowerCase().includes(q) ||
+            u.role?.toLowerCase().includes(q)
+          )
+        })
+        return { ...g, members }
+      })
+      .filter(g => {
+        if (!q) return g.members.length > 0
+        return g.members.length > 0 &&
+          (g.name?.toLowerCase().includes(q) || g.code?.toLowerCase().includes(q))
+      })
+  }, [institutionGroups, search, roleFilter])
+
+  const activeFilterCount = roleFilter !== "all" ? 1 : 0
 
   const roleColors: Record<string, string> = {
     super_admin: "bg-red-500/10 text-red-500 border-red-500/20",
@@ -124,89 +173,143 @@ export default function DevContrasenasPage() {
         />
       </motion.div>
 
-      {/* Users List */}
-      <motion.div variants={fadeUp} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="w-8 h-8 border-2 border-sb-primary/20 border-t-sb-primary rounded-full animate-spin mx-auto" />
-            <p className="text-[13px] text-sb-on-surface/50 mt-3">Cargando...</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <User className="h-12 w-12 text-sb-on-surface/50 mx-auto mb-3" />
-            <p className="text-[14px] text-sb-on-surface/70">{search ? "Sin resultados" : "Sin usuarios"}</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-sb-outline-variant/8">
-            {filtered.map((user, i) => {
-              const daysSinceChange = getDaysSince(user.password_changed_at)
-              const daysSinceLogin = getDaysSince(user.last_login)
-              const isStale = daysSinceChange !== null && daysSinceChange > 90
-
-              return (
-                <motion.div
-                  key={user.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02 }}
-                  className={`flex items-center gap-4 px-5 py-4 transition-colors ${
-                    successId === user.id ? "bg-emerald-500/5" : "hover:bg-sb-surface-container-low/30"
-                  }`}
-                >
-                  <div className="h-11 w-11 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
-                    <span className="text-[12px] font-medium text-sb-on-surface/70">
-                      {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
-                    </span>
+      {/* Institution Cards */}
+      <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {filteredGroups.map((g) => {
+          const isGlobal = !g.id || g.id === "sin-institución"
+          const activeUsers = g.users.filter(u => u.status === "active").length
+          return (
+            <motion.button
+              key={g.id}
+              variants={fadeUp}
+              whileHover={{ y: -2, transition: { duration: 0.15 } }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setSelectedInstitution({ id: g.id, code: g.code, name: g.name, users: g.users })}
+              className="group relative overflow-hidden rounded-2xl p-4 border border-sb-outline-variant/10 bg-sb-surface hover:border-sb-outline-variant/25 hover:bg-sb-surface-container transition-all duration-200 text-left md-anim-card-in"
+            >
+              <div
+                className={`absolute right-[-20px] top-[-20px] h-24 w-24 rounded-full blur-2xl transition-opacity opacity-40 group-hover:opacity-60 ${
+                  isGlobal ? "bg-red-500/20" : "bg-[var(--sb-primary)]/20"
+                }`}
+              />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-2">
+                  <div className={`h-11 w-11 rounded-xl ${
+                    isGlobal ? "bg-red-500/10" : "bg-[var(--sb-primary)]/10"
+                  } flex items-center justify-center shrink-0`}>
+                    {React.createElement(isGlobal ? Shield : Building2, { className: "h-5 w-5 " + (isGlobal ? "text-red-500" : "text-[var(--sb-primary)]") })}
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[14px] font-medium text-sb-on-surface truncate">{user.full_name}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${roleColors[user.role] || "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
-                        {roleLabels[user.role]}
-                      </span>
-                      {isStale && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
-                          <AlertTriangle className="w-2.5 h-2.5" /> Sin cambio ({daysSinceChange}d)
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3 mt-0.5">
-                      <span className="text-[12px] text-sb-on-surface/70">{user.email}</span>
-                      {user.last_login && (
-                        <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
-                          <Clock className="w-2.5 h-2.5" />
-                          Último login: {daysSinceLogin === 0 ? "Hoy" : daysSinceLogin === 1 ? "Ayer" : `hace ${daysSinceLogin}d`}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <AnimatePresence>
-                    {successId === user.id ? (
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.8, opacity: 0 }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600"
-                      >
-                        <Check className="w-3.5 h-3.5" /> Reseteada
-                      </motion.div>
-                    ) : (
-                      <button
-                        onClick={() => { setResetModal(user); setNewPassword(""); setShowPassword(false) }}
-                        className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-sb-surface-container-high text-[12px] font-medium text-sb-on-surface/80 hover:text-sb-on-surface hover:bg-sb-surface-container-high transition-colors shrink-0"
-                      >
-                        <Key className="w-3.5 h-3.5" /> Resetear
-                      </button>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )
-            })}
+                  <span className="text-[10px] font-mono text-sb-on-surface/60 bg-sb-surface-container px-2 py-1 rounded-md">
+                    {g.code}
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-sb-on-surface truncate mt-3">{g.name}</p>
+                <p className="text-[11px] text-sb-on-surface/70 mt-0.5">{g.users.length} usuarios · {activeUsers} activos</p>
+                <span className="text-[9px] text-sb-on-surface/40 mt-2.5 block">Ver usuarios</span>
+              </div>
+            </motion.button>
+          )
+        })}
+        {!loading && filteredGroups.length === 0 && (
+          <div className="col-span-full bg-sb-surface rounded-3xl border border-sb-outline-variant/10 px-5 py-16 text-center">
+            <User className="h-10 w-10 text-sb-on-surface/50 mx-auto mb-3" />
+            <p className="text-[14px] text-sb-on-surface/70">{search || activeFilterCount > 0 ? "Sin resultados" : "Sin usuarios"}</p>
           </div>
         )}
       </motion.div>
+
+      {/* Institution Users Modal */}
+      <AnimatePresence>
+        {selectedInstitution && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setSelectedInstitution(null)}>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="fixed inset-x-3 bottom-3 top-auto max-h-[85vh] overflow-y-auto rounded-3xl sm:inset-0 sm:top-1/2 sm:-translate-y-1/2 sm:max-w-2xl sm:rounded-2xl bg-sb-surface border border-sb-outline-variant/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-sb-surface/95 backdrop-blur flex items-center justify-between px-6 py-4 border-b border-sb-outline-variant/10">
+                <div className="min-w-0">
+                  <p className="text-[15px] font-semibold text-sb-on-surface truncate">
+                    {selectedInstitution.code !== "—" ? `${selectedInstitution.code} · ` : ""}{selectedInstitution.name}
+                  </p>
+                  <p className="text-[12px] text-sb-on-surface/60">{selectedInstitution.users.length} usuarios</p>
+                </div>
+                <button onClick={() => setSelectedInstitution(null)} className="h-9 w-9 rounded-xl hover:bg-sb-surface-container-high flex items-center justify-center transition-colors shrink-0">
+                  <X className="h-4 w-4 text-sb-on-surface/70" />
+                </button>
+              </div>
+              <div className="px-6 py-4 space-y-2">
+                {selectedInstitution.users.map((user) => {
+                  const daysSinceChange = getDaysSince(user.password_changed_at)
+                  const daysSinceLogin = getDaysSince(user.last_login)
+                  const isStale = daysSinceChange !== null && daysSinceChange > 90
+                  return (
+                    <div
+                      key={user.id}
+                      className={`flex items-center gap-4 px-4 py-3 rounded-xl border border-sb-outline-variant/10 hover:bg-sb-surface-container-low/50 transition-colors ${
+                        successId === user.id ? "bg-emerald-500/5" : ""
+                      }`}
+                    >
+                      <div className="h-11 w-11 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
+                        <span className="text-[12px] font-medium text-sb-on-surface/70">
+                          {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[14px] font-medium text-sb-on-surface truncate">{user.full_name}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${roleColors[user.role] || "bg-gray-500/10 text-gray-500 border-gray-500/20"}`}>
+                            {roleLabels[user.role]}
+                          </span>
+                          {isStale && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
+                              <AlertTriangle className="w-2.5 h-2.5" /> Sin cambio ({daysSinceChange}d)
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 mt-0.5">
+                          <span className="text-[12px] text-sb-on-surface/70">{user.email}</span>
+                          {user.last_login && (
+                            <span className="text-[11px] text-sb-on-surface/60 flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5" />
+                              Último login: {daysSinceLogin === 0 ? "Hoy" : daysSinceLogin === 1 ? "Ayer" : `hace ${daysSinceLogin}d`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <AnimatePresence>
+                        {successId === user.id ? (
+                          <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 shrink-0"
+                          >
+                            <Check className="w-3.5 h-3.5" /> Reseteada
+                          </motion.div>
+                        ) : (
+                          <button
+                            onClick={() => { setResetModal(user); setNewPassword(""); setShowPassword(false) }}
+                            className="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-sb-surface-container-high text-[12px] font-medium text-sb-on-surface/80 hover:text-sb-on-surface hover:bg-sb-surface-container-high transition-colors shrink-0"
+                          >
+                            <Key className="w-3.5 h-3.5" /> Resetear
+                          </button>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  )
+                })}
+                {selectedInstitution.users.length === 0 && (
+                  <p className="text-[13px] text-sb-on-surface/70 py-10 text-center">Sin usuarios</p>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Reset Modal */}
       <AnimatePresence>

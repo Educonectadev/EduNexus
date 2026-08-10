@@ -5,7 +5,8 @@ export async function GET() {
   try {
     const [rows] = await pool.query(
       `SELECT u.id, u.email, u.full_name, u.role, u.status, u.created_at, u.last_login,
-              u.password_hash, u.password,
+              u.password_hash, u.password, u.institution_id,
+              i.code as institution_code,
               i.name as institution_name,
               (SELECT al.created_at FROM audit_logs al
                WHERE al.user_id = u.id AND al.action = 'password_change'
