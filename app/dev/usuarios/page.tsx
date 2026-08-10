@@ -223,7 +223,12 @@ export default function DevUsuariosPage() {
     for (const u of users) {
       const key = u.institution_id || "sin-institución"
       if (!groups[key]) {
-        groups[key] = { id: key, code: u.institution_code || "—", name: u.institution_name || "Sin institución", users: [] }
+        groups[key] = {
+          id: key,
+          code: u.institution_code || "—",
+          name: u.institution_name || (u.full_name ? `Desarrollador · ${u.full_name}` : "Sin institución"),
+          users: [],
+        }
       }
       groups[key].users.push(u)
     }
