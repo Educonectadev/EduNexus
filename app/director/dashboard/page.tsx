@@ -38,13 +38,13 @@ export default function DirectorDashboard() {
   const [seeding, setSeeding] = React.useState(false)
   const [demoAccess, setDemoAccess] = React.useState<{ role: string; email: string; password: string }[]>([])
   const [activeTab, setActiveTab] = React.useState("general")
-  const [trial, setTrial] = React.useState<{ isDemo: boolean; trialDays: number | null; info: TrialInfo | null }>({ isDemo: false, trialDays: null, info: null })
+  const [trial, setTrial] = React.useState<{ isDemo: boolean; trialDays: number | null; hasPlan: boolean; info: TrialInfo | null }>({ isDemo: false, trialDays: null, hasPlan: false, info: null })
   const [instLabel, setInstLabel] = React.useState<string>("")
 
   const loadTrial = React.useCallback(() => {
     return fetch("/api/auth/institution").then(r => r.json()).then(d => {
       if (d?.name) setInstLabel(d.code ? `${d.name} · ${d.code}` : d.name)
-      setTrial({ isDemo: !!d.isDemo, trialDays: d.trialDays, info: d.trial || null })
+      setTrial({ isDemo: !!d.isDemo, trialDays: d.trialDays, hasPlan: !!d.plan, info: d.trial || null })
     }).catch(() => {})
   }, [])
 
@@ -107,7 +107,7 @@ const res = await fetch("/api/director/demo-seed", { method: "POST", headers: { 
         </div>
         <div className="flex items-center gap-2 flex-wrap">
 {/* Trial / plan banner */}
-      {trial.info && !trial.info.isExpired && (
+      {trial.info && !trial.info.isExpired && !trial.hasPlan && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
           <Link
             href="/director/configuracion"

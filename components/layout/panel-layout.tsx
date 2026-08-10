@@ -280,7 +280,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           if (instRes.ok) {
             const inst = await instRes.json()
             if (inst.trial?.isExpired) setTrialExpired(true)
-            else if (inst.trial?.remainingBusinessDays > 0) {
+            else if (inst.trial?.remainingBusinessDays > 0 && !inst.plan) {
               setTrialInfo({
                 isExpired: inst.trial.isExpired,
                 remainingBusinessDays: inst.trial.remainingBusinessDays,

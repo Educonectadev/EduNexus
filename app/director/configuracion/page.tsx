@@ -35,7 +35,7 @@ export default function ConfiguracionPage() {
       if (data.plan) setPlan(data.plan)
       if (data.isDemo !== undefined) setIsDemo(data.isDemo)
       if (data.trialDays !== undefined) setTrialDays(data.trialDays)
-      if (data.trial && !data.trial.hasPaidPlan) setTrial(data.trial)
+      if (data.trial && !data.trial.hasPaidPlan && !data.plan) setTrial(data.trial)
       return data
     })
   }, [])
