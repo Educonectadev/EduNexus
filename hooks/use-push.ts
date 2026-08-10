@@ -2,11 +2,11 @@
 
 import * as React from 'react'
 import {
-  getExistingPushSubscription,
   isPushSupported,
   registerServiceWorker,
   subscribeToPush,
   unsubscribeFromPush,
+  isUserSubscribed,
   isIOSPWA,
   isStandalone,
   type BeforeInstallPromptEvent,
@@ -44,8 +44,7 @@ export function usePushSettings(): PushSettings & {
   }, [])
 
   const refreshSubscription = React.useCallback(async () => {
-    const sub = await getExistingPushSubscription()
-    setSubscribed(!!sub)
+    setSubscribed(await isUserSubscribed())
   }, [])
 
   React.useEffect(() => {
@@ -87,12 +86,12 @@ export function usePushSettings(): PushSettings & {
     const result = await Notification.requestPermission()
     syncPermission(result)
     if (result === 'granted') await subscribeToPush()
-    setSubscribed(await getExistingPushSubscription().then((s) => !!s))
+    setSubscribed(await isUserSubscribed())
   }, [supported, syncPermission])
 
   const toggle = React.useCallback(async () => {
-    const sub = await getExistingPushSubscription()
-    if (sub) {
+    const active = await isUserSubscribed()
+    if (active) {
       await unsubscribeFromPush()
       setSubscribed(false)
     } else {

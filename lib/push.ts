@@ -91,6 +91,25 @@ export async function subscribeToPush(): Promise<boolean> {
   }
 }
 
+// ¿Esta CUENTA (usuario logueado) tiene activadas las notificaciones
+// push en este dispositivo/navegador? (el endpoint es por navegador)
+export async function isUserSubscribed(): Promise<boolean> {
+  if (!isPushSupported()) return false
+  const reg = await registerServiceWorker()
+  if (!reg) return false
+  try {
+    const subscription = await reg.pushManager.getSubscription()
+    if (!subscription) return false
+    const res = await fetch(`/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`)
+    if (!res.ok) return false
+    const data = await res.json()
+    return !!data.active
+  } catch (error) {
+    console.error('Error consultando suscripción del usuario:', error)
+    return false
+  }
+}
+
 export async function unsubscribeFromPush(): Promise<boolean> {
   if (!isPushSupported()) return false
   const reg = await registerServiceWorker()
@@ -100,16 +119,19 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     if (!subscription) return true
     const endpoint = subscription.endpoint
 
+    // Solo desactiva ESTA cuenta (borra su fila). No se elimina la
+    // suscripción del navegador para no afectar a otras cuentas del
+    // mismo dispositivo.
     try {
-      await fetch('/api/push/subscribe', {
+      const res = await fetch('/api/push/subscribe', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ endpoint }),
       })
-    } catch { /* noop */ }
-
-    const ok = await subscription.unsubscribe()
-    return ok
+      return res.ok
+    } catch {
+      return false
+    }
   } catch (error) {
     console.error('Error desuscribiendo push:', error)
     return false
