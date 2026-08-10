@@ -30,6 +30,42 @@ export async function POST(request: NextRequest) {
       }, { status: 429 })
     }
 
+    // Si el email o el nombre de la institución ya pertenecen a un cliente
+    // (institución con plan, usuario, o solicitud de contratación en curso),
+    // no se crea solicitud de demo ni se avisa al dev.
+    const norm = (s: string) =>
+      String(s || '').toLowerCase().trim().replace(/\s+/g, ' ')
+
+    let existingCustomer: any[] = []
+    try {
+      const [customerRows] = await pool.query(
+        `SELECT src FROM (
+           SELECT 'inst' AS src FROM institutions
+           WHERE status = 'active' AND plan_id IS NOT NULL
+             AND (LOWER(TRIM(email)) = ? OR translate(LOWER(TRIM(name)), 'áéíóúü', 'aeiou') = translate(?, 'áéíóúü', 'aeiou'))
+           UNION ALL
+           SELECT 'user' AS src FROM users
+           WHERE LOWER(TRIM(email)) = ?
+           UNION ALL
+           SELECT 'trial' AS src FROM trial_requests
+           WHERE LOWER(TRIM(email)) = ?
+           LIMIT 1
+         ) t`,
+        [norm(email), norm(institution_name || ''), norm(email), norm(email)]
+      ) as any[]
+      existingCustomer = customerRows || []
+    } catch (error) {
+      console.error('Error chequeando cliente existente:', error)
+    }
+
+    if (existingCustomer.length > 0) {
+      return NextResponse.json({
+        success: true,
+        already_customer: true,
+        message: 'El colegio ya cuenta con un plan activo. No registramos la solicitud de demo.',
+      })
+    }
+
     const id = crypto.randomUUID()
     await pool.query(
       `INSERT INTO demo_requests (id, full_name, email, phone, institution_name, institution_type, level, estimated_students, message)

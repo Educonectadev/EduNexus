@@ -20,7 +20,7 @@ export default function DemoPage() {
     message: '',
   })
   const [submitting, setSubmitting] = React.useState(false)
-  const [submitted, setSubmitted] = React.useState(false)
+  const [submitted, setSubmitted] = React.useState<string | boolean>(false)
   const [error, setError] = React.useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +42,7 @@ export default function DemoPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        setSubmitted(true)
+        setSubmitted(data.message || true)
       } else {
         setError(data.error || 'Error al enviar')
       }
@@ -54,6 +54,7 @@ export default function DemoPage() {
   }
 
   if (submitted) {
+    const isCustomer = typeof submitted === 'string' && submitted.toLowerCase().includes('plan activo')
     return (
       <div className="min-h-screen bg-sb-background flex items-center justify-center p-6">
         <motion.div
@@ -61,12 +62,14 @@ export default function DemoPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-sb-surface rounded-2xl p-8 max-w-md w-full text-center shadow-lg border border-sb-outline-variant/8"
         >
-          <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-emerald-500" />
+          <div className={`w-16 h-16 ${isCustomer ? 'bg-sb-primary/10' : 'bg-emerald-50'} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+            <CheckCircle className={`w-8 h-8 ${isCustomer ? 'text-sb-primary' : 'text-emerald-500'}`} />
           </div>
-          <h2 className="text-xl font-bold text-sb-on-surface mb-2">Solicitud enviada</h2>
+          <h2 className="text-xl font-bold text-sb-on-surface mb-2">{isCustomer ? 'Ya eres cliente' : 'Solicitud enviada'}</h2>
           <p className="text-sb-on-surface/60 mb-6">
-            Nos contactaremos contigo pronto para coordinar la demostración del sistema.
+            {typeof submitted === 'string'
+              ? submitted
+              : 'Nos contactaremos contigo pronto para coordinar la demostración del sistema.'}
           </p>
           <Link
             href="/"

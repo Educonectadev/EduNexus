@@ -85,28 +85,45 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
+    const includeCustomers = searchParams.get('include_customers') === '1'
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')))
     const offset = (page - 1) * limit
 
-    let query = 'SELECT * FROM demo_requests'
+    // Por defecto NO se muestran solicitudes de colegios que ya tienen plan
+    // (ya son clientes). Con include_customers=1 se pueden ver igual.
+    const where: string[] = []
     const params: any[] = []
 
     if (status) {
-      query += ' WHERE status = ?'
+      where.push('status = ?')
       params.push(status)
     }
+    if (!includeCustomers) {
+      where.push(`NOT EXISTS (
+        SELECT 1 FROM institutions i
+        WHERE i.status = 'active' AND i.plan_id IS NOT NULL
+          AND (i.id = demo_requests.institution_id
+               OR LOWER(TRIM(i.email)) = LOWER(TRIM(demo_requests.email))
+               OR translate(LOWER(TRIM(i.name)), 'áéíóúü', 'aeiou')
+                  = translate(LOWER(TRIM(demo_requests.institution_name)), 'áéíóúü', 'aeiou'))
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM users u
+        WHERE u.status = 'active' AND LOWER(TRIM(u.email)) = LOWER(TRIM(demo_requests.email))
+      )`)
+    }
+
+    const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : ''
 
     // Get total count
-    const countQuery = status 
-      ? 'SELECT COUNT(*) as total FROM demo_requests WHERE status = ?'
-      : 'SELECT COUNT(*) as total FROM demo_requests'
-    const [[{ total }]] = await pool.query(countQuery, status ? [status] : []) as any[]
+    const countQuery = `SELECT COUNT(*) as total FROM demo_requests${whereSql ? ' ' + whereSql : ''}`
+    const [[{ total }]] = await pool.query(countQuery, params) as any[]
 
-    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?'
-    params.push(limit, offset)
-
-    const [rows] = await pool.query(query, params) as any[]
+    const [rows] = await pool.query(
+      `SELECT demo_requests.* FROM demo_requests${whereSql ? ' ' + whereSql : ''} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      [...params, limit, offset]
+    ) as any[]
 
     return NextResponse.json({
       data: rows,
