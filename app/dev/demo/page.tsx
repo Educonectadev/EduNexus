@@ -109,28 +109,8 @@ export default function DevDemoPage() {
   }
 
   const createInstitution = async (id: string) => {
-    if (!confirm('¿Crear la institución demo (15 días) a partir de esta solicitud?')) return
-    setCreating(true)
-    setCreatedCreds(null)
-    try {
-      const res = await fetch('/api/dev/demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setCreatedCreds(data.director ? { code: data.code, email: data.director.email, password: data.director.password } : null)
-        fetchRequests()
-      } else {
-        alert(data.error || 'Error al crear la institución')
-      }
-    } catch (e) {
-      console.error(e)
-      alert('Error de conexión')
-    } finally {
-      setCreating(false)
-    }
+    if (!confirm('Ir al formulario completo de creación con los datos de esta solicitud?')) return
+    window.location.href = `/dev/instituciones?demo=${id}`
   }
 
   const deleteRequest = async (id: string) => {

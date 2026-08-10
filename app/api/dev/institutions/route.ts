@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       director_name, director_dni, director_phone, director_email,
       total_students, total_teachers, total_classrooms,
       has_lab, has_library, has_computer_room, has_playground,
-      notes, plan_id, schedule_config,
+      notes, plan_id, schedule_config, demo_request_id,
     } = body
 
     if (!name) {
@@ -135,9 +135,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (demo_request_id) {
+      await pool.query(
+        `UPDATE demo_requests SET status = 'completed', institution_id = ? WHERE id = ?`,
+        [instId, demo_request_id]
+      )
+    }
+
     return NextResponse.json({
       success: true,
       code: instCode,
+      institutionId: instId,
       director: {
         email: directorEmail,
         password: directorPassword,

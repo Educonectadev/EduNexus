@@ -251,6 +251,7 @@ export default function DevInstitucionesPage() {
     password: string
     name: string
   } | null>(null)
+  const [demoRequestId, setDemoRequestId] = React.useState<string | null>(null)
   const [selectedInst, setSelectedInst] = React.useState<Institution | null>(null)
   const [deleteConfirm, setDeleteConfirm] = React.useState<string | null>(null)
   const [cleanConfirm, setCleanConfirm] = React.useState<string | null>(null)
@@ -274,6 +275,34 @@ export default function DevInstitucionesPage() {
   })
 
   React.useEffect(() => { fetchInstitutions() }, [])
+
+  React.useEffect(() => {
+    const demoId = new URLSearchParams(window.location.search).get("demo")
+    if (!demoId) return
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/dev/demo?limit=100`)
+        const data = await res.json()
+        const req = (data.data || []).find((r: any) => r.id === demoId)
+        if (!req) return
+        setDemoRequestId(demoId)
+        fetchNextCode()
+        setForm(prev => ({
+          ...prev,
+          name: req.institution_name || `Institución de ${req.full_name}`,
+          email: "",
+          phone: req.phone || "",
+          director_name: req.full_name,
+          director_email: req.email,
+          total_students: String(req.estimated_students || "0"),
+          type: req.institution_type === "public" || req.institution_type === "publico" ? "colegio" : "colegio",
+        }))
+        setDialogOpen(true)
+      } catch (e) {
+        console.error(e)
+      }
+    })()
+  }, [])
 
   React.useEffect(() => {
     setForm(prev => ({ ...prev, province: "", district: "" }))
@@ -374,7 +403,7 @@ export default function DevInstitucionesPage() {
       const res = await fetch("/api/dev/institutions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, schedule_config: scheduleConfig }),
+        body: JSON.stringify({ ...form, schedule_config: scheduleConfig, ...(demoRequestId ? { demo_request_id: demoRequestId } : {}) }),
       })
       const data = await res.json()
       if (res.ok) {
