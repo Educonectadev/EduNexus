@@ -71,7 +71,7 @@ export default function DevBasedatosPage() {
     { label: `${conn.ssl ? "SSL activo" : "SSL desactivado"} · pool ${conn.poolLimit}`, value: conn.ssl ? "Cifrado" : "Sin cifrar", icon: Lock, color: "text-emerald-500" },
   ] : []
 
-  const tablePie = (info?.tables || []).slice(0, 10).map(t => ({ name: t.table_name, value: 1, cols: t.column_count }))
+  const tablePie = (info?.tables || []).slice(0, 10).map(t => ({ name: t.table_name, cols: t.column_count }))
   const countsData = info?.counts
     ? Object.entries(info.counts).map(([k, v]) => ({ name: k, value: v }))
     : []
