@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { Database, Key, Link2, RefreshCw, Layers, Table2 } from "@/components/ui/proicons"
+import { Database, Key, Link2, RefreshCw, Layers, Table2, ArrowRight } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface ColumnInfo {
@@ -32,15 +32,33 @@ interface SchemaData {
   error?: string
 }
 
+interface EdgeLine {
+  from: { x: number; y: number }
+  to: { x: number; y: number }
+  c1: { x: number; y: number }
+  c2: { x: number; y: number }
+  mid: { x: number; y: number }
+  color: string
+  source: string
+  target: string
+  label: string
+}
+
 const PALETTE = ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#6366f1", "#14b8a6"]
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const } },
+}
 
 export default function DevEsquemaPage() {
   const [data, setData] = React.useState<SchemaData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [view, setView] = React.useState<"erd" | "list">("erd")
+  const [hovered, setHovered] = React.useState<string | null>(null)
   const wrapRef = React.useRef<HTMLDivElement>(null)
   const cardRefs = React.useRef<Record<string, HTMLDivElement | null>>({})
-  const [lines, setLines] = React.useState<{ from: { x: number; y: number }; to: { x: number; y: number }; color: string; label: string }[]>([])
+  const [lines, setLines] = React.useState<EdgeLine[]>([])
 
   const load = React.useCallback(() => {
     setLoading(true)
@@ -56,37 +74,84 @@ export default function DevEsquemaPage() {
     return () => clearTimeout(t)
   }, [load])
 
-  // Calcula las líneas de relación entre tarjetas una vez renderizadas
+  const tableColor = React.useCallback((name: string) => {
+    return PALETTE[Math.abs(hash(name)) % PALETTE.length]
+  }, [])
+
+  const relatedTables = React.useCallback((table: string) => {
+    const out = new Set<string>()
+    if (!data?.tables) return out
+    for (const t of data.tables) {
+      if (t.name === table) {
+        t.relations.forEach(r => out.add(r.refTable))
+      }
+      for (const r of t.relations) {
+        if (r.refTable === table) out.add(t.name)
+      }
+    }
+    return out
+  }, [data])
+
   const computeLines = React.useCallback(() => {
     if (view !== "erd" || !data?.tables) return
     const wrap = wrapRef.current
     if (!wrap) return
     const wrapRect = wrap.getBoundingClientRect()
-    const out: typeof lines = []
+    const out: EdgeLine[] = []
 
     data.tables.forEach(t => {
       const src = cardRefs.current[t.name]
       if (!src) return
+      const s = src.getBoundingClientRect()
+      const sCx = s.left - wrapRect.left + s.width / 2
+      const sCy = s.top - wrapRect.top + s.height / 2
+
       t.relations.forEach(rel => {
         const dst = cardRefs.current[rel.refTable]
         if (!dst) return
-        const s = src.getBoundingClientRect()
         const d = dst.getBoundingClientRect()
-        const sCx = s.left - wrapRect.left + s.width / 2
-        const sCy = s.top - wrapRect.top + s.height / 2
         const dCx = d.left - wrapRect.left + d.width / 2
         const dCy = d.top - wrapRect.top + d.height / 2
-        const color = PALETTE[Math.abs(hash(t.name)) % PALETTE.length]
+
+        const dx = dCx - sCx
+        const dy = dCy - sCy
+        const len = Math.max(1, Math.sqrt(dx * dx + dy * dy))
+        const nx = dx / len
+        const ny = dy / len
+
+        // Puntos inicio/fin acortados para no dibujar sobre las tarjetas
+        const fromX = sCx + nx * 26
+        const fromY = sCy + ny * 26
+        const toX = dCx - nx * 26
+        const toY = dCy - ny * 26
+
+        // Curva cúbica con control perpendicular suave
+        const px = -ny
+        const py = nx
+        const bend = Math.min(64, len * 0.22)
+        const c1 = { x: fromX + dx * 0.35 + px * bend, y: fromY + dy * 0.35 + py * bend }
+        const c2 = { x: toX - dx * 0.35 + px * bend, y: toY - dy * 0.35 + py * bend }
+
+        // Punto medio aproximado de la curva de Bézier en t=0.5
+        const midX = (fromX + 3 * c1.x + 3 * c2.x + toX) / 8
+        const midY = (fromY + 3 * c1.y + 3 * c2.y + toY) / 8
+
         out.push({
-          from: { x: sCx, y: sCy },
-          to: { x: dCx, y: dCy },
-          color,
-          label: `${rel.column} → ${rel.refTable}.${rel.refColumn}`,
+          from: { x: fromX, y: fromY },
+          to: { x: toX, y: toY },
+          c1,
+          c2,
+          mid: { x: midX, y: midY },
+          color: tableColor(t.name),
+          source: t.name,
+          target: rel.refTable,
+          label: rel.column,
         })
       })
     })
+
     setLines(out)
-  }, [data, view])
+  }, [data, view, tableColor])
 
   React.useEffect(() => {
     if (loading || !data?.tables) return
@@ -96,6 +161,68 @@ export default function DevEsquemaPage() {
   }, [loading, data, computeLines])
 
   const tables = data?.tables || []
+
+  const isDimmed = React.useCallback((name: string) => {
+    if (!hovered) return false
+    if (name === hovered) return false
+    return !relatedTables(hovered).has(name)
+  }, [hovered, relatedTables])
+
+  const lineActive = React.useCallback((ln: EdgeLine) => {
+    if (!hovered) return true
+    return ln.source === hovered || ln.target === hovered
+  }, [hovered])
+
+  const renderEdge = (ln: EdgeLine, i: number) => {
+    const active = lineActive(ln)
+    const path = `M ${ln.from.x} ${ln.from.y} C ${ln.c1.x} ${ln.c1.y} ${ln.c2.x} ${ln.c2.y} ${ln.to.x} ${ln.to.y}`
+    const labelVisible = hovered && active
+    const labelW = ln.label.length * 5.2 + 12
+    const labelH = 14
+
+    return (
+      <g key={`${ln.source}-${ln.target}-${i}`} opacity={active ? 1 : 0.12} style={{ transition: "opacity 0.2s" }}>
+        <path d={path} fill="none" stroke={ln.color} strokeOpacity={0.55} strokeWidth={1.6} strokeLinecap="round" />
+        {/* Flecha de dirección en el destino */}
+        {(() => {
+          const a = Math.atan2(ln.to.y - ln.c2.y, ln.to.x - ln.c2.x)
+          const size = 5.5
+          return (
+            <path
+              d={`M ${ln.to.x} ${ln.to.y} L ${ln.to.x - size * Math.cos(a - 0.42)} ${ln.to.y - size * Math.sin(a - 0.42)} L ${ln.to.x - size * Math.cos(a + 0.42)} ${ln.to.y - size * Math.sin(a + 0.42)} Z`}
+              fill={ln.color}
+              fillOpacity={0.85}
+            />
+          )
+        })()}
+        {labelVisible && (
+          <g>
+            <rect
+              x={ln.mid.x - labelW / 2}
+              y={ln.mid.y - labelH / 2 - 4}
+              width={labelW}
+              height={labelH}
+              rx={7}
+              fill="var(--sb-surface)"
+              stroke={ln.color}
+              strokeOpacity={0.4}
+            />
+            <text
+              x={ln.mid.x}
+              y={ln.mid.y + 0.5 - 4}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={9}
+              fill={ln.color}
+              style={{ fontFamily: "monospace", fontWeight: 600 }}
+            >
+              {ln.label}
+            </text>
+          </g>
+        )}
+      </g>
+    )
+  }
 
   return (
     <div className="w-full space-y-6 py-2 md:py-4">
@@ -164,80 +291,62 @@ export default function DevEsquemaPage() {
           className="relative"
           ref={wrapRef}
         >
-          {/* Líneas de relación */}
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full z-0"
             style={{ overflow: "visible" }}
           >
-            {lines.map((ln, i) => {
-              const dx = ln.to.x - ln.from.x
-              const dy = ln.to.y - ln.from.y
-              const len = Math.max(1, Math.sqrt(dx * dx + dy * dy))
-              const nx = dx / len
-              const ny = dy / len
-              // acorta para no dibujar sobre las tarjetas
-              const fromX = ln.from.x + nx * 28
-              const fromY = ln.from.y + ny * 28
-              const toX = ln.to.x - nx * 28
-              const toY = ln.to.y - ny * 28
-              const midX = (fromX + toX) / 2
-              const midY = (fromY + toY) / 2
-              const path = `M ${fromX} ${fromY} Q ${midX + ny * -24} ${midY + nx * 24} ${toX} ${toY}`
-              return (
-                <g key={i}>
-                  <path d={path} fill="none" stroke={ln.color} strokeOpacity={0.45} strokeWidth={1.5} strokeDasharray="5 4" />
-                  <circle cx={toX} cy={toY} r={3} fill={ln.color} fillOpacity={0.8} />
-                  <text
-                    x={midX}
-                    y={midY - 8}
-                    textAnchor="middle"
-                    fontSize={8.5}
-                    fill={ln.color}
-                    fillOpacity={0.75}
-                    style={{ fontFamily: "monospace" }}
-                  >
-                    {ln.label}
-                  </text>
-                </g>
-              )
-            })}
+            {lines.map((ln, i) => renderEdge(ln, i))}
           </svg>
 
           {/* Tarjetas de tablas */}
           <div className="relative z-10 flex flex-wrap gap-4">
-            {tables.map((t, i) => {
-              const color = PALETTE[i % PALETTE.length]
+            {tables.map((t) => {
+              const color = tableColor(t.name)
+              const dimmed = isDimmed(t.name)
               return (
-                <div
+                <motion.div
                   key={t.name}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="show"
                   ref={el => { cardRefs.current[t.name] = el }}
-                  className="w-[260px] rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden shadow-sm"
+                  onMouseEnter={() => setHovered(t.name)}
+                  onMouseLeave={() => setHovered(null)}
+                  className={cn(
+                    "w-[260px] rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden shadow-sm transition-all duration-200",
+                    dimmed && "opacity-40 saturate-50",
+                    !dimmed && hovered !== t.name && hovered && "shadow-md ring-1 ring-sb-outline-variant/20"
+                  )}
                   style={{ borderTop: `3px solid ${color}` }}
                 >
                   <div className="flex items-center gap-2 px-3.5 py-2.5 bg-sb-surface-container/60">
                     <Database className="h-3.5 w-3.5 shrink-0" style={{ color }} />
                     <p className="text-[13px] font-semibold text-sb-on-surface truncate font-mono">{t.name}</p>
+                    <span className="ml-auto shrink-0 text-[9px] font-mono text-sb-on-surface/40">{t.columns.length}</span>
                   </div>
                   <div className="divide-y divide-sb-outline-variant/8">
-                    {t.columns.map(c => (
-                      <div key={c.name} className="flex items-center gap-2 px-3.5 py-1.5">
-                        {c.primary ? (
-                          <Key className="h-3 w-3 shrink-0 text-amber-500" />
-                        ) : t.relations.some(r => r.column === c.name) ? (
-                          <Link2 className="h-3 w-3 shrink-0 text-sky-500" />
-                        ) : (
-                          <span className="h-3 w-3 shrink-0" />
-                        )}
-                        <span className={cn("text-[12px] font-mono flex-1 min-w-0 truncate",
-                          c.primary ? "text-sb-on-surface font-semibold" : "text-sb-on-surface/80")}>
-                          {c.name}
-                        </span>
-                        <span className="text-[10px] font-mono text-sb-on-surface/45">{c.type}</span>
-                        {c.nullable && <span className="text-[9px] text-sb-on-surface/40 font-medium">NULL</span>}
-                      </div>
-                    ))}
+                    {t.columns.map(c => {
+                      const rel = t.relations.find(r => r.column === c.name)
+                      return (
+                        <div key={c.name} className="flex items-center gap-2 px-3.5 py-1.5 hover:bg-sb-surface-container-low/50 transition-colors">
+                          {c.primary ? (
+                            <Key className="h-3 w-3 shrink-0 text-amber-500" />
+                          ) : rel ? (
+                            <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: tableColor(t.name) }} />
+                          ) : (
+                            <span className="h-3 w-3 shrink-0" />
+                          )}
+                          <span className={cn("text-[12px] font-mono flex-1 min-w-0 truncate",
+                            c.primary ? "text-sb-on-surface font-semibold" : "text-sb-on-surface/80")}>
+                            {c.name}
+                          </span>
+                          <span className="text-[10px] font-mono text-sb-on-surface/45">{c.type}</span>
+                          {c.nullable && <span className="text-[9px] text-sb-on-surface/40 font-medium">NULL</span>}
+                        </div>
+                      )
+                    })}
                   </div>
-                </div>
+                </motion.div>
               )
             })}
           </div>
@@ -245,19 +354,22 @@ export default function DevEsquemaPage() {
           {/* Leyenda */}
           <div className="flex flex-wrap items-center gap-4 mt-4 text-[11px] text-sb-on-surface/60">
             <span className="flex items-center gap-1.5"><Key className="h-3 w-3 text-amber-500" /> Primary key</span>
-            <span className="flex items-center gap-1.5"><Link2 className="h-3 w-3 text-sky-500" /> Foreign key</span>
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-sky-500" /> Foreign key</span>
             <span className="flex items-center gap-1.5">
-              <svg width="18" height="8"><line x1="0" y1="4" x2="18" y2="4" stroke="var(--sb-on-surface-variant)" strokeOpacity="0.5" strokeDasharray="5 4" strokeWidth="1.5" /></svg>
-              Relación FK
+              <svg width="18" height="8"><line x1="0" y1="4" x2="14" y2="4" stroke="var(--sb-on-surface-variant)" strokeOpacity="0.55" strokeWidth="1.6" /></svg>
+              <ArrowRight className="h-3 w-3" /> Relación FK
             </span>
+            {hovered && (
+              <span className="text-[11px] text-sb-on-surface/40">Pasa el cursor sobre una tabla para aislar sus relaciones</span>
+            )}
           </div>
         </motion.div>
       )}
 
       {data?.ok && view === "list" && (
         <div className="space-y-4">
-          {tables.map((t, i) => {
-            const color = PALETTE[i % PALETTE.length]
+          {tables.map((t) => {
+            const color = tableColor(t.name)
             return (
               <motion.div
                 key={t.name}
@@ -299,7 +411,7 @@ export default function DevEsquemaPage() {
                             <td className="px-3 py-2 font-mono text-[11px] text-sb-on-surface/60">{c.type}</td>
                             <td className="px-3 py-2">{c.primary ? <Key className="h-3.5 w-3.5 text-amber-500" /> : "—"}</td>
                             <td className="px-3 py-2 text-sb-on-surface/60">{c.nullable ? "Sí" : "No"}</td>
-                            <td className="px-4 py-2 font-mono text-[11px] text-sky-600">
+                            <td className="px-4 py-2 font-mono text-[11px]" style={{ color: rel ? tableColor(t.name) : "transparent" }}>
                               {rel ? `${rel.refTable}.${rel.refColumn}` : ""}
                             </td>
                           </tr>

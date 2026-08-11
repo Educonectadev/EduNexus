@@ -6,7 +6,7 @@ export async function GET() {
     const [institutions] = await pool.query('SELECT COUNT(*) as count FROM institutions')
     const [users] = await pool.query('SELECT COUNT(*) as count FROM users')
     const [students] = await pool.query('SELECT COUNT(*) as count FROM students')
-    const [tables] = await pool.query("SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = 'educonecta'")
+    const [tables] = await pool.query("SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = current_schema()")
 
     return NextResponse.json({
       institutions: (institutions as any)[0].count,
