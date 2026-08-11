@@ -37,6 +37,7 @@ interface AnomaliaItem {
 
 interface AuditData {
   scan: { at: string; nuevos: number }
+  checks?: number
   constitution: { list: any[]; agg: any }
   anomalias: AnomaliaItem[]
   resolvedCount: number
@@ -231,6 +232,7 @@ export default function DevDashboard() {
             <p className="text-[12px] text-sb-on-surface/60 mt-0.5">
               Cómo está formado cada colegio, cruces de datos entre instituciones y errores detectados.
               Las anomalías nuevas te llegan a la campana y por push.
+              {audit?.checks ? ` · ${audit.checks} checks por revisión.` : ""}
             </p>
           </div>
           <button

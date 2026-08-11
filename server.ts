@@ -3,8 +3,10 @@ import { createServer } from 'http'
 import { parse } from 'cookie'
 import { jwtVerify } from 'jose'
 import { Client } from 'pg'
+import crypto from 'crypto'
 import pool from './lib/db'
 import webpush from 'web-push'
+import { runAnomalyScan } from './lib/anomalies'
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3001')
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
@@ -304,3 +306,35 @@ async function listenNotifications() {
 }
 
 listenNotifications()
+
+// ===== AUDITORÍA AUTOMÁTICA POR HORARIO =====
+// Revisa la constitución de los colegios y las anomalías/cruces de datos
+// periódicamente. Las anomalías NUEVAS (no-baja) se notifican al dev:
+// se inserta una fila en notifications (target_role='dev'), el trigger de
+// realtime la entrega en vivo a la sala notif:dev y dispatchWebPush la
+// envía como push a las suscripciones del dev. No re-notifica las que ya
+// están abiertas (runAnomalyScan sincroniza dev_anomaly_log).
+async function runScheduledAudit() {
+  const started = new Date().toISOString()
+  try {
+    const { nuevos, findings } = await runAnomalyScan(async (f) => {
+      try {
+        await pool.query(
+          `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status)
+           VALUES (?, NULL, ?, ?, 'anomalia', 'dev', 'errores', ?, 'active')`,
+          [crypto.randomUUID(), `Anomalía (${f.severity}): ${f.title}`, f.detail, f.severity === 'alta' ? 'alta' : 'media']
+        )
+      } catch (error) {
+        console.error('[auditoría] error creando notificación dev:', error)
+      }
+    })
+    console.log(`[auditoría] revisión ${started}: ${findings.length} anomalía(s) detectadas, ${nuevos} nueva(s) notificada(s)`)
+  } catch (error) {
+    console.error('[auditoría] error en revisión programada:', error)
+  }
+}
+
+// Al arrancar y luego cada 12 horas
+runScheduledAudit()
+const AUDIT_INTERVAL_MS = 12 * 60 * 60 * 1000
+setInterval(runScheduledAudit, AUDIT_INTERVAL_MS)
