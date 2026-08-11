@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Server, Database, Shield, Globe, Code2, Zap, Palette } from "@/components/ui/proicons"
+import { Settings, Server, Database, Shield, Globe, Code2, Zap, Palette, Lock, Link2 } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 
 const stagger = {
@@ -20,23 +20,64 @@ interface ConfigItem {
   category: string
 }
 
+interface DbInfo {
+  ok: boolean
+  connection?: {
+    database: string
+    host: string
+    port: string
+    user: string
+    socket: string | null
+    ssl: boolean
+    engine: string
+    poolLimit: number
+  }
+}
+
 export default function DevConfigPage() {
   const [config, setConfig] = React.useState<ConfigItem[]>([])
+  const [dbReady, setDbReady] = React.useState(false)
 
   React.useEffect(() => {
-    setConfig([
-      { key: "App Name", value: "Educonecta", icon: Globe, category: "General" },
-      { key: "Version", value: "1.1.1", icon: Zap, category: "General" },
-      { key: "Environment", value: process.env.NODE_ENV || "development", icon: Server, category: "General" },
-      { key: "Database", value: "educonecta", icon: Database, category: "Base de Datos" },
-      { key: "DB Host", value: "localhost:3306", icon: Server, category: "Base de Datos" },
-      { key: "DB Socket", value: "/opt/lampp/var/mysql/mysql.sock", icon: Server, category: "Base de Datos" },
-      { key: "Auth", value: "JWT (jose)", icon: Shield, category: "Seguridad" },
-      { key: "Frontend", value: "Next.js 16", icon: Code2, category: "Stack" },
-      { key: "UI", value: "shadcn/ui + TailwindCSS", icon: Palette, category: "Stack" },
-      { key: "State", value: "Zustand", icon: Code2, category: "Stack" },
-      { key: "Animations", value: "Framer Motion", icon: Zap, category: "Stack" },
-    ])
+    fetch("/api/dev/db-info")
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: DbInfo | null) => {
+        const conn = d?.connection
+        const dbItems: ConfigItem[] = conn ? [
+          { key: "Database", value: conn.database, icon: Database, category: "Base de Datos" },
+          { key: "DB Host", value: `${conn.host}:${conn.port}`, icon: Server, category: "Base de Datos" },
+          { key: "DB Socket", value: conn.socket || "TCP/IP (remoto)", icon: Link2, category: "Base de Datos" },
+          { key: "DB User", value: conn.user, icon: Server, category: "Base de Datos" },
+          { key: "Motor", value: conn.engine, icon: Database, category: "Base de Datos" },
+          { key: "SSL", value: conn.ssl ? "Activado" : "Desactivado", icon: Lock, category: "Base de Datos" },
+          { key: "Pool", value: String(conn.poolLimit), icon: Server, category: "Base de Datos" },
+        ] : []
+        if (conn) setDbReady(true)
+        setConfig([
+          { key: "App Name", value: "Educonecta", icon: Globe, category: "General" },
+          { key: "Version", value: "1.1.1", icon: Zap, category: "General" },
+          { key: "Environment", value: process.env.NODE_ENV || "development", icon: Server, category: "General" },
+          ...dbItems,
+          { key: "Auth", value: "JWT (jose)", icon: Shield, category: "Seguridad" },
+          { key: "Frontend", value: "Next.js 16", icon: Code2, category: "Stack" },
+          { key: "UI", value: "shadcn/ui + TailwindCSS", icon: Palette, category: "Stack" },
+          { key: "State", value: "Zustand", icon: Code2, category: "Stack" },
+          { key: "Animations", value: "Framer Motion", icon: Zap, category: "Stack" },
+        ])
+      })
+      .catch(() => {
+        setConfig([
+          { key: "App Name", value: "Educonecta", icon: Globe, category: "General" },
+          { key: "Version", value: "1.1.1", icon: Zap, category: "General" },
+          { key: "Environment", value: process.env.NODE_ENV || "development", icon: Server, category: "General" },
+          { key: "Database", value: "no disponible", icon: Database, category: "Base de Datos" },
+          { key: "Auth", value: "JWT (jose)", icon: Shield, category: "Seguridad" },
+          { key: "Frontend", value: "Next.js 16", icon: Code2, category: "Stack" },
+          { key: "UI", value: "shadcn/ui + TailwindCSS", icon: Palette, category: "Stack" },
+          { key: "State", value: "Zustand", icon: Code2, category: "Stack" },
+          { key: "Animations", value: "Framer Motion", icon: Zap, category: "Stack" },
+        ])
+      })
   }, [])
 
   const categories = [...new Set(config.map(c => c.category))]
@@ -50,7 +91,14 @@ export default function DevConfigPage() {
 
       {categories.map((cat) => (
         <motion.div key={cat} variants={fadeUp}>
-          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-widest mb-3">{cat}</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-widest">{cat}</p>
+            {cat === "Base de Datos" && (
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${dbReady ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"}`}>
+                {dbReady ? "datos reales" : "cargando..."}
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {config.filter(c => c.category === cat).map((item, i) => (
               <motion.div

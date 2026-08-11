@@ -48,6 +48,8 @@ const navSections: { title: string; items: NavItem[] }[] = [
       { title: "Planes", href: "/dev/planes", icon: CreditCard },
       { title: "Facturación", href: "/dev/facturacion", icon: DollarSign },
       { title: "Reportes", href: "/dev/reportes", icon: BarChart3 },
+      { title: "Anomalías", href: "/dev/anomalias", icon: Shield },
+      { title: "Base de Datos", href: "/dev/basedatos", icon: Database },
     ],
   },
   {
@@ -55,7 +57,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { title: "Contraseñas", href: "/dev/contrasenas", icon: Key },
       { title: "Seguimiento", href: "/dev/seguimiento", icon: Activity },
-      { title: "Database", href: "/dev/database", icon: Database, badge: "SQL" },
+      { title: "SQL Console", href: "/dev/database", icon: Database, badge: "SQL" },
       { title: "Seed", href: "/dev/seed", icon: Terminal, badge: "DEV" },
     ],
   },
