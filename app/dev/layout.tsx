@@ -57,6 +57,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { title: "Contraseñas", href: "/dev/contrasenas", icon: Key },
       { title: "Seguimiento", href: "/dev/seguimiento", icon: Activity },
+      { title: "Esquema BD", href: "/dev/esquema", icon: Database, badge: "ERD" },
       { title: "SQL Console", href: "/dev/database", icon: Database, badge: "SQL" },
       { title: "Seed", href: "/dev/seed", icon: Terminal, badge: "DEV" },
     ],

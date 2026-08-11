@@ -53,6 +53,7 @@ export default function DevDashboard() {
     { label: "Planes", desc: "Planes de suscripción", href: "/dev/planes", icon: CreditCard },
     { label: "Anomalías", desc: "Constitución, cruces y errores", href: "/dev/anomalias", icon: AlertTriangle },
     { label: "Base de Datos", desc: "Conexión real y tablas", href: "/dev/basedatos", icon: Database },
+    { label: "Esquema BD", desc: "Diagrama ER de tablas", href: "/dev/esquema", icon: Database },
     { label: "Database SQL", desc: "Ejecutar SQL directo", href: "/dev/database", icon: Terminal },
     { label: "Seguimiento", desc: "Monitoreo y actividad", href: "/dev/seguimiento", icon: Activity },
     { label: "Configuración", desc: "Ajustes del sistema", href: "/dev/config", icon: Settings },
