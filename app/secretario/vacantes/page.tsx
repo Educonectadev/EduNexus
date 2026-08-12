@@ -5,12 +5,19 @@ import { Plus, Minus, LayoutGrid, RefreshCw, CalendarDays } from "@/components/u
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalBody, SbModalHeader, SbBtn, SbInput } from "@/components/ui/sb"
 
+interface VacancyStudent {
+  name: string
+  dni: string | null
+  code: string | null
+}
+
 interface VacancyCell {
   id: string | null
   section: string
   capacity: number | null
   occupied: number
   available: number | null
+  students: VacancyStudent[]
 }
 
 interface GradeRow {
@@ -28,7 +35,7 @@ export default function VacantesPage() {
   const [data, setData] = React.useState<VacanciesData | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [year, setYear] = React.useState(new Date().getFullYear())
-  const [editing, setEditing] = React.useState<{ grade: string; section: string; capacity: number | null; id: string | null } | null>(null)
+  const [editing, setEditing] = React.useState<{ grade: string; section: string; capacity: number | null; id: string | null; occupied: number; available: number | null; students: VacancyStudent[] } | null>(null)
   const [capacityInput, setCapacityInput] = React.useState("")
   const [saving, setSaving] = React.useState(false)
   const [toast, setToast] = React.useState<{ msg: string; ok: boolean } | null>(null)
@@ -59,7 +66,7 @@ export default function VacantesPage() {
   }
 
   const openEdit = (cell: VacancyCell, grade: string) => {
-    setEditing({ grade, section: cell.section, capacity: cell.capacity, id: cell.id })
+    setEditing({ grade, section: cell.section, capacity: cell.capacity, id: cell.id, occupied: cell.occupied, available: cell.available, students: cell.students || [] })
     setCapacityInput(cell.capacity == null ? "" : String(cell.capacity))
   }
 
@@ -255,16 +262,58 @@ export default function VacantesPage() {
                   placeholder="Ej: 10"
                   className="!text-base !h-11 text-center font-semibold"
                 />
-                <div className="grid grid-cols-2 gap-2 text-center">
-                  <div className="bg-sb-surface-container-low/60 rounded-xl py-2.5 border border-sb-outline-variant/10">
-                    <p className="text-lg font-bold text-sb-on-surface">{editing.capacity ?? 0}</p>
-                    <p className="text-[10px] text-sb-on-surface-variant/40">Vacantes configuradas</p>
+
+                {/* Descomposición: cómo se usa la capacidad */}
+                <div className="rounded-xl border border-sb-outline-variant/10 overflow-hidden">
+                  <div className="grid grid-cols-3 text-center">
+                    <div className="bg-sb-surface-container-low/60 py-2.5 border-r border-sb-outline-variant/10">
+                      <p className="text-lg font-bold text-sb-on-surface">{editing.capacity ?? 0}</p>
+                      <p className="text-[10px] text-sb-on-surface-variant/40">Capacidad</p>
+                    </div>
+                    <div className="bg-amber-500/[0.06] py-2.5 border-r border-sb-outline-variant/10">
+                      <p className="text-lg font-bold text-amber-600">{editing.occupied}</p>
+                      <p className="text-[10px] text-amber-600/70">Ocupados</p>
+                    </div>
+                    <div className="bg-emerald-500/[0.06] py-2.5">
+                      <p className="text-lg font-bold text-emerald-600">{editing.capacity == null ? "—" : Math.max(0, editing.capacity - editing.occupied)}</p>
+                      <p className="text-[10px] text-emerald-600/70">Disponibles</p>
+                    </div>
                   </div>
-                  <div className="bg-emerald-500/[0.06] rounded-xl py-2.5 border border-emerald-500/20">
-                    <p className="text-lg font-bold text-emerald-600">{editing.capacity == null ? "—" : Math.max(0, editing.capacity - (data?.grades.find(g => g.grade === editing.grade)?.sections.find(s => s.section === editing.section)?.occupied || 0))}</p>
-                    <p className="text-[10px] text-emerald-600/70">Disponibles ahora</p>
-                  </div>
+                  <p className="text-center text-[10px] text-sb-on-surface-variant/40 py-2 bg-sb-surface-container-low/30">
+                    {editing.capacity == null ? "Sin límite definido" : "Capacidad − Ocupados = Disponibles"}
+                  </p>
                 </div>
+
+                {/* Alumnos matriculados */}
+                {editing.occupied > 0 ? (
+                  <div className="rounded-xl border border-sb-outline-variant/10 overflow-hidden">
+                    <div className="flex items-center justify-between px-3 py-2 bg-sb-surface-container-low/50 border-b border-sb-outline-variant/10">
+                      <p className="text-[11px] font-semibold text-sb-on-surface-variant/60">
+                        {editing.occupied} matriculado{editing.occupied === 1 ? "" : "s"} en esta sección
+                      </p>
+                      <span className="text-[9px] text-sb-on-surface-variant/30">matrículas activas {year}</span>
+                    </div>
+                    <div className="max-h-36 overflow-y-auto divide-y divide-sb-outline-variant/8">
+                      {editing.students.map((st, i) => (
+                        <div key={i} className="flex items-center gap-2 px-3 py-1.5">
+                          <span className="h-4 w-4 rounded-full text-[9px] font-semibold flex items-center justify-center bg-sb-surface-container-high text-sb-on-surface-variant/50 shrink-0">
+                            {i + 1}
+                          </span>
+                          <span className="text-[11px] text-sb-on-surface truncate">{st.name}</span>
+                          <span className="text-[9px] text-sb-on-surface-variant/30 ml-auto shrink-0">{st.dni || st.code || ""}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-sb-surface-container-low/40 border border-sb-outline-variant/10 px-3 py-2.5 text-center">
+                    <p className="text-[11px] text-sb-on-surface-variant/50">Sin alumnos matriculados todavía</p>
+                    <p className="text-[9.5px] text-sb-on-surface-variant/30 mt-0.5">
+                      Por eso de {editing.capacity ?? 0} vacantes quedan {editing.capacity ?? 0} disponibles
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2">
                   <SbBtn variant="filled" rounded className="flex-1 gap-2" onClick={saveCapacity} disabled={saving}>
                     <Plus className="h-4 w-4" /> {saving ? "Guardando..." : "Guardar vacantes"}

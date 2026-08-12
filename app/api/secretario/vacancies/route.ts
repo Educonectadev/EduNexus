@@ -36,6 +36,15 @@ export async function GET(request: NextRequest) {
       [instId, year]
     ).catch(() => [] as any[]) as any[]
 
+    const [studentRows] = await pool.query(
+      `SELECT e.grade, e.section, s.full_name, s.dni, s.code, s.student_code
+       FROM enrollments e
+       JOIN students s ON e.student_id = s.id
+       WHERE e.institution_id = ? AND e.year = ? AND e.status = 'active'
+       ORDER BY s.full_name ASC`,
+      [instId, year]
+    ).catch(() => [] as any[]) as any[]
+
     const [capacityRows] = await pool.query(
       `SELECT id, grade, section, capacity FROM grade_section_vacancies
        WHERE institution_id = ? AND year = ?`,
@@ -45,6 +54,17 @@ export async function GET(request: NextRequest) {
     const occupiedMap: Record<string, number> = {}
     for (const r of (occupiedRows || []) as any[]) {
       occupiedMap[`${r.grade}__${r.section || 'A'}`] = Number(r.occupied) || 0
+    }
+
+    const studentsMap: Record<string, any[]> = {}
+    for (const r of (studentRows || []) as any[]) {
+      const key = `${r.grade}__${r.section || 'A'}`
+      if (!studentsMap[key]) studentsMap[key] = []
+      studentsMap[key].push({
+        name: r.full_name || `${r.dni || ''}`.trim(),
+        dni: r.dni || null,
+        code: r.code || r.student_code || null,
+      })
     }
 
     const capacityMap: Record<string, number> = {}
@@ -68,6 +88,7 @@ export async function GET(request: NextRequest) {
           capacity,
           occupied,
           available: capacity == null ? null : Math.max(0, capacity - occupied),
+          students: studentsMap[key] || [],
         }
       }),
     }))
