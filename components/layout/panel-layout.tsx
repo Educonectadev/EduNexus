@@ -14,6 +14,7 @@ import {
   Sun, Moon, Megaphone, Handshake, Briefcase, BookOpen, ClipboardList,
   MessageSquare, Calendar, UserCheck, BookMarked, Search, User,
   ArrowRight, Clock, AlertCircle, X, Layers, Plus,
+  LayoutGrid, ArrowLeftRight, Receipt,
   Sparkles,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
@@ -52,6 +53,7 @@ const navByRole: Record<string, NavItem[]> = {
     { title: "Comunicados", href: "/director/comunicados", icon: Megaphone },
     { title: "Reuniones", href: "/director/reuniones", icon: Handshake },
     { title: "Reportes", href: "/director/reportes", icon: BarChart3 },
+    { title: "Pagos del Plan", href: "/director/pagos-plan", icon: Receipt },
     { title: "Configuración", href: "/director/configuracion", icon: Settings },
   ],
   secretario: [
@@ -61,8 +63,11 @@ const navByRole: Record<string, NavItem[]> = {
     { title: "Asistencia", href: "/secretario/asistencia", icon: UserCheck },
     { title: "Notas", href: "/secretario/notas", icon: GraduationCap },
     { title: "Pagos", href: "/secretario/pagos", icon: CreditCard },
+    { title: "Pagos del Plan", href: "/secretario/pagos-plan", icon: Receipt },
     { title: "Cursos", href: "/secretario/cursos", icon: BookOpen },
     { title: "Horarios", href: "/secretario/horarios", icon: Calendar },
+    { title: "Vacantes", href: "/secretario/vacantes", icon: LayoutGrid },
+    { title: "Sustituciones", href: "/secretario/sustituciones", icon: ArrowLeftRight },
     { title: "Documentos", href: "/secretario/documentos", icon: FileText },
     { title: "Certificados", href: "/secretario/certificados", icon: ClipboardList },
     { title: "Padres", href: "/secretario/padres", icon: Users },
@@ -134,6 +139,7 @@ const navSectionsByRole: Record<string, { title: string; items: NavItem[] }[]> =
     ]},
     { title: "Análisis", items: [
       { title: "Reportes", href: "/director/reportes", icon: BarChart3 },
+      { title: "Pagos del Plan", href: "/director/pagos-plan", icon: Receipt },
     ]},
     { title: "Sistema", items: [
       { title: "Configuración", href: "/director/configuracion", icon: Settings },
@@ -150,9 +156,12 @@ const navSectionsByRole: Record<string, { title: string; items: NavItem[] }[]> =
       { title: "Notas", href: "/secretario/notas", icon: GraduationCap },
       { title: "Cursos", href: "/secretario/cursos", icon: BookOpen },
       { title: "Horarios", href: "/secretario/horarios", icon: Calendar },
+      { title: "Vacantes", href: "/secretario/vacantes", icon: LayoutGrid },
+      { title: "Sustituciones", href: "/secretario/sustituciones", icon: ArrowLeftRight },
     ]},
     { title: "Gestión", items: [
       { title: "Pagos", href: "/secretario/pagos", icon: CreditCard },
+      { title: "Pagos del Plan", href: "/secretario/pagos-plan", icon: Receipt },
       { title: "Documentos", href: "/secretario/documentos", icon: FileText },
       { title: "Certificados", href: "/secretario/certificados", icon: ClipboardList },
       { title: "Padres", href: "/secretario/padres", icon: Users },

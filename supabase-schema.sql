@@ -675,3 +675,63 @@ CREATE TABLE IF NOT EXISTS dev_anomaly_log (
 
 CREATE INDEX IF NOT EXISTS idx_dev_anomaly_status ON dev_anomaly_log(status);
 CREATE INDEX IF NOT EXISTS idx_dev_anomaly_inst ON dev_anomaly_log(institution_id);
+
+-- =========================
+-- VACANTES POR GRADO + SECCIÓN (features secretario)
+-- =========================
+CREATE TABLE IF NOT EXISTS grade_section_vacancies (
+  id VARCHAR(36) PRIMARY KEY,
+  institution_id VARCHAR(36) NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
+  grade VARCHAR(100) NOT NULL,
+  section VARCHAR(10) NOT NULL DEFAULT 'A',
+  year INTEGER NOT NULL DEFAULT EXTRACT(YEAR FROM CURRENT_DATE),
+  capacity INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uk_grade_section_vacancy UNIQUE (institution_id, grade, section, year)
+);
+
+CREATE INDEX IF NOT EXISTS idx_grade_section_vacancies_inst ON grade_section_vacancies(institution_id);
+
+-- =========================
+-- SUSTITUCIÓN TEMPORAL DE DOCENTES (features secretario)
+-- =========================
+CREATE TABLE IF NOT EXISTS teacher_substitutions (
+  id VARCHAR(36) PRIMARY KEY,
+  institution_id VARCHAR(36) NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
+  course_id VARCHAR(36) NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  original_teacher_id VARCHAR(36) REFERENCES users(id) ON DELETE SET NULL,
+  substitute_teacher_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  notes TEXT DEFAULT '',
+  status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'cancelled')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uk_teacher_substitution UNIQUE (course_id, date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_teacher_substitutions_inst ON teacher_substitutions(institution_id);
+CREATE INDEX IF NOT EXISTS idx_teacher_substitutions_date ON teacher_substitutions(date);
+
+-- =========================
+-- PAGOS DEL PLAN ADQUIRIDO (SaaS de la institución, aparte de pagos de padres)
+-- =========================
+CREATE TABLE IF NOT EXISTS institution_plan_payments (
+  id VARCHAR(36) PRIMARY KEY,
+  institution_id VARCHAR(36) NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
+  plan_id VARCHAR(36) REFERENCES plans(id) ON DELETE SET NULL,
+  year INTEGER NOT NULL,
+  month INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
+  amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'overdue')),
+  payment_date DATE DEFAULT NULL,
+  method VARCHAR(50) DEFAULT '',
+  voucher_ref VARCHAR(200) DEFAULT '',
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uk_institution_plan_payment UNIQUE (institution_id, year, month)
+);
+
+CREATE INDEX IF NOT EXISTS idx_plan_payments_inst ON institution_plan_payments(institution_id);
+CREATE INDEX IF NOT EXISTS idx_plan_payments_year ON institution_plan_payments(institution_id, year, month);
