@@ -123,62 +123,127 @@ html.dark [data-role="docente"] {
   box-shadow: var(--sb-docente-shadow-sm);
 }
 
-/* ─── Inputs: focus glow ──────────────────── */
+/* ─── Inputs y selects note: flat, hairline ─── */
 [data-role="docente"] .sb-input,
 [data-role="docente"] .sb-textarea,
-[data-role="docente"] .sbf-native-select {
-  transition: border-color 250ms ease, box-shadow 250ms ease, background 250ms ease;
+[data-role="docente"] .sb-select,
+[data-role="docente"] .sbf-native-select,
+[data-role="docente"] .nb-select {
+  border-radius: 12px !important;
+  border: 1px solid var(--sb-outline-variant);
+  background-color: transparent;
+  color: var(--sb-on-surface);
+  font-family: var(--sb-docente-font);
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
 }
 [data-role="docente"] .sb-input:hover,
 [data-role="docente"] .sb-textarea:hover,
-[data-role="docente"] .sbf-native-select:hover {
-  background: var(--sb-surface-container-highest);
+[data-role="docente"] .sb-select:hover,
+[data-role="docente"] .sbf-native-select:hover,
+[data-role="docente"] .nb-select:hover {
+  background: var(--sb-surface-container-low);
 }
 [data-role="docente"] .sb-input:focus,
 [data-role="docente"] .sb-textarea:focus,
-[data-role="docente"] .sbf-native-select:focus {
+[data-role="docente"] .sb-select:focus,
+[data-role="docente"] .sbf-native-select:focus,
+[data-role="docente"] .nb-select:focus {
   outline: none;
-  background: var(--sb-surface-container-highest);
-  border-color: var(--sb-primary) !important;
-  box-shadow: var(--sb-docente-glow) !important;
+  background-color: transparent;
+  border-color: var(--sb-on-surface-variant);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
 }
 
-/* ─── Botones premium ─────────────────────── */
-[data-role="docente"] .sb-btn {
+/* ─── Botones note (stepbro flat + springy scale) ─── */
+[data-role="docente"] .sb-btn,
+[data-role="docente"] .nb-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 12px !important;
+  background: var(--sb-surface-container);
+  color: var(--sb-on-surface);
+  font-family: var(--sb-docente-font);
+  font-size: 13px;
   font-weight: 550;
   letter-spacing: 0.01em;
-  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 250ms ease,
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 220ms cubic-bezier(0.34, 1.45, 0.5, 1),
               background 200ms ease,
-              color 200ms ease,
-              padding 400ms cubic-bezier(0.38, 0.49, 0, 2),
-              border-radius 250ms cubic-bezier(0.38, 0.49, 0, 1.5);
+              border-color 200ms ease,
+              opacity 200ms ease,
+              color 200ms ease;
 }
-[data-role="docente"] .sb-btn:hover {
+[data-role="docente"] .sb-btn:hover,
+[data-role="docente"] .nb-btn:hover {
+  background: var(--sb-surface-container-high);
   transform: translateY(-1px);
 }
-[data-role="docente"] .sb-btn:active {
+[data-role="docente"] .sb-btn:active,
+[data-role="docente"] .nb-btn:active {
   transform: translateY(0) scale(0.96);
 }
-[data-role="docente"] .sb-btn.filled {
+[data-role="docente"] .sb-btn:disabled,
+[data-role="docente"] .nb-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+}
+[data-role="docente"] .sb-btn.filled,
+[data-role="docente"] .nb-btn-solid {
   background: var(--sb-on-surface);
   color: var(--sb-surface) !important;
-  box-shadow: 0 4px 16px -6px color-mix(in srgb, var(--sb-primary) 40%, transparent);
 }
-[data-role="docente"] .sb-btn.filled:hover {
-  box-shadow: 0 8px 24px -6px color-mix(in srgb, var(--sb-primary) 50%, transparent);
+[data-role="docente"] .sb-btn.filled:hover,
+[data-role="docente"] .nb-btn-solid:hover {
+  background: var(--sb-on-surface);
+  opacity: 0.88;
+}
+[data-role="docente"] .sb-btn.outlined,
+[data-role="docente"] .nb-btn-outline {
+  background: transparent;
+  border: 1px solid var(--sb-outline-variant);
+  color: var(--sb-on-surface);
+}
+[data-role="docente"] .sb-btn.outlined:hover,
+[data-role="docente"] .nb-btn-outline:hover {
+  background: var(--sb-surface-container);
+}
+[data-role="docente"] .sb-btn.tonal,
+[data-role="docente"] .nb-btn-tonal {
+  background: var(--sb-surface-container-high);
+  color: var(--sb-on-surface);
 }
 [data-role="docente"] .sb-btn.rounded,
 [data-role="docente"] .sb-btn.playful {
-  border-radius: 999px !important;
+  border-radius: 12px !important;
+  padding: 0 18px;
+}
+[data-role="docente"] .sb-btn.rounded:hover,
+[data-role="docente"] .sb-btn.playful:hover {
+  padding: 0 18px;
+  border-radius: 12px !important;
 }
 [data-role="docente"] .sb-btn-icon {
-  transition: background 200ms ease, border-radius 200ms ease, transform 200ms ease;
+  transition: background 200ms ease, transform 200ms cubic-bezier(0.34, 1.45, 0.5, 1);
 }
 [data-role="docente"] .sb-btn-icon:hover {
   background: var(--sb-surface-container-high);
-  border-radius: 14px;
+  border-radius: 12px;
   transform: translateY(-1px);
+}
+[data-role="docente"] .sb-btn-icon:active {
+  transform: scale(0.92);
 }
 
 /* ─── Sidebar glass ───────────────────────── */
@@ -431,4 +496,145 @@ html.dark [data-role="docente"] {
 .sb-note button:focus-visible {
   outline: 1px solid var(--note-muted);
   outline-offset: 2px;
+}
+
+/* ============================================
+   stepbro note — botones, rail/pills y selects
+   Fuente: stepbro-tasks.js + frontend.css (.sbf)
+   Mono flat: sin sombras, hairline 1px, radios
+   12px (btn/option) / 14px (rail), scaling
+   springy cubic-bezier(0.34, 1.45, 0.5, 1).
+   ============================================ */
+
+/* Rail segmentado (toggle de opciones) */
+[data-role="docente"] main .nb-rail,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: color-mix(in srgb, var(--sb-surface-container) 55%, transparent) !important;
+  border-radius: 14px !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Pill de opción dentro del rail */
+[data-role="docente"] main .nb-pill,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface button,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container button,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface [role="tab"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container [role="tab"] {
+  border: none;
+  border-radius: 12px !important;
+  background: transparent;
+  color: var(--sb-on-surface-variant);
+  font-family: var(--sb-docente-font);
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  padding: 8px 14px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 200ms ease, color 200ms ease,
+              transform 200ms cubic-bezier(0.34, 1.45, 0.5, 1);
+}
+[data-role="docente"] main .nb-pill:hover,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface button:hover,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container button:hover,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface [role="tab"]:hover,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container [role="tab"]:hover {
+  color: var(--sb-on-surface);
+  background: var(--sb-surface-container-high);
+}
+[data-role="docente"] main .nb-pill:active,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface button:active {
+  transform: scale(0.96);
+}
+[data-role="docente"] main .nb-pill.active,
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface button[class*="bg-sb-on-surface"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container button[class*="bg-sb-on-surface"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface [role="tab"][class*="bg-sb-on-surface"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container [role="tab"][class*="bg-sb-on-surface"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface button[class*="bg-sb-surface-container-high"],
+[data-role="docente"] .flex.gap-1.p-1.bg-sb-surface-container button[class*="bg-sb-surface-container-high"] {
+  background: var(--sb-on-surface) !important;
+  color: var(--sb-surface) !important;
+  box-shadow: none !important;
+}
+
+/* Dropdown/popover de opciones (SbDropdown, SbSearchSelect) */
+[data-role="docente"] main [class*="shadow-[0_8px_32px"],
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl {
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-outline-variant) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.45) !important;
+  padding: 6px;
+}
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl button,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button,
+[data-role="docente"] main .nb-option {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--sb-on-surface);
+  font-family: var(--sb-docente-font);
+  font-size: 13px;
+  font-weight: 450;
+  text-align: left;
+  cursor: pointer;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 120ms, color 120ms,
+              transform 150ms cubic-bezier(0.34, 1.45, 0.5, 1);
+}
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl button:hover,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button:hover,
+[data-role="docente"] main .nb-option:hover {
+  background: var(--sb-surface-container);
+  color: var(--sb-on-surface);
+}
+[data-role="docente"] main .nb-option:active {
+  transform: scale(0.97);
+}
+[data-role="docente"] main .nb-option.selected,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button[class*="bg-sb-surface-container-high"] {
+  background: var(--sb-surface-container-high);
+  color: var(--sb-on-surface);
+  font-weight: 550;
+}
+
+/* Selector note (trigger de select de opciones) */
+[data-role="docente"] main .nb-select {
+  height: 40px;
+  padding: 0 36px 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--sb-outline-variant);
+  background-color: transparent;
+  color: var(--sb-on-surface-variant);
+  font-family: var(--sb-docente-font);
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+[data-role="docente"] main .nb-select:hover {
+  background-color: var(--sb-surface-container);
+  border-color: var(--sb-on-surface-variant);
+}
+[data-role="docente"] main .nb-select:focus {
+  outline: none;
+  border-color: var(--sb-on-surface-variant);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
 }
