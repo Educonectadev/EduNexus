@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams } from "next/navigation"
 import { ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap, ChevronDown } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
@@ -71,6 +72,16 @@ const submissionStatusConfig: Record<string, { color: string; label: string; bg:
 }
 
 export default function TareasPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <TareasInner />
+    </React.Suspense>
+  )
+}
+
+function TareasInner() {
+  const searchParams = useSearchParams()
+  const prefilterCourse = searchParams.get("curso") || ""
   const [tasks, setTasks] = React.useState<Task[]>([])
   const [courses, setCourses] = React.useState<Course[]>([])
   const [dialogOpen, setDialogOpen] = React.useState(false)
@@ -80,14 +91,17 @@ export default function TareasPage() {
   const [detailLoading, setDetailLoading] = React.useState(false)
   const [filter, setFilter] = React.useState<string>("all")
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [formData, setFormData] = React.useState({ title: "", subject: "", start_date: "", due_date: "", priority: "medium" as "high" | "medium" | "low", description: "", course_id: "" })
+  const [courseFilter, setCourseFilter] = React.useState(prefilterCourse)
+  const [formData, setFormData] = React.useState({ title: "", subject: "", start_date: "", due_date: "", priority: "medium" as "high" | "medium" | "low", description: "", course_id: prefilterCourse })
+  const [editingSubmission, setEditingSubmission] = React.useState<{ studentId: string; submissionId: string | null; grade: string; feedback: string } | null>(null)
+  const [gradingTaskId, setGradingTaskId] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     fetchTasks()
     fetchCourses()
   }, [])
 
-  const fetchTasks = async () => {
+  async function fetchTasks() {
     try {
       const res = await fetch("/api/docente/tareas")
       if (res.ok) {
@@ -101,7 +115,7 @@ export default function TareasPage() {
     }
   }
 
-  const fetchCourses = async () => {
+  async function fetchCourses() {
     try {
       const res = await fetch("/api/docente/cursos")
       if (res.ok) {
@@ -169,17 +183,49 @@ export default function TareasPage() {
     }
   }
 
+  const handleGradeSubmission = async (taskId: string, student: StudentSubmission) => {
+    if (!editingSubmission) return
+    setGradingTaskId(student.student_id)
+    try {
+      const body: any = { action: "update_submission", status: "graded", grade: Number(editingSubmission.grade) || null, feedback: editingSubmission.feedback || null }
+      if (student.submission_id) {
+        body.submission_id = student.submission_id
+      } else {
+        body.student_id = student.student_id
+        await fetch(`/api/docente/tareas/${taskId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "mark_submitted", student_id: student.student_id }),
+        })
+      }
+      await fetch(`/api/docente/tareas/${taskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      setEditingSubmission(null)
+      fetchTaskDetail(taskId)
+      fetchTasks()
+    } catch (e) {
+      console.error("Error grading submission:", e)
+    } finally {
+      setGradingTaskId(null)
+    }
+  }
+
   const filtered = tasks.filter(t => {
     const matchesFilter = filter === "all" || t.status === filter
+    const matchesCourse = !courseFilter || t.course_id === courseFilter
     const matchesSearch = !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.subject?.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesFilter && matchesSearch
+    return matchesFilter && matchesCourse && matchesSearch
   })
 
+  const courseTasks = courseFilter ? tasks.filter(t => t.course_id === courseFilter) : tasks
   const counts = {
-    all: tasks.length,
-    pending: tasks.filter(t => t.status === "pending").length,
-    delivered: tasks.filter(t => t.status === "delivered").length,
-    graded: tasks.filter(t => t.status === "graded").length,
+    all: courseTasks.length,
+    pending: courseTasks.filter(t => t.status === "pending").length,
+    delivered: courseTasks.filter(t => t.status === "delivered").length,
+    graded: courseTasks.filter(t => t.status === "graded").length,
   }
 
   const selectedCourseName = courses.find(c => c.id === formData.course_id)?.name || ""
@@ -218,13 +264,20 @@ export default function TareasPage() {
       </motion.div>
 
       {/* Search + Filters */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-sb-on-surface-variant/30" />
           <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             className="sb-input rounded-[6px] text-sm h-10 w-full pl-9" />
         </div>
-        <div className="flex gap-2">
+        <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
+          className="sbf-native-select sm:w-56">
+          <option value="">Todos los cursos</option>
+          {courses.map(c => (
+            <option key={c.id} value={c.id}>{c.name} - {c.grade}{c.section}</option>
+          ))}
+        </select>
+        <div className="flex gap-2 flex-wrap">
           {([
             { key: 'all', label: 'Todas' },
             { key: 'pending', label: 'Pendientes' },
@@ -500,38 +553,81 @@ export default function TareasPage() {
                       <div className="divide-y divide-sb-outline-variant/10">
                         {selectedTask.students.map((student, i) => {
                           const ss = submissionStatusConfig[student.submission_status] || submissionStatusConfig.pending
+                          const isEditing = editingSubmission?.studentId === student.student_id
                           return (
                             <motion.div key={student.student_id}
                               initial={{ opacity: 0, x: -8 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: i * 0.03 }}
-                              className="flex items-center justify-between px-4 py-3 hover:bg-sb-surface-container/50 transition-colors">
-                              <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-[6px] bg-sb-on-surface/8 flex items-center justify-center text-[10px] font-bold text-sb-on-surface-variant/60">
-                                  {student.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                              className="px-4 py-3 hover:bg-sb-surface-container/50 transition-colors">
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="h-8 w-8 rounded-[6px] bg-sb-on-surface/8 flex items-center justify-center text-[10px] font-bold text-sb-on-surface-variant/60 shrink-0">
+                                    {student.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-semibold text-sb-on-surface truncate">{student.full_name}</p>
+                                    <p className="text-[10px] text-sb-on-surface-variant/40">DNI: {student.dni || 'N/A'} - {student.grade}{student.section}</p>
+                                  </div>
                                 </div>
-                                <div>
-                                  <p className="text-xs font-semibold text-sb-on-surface">{student.full_name}</p>
-                                  <p className="text-[10px] text-sb-on-surface-variant/40">DNI: {student.dni || 'N/A'} - {student.grade}{student.section}</p>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {student.submission_grade != null && (
-                                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-[6px]">
-                                    {student.submission_grade}
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {student.submission_grade != null && (
+                                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-[6px]">
+                                      {student.submission_grade}
+                                    </span>
+                                  )}
+                                  <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] ${ss.bg} ${ss.color}`}>
+                                    <span className={`h-1.5 w-1.5 rounded-[6px] ${ss.dot}`} />
+                                    {ss.label}
                                   </span>
-                                )}
-                                <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[6px] ${ss.bg} ${ss.color}`}>
-                                  <span className={`h-1.5 w-1.5 rounded-[6px] ${ss.dot}`} />
-                                  {ss.label}
-                                </span>
-                                {student.submission_status === 'pending' && (
-                                  <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
-                                    className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-[6px] transition-colors">
-                                    Marcar entrega
-                                  </button>
-                                )}
+                                  {student.submission_status === 'pending' && (
+                                    <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
+                                      className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-[6px] transition-colors">
+                                      Marcar entrega
+                                    </button>
+                                  )}
+                                  {student.submission_status !== 'pending' && (
+                                    <button onClick={(e) => {
+                                      e.stopPropagation()
+                                      setEditingSubmission(isEditing ? null : {
+                                        studentId: student.student_id,
+                                        submissionId: student.submission_id,
+                                        grade: student.submission_grade?.toString() || "",
+                                        feedback: student.feedback || "",
+                                      })
+                                    }}
+                                      className={`text-[10px] font-medium px-2.5 py-1 rounded-[6px] transition-colors ${
+                                        isEditing ? 'text-sb-on-surface bg-sb-surface-container-high' : 'text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/20'
+                                      }`}>
+                                      {student.submission_status === 'graded' ? (isEditing ? 'Cerrar' : 'Editar nota') : (isEditing ? 'Cerrar' : 'Calificar')}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
+
+                              {/* Grading inline */}
+                              {isEditing && (
+                                <div className="mt-3 pl-11 flex items-start gap-2">
+                                  <div className="w-20">
+                                    <label className="text-[9px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1 block">Nota</label>
+                                    <input type="number" min={0} max={20} step="0.5" value={editingSubmission.grade}
+                                      onChange={e => setEditingSubmission(prev => prev ? { ...prev, grade: e.target.value } : prev)}
+                                      placeholder="0-20"
+                                      className="sb-input rounded-[6px] text-sm h-9 w-full text-center" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <label className="text-[9px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider mb-1 block">Comentario</label>
+                                    <input value={editingSubmission.feedback}
+                                      onChange={e => setEditingSubmission(prev => prev ? { ...prev, feedback: e.target.value } : prev)}
+                                      placeholder="Retroalimentación para el alumno"
+                                      className="sb-input rounded-[6px] text-sm h-9 w-full" />
+                                  </div>
+                                  <button onClick={() => handleGradeSubmission(selectedTask.id, student)} disabled={gradingTaskId === student.student_id}
+                                    className="h-9 px-4 rounded-[6px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors disabled:opacity-50 mt-5 shrink-0">
+                                    {gradingTaskId === student.student_id ? "Guardando..." : "Guardar"}
+                                  </button>
+                                </div>
+                              )}
                             </motion.div>
                           )
                         })}

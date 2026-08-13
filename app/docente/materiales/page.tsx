@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams } from "next/navigation"
 import { FileText, Upload, Download, Search, Image, File, X, Trash2, Library } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbInput, SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
@@ -71,10 +72,20 @@ function formatDate(date: string) {
 }
 
 export default function MaterialesPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <MaterialesInner />
+    </React.Suspense>
+  )
+}
+
+function MaterialesInner() {
+  const searchParams = useSearchParams()
+  const prefilterCourse = searchParams.get("curso") || ""
   const [materials, setMaterials] = React.useState<Material[]>([])
   const [courses, setCourses] = React.useState<Course[]>([])
   const [search, setSearch] = React.useState("")
-  const [courseFilter, setCourseFilter] = React.useState("all")
+  const [courseFilter, setCourseFilter] = React.useState(prefilterCourse || "all")
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 

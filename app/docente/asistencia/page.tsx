@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams } from "next/navigation"
 import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Flame, Clock, ChevronDown, ChevronLeft, ChevronRight } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -51,7 +52,18 @@ function getBarConfig(status: string | null) {
 }
 
 export default function AsistenciaPage() {
-  const [tab, setTab] = React.useState<Tab>("personal")
+  return (
+    <React.Suspense fallback={null}>
+      <AsistenciaInner />
+    </React.Suspense>
+  )
+}
+
+function AsistenciaInner() {
+  const searchParams = useSearchParams()
+  const prefilterCourse = searchParams.get("curso") || ""
+  const [tab, setTab] = React.useState<Tab>(prefilterCourse ? "alumnos" : "personal")
+  const [prefillCourse, setPrefillCourse] = React.useState(prefilterCourse)
   const tabs: { key: Tab; label: string }[] = [
     { key: "personal", label: "Mi Asistencia" },
     { key: "alumnos", label: "Asistencia de Alumnos" },
@@ -74,7 +86,7 @@ export default function AsistenciaPage() {
       </div>
 
       <AnimatePresence mode="wait">
-        {tab === "personal" ? <MiAsistencia key="personal" /> : <AsistenciaAlumnos key="alumnos" />}
+        {tab === "personal" ? <MiAsistencia key="personal" /> : <AsistenciaAlumnos key="alumnos" prefillCourse={prefillCourse} />}
       </AnimatePresence>
     </div>
   )
@@ -419,15 +431,19 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   )
 }
 
-function AsistenciaAlumnos() {
+function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const [courses, setCourses] = React.useState<any[]>([])
-  const [selectedCourse, setSelectedCourse] = React.useState("")
+  const [selectedCourse, setSelectedCourse] = React.useState(prefillCourse)
   const [date, setDate] = React.useState(getLocalDateStr())
   const [students, setStudents] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
   const [loaded, setLoaded] = React.useState(false)
   const [searchTerm, setSearchTerm] = React.useState("")
+  const [alumnoView, setAlumnoView] = React.useState<"registro" | "estadisticas">("registro")
+  const [stats, setStats] = React.useState<any[]>([])
+  const [statsLoading, setStatsLoading] = React.useState(false)
+  const [statsLoaded, setStatsLoaded] = React.useState(false)
 
   React.useEffect(() => {
     fetch("/api/docente/cursos").then(r => r.json()).then(setCourses).catch(() => {})
@@ -448,6 +464,25 @@ function AsistenciaAlumnos() {
     setStudents(prev => prev.map(s => s.id !== studentId ? s : { ...s, status: s.status === status ? null : status }))
   }
 
+  const handleMarkAllPresent = () => {
+    setStudents(prev => prev.map(s => s.status ? s : { ...s, status: "present" as const }))
+  }
+
+  const handleClearAll = () => {
+    setStudents(prev => prev.map(s => ({ ...s, status: null })))
+  }
+
+  const loadStats = async () => {
+    if (!selectedCourse || statsLoaded) return
+    setStatsLoading(true)
+    try {
+      const res = await fetch(`/api/docente/student-attendance?course_id=${selectedCourse}&mode=stats`)
+      const data = await res.json()
+      setStats(data.students || [])
+      setStatsLoaded(true)
+    } catch {} finally { setStatsLoading(false) }
+  }
+
   const handleGuardar = async () => {
     if (!selectedCourse || !date || students.length === 0) return
     setSaving(true)
@@ -458,7 +493,7 @@ function AsistenciaAlumnos() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ course_id: selectedCourse, date, records }),
       })
-      if (res.ok) setLoaded(false)
+      if (res.ok) { setLoaded(false); setStatsLoaded(false); setStats([]) }
     } catch {} finally { setSaving(false) }
   }
 
@@ -506,7 +541,7 @@ function AsistenciaAlumnos() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-sb-on-surface-variant/60">Curso</p>
-              <select value={selectedCourse} onChange={e => setSelectedCourse(e.target.value)}
+              <select value={selectedCourse} onChange={e => { setSelectedCourse(e.target.value); setStatsLoaded(false); setStats([]) }}
                 className={`sbf-native-select w-full ${selectedCourse ? "has-value" : ""}`}>
                 <option value="">Seleccionar curso</option>
                 {courses.map(c => <option key={c.id} value={c.id}>{c.name} - {c.grade} {c.section}</option>)}
@@ -525,7 +560,84 @@ function AsistenciaAlumnos() {
         </div>
       </div>
 
-      {loaded && students.length > 0 && (
+      {/* View toggle */}
+      {selectedCourse && (
+        <div className="flex gap-1 p-1 bg-sb-surface rounded-[6px] w-fit">
+          {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
+            <button key={key} onClick={() => { setAlumnoView(key); if (key === "estadisticas") loadStats() }}
+              className={`px-4 py-2 rounded-[6px] text-sm font-medium transition-all ${alumnoView === key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/60 hover:text-sb-on-surface-variant"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {alumnoView === "estadisticas" && selectedCourse && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
+          <div className="px-5 pt-5 pb-3 border-b border-sb-outline-variant/8">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-sb-primary/60" />
+              <p className="text-sm font-semibold text-sb-on-surface">Asistencia de los últimos 30 días</p>
+            </div>
+            <p className="text-[11px] text-sb-on-surface-variant/50 mt-0.5">Resumen por alumno del curso seleccionado</p>
+          </div>
+          {statsLoading ? (
+            <div className="py-10 text-center">
+              <div className="h-6 w-6 border-2 border-sb-primary/30 border-t-sb-primary rounded-full animate-spin mx-auto" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] text-sm">
+                <thead>
+                  <tr className="bg-sb-surface-container/40 text-left">
+                    <th className="px-5 py-3 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Alumno</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">A tiempo</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Tardanzas</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Faltas</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Justific.</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Registros</th>
+                    <th className="px-5 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">% Asistencia</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-sb-outline-variant/8">
+                  {stats.length === 0 ? (
+                    <tr><td colSpan={7} className="px-5 py-10 text-center text-sm text-sb-on-surface-variant/30">Sin registros de asistencia en el curso</td></tr>
+                  ) : stats.map(s => (
+                    <tr key={s.id} className="hover:bg-sb-surface-container-low/40 transition-colors">
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`h-8 w-8 rounded-[6px] ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
+                            <span className="text-[9px] font-bold text-white">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-sb-on-surface truncate">{s.apellidos}, {s.nombres}</p>
+                            <p className="text-[9px] text-sb-on-surface-variant/35">DNI: {s.dni}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-emerald-600">{s.present}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-amber-600">{s.late}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-red-500">{s.absent}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-blue-600">{s.justified}</td>
+                      <td className="px-3 py-3 text-center text-xs text-sb-on-surface-variant/50">{s.total}</td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2 justify-end">
+                          <div className="w-24 h-1.5 rounded-[6px] bg-sb-surface-container overflow-hidden">
+                            <div className={`h-full rounded-[6px] ${s.rate >= 80 ? "bg-emerald-400" : s.rate >= 60 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${s.rate}%` }} />
+                          </div>
+                          <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-emerald-600" : s.rate >= 60 ? "text-amber-600" : "text-red-500"}`}>{s.rate}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {loaded && students.length > 0 && alumnoView === "registro" && (
         <>
           {/* Summary */}
           <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -547,16 +659,26 @@ function AsistenciaAlumnos() {
           <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
             {/* Header */}
             <div className="px-5 pt-5 pb-4">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
                   <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Lista de alumnos</p>
                   <p className="text-[11px] text-sb-on-surface-variant/50 mt-0.5">{filtered.length} de {students.length} alumnos</p>
                 </div>
-                {/* Search */}
-                <div className="relative w-44">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/30" />
-                  <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                    className="sb-input rounded-[6px] text-sm h-9 pl-9" />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button onClick={handleMarkAllPresent}
+                    className="h-9 px-3.5 rounded-[6px] bg-emerald-500/10 text-emerald-600 text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center gap-1.5">
+                    <UserCheck className="h-3.5 w-3.5" /> Marcar todos presentes
+                  </button>
+                  <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
+                    className="h-9 px-3 rounded-[6px] bg-sb-surface-container text-sb-on-surface-variant/60 text-xs font-medium hover:bg-sb-surface-container-high disabled:opacity-40 transition-colors">
+                    Limpiar
+                  </button>
+                  {/* Search */}
+                  <div className="relative w-44">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/30" />
+                    <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                      className="sb-input rounded-[6px] text-sm h-9 pl-9" />
+                  </div>
                 </div>
               </div>
               {/* Legend */}

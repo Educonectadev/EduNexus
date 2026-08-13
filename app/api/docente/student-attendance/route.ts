@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const courseId = searchParams.get('course_id')
     const date = searchParams.get('date') || new Date().toISOString().slice(0, 10)
+    const mode = searchParams.get('mode')
 
     if (!courseId) {
       return NextResponse.json({ error: 'course_id es requerido' }, { status: 400 })
@@ -44,6 +45,39 @@ export async function GET(request: NextRequest) {
        ORDER BY s.last_name, s.first_name`,
       [course.grade, course.section]
     )
+
+    if (mode === 'stats') {
+      const [rows] = await pool.query(
+        `SELECT a.student_id, a.status, COUNT(*)::int as count
+         FROM attendance a
+         WHERE a.student_id = ANY($1) AND a.date >= CURRENT_DATE - INTERVAL '30 days'
+         GROUP BY a.student_id, a.status`,
+        [(students as any[]).map(s => s.id)]
+      )
+      const byStudent: Record<string, Record<string, number>> = {}
+      for (const r of rows as any[]) {
+        byStudent[r.student_id] = byStudent[r.student_id] || {}
+        byStudent[r.student_id][r.status] = r.count
+      }
+      const result = (students as any[]).map(s => {
+        const st = byStudent[s.id] || {}
+        const total = (st.present || 0) + (st.late || 0) + (st.absent || 0) + (st.justified || 0)
+        const presentLike = (st.present || 0) + (st.late || 0)
+        return {
+          id: s.id,
+          dni: s.document_number,
+          nombres: s.first_name,
+          apellidos: s.last_name,
+          present: st.present || 0,
+          late: st.late || 0,
+          absent: st.absent || 0,
+          justified: st.justified || 0,
+          total,
+          rate: total ? Math.round((presentLike / total) * 100) : 0,
+        }
+      })
+      return NextResponse.json({ mode: 'stats', students: result })
+    }
 
     const studentIds = (students as any[]).map(s => s.id)
     let attendanceRows: any[] = []

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSearchParams } from "next/navigation"
 import { Plus, BookMarked, TrendingUp, TrendingDown, X, Pencil, Trash2, BarChart3, ChevronDown } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
@@ -66,8 +67,18 @@ function calcAverage(grades: Grade[]) {
 function studentName(s: Student) { return `${s.first_name} ${s.last_name}` }
 
 export default function CalificacionesPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <CalificacionesInner />
+    </React.Suspense>
+  )
+}
+
+function CalificacionesInner() {
+  const searchParams = useSearchParams()
+  const prefilterCourse = searchParams.get("curso") || ""
   const [courses, setCourses] = React.useState<Course[]>([])
-  const [courseId, setCourseId] = React.useState("")
+  const [courseId, setCourseId] = React.useState(prefilterCourse)
   const [students, setStudents] = React.useState<Student[]>([])
   const [courseLabel, setCourseLabel] = React.useState("")
   const [loading, setLoading] = React.useState(true)
@@ -87,6 +98,9 @@ export default function CalificacionesPage() {
   const [registerPeriod, setRegisterPeriod] = React.useState("")
   const [registerScore, setRegisterScore] = React.useState("")
   const [saving, setSaving] = React.useState(false)
+  const [viewMode, setViewMode] = React.useState<"lista" | "tabla">("lista")
+  const [savingCell, setSavingCell] = React.useState<string | null>(null)
+  const [saveError, setSaveError] = React.useState<string | null>(null)
 
   const loadCourses = React.useCallback(async () => {
     try {
@@ -95,8 +109,8 @@ export default function CalificacionesPage() {
       if (!res.ok) throw new Error(data.error || "Error al cargar")
       setCourses(Array.isArray(data.courses) ? data.courses : [])
       if (Array.isArray(data.courses) && data.courses.length > 0) {
-        setCourseId(data.courses[0].id)
-        setRegisterCourseId(data.courses[0].id)
+        setCourseId(prev => prev && data.courses.some((c: Course) => c.id === prev) ? prev : data.courses[0].id)
+        setRegisterCourseId(prev => prev && data.courses.some((c: Course) => c.id === prev) ? prev : data.courses[0].id)
       }
     } catch (e: any) {
       setError(e.message)
@@ -176,6 +190,28 @@ export default function CalificacionesPage() {
     }
   }
 
+  const handleSaveCell = async (studentId: string, period: string, rawValue: string) => {
+    const value = Number(rawValue)
+    if (rawValue === "" || isNaN(value) || value < 0 || value > MAX_SCORE) return
+    const cellKey = `${studentId}:${period}`
+    setSavingCell(cellKey)
+    setSaveError(null)
+    try {
+      const res = await fetch("/api/docente/calificaciones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ student_id: studentId, course_id: courseId, period, score: value, max_score: MAX_SCORE }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Error al guardar")
+      loadCourseData(courseId)
+    } catch (e: any) {
+      setSaveError(e.message)
+    } finally {
+      setSavingCell(null)
+    }
+  }
+
   const getTrend = (grades: Grade[]) => {
     if (grades.length < 2) return true
     const sorted = [...grades].sort((a, b) => a.period.localeCompare(b.period))
@@ -210,6 +246,16 @@ export default function CalificacionesPage() {
             </select>
             <ChevronDown className="h-4 w-4 text-sb-on-surface-variant/40 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
+          {students.length > 0 && (
+            <div className="flex p-1 bg-sb-surface-container rounded-[6px]">
+              {([["lista", "Lista"], ["tabla", "Libro de notas"]] as const).map(([key, label]) => (
+                <button key={key} onClick={() => setViewMode(key)}
+                  className={`px-3 py-1.5 rounded-[6px] text-xs font-medium transition-all ${viewMode === key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/50 hover:text-sb-on-surface-variant"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
             <Plus className="h-4 w-4" /> Registrar
           </SbBtn>
@@ -236,6 +282,16 @@ export default function CalificacionesPage() {
             {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
           </p>
         </div>
+      ) : viewMode === "tabla" ? (
+        <TablaNotas
+          key={courseId}
+          students={students}
+          courseId={courseId}
+          maxScore={MAX_SCORE}
+          savingCell={savingCell}
+          saveError={saveError}
+          onSaveCell={handleSaveCell}
+        />
       ) : (
         <>
           {/* Stats */}
@@ -458,6 +514,131 @@ export default function CalificacionesPage() {
           </SbBtn>
         </SbModalFooter>
       </SbModal>
+    </div>
+  )
+}
+
+/* ===== LIBRO DE NOTAS (matriz por bimestres) ===== */
+function TablaNotas({
+  students,
+  courseId,
+  maxScore,
+  savingCell,
+  saveError,
+  onSaveCell,
+}: {
+  students: Student[]
+  courseId: string
+  maxScore: number
+  savingCell: string | null
+  saveError: string | null
+  onSaveCell: (studentId: string, period: string, rawValue: string) => void
+}) {
+  const [drafts, setDrafts] = React.useState<Record<string, string>>({})
+
+  const gradeFor = (s: Student, period: string) => s.grades.find(g => g.period === period)
+
+  const cellKey = (studentId: string, period: string) => `${studentId}:${period}`
+
+  const commit = (studentId: string, period: string) => {
+    const key = cellKey(studentId, period)
+    const value = drafts[key]
+    if (value === undefined) return
+    onSaveCell(studentId, period, value)
+  }
+
+  const avgClass = (avg: number) => avg === 0 ? "text-sb-on-surface-variant/30" : avg >= 11 ? "text-emerald-600" : "text-red-500"
+
+  return (
+    <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
+      {saveError && (
+        <div className="px-5 pt-4">
+          <div className="rounded-[6px] bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div>
+        </div>
+      )}
+      <div className="px-5 pt-5 pb-4 border-b border-sb-outline-variant/8">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Libro de notas</p>
+            <p className="text-[11px] text-sb-on-surface-variant/50 mt-0.5">Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
+          </div>
+          <div className="flex items-center gap-3 text-[10px]">
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-[6px] bg-emerald-400" /> Aprobado (11+)</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-[6px] bg-red-400" /> Desaprobado</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-[6px] bg-sb-surface-container-high" /> Sin nota</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
+          <thead>
+            <tr className="bg-sb-surface-container/40 text-left">
+              <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Alumno</th>
+              {PERIODS.map(p => (
+                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">
+                  B{p.split(" ")[1]}
+                </th>
+              ))}
+              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Promedio</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-sb-outline-variant/8">
+            {students.map(s => {
+              const avg = calcAverage(s.grades)
+              return (
+                <tr key={s.id} className="hover:bg-sb-surface-container-low/40 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`h-8 w-8 rounded-[6px] ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
+                        <span className="text-[9px] font-bold text-white">{getInitials(studentName(s))}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-sb-on-surface truncate max-w-[160px]">{studentName(s)}</p>
+                        <p className="text-[9px] text-sb-on-surface-variant/35">{s.code}</p>
+                      </div>
+                    </div>
+                  </td>
+                  {PERIODS.map(p => {
+                    const g = gradeFor(s, p)
+                    const key = cellKey(s.id, p)
+                    const value = drafts[key] !== undefined ? drafts[key] : g ? String(g.score) : ""
+                    const isSaving = savingCell === key
+                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-sb-on-surface-variant/30"
+                    return (
+                      <td key={p} className="px-3 py-2 text-center">
+                        <div className="relative inline-block">
+                          <input
+                            type="number"
+                            min={0}
+                            max={maxScore}
+                            step="0.5"
+                            value={value}
+                            placeholder="—"
+                            onChange={e => setDrafts(prev => ({ ...prev, [key]: e.target.value }))}
+                            onBlur={() => commit(s.id, p)}
+                            onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
+                            className={`w-14 h-9 rounded-[6px] text-center text-sm font-semibold bg-sb-surface-container focus:outline-none focus:ring-2 focus:ring-sb-primary/40 transition-all ${color}`}
+                          />
+                          {isSaving && (
+                            <span className="absolute -top-1 -right-1 h-2.5 w-2.5">
+                              <span className="absolute inset-0 rounded-full bg-sb-primary/30 animate-ping" />
+                              <span className="absolute inset-0 rounded-full bg-sb-primary" />
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    )
+                  })}
+                  <td className="px-4 py-2 text-center">
+                    <span className={`text-base font-bold ${avgClass(avg)}`}>{avg === 0 ? "—" : avg.toFixed(1)}</span>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
