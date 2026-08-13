@@ -696,7 +696,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             items={visibleNavItems}
             activeHref={pathname}
             role={role}
-            onAiClick={can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
+            onAiClick={role === 'secretario' && can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
             maxVisible={4}
           />
         )}
