@@ -320,3 +320,57 @@ html.dark [data-role="docente"] {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================
+   Dashboard docente — stepbro note (monocromo, soft)
+   Superficie #000/#101012, texto #E4E2E5, sin sombras,
+   radios 12px, focus/hover por contraste.
+   ============================================ */
+.sb-note-dash {
+  --note-bg: #f7f7f8;
+  --note-surface: #ffffff;
+  --note-elevated: #ffffff;
+  --note-text: #111113;
+  --note-muted: #7e8088;
+  --note-border: rgba(17, 17, 19, 0.08);
+  --note-border-strong: rgba(17, 17, 19, 0.16);
+  --note-fill: rgba(17, 17, 19, 0.04);
+  --note-fill-strong: rgba(17, 17, 19, 0.07);
+  --note-solid-bg: #111113;
+  --note-solid-fg: #ffffff;
+}
+.dark .sb-note-dash {
+  --note-bg: #000000;
+  --note-surface: #000000;
+  --note-elevated: #101012;
+  --note-text: #e4e2e5;
+  --note-muted: #7e8088;
+  --note-border: rgba(228, 226, 229, 0.08);
+  --note-border-strong: rgba(228, 226, 229, 0.16);
+  --note-fill: rgba(255, 255, 255, 0.04);
+  --note-fill-strong: rgba(255, 255, 255, 0.07);
+  --note-solid-bg: #ffffff;
+  --note-solid-fg: #000000;
+}
+
+/* flat + radio 12px dentro del dashboard (anula el premium con sombras) */
+.sb-note-dash [class*="rounded-["] {
+  border-radius: 12px !important;
+}
+.sb-note-dash [class*="rounded-["][class*="p-"] {
+  box-shadow: none !important;
+}
+.sb-note-dash h1,
+.sb-note-dash h2 {
+  font-family: var(--sb-docente-font);
+  font-weight: 700;
+}
+.sb-note-dash a,
+.sb-note-dash button {
+  -webkit-tap-highlight-color: transparent;
+}
+.sb-note-dash a:focus-visible,
+.sb-note-dash button:focus-visible {
+  outline: 1px solid var(--note-muted);
+  outline-offset: 2px;
+}

@@ -5,7 +5,6 @@ import {
   BookOpen, GraduationCap, UserCheck, ClipboardList, MessageSquare,
   Calendar, Clock, ChevronRight, LogIn, LogOut, BookMarked, MapPin,
 } from "@/components/ui/proicons"
-import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
 import { cn } from "@/lib/utils"
@@ -32,13 +31,6 @@ interface Horario {
 
 const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
-
-function getAvatarColor(name: string) {
-  const colors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-pink-500", "bg-cyan-500", "bg-rose-500"]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
-}
 
 export default function DocenteDashboard() {
   const user = useAuthStore((s) => s.user)
@@ -101,10 +93,10 @@ export default function DocenteDashboard() {
   }
 
   const metrics = [
-    { label: "Mis Cursos", value: loading ? "—" : courses.length, icon: BookOpen, href: "/docente/cursos", color: "text-sb-primary", bg: "bg-sb-primary/8" },
-    { label: "Total Alumnos", value: loading ? "—" : totalStudents, icon: GraduationCap, href: "/docente/cursos", color: "text-blue-600", bg: "bg-blue-500/8" },
-    { label: "Clases Hoy", value: loading ? "—" : todaySchedule.length, icon: Calendar, href: "/docente/horarios", color: "text-amber-600", bg: "bg-amber-500/8" },
-    { label: "Horas Hoy", value: loading ? "—" : `${todaySchedule.reduce((a, h) => a + (toMin(h.end_time) - toMin(h.start_time)), 0) / 60} h`, icon: Clock, href: "/docente/horarios", color: "text-emerald-600", bg: "bg-emerald-500/8" },
+    { label: "Mis Cursos", value: loading ? "—" : courses.length, icon: BookOpen, href: "/docente/cursos" },
+    { label: "Total Alumnos", value: loading ? "—" : totalStudents, icon: GraduationCap, href: "/docente/cursos" },
+    { label: "Clases Hoy", value: loading ? "—" : todaySchedule.length, icon: Calendar, href: "/docente/horarios" },
+    { label: "Horas Hoy", value: loading ? "—" : `${todaySchedule.reduce((a, h) => a + (toMin(h.end_time) - toMin(h.start_time)), 0) / 60} h`, icon: Clock, href: "/docente/horarios" },
   ]
 
   const quickActions = [
@@ -117,21 +109,25 @@ export default function DocenteDashboard() {
   ]
 
   const attConfig: Record<string, { label: string; color: string; dot: string }> = {
-    present: { label: "A tiempo", color: "bg-emerald-500/10 text-emerald-600", dot: "bg-emerald-500" },
-    late: { label: "Tardanza", color: "bg-amber-500/10 text-amber-600", dot: "bg-amber-500" },
-    absent: { label: "Ausente", color: "bg-red-500/10 text-red-600", dot: "bg-red-500" },
-    justified: { label: "Justificado", color: "bg-blue-500/10 text-blue-600", dot: "bg-blue-500" },
-    early_leave: { label: "Salida anticipada", color: "bg-orange-500/10 text-orange-600", dot: "bg-orange-500" },
+    present: { label: "A tiempo", color: "bg-emerald-500/10 text-emerald-500", dot: "bg-emerald-500" },
+    late: { label: "Tardanza", color: "bg-amber-500/10 text-amber-500", dot: "bg-amber-500" },
+    absent: { label: "Ausente", color: "bg-red-500/10 text-red-500", dot: "bg-red-500" },
+    justified: { label: "Justificado", color: "bg-blue-500/10 text-blue-500", dot: "bg-blue-500" },
+    early_leave: { label: "Salida anticipada", color: "bg-orange-500/10 text-orange-500", dot: "bg-orange-500" },
   }
   const attS = attendanceStatus ? attConfig[attendanceStatus] : null
 
   if (loading) {
     return (
-      <div className="space-y-5">
-        <div className="animate-pulse space-y-5">
-          <div className="h-8 w-56 rounded-[6px] bg-sb-surface-container" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-28 rounded-[6px] bg-sb-surface-container" />)}
+      <div className="sb-note-dash">
+        <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 animate-pulse space-y-4">
+          <div className="h-9 w-64 rounded-[12px] bg-[var(--note-fill)]" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-[12px] bg-[var(--note-fill)]" />)}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3 h-64 rounded-[12px] bg-[var(--note-fill)]" />
+            <div className="lg:col-span-2 h-64 rounded-[12px] bg-[var(--note-fill)]" />
           </div>
         </div>
       </div>
@@ -139,216 +135,210 @@ export default function DocenteDashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-sb-on-surface">{greeting}, {user?.full_name?.split(" ")[0] || "Docente"}</h1>
-          <p className="text-sm text-sb-on-surface-variant/50 mt-0.5 capitalize">{dateStr}</p>
+    <div className="sb-note-dash">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-end justify-between gap-3 pt-2">
+          <div>
+            <h1 className="text-[24px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">
+              {greeting}, {user?.full_name?.split(" ")[0] || "Docente"}
+            </h1>
+            <p className="mt-1.5 text-sm text-[var(--note-muted)] capitalize">{dateStr}</p>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full border border-[var(--note-border)] bg-[var(--note-elevated)] px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-medium text-[var(--note-muted)]">Activo</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-sb-on-surface/[0.04]">
-          <div className="h-1.5 w-1.5 rounded-[6px] bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] text-sb-on-surface-variant font-medium">Activo</span>
-        </div>
-      </motion.div>
 
-      {/* Metrics */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {metrics.map((m, i) => {
-          const Icon = m.icon
-          return (
-            <motion.div key={m.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 + i * 0.04 }}>
-              <Link href={m.href} className="block">
-                <div className="bg-sb-surface rounded-[6px] p-5 border border-sb-outline-variant/8 hover:border-sb-outline-variant/15 transition-all group">
-                  <div className={`h-10 w-10 rounded-[6px] ${m.bg} flex items-center justify-center mb-4`}>
-                    <Icon className={`h-5 w-5 ${m.color}`} />
+        {/* Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {metrics.map((m) => {
+            const Icon = m.icon
+            return (
+              <Link key={m.label} href={m.href} className="group block">
+                <div className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-elevated)] p-6 transition-all duration-150 group-hover:-translate-y-px group-hover:opacity-90 group-hover:border-[var(--note-border-strong)]">
+                  <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-[var(--note-text)]" />
                   </div>
-                  <p className="text-2xl font-bold tracking-tight text-sb-on-surface">{m.value}</p>
-                  <p className="text-[11px] text-sb-on-surface-variant/50 mt-1">{m.label}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">{m.label}</p>
+                  <p className="mt-1 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
                 </div>
               </Link>
-            </motion.div>
-          )
-        })}
-      </motion.div>
+            )
+          })}
+        </div>
 
-      {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Left: horario de hoy + cursos */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* Horario de hoy */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        {/* Main grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+          {/* Left: horario de hoy + cursos */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Horario de hoy */}
+            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
+              <header className="flex items-center justify-between px-6 pt-6 pb-4">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-sb-primary/60" />
-                  <p className="text-sm font-semibold text-sb-on-surface">Horario de hoy</p>
+                  <Calendar className="h-4 w-4 text-[var(--note-muted)]" />
+                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Horario de hoy</h2>
                 </div>
-                <Link href="/docente/horarios" className="text-[11px] font-medium text-sb-primary hover:underline">Ver semana</Link>
-              </div>
+                <Link href="/docente/horarios" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver semana</Link>
+              </header>
               {todaySchedule.length === 0 ? (
-                <div className="px-5 pb-5">
-                  <div className="rounded-[6px] bg-sb-surface-container p-4 text-center">
-                    <Calendar className="h-6 w-6 mx-auto text-sb-on-surface-variant/20 mb-1.5" />
-                    <p className="text-xs text-sb-on-surface-variant/40">No tienes clases hoy</p>
+                <div className="px-6 pb-6">
+                  <div className="rounded-[12px] bg-[var(--note-fill)] p-6 text-center">
+                    <Calendar className="h-6 w-6 mx-auto text-[var(--note-muted)]/40 mb-2" />
+                    <p className="text-xs text-[var(--note-muted)]">No tienes clases hoy</p>
                   </div>
                 </div>
               ) : (
-                <div className="px-5 pb-5 space-y-2">
+                <div className="px-6 pb-6 space-y-2">
                   {todaySchedule.map(h => {
                     const isNext = nextClass?.id === h.id
                     return (
                       <div key={h.id} className={cn(
-                        "flex items-center gap-3 p-3 rounded-[6px] transition-colors",
-                        isNext ? "bg-sb-primary/5 ring-1 ring-sb-primary/20" : "bg-sb-surface-container hover:bg-sb-surface-container-high/60"
+                        "flex items-center gap-3 rounded-[12px] border p-3 transition-colors duration-150",
+                        isNext ? "border-[var(--note-border-strong)] bg-[var(--note-fill-strong)]" : "border-[var(--note-border)] bg-[var(--note-fill)]"
                       )}>
-                        <div className={cn("h-10 w-14 rounded-[6px] flex flex-col items-center justify-center shrink-0", isNext ? "bg-sb-primary text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant")}>
+                        <div className={cn(
+                          "h-10 w-14 rounded-[10px] flex flex-col items-center justify-center shrink-0",
+                          isNext ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "bg-[var(--note-fill-strong)] text-[var(--note-muted)]"
+                        )}>
                           <span className="text-[10px] font-bold leading-none">{h.start_time.slice(0, 5)}</span>
-                          <span className="text-[8px] opacity-70 mt-0.5">—</span>
+                          <span className="text-[8px] opacity-60 mt-0.5">—</span>
                           <span className="text-[10px] font-bold leading-none">{h.end_time.slice(0, 5)}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-sb-on-surface truncate">{h.course_name}</p>
-                          <p className="text-[11px] text-sb-on-surface-variant/50 truncate">{h.grade} · Sección {h.section}</p>
+                          <p className="text-sm font-medium text-[var(--note-text)] truncate">{h.course_name}</p>
+                          <p className="text-[11px] text-[var(--note-muted)] truncate">{h.grade} · Sección {h.section}</p>
                         </div>
                         {h.classroom && (
-                          <div className="hidden sm:flex items-center gap-1 text-[11px] text-sb-on-surface-variant/50">
+                          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[var(--note-muted)]">
                             <MapPin className="h-3 w-3" /> {h.classroom}
                           </div>
                         )}
                         {isNext && (
-                          <span className="text-[9px] font-semibold uppercase px-2 py-1 rounded-[6px] bg-sb-primary/10 text-sb-primary">Siguiente</span>
+                          <span className="text-[9px] font-semibold uppercase tracking-wider rounded-full bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] px-2.5 py-1">Siguiente</span>
                         )}
                       </div>
                     )
                   })}
                 </div>
               )}
-            </div>
-          </motion.div>
+            </section>
 
-          {/* Mis cursos */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
-            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+            {/* Mis cursos */}
+            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
+              <header className="flex items-center justify-between px-6 pt-6 pb-4">
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-sb-primary/60" />
-                  <p className="text-sm font-semibold text-sb-on-surface">Mis cursos</p>
+                  <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
+                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Mis cursos</h2>
                 </div>
-                <Link href="/docente/cursos" className="text-[11px] font-medium text-sb-primary hover:underline">Ver todos</Link>
-              </div>
-              <div className="divide-y divide-sb-outline-variant/8">
+                <Link href="/docente/cursos" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver todos</Link>
+              </header>
+              <div className="divide-y divide-[var(--note-border)]">
                 {courses.length === 0 ? (
-                  <div className="px-5 py-10 text-center">
-                    <BookOpen className="h-8 w-8 mx-auto text-sb-on-surface-variant/15 mb-2" />
-                    <p className="text-sm text-sb-on-surface-variant/30">Sin cursos asignados</p>
+                  <div className="px-6 pb-8 pt-2 text-center">
+                    <BookOpen className="h-8 w-8 mx-auto text-[var(--note-muted)]/40 mb-2" />
+                    <p className="text-sm text-[var(--note-muted)]">Sin cursos asignados</p>
                   </div>
                 ) : courses.slice(0, 4).map(c => (
-                  <Link key={c.id} href={`/docente/cursos/${c.id}`}>
-                    <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-sb-surface-container-low/50 transition-colors group">
-                      <div className={cn("h-9 w-9 rounded-[6px] flex items-center justify-center shrink-0", getAvatarColor(c.name))}>
-                        <BookOpen className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-sb-on-surface truncate">{c.name}</p>
-                        <p className="text-[11px] text-sb-on-surface-variant/50">{c.grade} · Sección {c.section}</p>
-                      </div>
-                      <span className="text-[11px] text-sb-on-surface-variant/50 shrink-0">{c.students} alumnos</span>
-                      <ChevronRight className="h-4 w-4 text-sb-on-surface-variant/25 group-hover:text-sb-on-surface-variant/50 transition-colors shrink-0" />
+                  <Link key={c.id} href={`/docente/cursos/${c.id}`} className="flex items-center gap-3 px-6 py-3.5 transition-colors duration-150 hover:bg-[var(--note-fill)] group">
+                    <div className="h-9 w-9 rounded-[10px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
+                      <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[var(--note-text)] truncate">{c.name}</p>
+                      <p className="text-[11px] text-[var(--note-muted)]">{c.grade} · Sección {c.section}</p>
+                    </div>
+                    <span className="text-[11px] text-[var(--note-muted)] shrink-0">{c.students} alumnos</span>
+                    <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
                   </Link>
                 ))}
               </div>
-            </div>
-          </motion.div>
-        </div>
+            </section>
+          </div>
 
-        {/* Right: asistencia + acciones */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Asistencia hoy */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
-            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-              <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+          {/* Right: asistencia + acciones */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Asistencia hoy */}
+            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
+              <header className="flex items-center justify-between px-6 pt-6 pb-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-sb-primary/60" />
-                  <p className="text-sm font-semibold text-sb-on-surface">Asistencia de hoy</p>
+                  <Clock className="h-4 w-4 text-[var(--note-muted)]" />
+                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Asistencia de hoy</h2>
                 </div>
                 {attS && (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-medium ${attS.color}`}>
-                    <span className={`h-1 w-1 rounded-[6px] ${attS.dot}`} /> {attS.label}
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium ${attS.color}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${attS.dot}`} /> {attS.label}
                   </span>
                 )}
-              </div>
-              <div className="px-5 pb-5 space-y-3">
+              </header>
+              <div className="px-6 pb-6 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-[6px] bg-sb-surface-container p-3">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-sb-on-surface-variant/30"}`} />
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Entrada</span>
+                  <div className="rounded-[12px] bg-[var(--note-fill)] p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
+                      <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Entrada</span>
                     </div>
-                    <p className={`text-lg font-bold ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/30"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
-                    {schedule && <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Prog. {schedule.start_time}</p>}
+                    <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
+                    {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.start_time}</p>}
                   </div>
-                  <div className="rounded-[6px] bg-sb-surface-container p-3">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-sb-on-surface-variant/30"}`} />
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/40">Salida</span>
+                  <div className="rounded-[12px] bg-[var(--note-fill)] p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
+                      <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Salida</span>
                     </div>
-                    <p className={`text-lg font-bold ${checkedOut ? "text-sb-on-surface" : "text-sb-on-surface-variant/30"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
-                    {schedule && <p className="text-[9px] text-sb-on-surface-variant/40 mt-0.5">Prog. {schedule.end_time}</p>}
+                    <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
+                    {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.end_time}</p>}
                   </div>
                 </div>
                 {!checkedIn && (
                   <button onClick={() => handleCheck("check-in")}
-                    className="w-full h-11 rounded-[6px] bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all">
+                    className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
                     <LogIn className="h-4 w-4" /> Marcar Entrada
                   </button>
                 )}
                 {checkedIn && !checkedOut && (
                   <button onClick={() => handleCheck("check-out")}
-                    className="w-full h-11 rounded-[6px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all">
+                    className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
                     <LogOut className="h-4 w-4" /> Marcar Salida
                   </button>
                 )}
                 {checkedIn && checkedOut && (
                   <Link href="/docente/asistencia">
-                    <div className="w-full h-11 rounded-[6px] bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/15 transition-all">
+                    <div className="w-full h-11 rounded-[12px] border border-[var(--note-border-strong)] text-[var(--note-text)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:bg-[var(--note-fill)]">
                       <LogIn className="h-4 w-4" /> Ver detalle de asistencia
                     </div>
                   </Link>
                 )}
               </div>
-            </div>
-          </motion.div>
+            </section>
 
-          {/* Quick actions */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
-            <div className="bg-sb-surface rounded-[6px] overflow-hidden border border-sb-outline-variant/8">
-              <div className="px-5 pt-5 pb-3">
-                <p className="text-[10px] font-semibold text-sb-on-surface-variant/40 uppercase tracking-wider">Acciones rápidas</p>
-              </div>
-              <div className="divide-y divide-sb-outline-variant/8">
+            {/* Quick actions */}
+            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
+              <header className="px-6 pt-6 pb-4">
+                <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Acciones rápidas</h2>
+              </header>
+              <div className="divide-y divide-[var(--note-border)]">
                 {quickActions.map(a => {
                   const Icon = a.icon
                   return (
                     <Link key={a.label} href={a.href}>
-                      <div className="flex items-center gap-3 px-5 py-3 hover:bg-sb-surface-container-low/50 transition-colors group">
-                        <div className="h-8 w-8 rounded-[6px] bg-sb-surface-container flex items-center justify-center shrink-0 group-hover:bg-sb-primary/10 transition-colors">
-                          <Icon className="h-4 w-4 text-sb-on-surface-variant/50 group-hover:text-sb-primary transition-colors" />
+                      <div className="flex items-center gap-3 px-6 py-3.5 transition-colors duration-150 hover:bg-[var(--note-fill)] group">
+                        <div className="h-8 w-8 rounded-[10px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0 transition-colors duration-150 group-hover:bg-[var(--note-solid-bg)]">
+                          <Icon className="h-4 w-4 text-[var(--note-muted)] group-hover:text-[var(--note-solid-fg)] transition-colors duration-150" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-sb-on-surface">{a.label}</p>
-                          <p className="text-[11px] text-sb-on-surface-variant/50">{a.desc}</p>
+                          <p className="text-sm font-medium text-[var(--note-text)]">{a.label}</p>
+                          <p className="text-[11px] text-[var(--note-muted)]">{a.desc}</p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-sb-on-surface-variant/25 group-hover:text-sb-on-surface-variant/50 transition-colors shrink-0" />
+                        <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
                       </div>
                     </Link>
                   )
                 })}
               </div>
-            </div>
-          </motion.div>
+            </section>
+          </div>
         </div>
       </div>
     </div>
