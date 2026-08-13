@@ -351,6 +351,60 @@ html.dark [data-role="docente"] {
   --note-solid-fg: #000000;
 }
 
+/* ============================================
+   stepbro note — páginas del módulo docente
+   (Cursos, Horarios, Asistencia, Notas, Tareas,
+   Materiales, Calendario)
+   Tarjetas planas = fondo de página + hairline 1px,
+   radios 24px (tarjetas) / 12px (chips y botones).
+   ============================================ */
+
+/* Cabeceras de página (no afecta al greeting del dashboard) */
+[data-role="docente"] main h1:not(.sb-note-dash h1) {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+/* Radios note: chips y botones → 12px */
+[data-role="docente"] main [class*="rounded-[6px]"] {
+  border-radius: 12px !important;
+}
+
+/* Tarjetas note: fondo de página + hairline interior 1px, radio 24px */
+[data-role="docente"] main .bg-sb-surface,
+[data-role="docente"] main .bg-\[var\(--sb-surface-container\)\] {
+  border-radius: 24px !important;
+  outline: 1px solid color-mix(in srgb, var(--sb-outline-variant) 42%, transparent);
+  outline-offset: -1px;
+}
+
+/* Pills de día / filtros: no son tarjetas (radio 12px, sin hairline) */
+[data-role="docente"] main button.bg-\[var\(--sb-surface-container\)\],
+[data-role="docente"] main button.bg-sb-surface {
+  border-radius: 12px !important;
+  outline: none !important;
+}
+
+/* Flat: sin sombras premium dentro del contenido del módulo */
+[data-role="docente"] main [class*="rounded-["][class*="p-"] {
+  box-shadow: none;
+}
+
+/* Pills segmentados: rail sutil, sin hairline */
+[data-role="docente"] main .flex.gap-1.p-1.bg-sb-surface {
+  background: color-mix(in srgb, var(--sb-surface-container) 55%, transparent) !important;
+  border-radius: 14px !important;
+  outline: none !important;
+}
+
+/* Poppers/dropdowns conservan elevación */
+[data-role="docente"] main [class*="shadow-2xl"] {
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.45) !important;
+  outline: none !important;
+}
+
 /* flat dentro del dashboard (anula el premium con sombras) */
 .sb-note-dash [class*="rounded-["][class*="p-"] {
   box-shadow: none !important;
