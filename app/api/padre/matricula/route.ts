@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         [instId]
       ) as any[]
       const inst = (instRows as any[])[0]
-      if (inst) institution = { name: inst.name, code: inst.code }
+      if (inst) institution = { name: inst.name }
     }
 
     const children = (enrollments as any[]).map(e => ({

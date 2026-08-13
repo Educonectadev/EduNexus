@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -103,6 +104,30 @@ export default function MineduPage() {
         label="MINEDU"
         title="Tecnología al servicio de la política educativa"
         description="EduNexus proporciona al Ministerio de Educación datos confiables, actualizados y auditables del sistema educativo nacional para fundamentar las decisiones de política pública."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Cobertura nacional">
+              <div className="space-y-3">
+                {[
+                  { v: "18,000+", l: "colegios" },
+                  { v: "2.4M", l: "estudiantes" },
+                  { v: "156,000+", l: "docentes" },
+                  { v: "3,200", l: "UGELES" },
+                  { v: "25", l: "regiones" },
+                ].map((s) => (
+                  <div key={s.l} className="flex items-baseline justify-between border-b border-foreground/5 pb-3 last:border-0 last:pb-0">
+                    <span className="text-sm">{s.l}</span>
+                    <span className="font-display text-xl text-foreground">{s.v}</span>
+                  </div>
+                ))}
+              </div>
+            </SideCard>
+            <SideCard label="Disponibilidad">
+              <p className="font-display text-3xl text-foreground">99.9%</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">SLA garantizado</p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Datos */}

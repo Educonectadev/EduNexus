@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -124,6 +125,40 @@ export default function TrabajaPage() {
         label="Trabaja con nosotros"
         title="Construye el futuro de la educación"
         description="Buscamos personas extraordinarias que quieran usar tecnología para resolver los problemas educativos más grandes de Latinoamérica."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Cultura">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Trabajo híbrido
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  25 días de vacaciones
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Seguro de salud completo
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Acciones de la empresa
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Capacitación continua
+                </li>
+              </ul>
+            </SideCard>
+            <SideCard label="Aplicar">
+              <p className="text-sm leading-relaxed mb-3">
+                Envía tu CV y cuéntanos por qué quieres unirte.
+              </p>
+              <p className="font-mono text-xs text-foreground/60">talento@edunexus.pe</p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Beneficios */}

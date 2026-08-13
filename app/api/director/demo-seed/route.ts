@@ -20,7 +20,7 @@ async function dumpInto(institutionId: string, studentsCount: number) {
   const [colRows] = await pool.query(
     `SELECT column_name FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'users'`
   ) as any[]
-  const hasPasswordHash = (colRows || []).some(c => c.column_name === 'password_hash')
+  const hasPasswordHash = (colRows || []).some((c: { column_name: string }) => c.column_name === 'password_hash')
 
   const userCols = hasPasswordHash
     ? 'id, email, full_name, password_hash, role, institution_id, status'
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const count = Math.max(1, Math.min(60, body.students || 20))
 
-    const result = await dumpInto(payload.institutionId, count)
+    const result = await dumpInto(payload.institutionId as string, count)
     return NextResponse.json({ success: true, ...result })
   } catch (error: any) {
     console.error('Seed demo error:', error)

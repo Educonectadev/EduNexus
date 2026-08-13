@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   PageHeader,
   PageSection,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -75,6 +76,32 @@ export default function ContactoPage() {
         label="Contacto"
         title="Hablemos"
         description="Ya sea para una demostración, una consulta técnica o una alianza estratégica, estamos aquí para ayudarte."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Respuesta rápida">
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Email</p>
+                  <p>contacto@edunexus.pe</p>
+                </div>
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Ventas</p>
+                  <p>+51 (01) 555-0199</p>
+                </div>
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Soporte 24/7</p>
+                  <p>soporte@edunexus.pe</p>
+                </div>
+              </div>
+            </SideCard>
+            <SideCard label="Tiempo de respuesta">
+              <p className="text-sm leading-relaxed">
+                Te respondemos en menos de <span className="font-display text-2xl text-foreground block mt-2">24h</span>
+                en días hábiles.
+              </p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Formulario + Oficinas */}

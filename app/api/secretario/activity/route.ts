@@ -68,9 +68,9 @@ export async function GET(request: NextRequest) {
         items.push({
           id: `m-${e.id}-${e.created_at}`, created_at: e.created_at,
           type: 'matricula',
-          title: 'Nueva matricula',
+          act_title: 'Nueva matricula',
           act_desc: `Se registro un nuevo alumno (${e.student_name}) en ${e.grade}${e.section ? ` ${e.section}` : ''}`,
-          act_color: '#10b981',
+          color: '#10b981',
         })
       }
     })
@@ -80,9 +80,9 @@ export async function GET(request: NextRequest) {
         id: `a-${a.id}-${a.created_at}`,
         created_at: a.created_at || a.date,
         type: 'asistencia',
-        title: 'Asistencia registrada',
+        act_title: 'Asistencia registrada',
         act_desc: `Se registro asistencia de ${a.grade}${a.section ? ` ${a.section}` : ''}`,
-        act_color: '#3b82f6',
+        color: '#3b82f6',
       })
     })
 
@@ -92,9 +92,9 @@ export async function GET(request: NextRequest) {
           id: `p-${p.id}-${p.payment_date}`,
           created_at: p.payment_date,
           type: 'pago',
-          title: 'Pago registrado',
+          act_title: 'Pago registrado',
           act_desc: `${p.concept_name} — ${p.student_name}`,
-          act_color: '#8b5cf6',
+          color: '#8b5cf6',
         })
       }
     })
@@ -104,9 +104,9 @@ export async function GET(request: NextRequest) {
         id: `d-${d.id}-${d.created_at}`,
         created_at: d.created_at,
         type: 'documento',
-        title: 'Documento generado',
+        act_title: 'Documento generado',
         act_desc: `${d.type === 'certificado' ? 'Certificado' : 'Constancia'} para ${d.student_name}`,
-        act_color: '#f59e0b',
+        color: '#f59e0b',
       })
     })
 
@@ -116,10 +116,10 @@ export async function GET(request: NextRequest) {
     const activities = items.slice(0, limit).map((it: any) => ({
       id: it.id,
       type: it.type,
-      title: it.title,
+      title: it.act_title,
       description: it.act_desc,
       time: it.created_at ? new Date(it.created_at).toISOString() : null,
-      color: it.act_color,
+      color: it.color,
     }))
 
     return NextResponse.json({ activities })

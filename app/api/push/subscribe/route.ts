@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
          user_agent = EXCLUDED.user_agent,
          last_seen_at = NOW()`,
       [crypto.randomUUID(), user.id, endpoint, p256dh, auth, userAgent]
-    ).catch((error) => {
+    ).catch((error: Error) => {
       console.error('[push] error guardando suscripción:', error)
     })
 

@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -106,6 +107,35 @@ export default function UgelesPage() {
         label="UGELES"
         title="Visibilidad total de tu jurisdicción"
         description="Un panel centralizado que te da control absoluto sobre todos los colegios de tu jurisdicción. Datos en tiempo real, reportes automáticos y comunicación directa."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Impacto">
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-baseline justify-between border-b border-foreground/5 pb-3">
+                  <span>Reportes</span>
+                  <span className="font-display text-lg text-foreground">−95%</span>
+                </li>
+                <li className="flex items-baseline justify-between border-b border-foreground/5 pb-3">
+                  <span>Visibilidad IE</span>
+                  <span className="font-display text-lg text-foreground">100%</span>
+                </li>
+                <li className="flex items-baseline justify-between border-b border-foreground/5 pb-3">
+                  <span>Intervención</span>
+                  <span className="font-display text-lg text-foreground">+30d</span>
+                </li>
+                <li className="flex items-baseline justify-between">
+                  <span>Despliegue</span>
+                  <span className="font-display text-lg text-foreground">30d</span>
+                </li>
+              </ul>
+            </SideCard>
+            <SideCard label="Convenio">
+              <p className="text-sm leading-relaxed">
+                Firma del convenio UGEL-EduNexus y designación del coordinador.
+              </p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Reto */}

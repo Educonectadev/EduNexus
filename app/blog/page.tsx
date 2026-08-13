@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   PageHeader,
   PageSection,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -97,7 +98,36 @@ export default function BlogPage() {
       <PageHeader
         label="Blog educativo"
         title="Ideas que transforman la educación"
-        description="Artículos, guías y recursos para directivos, docentes ypadres de familia interesados en la innovación educativa."
+        description="Artículos, guías y recursos para directivos, docentes y padres de familia interesados en la innovación educativa."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Newsletter">
+              <p className="text-sm leading-relaxed mb-4">
+                Recibe los mejores artículos cada semana.
+              </p>
+              <input
+                type="email"
+                placeholder="tu@colegio.edu.pe"
+                className="w-full px-4 py-3 bg-background border border-foreground/10 focus:border-foreground/30 focus:outline-none transition-colors text-sm"
+              />
+              <button className="w-full mt-3 px-4 py-3 bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors">
+                Suscribirme
+              </button>
+            </SideCard>
+            <SideCard label="Categorías">
+              <div className="flex flex-wrap gap-2">
+                {categories.slice(1, 7).map((cat) => (
+                  <span
+                    key={cat}
+                    className="px-3 py-1 text-xs font-mono border border-foreground/10 text-muted-foreground hover:border-foreground/30 transition-colors cursor-pointer"
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Categorías */}

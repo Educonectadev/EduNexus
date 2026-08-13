@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -130,6 +131,31 @@ export default function ColegiosPrivadosPage() {
         label="Colegios privados"
         title="Potencia tu colegio con tecnología de vanguardia"
         description="EduNexus ofrece a los colegios privados del Perú una plataforma integral que combina gestión académica, financiera y comunicacional en un solo sistema."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Planes">
+              <div className="space-y-3">
+                {[
+                  { n: "Básico", p: "S/. 199", s: "Hasta 200 alumnos" },
+                  { n: "Profesional", p: "S/. 599", s: "Hasta 1,500 alumnos" },
+                  { n: "Institucional", p: "Personalizado", s: "Redes y franquicias" },
+                ].map((p) => (
+                  <div key={p.n} className="flex items-baseline justify-between border-b border-foreground/5 pb-3 last:border-0 last:pb-0">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{p.n}</p>
+                      <p className="text-xs text-muted-foreground/70">{p.s}</p>
+                    </div>
+                    <span className="font-display text-lg text-foreground">{p.p}</span>
+                  </div>
+                ))}
+              </div>
+            </SideCard>
+            <SideCard label="Ahorro promedio">
+              <p className="font-display text-3xl text-foreground">S/. 36,000</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">anuales por colegio</p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Reto */}

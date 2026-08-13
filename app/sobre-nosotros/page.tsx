@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -101,6 +102,31 @@ export default function SobreNosotrosPage() {
         label="Sobre nosotros"
         title="Transformando la educación peruana"
         description="Somos un equipo de educadores y tecnólogos que cree que la tecnología puede cerrar las brechas educativas más grandes de América Latina."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Cifras clave">
+              <div className="space-y-4">
+                {[
+                  { v: "2.4M+", l: "estudiantes" },
+                  { v: "18,000+", l: "colegios" },
+                  { v: "25", l: "regiones" },
+                  { v: "5", l: "años operando" },
+                ].map((s) => (
+                  <div key={s.l} className="flex items-baseline justify-between border-b border-foreground/5 pb-3 last:border-0 last:pb-0">
+                    <span className="text-sm">{s.l}</span>
+                    <span className="font-display text-2xl text-foreground">{s.v}</span>
+                  </div>
+                ))}
+              </div>
+            </SideCard>
+            <SideCard label="Sede">
+              <p className="text-sm leading-relaxed">
+                Av. Javier Prado Este 4600<br />
+                Santiago de Surco, Lima
+              </p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Misión y Visión */}

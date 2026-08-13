@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -111,6 +112,29 @@ export default function ColegiosPublicosPage() {
         label="Colegios públicos"
         title="Gestión inteligente para la educación pública"
         description="EduNexus está diseñado para las necesidades específicas de los colegios del Estado peruano. Automatiza reportes, simplifica la gestión y cumple con el MINEDU sin esfuerzo."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Cobertura">
+              <div className="space-y-3">
+                {[
+                  { v: "12,400+", l: "colegios públicos" },
+                  { v: "1.8M", l: "estudiantes" },
+                  { v: "98,000+", l: "docentes" },
+                  { v: "25", l: "regiones" },
+                ].map((s) => (
+                  <div key={s.l} className="flex items-baseline justify-between border-b border-foreground/5 pb-3 last:border-0 last:pb-0">
+                    <span className="text-sm">{s.l}</span>
+                    <span className="font-display text-xl text-foreground">{s.v}</span>
+                  </div>
+                ))}
+              </div>
+            </SideCard>
+            <SideCard label="Costo">
+              <p className="font-display text-3xl text-foreground">Gratuito</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Financiado por UGELES y MINEDU</p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Stats */}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   PageHeader,
   PageSection,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -154,6 +155,37 @@ export default function TerminosPage() {
         label="Términos"
         title="Términos y Condiciones"
         description="Lee detenidamente los términos que rigen el uso de la plataforma EduNexus."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Documentos">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Términos y Condiciones
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Política de Privacidad
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Ley N° 29733 (PDPL)
+                </li>
+              </ul>
+            </SideCard>
+            <SideCard label="Soporte legal">
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Email</p>
+                  <p>legal@edunexus.pe</p>
+                </div>
+                <p className="text-xs text-muted-foreground/70 pt-2 border-t border-foreground/5">
+                  Última actualización: 15 jul 2025
+                </p>
+              </div>
+            </SideCard>
+          </div>
+        }
       />
 
       <PageSection>

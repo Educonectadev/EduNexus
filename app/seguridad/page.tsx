@@ -3,6 +3,7 @@ import {
   PageHeader,
   PageSection,
   InfoCard,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -78,6 +79,45 @@ export default function SeguridadPage() {
         label="Seguridad"
         title="Seguridad de nivel bancario para la educación"
         description="Los datos de más de 2.4 millones de estudiantes peruanos están protegidos con los más altos estándares internacionales de ciberseguridad."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Estado actual">
+              <div className="space-y-3">
+                {[
+                  { v: "0", l: "incidentes reportados" },
+                  { v: "AES-256", l: "cifrado" },
+                  { v: "24/7", l: "monitoreo" },
+                  { v: "99.99%", l: "disponibilidad" },
+                ].map((s) => (
+                  <div key={s.l} className="flex items-baseline justify-between border-b border-foreground/5 pb-3 last:border-0 last:pb-0">
+                    <span className="text-sm">{s.l}</span>
+                    <span className="font-display text-xl text-foreground">{s.v}</span>
+                  </div>
+                ))}
+              </div>
+            </SideCard>
+            <SideCard label="Certificaciones">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  ISO 27001
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  SOC 2 Tipo II
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Ley N° 29733 (PDPL)
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  GDPR
+                </li>
+              </ul>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Resumen */}

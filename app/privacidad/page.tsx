@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   PageHeader,
   PageSection,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -147,6 +148,38 @@ export default function PrivacidadPage() {
         label="Privacidad"
         title="Política de Privacidad"
         description="Tu privacidad y la de los estudiantes es nuestra prioridad. Esta política describe cómo protegemos y tratamos la información."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Oficial de protección">
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Email</p>
+                  <p>privacidad@edunexus.pe</p>
+                </div>
+                <div>
+                  <p className="font-mono text-xs text-foreground/40 mb-1">Teléfono</p>
+                  <p>+51 (01) 555-0199</p>
+                </div>
+              </div>
+            </SideCard>
+            <SideCard label="Cumplimiento">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  Ley N° 29733
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  ISO 27001
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-foreground/30" />
+                  GDPR
+                </li>
+              </ul>
+            </SideCard>
+          </div>
+        }
       />
 
       <PageSection>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   PageHeader,
   PageSection,
+  SideCard,
   CTAInline,
 } from "@/components/page-layout";
 import { FooterSection } from "@/components/landing/footer-section";
@@ -134,6 +135,34 @@ export default function PDPLPage() {
         label="PDPL"
         title="Protección de Datos Personales"
         description="EduNexus cumple plenamente con la Ley N° 29733 de Protección de Datos Personales y su Reglamento, adoptando las más altas medidas para resguardar la información de la comunidad educativa."
+        side={
+          <div className="space-y-4">
+            <SideCard label="Ejercita tus derechos ARCO">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <span className="font-display text-base text-foreground">A</span>
+                  Acceso
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="font-display text-base text-foreground">R</span>
+                  Rectificación
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="font-display text-base text-foreground">C</span>
+                  Cancelación
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="font-display text-base text-foreground">O</span>
+                  Oposición
+                </li>
+              </ul>
+            </SideCard>
+            <SideCard label="Oficina de protección">
+              <p className="font-mono text-xs text-foreground/60 mb-1">privacidad@edunexus.pe</p>
+              <p className="text-xs text-muted-foreground/70">Respuesta en 8 días hábiles.</p>
+            </SideCard>
+          </div>
+        }
       />
 
       {/* Resumen */}

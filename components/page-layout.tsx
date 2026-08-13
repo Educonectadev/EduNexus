@@ -8,37 +8,71 @@ export function PageHeader({
   label,
   title,
   description,
+  side,
 }: {
   label: string;
   title: string;
   description?: string;
+  side?: React.ReactNode;
 }) {
   return (
-    <div className="relative pt-32 lg:pt-40 pb-16 lg:pb-24">
+    <div className="relative pt-24 lg:pt-32 pb-10 lg:pb-14">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 group"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
           Volver al inicio
         </Link>
 
-        <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
-          <span className="w-8 h-px bg-foreground/30" />
+        <div className={side ? "grid lg:grid-cols-[1fr_360px] gap-10 lg:gap-16 items-start" : ""}>
+          <div>
+            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
+              <span className="w-8 h-px bg-foreground/30" />
+              {label}
+            </span>
+
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-tight text-foreground mb-6">
+              {title}
+            </h1>
+
+            {description && (
+              <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl">
+                {description}
+              </p>
+            )}
+          </div>
+
+          {side && (
+            <div className="lg:sticky lg:top-32">
+              {side}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SideCard({
+  label,
+  children,
+  className = "",
+}: {
+  label?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`p-6 lg:p-8 border border-foreground/10 bg-foreground/[0.02] ${className}`}>
+      {label && (
+        <span className="inline-flex items-center gap-3 text-xs font-mono text-muted-foreground mb-4">
+          <span className="w-6 h-px bg-foreground/30" />
           {label}
         </span>
-
-        <h1 className="font-display text-5xl md:text-6xl lg:text-8xl tracking-tight text-foreground mb-6">
-          {title}
-        </h1>
-
-        {description && (
-          <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-3xl">
-            {description}
-          </p>
-        )}
-      </div>
+      )}
+      <div className="text-muted-foreground">{children}</div>
     </div>
   );
 }
@@ -51,7 +85,7 @@ export function PageSection({
   className?: string;
 }) {
   return (
-    <div className={`max-w-[1400px] mx-auto px-6 lg:px-12 py-16 lg:py-24 ${className}`}>
+    <div className={`max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16 ${className}`}>
       {children}
     </div>
   );
