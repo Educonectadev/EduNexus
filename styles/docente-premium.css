@@ -638,3 +638,75 @@ html.dark [data-role="docente"] {
   border-color: var(--sb-on-surface-variant);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
 }
+
+/* ─── Rail note (contenedor de chips de opción) ─── */
+[data-role="docente"] main .nb-rail {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ─── Chip de opción (btn select de opciones, estilo .sbf-chip) ─── */
+[data-role="docente"] main .nb-chip {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--note-hairline-strong);
+  background: transparent;
+  color: var(--note-muted);
+  font-family: var(--sb-docente-font);
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease,
+              box-shadow 180ms ease, transform 220ms cubic-bezier(0.34, 1.45, 0.5, 1);
+}
+[data-role="docente"] main .nb-chip:hover {
+  background: var(--note-fill);
+  border-color: var(--note-hairline-strong);
+  color: var(--note-text);
+}
+[data-role="docente"] main .nb-chip.is-today {
+  background: var(--note-fill);
+  border-color: var(--note-hairline-strong);
+  color: var(--note-text);
+}
+[data-role="docente"] main .nb-chip:active {
+  transform: scale(0.96);
+}
+[data-role="docente"] main .nb-chip.active {
+  background: var(--note-solid-bg);
+  color: var(--note-solid-fg);
+  border-color: transparent;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.2);
+}
+[data-role="docente"] main .nb-chip .nb-chip-check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 180ms, transform 180ms cubic-bezier(0.34, 1.45, 0.5, 1);
+}
+[data-role="docente"] main .nb-chip.active .nb-chip-check {
+  opacity: 1;
+  transform: scale(1);
+}
+[data-role="docente"] main .nb-chip .nb-chip-count {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--note-fill-strong);
+  color: var(--note-muted);
+}
+[data-role="docente"] main .nb-chip.active .nb-chip-count {
+  background: color-mix(in srgb, var(--note-solid-fg) 20%, transparent);
+  color: var(--note-solid-fg);
+}

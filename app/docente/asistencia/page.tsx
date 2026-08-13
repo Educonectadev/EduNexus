@@ -85,11 +85,11 @@ function AsistenciaInner() {
           <p className="mt-1 text-sm text-[var(--note-muted)]">Control de tu marcación y la asistencia de tus alumnos</p>
         </header>
 
-        <div className="flex gap-1 p-1 w-fit rounded-[14px] bg-[var(--note-fill)]">
+        <div className="nb-rail">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={cn("px-4 py-2 rounded-[12px] text-sm font-medium transition-all",
-                tab === t.key ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "text-[var(--note-muted)] hover:text-[var(--note-text)]")}>
+              className={cn("nb-chip", tab === t.key && "active")}>
+              <Check className="nb-chip-check" />
               {t.label}
             </button>
           ))}
@@ -570,11 +570,11 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
       {/* View toggle */}
       {selectedCourse && (
-        <div className="flex gap-1 p-1 w-fit rounded-[14px] bg-[var(--note-fill)]">
+        <div className="nb-rail">
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => { setAlumnoView(key); if (key === "estadisticas") loadStats() }}
-              className={cn("px-4 py-2 rounded-[12px] text-sm font-medium transition-all",
-                alumnoView === key ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "text-[var(--note-muted)] hover:text-[var(--note-text)]")}>
+              className={cn("nb-chip", alumnoView === key && "active")}>
+              <Check className="nb-chip-check" />
               {label}
             </button>
           ))}

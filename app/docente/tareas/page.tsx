@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap } from "@/components/ui/proicons"
+import { ClipboardList, Plus, Calendar, Check, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 
 interface Task {
@@ -269,7 +270,7 @@ function TareasInner() {
               <option key={c.id} value={c.id}>{c.name} - {c.grade}{c.section}</option>
             ))}
           </select>
-          <div className="flex gap-2 flex-wrap">
+          <div className="nb-rail">
             {([
               { key: 'all', label: 'Todas' },
               { key: 'pending', label: 'Pendientes' },
@@ -277,15 +278,10 @@ function TareasInner() {
               { key: 'graded', label: 'Calificadas' },
             ]).map(f => (
               <button key={f.key} onClick={() => setFilter(f.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-[12px] border text-sm font-medium transition-all ${
-                  filter === f.key
-                    ? 'bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] border-transparent'
-                    : 'bg-[var(--note-surface)] text-[var(--note-muted)] border-[var(--note-hairline)] hover:border-[var(--note-hairline-strong)]'
-                }`}>
+                className={cn("nb-chip", filter === f.key && "active")}>
+                <Check className="nb-chip-check" />
                 {f.label}
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-[6px] font-semibold ${
-                  filter === f.key ? 'bg-white/20' : 'bg-[var(--note-fill-strong)] text-[var(--note-muted)]'
-                }`}>
+                <span className="nb-chip-count">
                   {counts[f.key as keyof typeof counts]}
                 </span>
               </button>

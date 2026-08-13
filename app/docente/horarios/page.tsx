@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap } from "@/components/ui/proicons"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, Check } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface Horario {
@@ -73,22 +73,17 @@ export default function DocenteHorariosPage() {
         </div>
 
         {/* Day pills */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="nb-rail">
           {scheduleByDay.map(({ day, label, items }) => (
             <button key={day} onClick={() => setActiveDay(activeDay === day ? null : day)}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-[12px] border transition-all whitespace-nowrap text-[var(--note-text)]",
-                activeDay === day
-                  ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] border-transparent"
-                  : todayDay === day
-                    ? "bg-[var(--note-fill)] border-[var(--note-hairline-strong)]"
-                    : "bg-[var(--note-surface)] border-[var(--note-hairline)] hover:border-[var(--note-hairline-strong)]")}>
+                "nb-chip",
+                activeDay === day && "active",
+                todayDay === day && activeDay !== day && "is-today")}>
+              <Check className="nb-chip-check" />
               <Calendar className="h-3.5 w-3.5 opacity-60" />
               <span className="text-xs font-medium">{label}</span>
-              <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded-[6px]",
-                items.length > 0 ? "bg-[var(--note-fill-strong)] text-[var(--note-muted)]" : "text-[var(--note-muted)]/40")}>
-                {items.length}
-              </span>
+              <span className="nb-chip-count">{items.length}</span>
             </button>
           ))}
         </div>

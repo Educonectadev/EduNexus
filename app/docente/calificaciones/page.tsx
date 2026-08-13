@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, ChevronDown } from "@/components/ui/proicons"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Check, Pencil, Trash2, BarChart3, ChevronDown } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
+import { cn } from "@/lib/utils"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 
 interface Grade {
@@ -242,10 +243,11 @@ function CalificacionesInner() {
               <ChevronDown className="h-4 w-4 text-[var(--note-muted)] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
             {students.length > 0 && (
-              <div className="flex p-1 bg-[var(--note-fill)] rounded-[14px]">
+              <div className="nb-rail">
                 {([["lista", "Lista"], ["tabla", "Libro de notas"]] as const).map(([key, label]) => (
                   <button key={key} onClick={() => setViewMode(key)}
-                    className={`px-3 py-1.5 rounded-[12px] text-xs font-medium transition-all ${viewMode === key ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "text-[var(--note-muted)] hover:text-[var(--note-text)]"}`}>
+                    className={cn("nb-chip", viewMode === key && "active")}>
+                    <Check className="nb-chip-check" />
                     {label}
                   </button>
                 ))}
