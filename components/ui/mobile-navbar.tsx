@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { MoreHorizontal, Sparkles, User } from "@/components/ui/proicons"
+import { MoreHorizontal, Sparkles, User, X } from "@/components/ui/proicons"
 
 interface NavItem {
   title: string
@@ -44,7 +44,7 @@ function NavButton({
         className="absolute inset-0"
         initial={false}
         animate={{
-          borderRadius: isActive ? 20 : 16,
+          borderRadius: isActive ? 999 : 999,
           backgroundColor: isActive ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
         }}
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
@@ -145,13 +145,13 @@ export function MobileNavbar({
                 animate={{
                   width: menuOpen ? Math.max(openSize.width, 56) : 56,
                   height: menuOpen ? Math.max(openSize.height, 56) : 56,
-                  borderRadius: menuOpen ? 24 : 16,
+                  borderRadius: menuOpen ? 24 : 999,
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
               >
                 <motion.button
                   type="button"
-                  className="absolute flex items-center justify-center w-14 h-14 z-10"
+                  className="absolute flex items-center justify-center w-14 h-14 z-10 rounded-full"
                   onClick={() => setMenuOpen(v => !v)}
                   aria-label="Más opciones"
                   aria-expanded={menuOpen}
@@ -180,50 +180,67 @@ export function MobileNavbar({
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
                     >
-                      <div ref={contentRef} className="p-2 pb-12 w-64">
-                      {onAiClick && (
-                        <button
-                          type="button"
-                          onClick={() => { setMenuOpen(false); onAiClick() }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium text-sb-surface hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl transition-colors"
-                        >
-                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-sb-primary/20 text-sb-primary">
-                            <Sparkles className="h-4 w-4" />
+                      <div ref={contentRef} className="w-64">
+                        <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sb-surface/45">
+                            Opciones
                           </span>
-                          Asistente IA
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => { setMenuOpen(false); router.push("/perfil") }}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                          activeHref === "/perfil"
-                            ? "bg-sb-surface text-sb-on-surface font-medium"
-                            : "text-sb-surface/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-sb-surface"
+                          <button
+                            type="button"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-sb-surface/10 text-sb-surface/60 transition-colors hover:bg-sb-surface/20 hover:text-sb-surface"
+                            aria-label="Cerrar opciones"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <div className="space-y-1 p-2 pt-1 pb-14">
+                        {onAiClick && (
+                          <button
+                            type="button"
+                            onClick={() => { setMenuOpen(false); onAiClick() }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium text-sb-surface hover:bg-sb-surface/10 rounded-full transition-colors"
+                          >
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                              <Sparkles className="h-4 w-4" />
+                            </span>
+                            Asistente IA
+                          </button>
                         )}
-                      >
-                        <span className="flex items-center justify-center w-8 h-8 rounded-full bg-sb-surface/20 text-sb-surface">
-                          <User className="h-4 w-4" />
-                        </span>
-                        Mi perfil
-                      </button>
-                      {optionsItems.map((item) => (
                         <button
-                          key={item.href}
                           type="button"
-                          onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                          onClick={() => { setMenuOpen(false); router.push("/perfil") }}
                           className={cn(
-                            "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                            isActive(item)
+                            "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                            activeHref === "/perfil"
                               ? "bg-sb-surface text-sb-on-surface font-medium"
-                              : "text-sb-surface/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-sb-surface"
+                              : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
                           )}
                         >
-                          <item.icon className="h-4 w-4 shrink-0" />
-                          {item.title}
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                            <User className="h-4 w-4" />
+                          </span>
+                          Mi perfil
                         </button>
-                      ))}
+                        {optionsItems.map((item) => (
+                          <button
+                            key={item.href}
+                            type="button"
+                            onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                              isActive(item)
+                                ? "bg-sb-surface text-sb-on-surface font-medium"
+                                : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
+                            )}
+                          >
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                              <item.icon className="h-4 w-4" />
+                            </span>
+                            {item.title}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 )}

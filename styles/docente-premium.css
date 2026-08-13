@@ -343,6 +343,8 @@ html.dark [data-role="docente"] {
   -webkit-backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid color-mix(in srgb, var(--sb-outline-variant) 35%, transparent);
   box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 999px !important;
+  padding: 6px 8px;
 }
 
 /* ─── Scrollbar sutil ─────────────────────── */
@@ -776,4 +778,77 @@ html.dark [data-role="docente"] {
 }
 [data-role="docente"] .ws-scroll::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--note-muted) 50%, transparent);
+}
+/* ═══ Botones redondos + inputs fecha/hora/horarios (note) ═══ */
+
+/* Botones pequeños y chips -> pill / circulares */
+[data-role="docente"] main button[class*="rounded-[6px]"],
+[data-role="docente"] main button[class*="rounded-[8px]"],
+[data-role="docente"] main button[class*="rounded-[10px]"],
+[data-role="docente"] main button[class*="rounded-[11px]"],
+[data-role="docente"] main button[class*="rounded-[12px]"],
+[data-role="docente"] main button[class*="rounded-[14px]"],
+[data-role="docente"] main button[class*="rounded-[16px]"],
+[data-role="docente"] main button[class*="rounded-lg"],
+[data-role="docente"] main button[class*="rounded-xl"],
+[data-role="docente"] main button[class*="rounded-2xl"] {
+  border-radius: 999px !important;
+}
+[data-role="docente"] .sb-btn,
+[data-role="docente"] .sb-btn-icon,
+[data-role="docente"] .nb-btn,
+[data-role="docente"] .nb-chip,
+[data-role="docente"] .sbf-chip,
+[data-role="docente"] .sbf-filter-btn {
+  border-radius: 999px !important;
+}
+
+/* Campos de formulario sin clase previa (fecha, hora, horarios, etc.)
+   -> note: hairline, transparente, 12px, 40px de alto */
+[data-role="docente"] main input:not([type="checkbox"]):not([type="radio"]):not(.sbf-search-input):not(.sb-input),
+[data-role="docente"] main select:not(.sbf-native-select):not(.nb-select):not(.sb-select),
+[data-role="docente"] main textarea:not(.sb-input) {
+  height: 40px;
+  border-radius: 12px !important;
+  border: 1px solid var(--sb-outline-variant) !important;
+  background-color: transparent !important;
+  color: var(--sb-on-surface);
+  font-family: var(--sb-docente-font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 12px;
+  outline: none;
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+[data-role="docente"] main textarea:not(.sb-input) {
+  height: auto;
+  min-height: 80px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+[data-role="docente"] main input:not([type="checkbox"]):not([type="radio"]):not(.sbf-search-input):not(.sb-input):hover,
+[data-role="docente"] main select:not(.sbf-native-select):not(.nb-select):not(.sb-select):hover,
+[data-role="docente"] main textarea:not(.sb-input):hover {
+  border-color: var(--sb-on-surface-variant) !important;
+  background-color: var(--sb-surface-container-low);
+}
+[data-role="docente"] main input:not([type="checkbox"]):not([type="radio"]):not(.sbf-search-input):not(.sb-input):focus,
+[data-role="docente"] main select:not(.sbf-native-select):not(.nb-select):not(.sb-select):focus,
+[data-role="docente"] main textarea:not(.sb-input):focus {
+  outline: none;
+  border-color: var(--sb-on-surface-variant) !important;
+  background-color: transparent;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
+}
+
+/* Picker nativo de fecha/hora se adapta al tema */
+[data-role="docente"] main input[type="date"],
+[data-role="docente"] main input[type="time"],
+[data-role="docente"] main input[type="datetime-local"] {
+  color-scheme: light;
+}
+.dark [data-role="docente"] main input[type="date"],
+.dark [data-role="docente"] main input[type="time"],
+.dark [data-role="docente"] main input[type="datetime-local"] {
+  color-scheme: dark;
 }
