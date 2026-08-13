@@ -1,408 +1,369 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
 import {
-  Bold, Italic, List, ListOrdered, FormatQuote, ChevronDown, Check, Plus,
-  Star, StarOutline, SlidersHorizontal, Trash2, FileText, Share, ListChecks,
+  BookOpen, GraduationCap, UserCheck, ClipboardList, MessageSquare,
+  Calendar, Clock, ChevronRight, LogIn, LogOut, BookMarked, MapPin,
 } from "@/components/ui/proicons"
+import Link from "next/link"
+import { useAuthStore } from "@/stores/auth-store"
+import { cn } from "@/lib/utils"
 
-interface WsTask {
+interface Course {
   id: string
+  name: string
+  grade: string
+  section: string
+  students: number
+  schedule: string
+}
+
+interface Horario {
+  id: string
+  day_of_week: number
+  start_time: string
+  end_time: string
+  classroom: string
+  course_name: string
+  grade: string
+  section: string
+}
+
+const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
+const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+
+function SectionHeader({ icon: Icon, title, action }: {
+  icon: React.ComponentType<{ className?: string }>
   title: string
-  done: boolean
-  starred: boolean
-  createdAt: number
-}
-
-type FilterMode = "all" | "pending" | "done"
-
-const uid = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : String(Date.now() + Math.random())
-
-const easeOut = [0.37, 0.35, 0, 1] as const
-
-const surface = "bg-[var(--note-surface)]"
-const hair = "border-[var(--note-hairline)]"
-
-/* ────────────────────────── EDITOR ────────────────────────── */
-
-function Editor() {
-  const editorRef = React.useRef<HTMLDivElement>(null)
-  const [block, setBlock] = React.useState("Texto")
-  const [blockOpen, setBlockOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    try {
-      const saved = localStorage.getItem("sb-ws-editor")
-      if (saved && editorRef.current && editorRef.current.innerHTML !== saved) {
-        editorRef.current.innerHTML = saved
-      }
-    } catch {}
-  }, [])
-
-  const save = () => {
-    const el = editorRef.current
-    if (!el) return
-    const clean = el.innerHTML.replace(/<br>/g, "").trim()
-    if (clean === "") el.innerHTML = ""
-    try { localStorage.setItem("sb-ws-editor", el.innerHTML) } catch {}
-  }
-
-  const exec = (cmd: string, val?: string) => {
-    editorRef.current?.focus()
-    document.execCommand(cmd, false, val)
-    save()
-  }
-
-  const applyBlock = (label: string, tag: string) => {
-    if (tag === "ul") exec("insertUnorderedList")
-    else exec("formatBlock", tag)
-    setBlock(label)
-    setBlockOpen(false)
-  }
-
-  const BLOCKS = [
-    { label: "Texto", tag: "P" },
-    { label: "Título", tag: "h1" },
-    { label: "Subtítulo", tag: "h2" },
-    { label: "Cita", tag: "blockquote" },
-    { label: "Lista", tag: "ul" },
-  ]
-
-  const btn =
-    "flex h-8 w-8 items-center justify-center rounded-[10px] text-[var(--note-muted)] transition-colors duration-150 hover:bg-[var(--note-fill)] hover:text-[var(--note-text)]"
-
-  return (
-    <section className="flex min-h-[52vh] flex-col overflow-hidden rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] lg:min-h-0 lg:flex-1">
-      {/* Toolbar */}
-      <div className="flex h-[46px] shrink-0 items-center gap-1 border-b border-[var(--note-hairline)] px-3">
-        <div className="relative">
-          <button
-            onClick={() => setBlockOpen((o) => !o)}
-            className="flex h-9 w-[150px] items-center justify-between gap-2 rounded-[12px] border border-[var(--note-hairline)] bg-[var(--note-fill)] px-3.5 text-[13px] text-[var(--note-muted)] transition-all duration-150 hover:border-[var(--note-hairline-strong)] hover:text-[var(--note-text)]"
-          >
-            <span className="truncate">{block}</span>
-            <ChevronDown className={cn("h-4 w-4 shrink-0 opacity-50 transition-transform duration-200", blockOpen && "rotate-180")} />
-          </button>
-          <AnimatePresence>
-            {blockOpen && (
-              <motion.div
-                key="block"
-                initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                transition={{ duration: 0.15, ease: easeOut }}
-                className="absolute left-0 top-[calc(100%+6px)] z-30 w-[150px] rounded-[14px] border border-[var(--note-hairline-strong)] bg-[var(--note-fill)] p-1.5 shadow-lg shadow-black/10"
-              >
-                {BLOCKS.map((b) => (
-                  <button
-                    key={b.label}
-                    onClick={() => applyBlock(b.label, b.tag)}
-                    className={cn(
-                      "flex h-[34px] w-full items-center justify-between rounded-[10px] px-2.5 text-[13px] transition-colors duration-100",
-                      block === b.label
-                        ? "bg-[var(--note-fill-strong)] font-medium text-[var(--note-text)]"
-                        : "text-[var(--note-muted)] hover:bg-[var(--note-fill-strong)] hover:text-[var(--note-text)]"
-                    )}
-                  >
-                    {b.label}
-                    {block === b.label && <Check className="h-4 w-4" />}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <span className="mx-1 h-5 w-px shrink-0 bg-[var(--note-hairline-strong)]" />
-
-        <button className={btn} onClick={() => exec("bold")} title="Negrita"><Bold className="h-[16px] w-[16px]" /></button>
-        <button className={btn} onClick={() => exec("italic")} title="Cursiva"><Italic className="h-[16px] w-[16px]" /></button>
-        <button className={btn} onClick={() => exec("insertUnorderedList")} title="Lista"><List className="h-[16px] w-[16px]" /></button>
-        <button className={btn} onClick={() => exec("insertOrderedList")} title="Lista numerada"><ListOrdered className="h-[16px] w-[16px]" /></button>
-        <button className={btn} onClick={() => exec("formatBlock", "blockquote")} title="Cita"><FormatQuote className="h-[16px] w-[16px]" /></button>
-
-        <div className="ml-auto flex items-center gap-1">
-          <button className={btn} title="Documento"><FileText className="h-[16px] w-[16px]" /></button>
-          <button className={btn} title="Compartir"><Share className="h-[16px] w-[16px]" /></button>
-        </div>
-      </div>
-
-      {/* Editor */}
-      <div className="ws-scroll min-h-0 flex-1 overflow-y-auto px-6 py-5">
-        <div
-          ref={editorRef}
-          contentEditable
-          suppressContentEditableWarning
-          data-placeholder="Empieza a escribir..."
-          onInput={save}
-          onBlur={save}
-          spellCheck={false}
-          className="ws-editor min-h-full text-[14px] leading-[1.7] text-[var(--note-text)] outline-none"
-        />
-      </div>
-    </section>
-  )
-}
-
-/* ────────────────────────── TAREAS ────────────────────────── */
-
-function TasksPanel({ tasks, setTasks }: {
-  tasks: WsTask[]
-  setTasks: React.Dispatch<React.SetStateAction<WsTask[]>>
+  action?: React.ReactNode
 }) {
-  const [creating, setCreating] = React.useState(false)
-  const [title, setTitle] = React.useState("")
-  const [editId, setEditId] = React.useState<string | null>(null)
-  const [editTitle, setEditTitle] = React.useState("")
-  const [filter, setFilter] = React.useState<FilterMode>("all")
-  const [starOnly, setStarOnly] = React.useState(false)
-  const [filterOpen, setFilterOpen] = React.useState(false)
-
-  const startCreate = () => {
-    setCreating(true)
-    setEditId(null)
-  }
-
-  const commitCreate = () => {
-    const v = title.trim()
-    if (v) {
-      setTasks((prev) => [
-        { id: uid(), title: v, done: false, starred: false, createdAt: Date.now() },
-        ...prev,
-      ])
-    }
-    setTitle("")
-    setCreating(false)
-  }
-
-  const startEdit = (t: WsTask) => {
-    setEditId(t.id)
-    setEditTitle(t.title)
-    setCreating(false)
-  }
-
-  const commitEdit = (id: string) => {
-    const v = editTitle.trim()
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, title: v || t.title } : t)))
-    setEditId(null)
-  }
-
-  const toggle = (id: string) => setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)))
-  const toggleStar = (id: string) => setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, starred: !t.starred } : t)))
-  const remove = (id: string) => setTasks((prev) => prev.filter((t) => t.id !== id))
-
-  const visible = tasks
-    .filter((t) => {
-      if (filter === "pending") return !t.done
-      if (filter === "done") return t.done
-      return true
-    })
-    .filter((t) => (starOnly ? t.starred : true))
-
-  const FILTERS: { key: FilterMode; label: string }[] = [
-    { key: "all", label: "Todas" },
-    { key: "pending", label: "Pendientes" },
-    { key: "done", label: "Completadas" },
-  ]
-
-  const iconBtn = (active: boolean) =>
-    cn(
-      "flex h-9 w-9 items-center justify-center rounded-[11px] border transition-colors duration-150",
-      active
-        ? "border-[var(--note-hairline-strong)] bg-[var(--note-fill-strong)] text-[var(--note-text)]"
-        : "border-transparent bg-[var(--note-fill)] text-[var(--note-muted)] hover:bg-[var(--note-fill-strong)] hover:text-[var(--note-text)]"
-    )
-
   return (
-    <section className="flex h-[45vh] flex-col rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] lg:h-auto lg:min-h-0 lg:w-[290px] lg:shrink-0 xl:w-[400px]">
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between px-4 pb-3 pt-4">
-        <h2 className="text-[22px] font-semibold tracking-tight text-[var(--note-text)]">Tareas</h2>
-        <div className="flex items-center gap-1.5">
-          <div className="relative">
-            <button onClick={() => setFilterOpen((o) => !o)} className={iconBtn(filter !== "all")} title="Filtrar">
-              <SlidersHorizontal className="h-[17px] w-[17px]" />
-            </button>
-            <AnimatePresence>
-              {filterOpen && (
-                <motion.div
-                  key="filters"
-                  initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                  transition={{ duration: 0.15, ease: easeOut }}
-                  className="absolute right-0 top-[calc(100%+6px)] z-30 w-[180px] rounded-[14px] border border-[var(--note-hairline-strong)] bg-[var(--note-fill)] p-1.5 shadow-lg shadow-black/10"
-                >
-                  {FILTERS.map((f) => (
-                    <button
-                      key={f.key}
-                      onClick={() => { setFilter(f.key); setFilterOpen(false) }}
-                      className={cn(
-                        "flex h-[34px] w-full items-center justify-between rounded-[10px] px-2.5 text-[13px] transition-colors duration-100",
-                        filter === f.key
-                          ? "bg-[var(--note-fill-strong)] font-medium text-[var(--note-text)]"
-                          : "text-[var(--note-muted)] hover:bg-[var(--note-fill-strong)] hover:text-[var(--note-text)]"
-                      )}
-                    >
-                      {f.label}
-                      {filter === f.key && <Check className="h-4 w-4" />}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <button onClick={() => setStarOnly((s) => !s)} className={iconBtn(starOnly)} title="Favoritas">
-            <Star className="h-[17px] w-[17px]" />
-          </button>
-          <button
-            onClick={startCreate}
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] transition-all duration-150 hover:scale-[1.03] hover:opacity-90"
-            title="Crear tarea"
-          >
-            <Plus className="h-5 w-5" />
-          </button>
-        </div>
+    <div className="flex items-center justify-between px-1">
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
+        <h2 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{title}</h2>
       </div>
-
-      {/* Container */}
-      <div className={cn("mx-4 mb-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-[22px] border", hair, surface)}>
-        {creating && (
-          <div className="mx-2.5 mt-2.5 flex shrink-0 items-center gap-2.5 rounded-[12px] border border-[var(--note-hairline-strong)] bg-[var(--note-fill)] px-2.5 py-2">
-            <span className="h-[18px] w-[18px] shrink-0 rounded-full border border-[var(--note-hairline-strong)]" />
-            <input
-              autoFocus
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitCreate()
-                if (e.key === "Escape") { setTitle(""); setCreating(false) }
-              }}
-              placeholder="Nombre de la tarea..."
-              className="min-w-0 flex-1 bg-transparent text-[14px] text-[var(--note-text)] outline-none placeholder:text-[var(--note-muted)]"
-            />
-            <button
-              onClick={commitCreate}
-              className="shrink-0 text-[12px] font-medium text-[var(--note-muted)] transition-colors duration-150 hover:text-[var(--note-text)]"
-            >
-              Guardar
-            </button>
-          </div>
-        )}
-
-        {visible.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.25, ease: easeOut }}
-              className="flex flex-col items-center gap-3"
-            >
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--note-fill)]">
-                <ListChecks className="h-7 w-7 text-[var(--note-muted)]" />
-              </div>
-              <p className="text-[14px] text-[var(--note-muted)]">
-                {tasks.length === 0 ? "No hay tareas" : "No hay resultados"}
-              </p>
-              <button
-                onClick={startCreate}
-                className="rounded-[18px] bg-[var(--note-fill)] px-4 py-2 text-[13px] text-[var(--note-muted)] transition-colors duration-150 hover:bg-[var(--note-fill-strong)] hover:text-[var(--note-text)]"
-              >
-                Crear tarea
-              </button>
-            </motion.div>
-          </div>
-        ) : (
-          <div className="ws-scroll flex-1 overflow-y-auto px-1.5 py-2">
-            {visible.map((t) => (
-              <div
-                key={t.id}
-                className="group flex items-center gap-2.5 rounded-[12px] px-2.5 py-2 transition-colors duration-150 hover:bg-[var(--note-fill)]"
-              >
-                <button
-                  onClick={() => toggle(t.id)}
-                  className={cn(
-                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-all duration-150",
-                    t.done
-                      ? "border-transparent bg-[var(--note-solid-bg)]"
-                      : "border-[var(--note-hairline-strong)] hover:border-[var(--note-text)]"
-                  )}
-                  aria-label={t.done ? "Desmarcar" : "Completar"}
-                >
-                  {t.done && <Check className="h-3 w-3 text-[var(--note-solid-fg)]" />}
-                </button>
-
-                {editId === t.id ? (
-                  <input
-                    autoFocus
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") commitEdit(t.id)
-                      if (e.key === "Escape") setEditId(null)
-                    }}
-                    className="min-w-0 flex-1 border-b border-[var(--note-hairline-strong)] bg-transparent py-0.5 text-[14px] text-[var(--note-text)] outline-none"
-                  />
-                ) : (
-                  <button
-                    onClick={() => startEdit(t)}
-                    className={cn(
-                      "min-w-0 flex-1 truncate text-left text-[14px] transition-colors duration-150",
-                      t.done ? "text-[var(--note-muted)] line-through" : "text-[var(--note-text)] hover:text-[var(--note-muted)]"
-                    )}
-                  >
-                    {t.title}
-                  </button>
-                )}
-
-                <button
-                  onClick={() => toggleStar(t.id)}
-                  className="shrink-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus:opacity-100"
-                  aria-label="Favorita"
-                >
-                  {t.starred
-                    ? <Star className="h-[16px] w-[16px] text-[var(--note-text)]" />
-                    : <StarOutline className="h-[16px] w-[16px] text-[var(--note-muted)]" />}
-                </button>
-                <button
-                  onClick={() => remove(t.id)}
-                  className="shrink-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus:opacity-100"
-                  aria-label="Eliminar"
-                >
-                  <Trash2 className="h-[16px] w-[16px] text-[var(--note-muted)] transition-colors duration-150 hover:text-[var(--note-text)]" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+      {action}
+    </div>
   )
 }
 
-/* ────────────────────────── PÁGINA ────────────────────────── */
+function CardRow({ href, onClick, children, className, highlight }: {
+  href?: string
+  onClick?: () => void
+  children: React.ReactNode
+  className?: string
+  highlight?: boolean
+}) {
+  const base = cn(
+    "block rounded-[24px] border bg-[var(--note-surface)] p-4 transition-all duration-150 hover:-translate-y-px hover:opacity-90",
+    highlight
+      ? "border-[var(--note-hairline-strong)] bg-[var(--note-fill)]"
+      : "border-[var(--note-hairline)] hover:border-[var(--note-hairline-strong)]",
+    className
+  )
+  if (href) return <Link href={href} className={base}>{children}</Link>
+  return <button type="button" onClick={onClick} className={cn(base, "w-full text-left")}>{children}</button>
+}
 
 export default function DocenteDashboard() {
-  const [tasks, setTasks] = React.useState<WsTask[]>(() => {
-    try {
-      const raw = localStorage.getItem("sb-ws-tasks")
-      return raw ? (JSON.parse(raw) as WsTask[]) : []
-    } catch { return [] }
-  })
+  const user = useAuthStore((s) => s.user)
+  const [courses, setCourses] = React.useState<Course[]>([])
+  const [horarios, setHorarios] = React.useState<Horario[]>([])
+  const [attendance, setAttendance] = React.useState<any>(null)
+  const [schedule, setSchedule] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
+
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches"
+  const dateStr = new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
 
   React.useEffect(() => {
-    try { localStorage.setItem("sb-ws-tasks", JSON.stringify(tasks)) } catch {}
-  }, [tasks])
+    let cancelled = false
+    ;(async () => {
+      try {
+        const today = new Date().toISOString().split("T")[0]
+        const [c, h, a] = await Promise.all([
+          fetch("/api/docente/cursos").then(r => r.json()),
+          fetch("/api/docente/horarios").then(r => r.json()),
+          fetch(`/api/docente/attendance?date=${today}`).then(r => r.json()),
+        ])
+        if (cancelled) return
+        setCourses(Array.isArray(c) ? c : [])
+        setHorarios(Array.isArray(h) ? h : [])
+        setAttendance(a.attendance)
+        setSchedule(a.schedule)
+      } catch {} finally { if (!cancelled) setLoading(false) }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const totalStudents = courses.reduce((acc, c) => acc + (c.students || 0), 0)
+
+  const todayIdx = new Date().getDay()
+  const todaySchedule = horarios.filter(h => h.day_of_week === todayIdx).sort((a, b) => a.start_time.localeCompare(b.start_time))
+
+  const now = new Date()
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+  const nextClass = todaySchedule.find(h => toMin(h.end_time) > nowMin)
+
+  const checkedIn = attendance?.check_in
+  const checkedOut = attendance?.check_out
+  const attendanceStatus = attendance?.status
+
+  const handleCheck = async (action: "check-in" | "check-out") => {
+    try {
+      const res = await fetch("/api/docente/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setAttendance(data.attendance)
+        if (data.schedule) setSchedule(data.schedule)
+      }
+    } catch {}
+  }
+
+  const metrics = [
+    { label: "Mis Cursos", value: loading ? "—" : courses.length, icon: BookOpen, href: "/docente/cursos" },
+    { label: "Total Alumnos", value: loading ? "—" : totalStudents, icon: GraduationCap, href: "/docente/cursos" },
+    { label: "Clases Hoy", value: loading ? "—" : todaySchedule.length, icon: Calendar, href: "/docente/horarios" },
+    { label: "Horas Hoy", value: loading ? "—" : `${todaySchedule.reduce((a, h) => a + (toMin(h.end_time) - toMin(h.start_time)), 0) / 60} h`, icon: Clock, href: "/docente/horarios" },
+  ]
+
+  const quickActions = [
+    { label: "Tomar asistencia", desc: "Registrar asistencia del día", icon: UserCheck, href: "/docente/asistencia" },
+    { label: "Ingresar notas", desc: "Calificaciones de alumnos", icon: BookMarked, href: "/docente/calificaciones" },
+    { label: "Asignar tareas", desc: "Crear tareas para tus cursos", icon: ClipboardList, href: "/docente/tareas" },
+    { label: "Mis cursos", desc: `${courses.length} cursos asignados`, icon: BookOpen, href: "/docente/cursos" },
+    { label: "Horarios", desc: "Tu horario de la semana", icon: Calendar, href: "/docente/horarios" },
+    { label: "Mensajes", desc: "Bandeja de entrada", icon: MessageSquare, href: "/docente/mensajes" },
+  ]
+
+  const attConfig: Record<string, { label: string; color: string; dot: string }> = {
+    present: { label: "A tiempo", color: "bg-emerald-500/10 text-emerald-500", dot: "bg-emerald-500" },
+    late: { label: "Tardanza", color: "bg-amber-500/10 text-amber-500", dot: "bg-amber-500" },
+    absent: { label: "Ausente", color: "bg-red-500/10 text-red-500", dot: "bg-red-500" },
+    justified: { label: "Justificado", color: "bg-blue-500/10 text-blue-500", dot: "bg-blue-500" },
+    early_leave: { label: "Salida anticipada", color: "bg-orange-500/10 text-orange-500", dot: "bg-orange-500" },
+  }
+  const attS = attendanceStatus ? attConfig[attendanceStatus] : null
+
+  if (loading) {
+    return (
+      <div className="sb-note-dash">
+        <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 animate-pulse space-y-5">
+          <div className="h-9 w-64 rounded-[24px] bg-[var(--note-fill)]" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-[24px] bg-[var(--note-fill)]" />)}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <div className="lg:col-span-3 h-64 rounded-[24px] bg-[var(--note-fill)]" />
+            <div className="lg:col-span-2 h-64 rounded-[24px] bg-[var(--note-fill)]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="sb-note-dash flex min-h-full flex-col gap-3 lg:h-full lg:flex-row">
-      <Editor />
-      <TasksPanel tasks={tasks} setTasks={setTasks} />
+    <div className="sb-note-dash">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+        {/* Header */}
+        <header className="flex items-end justify-between gap-3 pt-2">
+          <div>
+            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">
+              {greeting}, {user?.full_name?.split(" ")[0] || "Docente"}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--note-muted)] capitalize">{dateStr}</p>
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-[var(--note-hairline)] bg-[var(--note-fill)] px-3.5 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-medium text-[var(--note-muted)]">Activo</span>
+          </div>
+        </header>
+
+        {/* Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {metrics.map((m) => {
+            const Icon = m.icon
+            return (
+              <Link key={m.label} href={m.href} className="group block">
+                <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6 transition-all duration-150 group-hover:-translate-y-px group-hover:opacity-90 group-hover:border-[var(--note-hairline-strong)]">
+                  <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-[var(--note-text)]" />
+                  </div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{m.label}</p>
+                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+
+        {/* Main grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          {/* Left: horario de hoy + cursos */}
+          <div className="lg:col-span-3 space-y-5">
+            {/* Horario de hoy */}
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={Calendar}
+                title="Horario de hoy"
+                action={<Link href="/docente/horarios" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver semana</Link>}
+              />
+              {todaySchedule.length === 0 ? (
+                <CardRow>
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
+                    <Calendar className="h-5 w-5 text-[var(--note-muted)]/40" />
+                    No tienes clases hoy
+                  </div>
+                </CardRow>
+              ) : (
+                todaySchedule.map(h => {
+                  const isNext = nextClass?.id === h.id
+                  return (
+                    <CardRow key={h.id} highlight={isNext} href="/docente/horarios">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "h-10 w-16 rounded-[12px] flex flex-col items-center justify-center shrink-0",
+                          isNext ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "bg-[var(--note-fill-strong)] text-[var(--note-muted)]"
+                        )}>
+                          <span className="text-[10px] font-bold leading-none">{h.start_time.slice(0, 5)}</span>
+                          <span className="text-[8px] opacity-60 mt-0.5">—</span>
+                          <span className="text-[10px] font-bold leading-none">{h.end_time.slice(0, 5)}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[var(--note-text)] truncate">{h.course_name}</p>
+                          <p className="text-[11px] text-[var(--note-muted)] truncate">{h.grade} · Sección {h.section}</p>
+                        </div>
+                        {h.classroom && (
+                          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[var(--note-muted)]">
+                            <MapPin className="h-3 w-3" /> {h.classroom}
+                          </div>
+                        )}
+                        {isNext && (
+                          <span className="text-[9px] font-semibold uppercase tracking-wider rounded-full bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] px-2.5 py-1">Siguiente</span>
+                        )}
+                      </div>
+                    </CardRow>
+                  )
+                })
+              )}
+            </section>
+
+            {/* Mis cursos */}
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={BookOpen}
+                title="Mis cursos"
+                action={<Link href="/docente/cursos" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver todos</Link>}
+              />
+              {courses.length === 0 ? (
+                <CardRow>
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
+                    <BookOpen className="h-5 w-5 text-[var(--note-muted)]/40" />
+                    Sin cursos asignados
+                  </div>
+                </CardRow>
+              ) : (
+                courses.slice(0, 4).map(c => (
+                  <CardRow key={c.id} href={`/docente/cursos/${c.id}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
+                        <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--note-text)] truncate">{c.name}</p>
+                        <p className="text-[11px] text-[var(--note-muted)]">{c.grade} · Sección {c.section}</p>
+                      </div>
+                      <span className="text-[11px] text-[var(--note-muted)] shrink-0">{c.students} alumnos</span>
+                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
+                    </div>
+                  </CardRow>
+                ))
+              )}
+            </section>
+          </div>
+
+          {/* Right: asistencia + acciones */}
+          <div className="lg:col-span-2 space-y-5">
+            {/* Asistencia hoy */}
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={Clock}
+                title="Asistencia de hoy"
+                action={attS ? (
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium ${attS.color}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${attS.dot}`} /> {attS.label}
+                  </span>
+                ) : undefined}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <CardRow>
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Entrada</span>
+                  </div>
+                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
+                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.start_time}</p>}
+                </CardRow>
+                <CardRow>
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Salida</span>
+                  </div>
+                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
+                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.end_time}</p>}
+                </CardRow>
+              </div>
+              {!checkedIn && (
+                <button onClick={() => handleCheck("check-in")}
+                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
+                  <LogIn className="h-4 w-4" /> Marcar Entrada
+                </button>
+              )}
+              {checkedIn && !checkedOut && (
+                <button onClick={() => handleCheck("check-out")}
+                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
+                  <LogOut className="h-4 w-4" /> Marcar Salida
+                </button>
+              )}
+              {checkedIn && checkedOut && (
+                <Link href="/docente/asistencia">
+                  <div className="w-full h-11 rounded-[12px] border border-[var(--note-hairline-strong)] text-[var(--note-text)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:bg-[var(--note-fill)]">
+                    <LogIn className="h-4 w-4" /> Ver detalle de asistencia
+                  </div>
+                </Link>
+              )}
+            </section>
+
+            {/* Quick actions */}
+            <section className="space-y-2.5">
+              <SectionHeader icon={UserCheck} title="Acciones rápidas" />
+              {quickActions.map(a => {
+                const Icon = a.icon
+                return (
+                  <CardRow key={a.label} href={a.href}>
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
+                        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--note-text)]">{a.label}</p>
+                        <p className="text-[11px] text-[var(--note-muted)]">{a.desc}</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
+                    </div>
+                  </CardRow>
+                )
+              })}
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
