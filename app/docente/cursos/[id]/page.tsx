@@ -223,19 +223,19 @@ export default function CursoDetallePage() {
 
       {/* Stats */}
       <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 gap-3">
-        <motion.div variants={staggerItem} className="bg-[var(--note-surface)] rounded-[24px] border border-[var(--note-hairline)] p-5">
-          <div className="h-9 w-9 rounded-[12px] flex items-center justify-center mb-3 bg-[var(--note-fill-strong)]">
-            <GraduationCap className="h-4 w-4 text-[var(--note-text)]" />
+        <motion.div variants={staggerItem} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6">
+          <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
+            <GraduationCap className="h-5 w-5 text-[var(--note-text)]" />
           </div>
-          <p className="text-xl font-bold tracking-tight text-[var(--note-text)]">{students.length}</p>
-          <p className="text-[11px] text-[var(--note-muted)] mt-0.5">Alumnos</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Alumnos</p>
+          <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{students.length}</p>
         </motion.div>
-        <motion.div variants={staggerItem} className="bg-[var(--note-surface)] rounded-[24px] border border-[var(--note-hairline)] p-5">
-          <div className="h-9 w-9 rounded-[12px] flex items-center justify-center mb-3 bg-[var(--note-fill-strong)]">
-            <UserRound className="h-4 w-4 text-[var(--note-text)]" />
+        <motion.div variants={staggerItem} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6">
+          <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
+            <UserRound className="h-5 w-5 text-[var(--note-text)]" />
           </div>
-          <p className="text-xl font-bold tracking-tight text-[var(--note-text)]">{teachers.length}</p>
-          <p className="text-[11px] text-[var(--note-muted)] mt-0.5">Docentes</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Docentes</p>
+          <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{teachers.length}</p>
         </motion.div>
       </motion.div>
 
