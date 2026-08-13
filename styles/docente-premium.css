@@ -126,9 +126,7 @@ html.dark [data-role="docente"] {
 /* ─── Inputs y selects note: flat, hairline ─── */
 [data-role="docente"] .sb-input,
 [data-role="docente"] .sb-textarea,
-[data-role="docente"] .sb-select,
-[data-role="docente"] .sbf-native-select,
-[data-role="docente"] .nb-select {
+[data-role="docente"] .sb-select {
   border-radius: 12px !important;
   border: 1px solid var(--sb-outline-variant);
   background-color: transparent;
@@ -140,16 +138,12 @@ html.dark [data-role="docente"] {
 }
 [data-role="docente"] .sb-input:hover,
 [data-role="docente"] .sb-textarea:hover,
-[data-role="docente"] .sb-select:hover,
-[data-role="docente"] .sbf-native-select:hover,
-[data-role="docente"] .nb-select:hover {
+[data-role="docente"] .sb-select:hover {
   background: var(--sb-surface-container-low);
 }
 [data-role="docente"] .sb-input:focus,
 [data-role="docente"] .sb-textarea:focus,
-[data-role="docente"] .sb-select:focus,
-[data-role="docente"] .sbf-native-select:focus,
-[data-role="docente"] .nb-select:focus {
+[data-role="docente"] .sb-select:focus {
   outline: none;
   background-color: transparent;
   border-color: var(--sb-on-surface-variant);
@@ -611,7 +605,7 @@ html.dark [data-role="docente"] {
   font-weight: 550;
 }
 
-/* Selector note (trigger de select de opciones) */
+/* Selector note (trigger de select de opciones, estilo .sbf-select-trigger) */
 [data-role="docente"] main .nb-select-wrap {
   position: relative;
   display: inline-flex;
@@ -619,19 +613,20 @@ html.dark [data-role="docente"] {
 [data-role="docente"] main .nb-select {
   height: 40px;
   padding: 0 36px 0 14px;
-  border-radius: 12px;
-  border: 1px solid var(--sb-outline-variant);
+  min-width: 120px;
+  border-radius: 14px;
+  border: 1.5px solid var(--sb-outline-variant);
   background-color: transparent;
   color: var(--sb-on-surface-variant);
   font-family: var(--sb-docente-font);
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 500;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  transition: border-color 200ms ease, background-color 200ms ease, color 200ms ease;
+  background-position: right 10px center;
+  transition: all 200ms ease;
 }
 [data-role="docente"] main .nb-select:hover {
   background-color: var(--sb-surface-container);
@@ -640,12 +635,12 @@ html.dark [data-role="docente"] {
 }
 [data-role="docente"] main .nb-select:focus {
   outline: none;
-  border-color: var(--sb-on-surface-variant);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sb-on-surface-variant) 60%, transparent);
+  border-color: var(--sb-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-primary) 12%, transparent);
 }
 [data-role="docente"] main .nb-select.has-value {
   background-color: var(--sb-surface-container);
-  border-color: var(--sb-on-surface-variant);
+  border-color: var(--sb-primary);
   color: var(--sb-on-surface);
 }
 [data-role="docente"] main .nb-select:disabled {
