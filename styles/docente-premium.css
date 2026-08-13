@@ -326,7 +326,8 @@ html.dark [data-role="docente"] {
    Superficie #000/#101012, texto #E4E2E5, flat (sin
    sombras), tarjetas con hairline inset 1px y radios 24px.
    ============================================ */
-.sb-note-dash {
+.sb-note-dash,
+.sb-note {
   --note-bg: #fbf9fc;
   --note-surface: #fbf9fc;
   --note-text: #1b1b1e;
@@ -338,7 +339,8 @@ html.dark [data-role="docente"] {
   --note-solid-bg: #1b1b1e;
   --note-solid-fg: #ffffff;
 }
-.dark .sb-note-dash {
+.dark .sb-note-dash,
+.dark .sb-note {
   --note-bg: #000000;
   --note-surface: #000000;
   --note-text: #e4e2e5;
@@ -359,8 +361,8 @@ html.dark [data-role="docente"] {
    radios 24px (tarjetas) / 12px (chips y botones).
    ============================================ */
 
-/* Cabeceras de página (no afecta al greeting del dashboard) */
-[data-role="docente"] main h1:not(.sb-note-dash h1) {
+/* Cabeceras de página (no afecta a páginas note ni al greeting del dashboard) */
+[data-role="docente"] main h1:not(.sb-note h1):not(.sb-note-dash h1) {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -405,21 +407,28 @@ html.dark [data-role="docente"] {
   outline: none !important;
 }
 
-/* flat dentro del dashboard (anula el premium con sombras) */
-.sb-note-dash [class*="rounded-["][class*="p-"] {
+/* flat dentro de páginas note (anula el premium con sombras) */
+.sb-note-dash [class*="rounded-["][class*="p-"],
+.sb-note [class*="rounded-["][class*="p-"] {
   box-shadow: none !important;
 }
 .sb-note-dash h1,
-.sb-note-dash h2 {
+.sb-note-dash h2,
+.sb-note h1,
+.sb-note h2 {
   font-family: var(--sb-docente-font);
   font-weight: 700;
 }
 .sb-note-dash a,
-.sb-note-dash button {
+.sb-note-dash button,
+.sb-note a,
+.sb-note button {
   -webkit-tap-highlight-color: transparent;
 }
 .sb-note-dash a:focus-visible,
-.sb-note-dash button:focus-visible {
+.sb-note-dash button:focus-visible,
+.sb-note a:focus-visible,
+.sb-note button:focus-visible {
   outline: 1px solid var(--note-muted);
   outline-offset: 2px;
 }
