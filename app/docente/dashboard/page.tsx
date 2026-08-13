@@ -1,369 +1,628 @@
 "use client"
 
 import * as React from "react"
-import {
-  BookOpen, GraduationCap, UserCheck, ClipboardList, MessageSquare,
-  Calendar, Clock, ChevronRight, LogIn, LogOut, BookMarked, MapPin,
-} from "@/components/ui/proicons"
 import Link from "next/link"
-import { useAuthStore } from "@/stores/auth-store"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/stores/auth-store"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  BookOpen, Calendar, CalendarDays, UserCheck, BookMarked, ClipboardList,
+  FileText, MessageSquare, Home, Plus, Star, StarOutline, ChevronDown,
+  Bold, Italic, List, ListOrdered, FormatQuote, SlidersHorizontal, Check, X,
+  Trash2, Menu, LogOut, ListChecks, Share,
+} from "@/components/ui/proicons"
 
-interface Course {
+type IconType = React.ComponentType<{ className?: string }>
+
+interface WsTask {
   id: string
-  name: string
-  grade: string
-  section: string
-  students: number
-  schedule: string
-}
-
-interface Horario {
-  id: string
-  day_of_week: number
-  start_time: string
-  end_time: string
-  classroom: string
-  course_name: string
-  grade: string
-  section: string
-}
-
-const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
-
-function SectionHeader({ icon: Icon, title, action }: {
-  icon: React.ComponentType<{ className?: string }>
   title: string
-  action?: React.ReactNode
-}) {
+  done: boolean
+  starred: boolean
+  createdAt: number
+}
+
+type FilterMode = "all" | "pending" | "done"
+
+interface NavItem {
+  title: string
+  href: string
+  icon: IconType
+}
+
+const NAV: NavItem[] = [
+  { title: "Inicio", href: "/docente/dashboard", icon: Home },
+  { title: "Cursos", href: "/docente/cursos", icon: BookOpen },
+  { title: "Horarios", href: "/docente/horarios", icon: Calendar },
+  { title: "Asistencia", href: "/docente/asistencia", icon: UserCheck },
+  { title: "Notas", href: "/docente/calificaciones", icon: BookMarked },
+  { title: "Tareas", href: "/docente/tareas", icon: ClipboardList },
+  { title: "Materiales", href: "/docente/materiales", icon: FileText },
+  { title: "Calendario", href: "/docente/calendario", icon: CalendarDays },
+  { title: "Mensajes", href: "/docente/mensajes", icon: MessageSquare },
+]
+
+const uid = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : String(Date.now() + Math.random())
+
+const easeOut = [0.37, 0.35, 0, 1] as const
+
+/* ────────────────────────── SIDEBAR ────────────────────────── */
+
+function NavLink({ item }: { item: NavItem }) {
+  const pathname = usePathname()
+  const active =
+    item.href === "/docente/dashboard"
+      ? pathname === "/docente/dashboard"
+      : pathname === item.href || pathname.startsWith(item.href + "/")
   return (
-    <div className="flex items-center justify-between px-1">
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{title}</h2>
+    <Link
+      href={item.href}
+      className={cn(
+        "flex h-[38px] items-center gap-[10px] rounded-[10px] px-3 text-[14px] transition-colors duration-150",
+        active
+          ? "bg-[#050505] font-medium text-white"
+          : "text-[#8a8a8a] hover:bg-[#181819] hover:text-white"
+      )}
+    >
+      <item.icon className="h-[17px] w-[17px] shrink-0" />
+      <span className="truncate">{item.title}</span>
+    </Link>
+  )
+}
+
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { logout } = useAuthStore()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+    logout()
+    router.push("/login")
+  }
+
+  return (
+    <div className="flex h-full flex-col bg-[#111112]">
+      <div className="flex shrink-0 items-center gap-2.5 px-[22px] pt-[22px] pb-5">
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-white">
+          <Check className="h-4 w-4 text-black" />
+        </span>
+        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold tracking-tight text-white/90">
+          EduNexus
+        </span>
+        <button
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] text-white/40 transition-colors duration-150 hover:bg-white/[0.06] hover:text-white/80"
+          aria-label="Cambiar workspace"
+        >
+          <ChevronDown className="h-4 w-4" />
+        </button>
       </div>
-      {action}
+
+      <nav className="flex shrink-0 flex-col gap-1 px-2.5">
+        {NAV.map((item) => (
+          <div key={item.href} onClick={onNavigate}>
+            <NavLink item={item} />
+          </div>
+        ))}
+      </nav>
+
+      <div className="mt-auto shrink-0 border-t border-white/[0.05] px-2.5 pb-5 pt-3">
+        <Link
+          href="/perfil"
+          onClick={onNavigate}
+          className="flex h-[38px] items-center gap-[10px] rounded-[10px] px-3 text-[14px] text-[#8a8a8a] transition-colors duration-150 hover:bg-[#181819] hover:text-white"
+        >
+          <SlidersHorizontal className="h-[17px] w-[17px] shrink-0" />
+          <span>Opciones</span>
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="flex h-[38px] w-full items-center gap-[10px] rounded-[10px] px-3 text-[14px] text-[#8a8a8a] transition-colors duration-150 hover:bg-[#181819] hover:text-white"
+        >
+          <LogOut className="h-[17px] w-[17px] shrink-0" />
+          <span>Salir</span>
+        </button>
+      </div>
     </div>
   )
 }
 
-function CardRow({ href, onClick, children, className, highlight }: {
-  href?: string
-  onClick?: () => void
-  children: React.ReactNode
-  className?: string
-  highlight?: boolean
-}) {
-  const base = cn(
-    "block rounded-[24px] border bg-[var(--note-surface)] p-4 transition-all duration-150 hover:-translate-y-px hover:opacity-90",
-    highlight
-      ? "border-[var(--note-hairline-strong)] bg-[var(--note-fill)]"
-      : "border-[var(--note-hairline)] hover:border-[var(--note-hairline-strong)]",
-    className
-  )
-  if (href) return <Link href={href} className={base}>{children}</Link>
-  return <button type="button" onClick={onClick} className={cn(base, "w-full text-left")}>{children}</button>
-}
+/* ────────────────────────── EDITOR ────────────────────────── */
 
-export default function DocenteDashboard() {
-  const user = useAuthStore((s) => s.user)
-  const [courses, setCourses] = React.useState<Course[]>([])
-  const [horarios, setHorarios] = React.useState<Horario[]>([])
-  const [attendance, setAttendance] = React.useState<any>(null)
-  const [schedule, setSchedule] = React.useState<any>(null)
-  const [loading, setLoading] = React.useState(true)
-
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches"
-  const dateStr = new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+function Editor() {
+  const editorRef = React.useRef<HTMLDivElement>(null)
+  const [block, setBlock] = React.useState("Texto")
+  const [blockOpen, setBlockOpen] = React.useState(false)
 
   React.useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const today = new Date().toISOString().split("T")[0]
-        const [c, h, a] = await Promise.all([
-          fetch("/api/docente/cursos").then(r => r.json()),
-          fetch("/api/docente/horarios").then(r => r.json()),
-          fetch(`/api/docente/attendance?date=${today}`).then(r => r.json()),
-        ])
-        if (cancelled) return
-        setCourses(Array.isArray(c) ? c : [])
-        setHorarios(Array.isArray(h) ? h : [])
-        setAttendance(a.attendance)
-        setSchedule(a.schedule)
-      } catch {} finally { if (!cancelled) setLoading(false) }
-    })()
-    return () => { cancelled = true }
-  }, [])
-
-  const totalStudents = courses.reduce((acc, c) => acc + (c.students || 0), 0)
-
-  const todayIdx = new Date().getDay()
-  const todaySchedule = horarios.filter(h => h.day_of_week === todayIdx).sort((a, b) => a.start_time.localeCompare(b.start_time))
-
-  const now = new Date()
-  const nowMin = now.getHours() * 60 + now.getMinutes()
-  const nextClass = todaySchedule.find(h => toMin(h.end_time) > nowMin)
-
-  const checkedIn = attendance?.check_in
-  const checkedOut = attendance?.check_out
-  const attendanceStatus = attendance?.status
-
-  const handleCheck = async (action: "check-in" | "check-out") => {
     try {
-      const res = await fetch("/api/docente/attendance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      })
-      const data = await res.json()
-      if (data.success) {
-        setAttendance(data.attendance)
-        if (data.schedule) setSchedule(data.schedule)
+      const saved = localStorage.getItem("sb-ws-editor")
+      if (saved && editorRef.current && editorRef.current.innerHTML !== saved) {
+        editorRef.current.innerHTML = saved
       }
     } catch {}
+  }, [])
+
+  const save = () => {
+    const el = editorRef.current
+    if (!el) return
+    const clean = el.innerHTML.replace(/<br>/g, "").trim()
+    if (clean === "") el.innerHTML = ""
+    try { localStorage.setItem("sb-ws-editor", el.innerHTML) } catch {}
   }
 
-  const metrics = [
-    { label: "Mis Cursos", value: loading ? "—" : courses.length, icon: BookOpen, href: "/docente/cursos" },
-    { label: "Total Alumnos", value: loading ? "—" : totalStudents, icon: GraduationCap, href: "/docente/cursos" },
-    { label: "Clases Hoy", value: loading ? "—" : todaySchedule.length, icon: Calendar, href: "/docente/horarios" },
-    { label: "Horas Hoy", value: loading ? "—" : `${todaySchedule.reduce((a, h) => a + (toMin(h.end_time) - toMin(h.start_time)), 0) / 60} h`, icon: Clock, href: "/docente/horarios" },
-  ]
-
-  const quickActions = [
-    { label: "Tomar asistencia", desc: "Registrar asistencia del día", icon: UserCheck, href: "/docente/asistencia" },
-    { label: "Ingresar notas", desc: "Calificaciones de alumnos", icon: BookMarked, href: "/docente/calificaciones" },
-    { label: "Asignar tareas", desc: "Crear tareas para tus cursos", icon: ClipboardList, href: "/docente/tareas" },
-    { label: "Mis cursos", desc: `${courses.length} cursos asignados`, icon: BookOpen, href: "/docente/cursos" },
-    { label: "Horarios", desc: "Tu horario de la semana", icon: Calendar, href: "/docente/horarios" },
-    { label: "Mensajes", desc: "Bandeja de entrada", icon: MessageSquare, href: "/docente/mensajes" },
-  ]
-
-  const attConfig: Record<string, { label: string; color: string; dot: string }> = {
-    present: { label: "A tiempo", color: "bg-emerald-500/10 text-emerald-500", dot: "bg-emerald-500" },
-    late: { label: "Tardanza", color: "bg-amber-500/10 text-amber-500", dot: "bg-amber-500" },
-    absent: { label: "Ausente", color: "bg-red-500/10 text-red-500", dot: "bg-red-500" },
-    justified: { label: "Justificado", color: "bg-blue-500/10 text-blue-500", dot: "bg-blue-500" },
-    early_leave: { label: "Salida anticipada", color: "bg-orange-500/10 text-orange-500", dot: "bg-orange-500" },
+  const exec = (cmd: string, val?: string) => {
+    editorRef.current?.focus()
+    document.execCommand(cmd, false, val)
+    save()
   }
-  const attS = attendanceStatus ? attConfig[attendanceStatus] : null
 
-  if (loading) {
-    return (
-      <div className="sb-note-dash">
-        <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 animate-pulse space-y-5">
-          <div className="h-9 w-64 rounded-[24px] bg-[var(--note-fill)]" />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-[24px] bg-[var(--note-fill)]" />)}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-            <div className="lg:col-span-3 h-64 rounded-[24px] bg-[var(--note-fill)]" />
-            <div className="lg:col-span-2 h-64 rounded-[24px] bg-[var(--note-fill)]" />
-          </div>
+  const applyBlock = (label: string, tag: string) => {
+    if (tag === "ul") exec("insertUnorderedList")
+    else exec("formatBlock", tag)
+    setBlock(label)
+    setBlockOpen(false)
+  }
+
+  const BLOCKS = [
+    { label: "Texto", tag: "P" },
+    { label: "Título", tag: "h1" },
+    { label: "Subtítulo", tag: "h2" },
+    { label: "Cita", tag: "blockquote" },
+    { label: "Lista", tag: "ul" },
+  ]
+
+  const btn =
+    "flex h-8 w-8 items-center justify-center rounded-[8px] text-white/50 transition-colors duration-150 hover:bg-white/[0.06] hover:text-white"
+
+  return (
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-black">
+      {/* Toolbar */}
+      <div className="flex h-[46px] shrink-0 items-center gap-1 border-b border-white/[0.06] px-3">
+        <div className="relative">
+          <button
+            onClick={() => setBlockOpen((o) => !o)}
+            className="flex h-9 w-[180px] items-center justify-between gap-2 rounded-[12px] border border-white/[0.08] bg-[#050505] px-3.5 text-[13px] text-white/70 transition-all duration-150 hover:border-white/[0.14] hover:text-white"
+          >
+            <span className="truncate">{block}</span>
+            <ChevronDown className={cn("h-4 w-4 shrink-0 opacity-40 transition-transform duration-200", blockOpen && "rotate-180")} />
+          </button>
+          <AnimatePresence>
+            {blockOpen && (
+              <motion.div
+                key="block"
+                initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                transition={{ duration: 0.15, ease: easeOut }}
+                className="absolute left-0 top-[calc(100%+6px)] z-30 w-[180px] rounded-[12px] border border-white/[0.08] bg-[#111112] p-1.5 shadow-xl shadow-black/40"
+              >
+                {BLOCKS.map((b) => (
+                  <button
+                    key={b.label}
+                    onClick={() => applyBlock(b.label, b.tag)}
+                    className={cn(
+                      "flex h-[34px] w-full items-center justify-between rounded-[8px] px-2.5 text-[13px] transition-colors duration-100",
+                      block === b.label ? "bg-white/[0.08] font-medium text-white" : "text-white/60 hover:bg-white/[0.06] hover:text-white"
+                    )}
+                  >
+                    {b.label}
+                    {block === b.label && <Check className="h-4 w-4" />}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <span className="mx-1 h-5 w-px shrink-0 bg-white/[0.08]" />
+
+        <button className={btn} onClick={() => exec("bold")} title="Negrita"><Bold className="h-[16px] w-[16px]" /></button>
+        <button className={btn} onClick={() => exec("italic")} title="Cursiva"><Italic className="h-[16px] w-[16px]" /></button>
+        <button className={btn} onClick={() => exec("insertUnorderedList")} title="Lista"><List className="h-[16px] w-[16px]" /></button>
+        <button className={btn} onClick={() => exec("insertOrderedList")} title="Lista numerada"><ListOrdered className="h-[16px] w-[16px]" /></button>
+        <button className={btn} onClick={() => exec("formatBlock", "blockquote")} title="Cita"><FormatQuote className="h-[16px] w-[16px]" /></button>
+
+        <div className="ml-auto flex items-center gap-1">
+          <button className={btn} title="Documento"><FileText className="h-[16px] w-[16px]" /></button>
+          <button className={btn} title="Compartir"><Share className="h-[16px] w-[16px]" /></button>
         </div>
       </div>
+
+      {/* Editor */}
+      <div className="ws-scroll min-h-0 flex-1 overflow-y-auto px-6 py-5">
+        <div
+          ref={editorRef}
+          contentEditable
+          suppressContentEditableWarning
+          data-placeholder="Empieza a escribir..."
+          onInput={save}
+          onBlur={save}
+          spellCheck={false}
+          className="ws-editor min-h-full text-[14px] leading-[1.7] text-white/80 outline-none"
+        />
+      </div>
+    </div>
+  )
+}
+
+/* ────────────────────────── TAREAS ────────────────────────── */
+
+function TasksPanel({
+  tasks,
+  setTasks,
+  onClose,
+  autoCreate,
+}: {
+  tasks: WsTask[]
+  setTasks: React.Dispatch<React.SetStateAction<WsTask[]>>
+  onClose?: () => void
+  autoCreate?: boolean
+}) {
+  const [filterOpen, setFilterOpen] = React.useState(false)
+  const [creating, setCreating] = React.useState(!!autoCreate)
+  const [title, setTitle] = React.useState("")
+  const [editId, setEditId] = React.useState<string | null>(null)
+  const [editTitle, setEditTitle] = React.useState("")
+  const [filter, setFilter] = React.useState<FilterMode>("all")
+  const [starOnly, setStarOnly] = React.useState(false)
+
+  const startCreate = () => {
+    setCreating(true)
+    setEditId(null)
+  }
+
+  const commitCreate = () => {
+    const v = title.trim()
+    if (v) {
+      setTasks((prev) => [
+        { id: uid(), title: v, done: false, starred: false, createdAt: Date.now() },
+        ...prev,
+      ])
+    }
+    setTitle("")
+    setCreating(false)
+  }
+
+  const startEdit = (t: WsTask) => {
+    setEditId(t.id)
+    setEditTitle(t.title)
+    setCreating(false)
+  }
+
+  const commitEdit = (id: string) => {
+    const v = editTitle.trim()
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, title: v || t.title } : t)))
+    setEditId(null)
+  }
+
+  const toggle = (id: string) => setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)))
+  const toggleStar = (id: string) => setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, starred: !t.starred } : t)))
+  const remove = (id: string) => setTasks((prev) => prev.filter((t) => t.id !== id))
+
+  const visible = tasks
+    .filter((t) => {
+      if (filter === "pending") return !t.done
+      if (filter === "done") return t.done
+      return true
+    })
+    .filter((t) => (starOnly ? t.starred : true))
+
+  const FILTERS: { key: FilterMode; label: string }[] = [
+    { key: "all", label: "Todas" },
+    { key: "pending", label: "Pendientes" },
+    { key: "done", label: "Completadas" },
+  ]
+
+  const iconBtn = (active: boolean) =>
+    cn(
+      "flex h-9 w-9 items-center justify-center rounded-[10px] transition-colors duration-150",
+      active ? "bg-white/[0.12] text-white" : "bg-[#1a1a1b] text-white/70 hover:bg-[#242425] hover:text-white"
     )
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Header */}
+      <div className="flex shrink-0 items-center justify-between px-1 pb-4">
+        <h2 className="text-[22px] font-semibold tracking-tight text-white">Tareas</h2>
+        <div className="flex items-center gap-2">
+          {onClose && (
+            <button
+              onClick={onClose}
+              className={cn(iconBtn(false), "md:hidden")}
+              aria-label="Cerrar tareas"
+            >
+              <X className="h-[18px] w-[18px]" />
+            </button>
+          )}
+          <div className="relative">
+            <button onClick={() => setFilterOpen((o) => !o)} className={iconBtn(filter !== "all")} title="Filtrar">
+              <SlidersHorizontal className="h-[17px] w-[17px]" />
+            </button>
+            <AnimatePresence>
+              {filterOpen && (
+                <motion.div
+                  key="filters"
+                  initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                  transition={{ duration: 0.15, ease: easeOut }}
+                  className="absolute right-0 top-[calc(100%+6px)] z-30 w-[180px] rounded-[12px] border border-white/[0.08] bg-[#111112] p-1.5 shadow-xl shadow-black/40"
+                >
+                  {FILTERS.map((f) => (
+                    <button
+                      key={f.key}
+                      onClick={() => { setFilter(f.key); setFilterOpen(false) }}
+                      className={cn(
+                        "flex h-[34px] w-full items-center justify-between rounded-[8px] px-2.5 text-[13px] transition-colors duration-100",
+                        filter === f.key ? "bg-white/[0.08] font-medium text-white" : "text-white/60 hover:bg-white/[0.06] hover:text-white"
+                      )}
+                    >
+                      {f.label}
+                      {filter === f.key && <Check className="h-4 w-4" />}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <button onClick={() => setStarOnly((s) => !s)} className={iconBtn(starOnly)} title="Favoritas">
+            <Star className="h-[17px] w-[17px]" />
+          </button>
+          <button
+            onClick={startCreate}
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-white text-black transition-all duration-150 hover:scale-[1.03] hover:opacity-90"
+            title="Crear tarea"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Container */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[22px] border border-white/[0.06] bg-black">
+        {creating && (
+          <div className="mx-2.5 mt-2.5 flex shrink-0 items-center gap-2.5 rounded-[12px] border border-white/[0.08] bg-[#050505] px-2.5 py-2">
+            <span className="h-[18px] w-[18px] shrink-0 rounded-full border border-white/25" />
+            <input
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitCreate()
+                if (e.key === "Escape") { setTitle(""); setCreating(false) }
+              }}
+              placeholder="Nombre de la tarea..."
+              className="min-w-0 flex-1 bg-transparent text-[14px] text-white outline-none placeholder:text-white/30"
+            />
+            <button
+              onClick={commitCreate}
+              className="shrink-0 text-[12px] font-medium text-white/40 transition-colors duration-150 hover:text-white"
+            >
+              Guardar
+            </button>
+          </div>
+        )}
+
+        {visible.length === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25, ease: easeOut }}
+              className="flex flex-col items-center gap-3"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04]">
+                <ListChecks className="h-7 w-7 text-white/25" />
+              </div>
+              <p className="text-[14px] text-[#8a8a8a]">
+                {tasks.length === 0 ? "No hay tareas" : "No hay resultados"}
+              </p>
+              <button
+                onClick={startCreate}
+                className="rounded-[18px] bg-[#1a1a1b] px-4 py-2 text-[13px] text-[#a0a0a0] transition-colors duration-150 hover:bg-[#242425] hover:text-white"
+              >
+                Crear tarea
+              </button>
+            </motion.div>
+          </div>
+        ) : (
+          <div className="ws-scroll flex-1 overflow-y-auto px-1.5 py-2">
+            {visible.map((t) => (
+              <div
+                key={t.id}
+                className="group flex items-center gap-2.5 rounded-[12px] px-2.5 py-2 transition-colors duration-150 hover:bg-white/[0.03]"
+              >
+                <button
+                  onClick={() => toggle(t.id)}
+                  className={cn(
+                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-all duration-150",
+                    t.done ? "border-white bg-white" : "border-white/25 hover:border-white/60"
+                  )}
+                  aria-label={t.done ? "Desmarcar" : "Completar"}
+                >
+                  {t.done && <Check className="h-3 w-3 text-black" />}
+                </button>
+
+                {editId === t.id ? (
+                  <input
+                    autoFocus
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitEdit(t.id)
+                      if (e.key === "Escape") setEditId(null)
+                    }}
+                    className="min-w-0 flex-1 border-b border-white/20 bg-transparent py-0.5 text-[14px] text-white outline-none"
+                  />
+                ) : (
+                  <button
+                    onClick={() => startEdit(t)}
+                    className={cn(
+                      "min-w-0 flex-1 truncate text-left text-[14px] transition-colors duration-150",
+                      t.done ? "text-white/30 line-through" : "text-white/80 hover:text-white"
+                    )}
+                  >
+                    {t.title}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => toggleStar(t.id)}
+                  className="shrink-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus:opacity-100"
+                  aria-label="Favorita"
+                >
+                  {t.starred
+                    ? <Star className="h-[16px] w-[16px] text-white/80" />
+                    : <StarOutline className="h-[16px] w-[16px] text-white/40" />}
+                </button>
+                <button
+                  onClick={() => remove(t.id)}
+                  className="shrink-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus:opacity-100"
+                  aria-label="Eliminar"
+                >
+                  <Trash2 className="h-[16px] w-[16px] text-white/40 transition-colors duration-150 hover:text-white/80" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ────────────────────────── PÁGINA ────────────────────────── */
+
+export default function DocenteDashboard() {
+  const [tasks, setTasks] = React.useState<WsTask[]>(() => {
+    try {
+      const raw = localStorage.getItem("sb-ws-tasks")
+      return raw ? (JSON.parse(raw) as WsTask[]) : []
+    } catch { return [] }
+  })
+  const [navOpen, setNavOpen] = React.useState(false)
+  const [tasksOpen, setTasksOpen] = React.useState(false)
+  const [autoCreate, setAutoCreate] = React.useState(false)
+
+  React.useEffect(() => {
+    try { localStorage.setItem("sb-ws-tasks", JSON.stringify(tasks)) } catch {}
+  }, [tasks])
+
+  const openTasksCreate = () => {
+    setTasksOpen(true)
+    setAutoCreate(true)
+  }
+
+  const closeTasks = () => {
+    setTasksOpen(false)
+    setAutoCreate(false)
   }
 
   return (
-    <div className="sb-note-dash">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
-        {/* Header */}
-        <header className="flex items-end justify-between gap-3 pt-2">
-          <div>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">
-              {greeting}, {user?.full_name?.split(" ")[0] || "Docente"}
-            </h1>
-            <p className="mt-1 text-sm text-[var(--note-muted)] capitalize">{dateStr}</p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-[var(--note-hairline)] bg-[var(--note-fill)] px-3.5 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-medium text-[var(--note-muted)]">Activo</span>
-          </div>
-        </header>
-
-        {/* Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {metrics.map((m) => {
-            const Icon = m.icon
-            return (
-              <Link key={m.label} href={m.href} className="group block">
-                <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6 transition-all duration-150 group-hover:-translate-y-px group-hover:opacity-90 group-hover:border-[var(--note-hairline-strong)]">
-                  <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-[var(--note-text)]" />
-                  </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{m.label}</p>
-                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
-                </div>
-              </Link>
-            )
-          })}
+    <div className="ws-root flex h-full flex-col bg-black text-white">
+      {/* Mobile top bar */}
+      <header className="z-20 flex h-14 shrink-0 items-center gap-2 border-b border-white/[0.06] bg-[#050505] px-3 md:hidden">
+        <button
+          onClick={() => setNavOpen(true)}
+          className="flex h-9 w-9 items-center justify-center rounded-[10px] text-white/70 transition-colors duration-150 hover:bg-white/[0.06] hover:text-white"
+          aria-label="Abrir menú"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] bg-white">
+            <Check className="h-3.5 w-3.5 text-black" />
+          </span>
+          <span className="truncate text-[13px] font-semibold tracking-tight text-white/90">EduNexus</span>
         </div>
+        <button
+          onClick={openTasksCreate}
+          className="ml-auto flex h-9 w-9 items-center justify-center rounded-[10px] bg-white text-black transition-all duration-150 hover:scale-[1.03]"
+          aria-label="Crear tarea"
+        >
+          <Plus className="h-5 w-5" />
+        </button>
+      </header>
 
-        {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-          {/* Left: horario de hoy + cursos */}
-          <div className="lg:col-span-3 space-y-5">
-            {/* Horario de hoy */}
-            <section className="space-y-2.5">
-              <SectionHeader
-                icon={Calendar}
-                title="Horario de hoy"
-                action={<Link href="/docente/horarios" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver semana</Link>}
-              />
-              {todaySchedule.length === 0 ? (
-                <CardRow>
-                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
-                    <Calendar className="h-5 w-5 text-[var(--note-muted)]/40" />
-                    No tienes clases hoy
-                  </div>
-                </CardRow>
-              ) : (
-                todaySchedule.map(h => {
-                  const isNext = nextClass?.id === h.id
-                  return (
-                    <CardRow key={h.id} highlight={isNext} href="/docente/horarios">
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "h-10 w-16 rounded-[12px] flex flex-col items-center justify-center shrink-0",
-                          isNext ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "bg-[var(--note-fill-strong)] text-[var(--note-muted)]"
-                        )}>
-                          <span className="text-[10px] font-bold leading-none">{h.start_time.slice(0, 5)}</span>
-                          <span className="text-[8px] opacity-60 mt-0.5">—</span>
-                          <span className="text-[10px] font-bold leading-none">{h.end_time.slice(0, 5)}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--note-text)] truncate">{h.course_name}</p>
-                          <p className="text-[11px] text-[var(--note-muted)] truncate">{h.grade} · Sección {h.section}</p>
-                        </div>
-                        {h.classroom && (
-                          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[var(--note-muted)]">
-                            <MapPin className="h-3 w-3" /> {h.classroom}
-                          </div>
-                        )}
-                        {isNext && (
-                          <span className="text-[9px] font-semibold uppercase tracking-wider rounded-full bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] px-2.5 py-1">Siguiente</span>
-                        )}
-                      </div>
-                    </CardRow>
-                  )
-                })
-              )}
-            </section>
+      <div className="flex min-h-0 flex-1 gap-2 p-2">
+        {/* Sidebar (desktop) */}
+        <aside className="hidden w-[220px] shrink-0 overflow-hidden rounded-2xl border border-white/[0.06] md:flex">
+          <SidebarContent />
+        </aside>
 
-            {/* Mis cursos */}
-            <section className="space-y-2.5">
-              <SectionHeader
-                icon={BookOpen}
-                title="Mis cursos"
-                action={<Link href="/docente/cursos" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver todos</Link>}
-              />
-              {courses.length === 0 ? (
-                <CardRow>
-                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
-                    <BookOpen className="h-5 w-5 text-[var(--note-muted)]/40" />
-                    Sin cursos asignados
-                  </div>
-                </CardRow>
-              ) : (
-                courses.slice(0, 4).map(c => (
-                  <CardRow key={c.id} href={`/docente/cursos/${c.id}`}>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
-                        <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--note-text)] truncate">{c.name}</p>
-                        <p className="text-[11px] text-[var(--note-muted)]">{c.grade} · Sección {c.section}</p>
-                      </div>
-                      <span className="text-[11px] text-[var(--note-muted)] shrink-0">{c.students} alumnos</span>
-                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
-                    </div>
-                  </CardRow>
-                ))
-              )}
-            </section>
-          </div>
+        {/* Editor */}
+        <Editor />
 
-          {/* Right: asistencia + acciones */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Asistencia hoy */}
-            <section className="space-y-2.5">
-              <SectionHeader
-                icon={Clock}
-                title="Asistencia de hoy"
-                action={attS ? (
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium ${attS.color}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${attS.dot}`} /> {attS.label}
-                  </span>
-                ) : undefined}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <CardRow>
-                  <div className="flex items-center gap-1.5 mb-2.5">
-                    <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
-                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Entrada</span>
-                  </div>
-                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
-                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.start_time}</p>}
-                </CardRow>
-                <CardRow>
-                  <div className="flex items-center gap-1.5 mb-2.5">
-                    <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
-                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Salida</span>
-                  </div>
-                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
-                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.end_time}</p>}
-                </CardRow>
-              </div>
-              {!checkedIn && (
-                <button onClick={() => handleCheck("check-in")}
-                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
-                  <LogIn className="h-4 w-4" /> Marcar Entrada
-                </button>
-              )}
-              {checkedIn && !checkedOut && (
-                <button onClick={() => handleCheck("check-out")}
-                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
-                  <LogOut className="h-4 w-4" /> Marcar Salida
-                </button>
-              )}
-              {checkedIn && checkedOut && (
-                <Link href="/docente/asistencia">
-                  <div className="w-full h-11 rounded-[12px] border border-[var(--note-hairline-strong)] text-[var(--note-text)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:bg-[var(--note-fill)]">
-                    <LogIn className="h-4 w-4" /> Ver detalle de asistencia
-                  </div>
-                </Link>
-              )}
-            </section>
-
-            {/* Quick actions */}
-            <section className="space-y-2.5">
-              <SectionHeader icon={UserCheck} title="Acciones rápidas" />
-              {quickActions.map(a => {
-                const Icon = a.icon
-                return (
-                  <CardRow key={a.label} href={a.href}>
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
-                        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--note-text)]">{a.label}</p>
-                        <p className="text-[11px] text-[var(--note-muted)]">{a.desc}</p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
-                    </div>
-                  </CardRow>
-                )
-              })}
-            </section>
-          </div>
+        {/* Tareas (desktop) */}
+        <div className="hidden min-h-0 w-[280px] shrink-0 flex-col md:flex lg:w-[30%] lg:max-w-[520px]">
+          <TasksPanel tasks={tasks} setTasks={setTasks} />
         </div>
       </div>
+
+      {/* Mobile nav drawer */}
+      <AnimatePresence>
+        {navOpen && (
+          <>
+            <motion.div
+              key="nav-backdrop"
+              className="fixed inset-0 z-40 bg-black/60 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setNavOpen(false)}
+            />
+            <motion.aside
+              key="nav-drawer"
+              className="fixed inset-y-0 left-0 z-50 w-[280px] md:hidden"
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: "spring", stiffness: 380, damping: 34 }}
+            >
+              <SidebarContent onNavigate={() => setNavOpen(false)} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile tasks drawer */}
+      <AnimatePresence>
+        {tasksOpen && (
+          <>
+            <motion.div
+              key="tasks-backdrop"
+              className="fixed inset-0 z-40 bg-black/60 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={closeTasks}
+            />
+            <motion.div
+              key="tasks-drawer"
+              className="fixed inset-y-0 right-0 z-50 w-full max-w-[420px] p-2 md:hidden"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 380, damping: 34 }}
+            >
+              <div className="flex h-full flex-col rounded-2xl border border-white/[0.08] bg-[#050505] p-3">
+                <TasksPanel
+                  tasks={tasks}
+                  setTasks={setTasks}
+                  onClose={closeTasks}
+                  autoCreate={autoCreate}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

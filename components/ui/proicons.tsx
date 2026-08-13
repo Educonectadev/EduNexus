@@ -102,11 +102,13 @@ const Filter = make("filter")
 const Fingerprint = make("fingerprint")
 const Flame = make("whatshot")
 const FolderOpen = make("folder-open")
+const FormatQuote = make("format-quote")
 const Gem = make("diamond")
 const Globe = make("globe")
 const GraduationCap = make("school")
 const GripVerticalIcon = make("drag-indicator")
 const Handshake = make("handshake")
+const Home = make("home")
 const HardDrive = make("hard-drive")
 const Hash = make("tag")
 const Heading1 = make("looks-one")
@@ -173,12 +175,15 @@ const Send = make("send")
 const Server = make("storage")
 const Settings = make("settings")
 const Settings2 = make("tune")
+const Share = make("share")
 const Shield = make("shield")
 const ShieldOff = make("gpp-bad")
+const SlidersHorizontal = make("tune")
 const Smartphone = make("mobile")
 const Sparkles = make("auto-awesome")
 const Square = make("square")
 const Star = make("star")
+const StarOutline = make("star-outline")
 const StickyNote = make("sticky-note")
 const Sun = make("sunny")
 const Table = make("table")
@@ -278,6 +283,7 @@ export {
   Fingerprint,
   Flame,
   FolderOpen,
+  FormatQuote,
   Gem,
   Globe,
   GraduationCap,
@@ -290,6 +296,7 @@ export {
   HeadphonesIcon,
   Heart,
   HelpCircle,
+  Home,
   Image,
   Inbox,
   Info,
@@ -349,12 +356,15 @@ export {
   Server,
   Settings,
   Settings2,
+  Share,
   Shield,
   ShieldOff,
+  SlidersHorizontal,
   Smartphone,
   Sparkles,
   Square,
   Star,
+  StarOutline,
   StickyNote,
   Sun,
   Table,

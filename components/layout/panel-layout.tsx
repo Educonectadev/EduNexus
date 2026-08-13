@@ -272,6 +272,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   )
 
   React.useEffect(() => {
+    if (pathname === "/padre/tareas") {
+      setLoading(false)
+      return
+    }
+
     const getUser = async () => {
       try {
         const res = await fetch("/api/auth/me")
@@ -390,6 +395,14 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             Cerrar sesión
           </button>
         </div>
+      </div>
+    )
+  }
+
+  if (pathname === "/padre/tareas" || pathname === "/docente/dashboard") {
+    return (
+      <div className="h-screen overflow-hidden bg-black text-white" data-role={role}>
+        {children}
       </div>
     )
   }
@@ -780,4 +793,3 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   </div>
   )
 }
-
