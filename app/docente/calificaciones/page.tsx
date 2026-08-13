@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Check, Pencil, Trash2, BarChart3, ChevronDown } from "@/components/ui/proicons"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Check, Pencil, Trash2, BarChart3 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
@@ -228,19 +228,18 @@ function CalificacionesInner() {
             <p className="mt-1 text-sm text-[var(--note-muted)]">Gestiona las notas de tus alumnos</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="relative min-w-[220px]">
+            <div className="nb-select-wrap">
               <select
                 value={courseId}
                 onChange={e => setCourseId(e.target.value)}
                 disabled={loading}
-                className="sb-input rounded-[12px] text-sm h-10 w-full appearance-none pr-9 disabled:opacity-50"
+                className={cn("nb-select min-w-[220px]", courseId && "has-value")}
               >
                 {courses.length === 0 && <option value="">Sin cursos asignados</option>}
                 {courses.map(c => (
                   <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
                 ))}
               </select>
-              <ChevronDown className="h-4 w-4 text-[var(--note-muted)] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
             {students.length > 0 && (
               <div className="nb-rail">
