@@ -89,14 +89,47 @@ async function dumpInto(institutionId: string, studentsCount: number) {
       )
     }
 
-    // 5. Horarios
+// 5. Horarios - schedule per teacher with their courses
+    const teacherSchedule: Record<string, any[]> = {}
+    for (let i = 0; i < COURSE_NAMES.length; i++) {
+      const day = (i % 5) + 1
+      for (let s = 0; s < 2; s++) {
+        const slot = TIMES[(i + s) % TIMES.length]
+        const teacherId = teachersUserIds[i % teachersUserIds.length]
+        if (!teacherSchedule[teacherId]) {
+          teacherSchedule[teacherId] = []
+        }
+        teacherSchedule[teacherId].push({
+          course: COURSE_NAMES[i],
+          day,
+          start_time: slot[0],
+          end_time: slot[1],
+          classroom: 'Aula ' + String(s + 1)
+        })
+      }
+    }
+
+    // Generate CSV schedules for each teacher
+    const csvRows: string[] = []
+    csvRows.push('teacher_id,teacher_name,day,start_time,end_time,course,classroom')
+    for (const [teacherId, schedule] of Object.entries(teacherSchedule)) {
+      const [teacherRow] = await pool.query(
+        `SELECT first_name, last_name FROM teachers WHERE user_id = ?`,
+        [teacherId]
+      ) as any[]
+      for (const s of schedule) {
+        csvRows.push(`${teacherId},${teacherRow?.first_name} ${teacherRow?.last_name},${s.day},${s.start_time},${s.end_time},${s.course},${s.classroom}`)
+      }
+    }
+
+    // 6. Insert schedules into DB
     for (let i = 0; i < COURSE_NAMES.length; i++) {
       const day = (i % 5) + 1
       for (let s = 0; s < 2; s++) {
         const slot = TIMES[(i + s) % TIMES.length]
         await conn.query(
           `INSERT INTO horarios (id, institution_id, course_id, teacher_id, day_of_week, start_time, end_time, classroom, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active')`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active')`,
           [crypto.randomUUID(), institutionId, courseIds[i], teachersUserIds[i % teachersUserIds.length], day, slot[0], slot[1], 'Aula ' + String(s + 1)]
         )
       }
@@ -145,10 +178,13 @@ async function dumpInto(institutionId: string, studentsCount: number) {
     }
 
     await conn.query('COMMIT')
+    // Generate CSV
+    const csvContent = csvRows.join('\n')
     return {
       students: studentIds.length,
       teachers: teachersUserIds.length,
       courses: courseIds.length,
+      csvSchedule: csvContent,
       demoAccess: [
         { role: 'secretario', email: secretarioEmail, password: 'demo1234' },
         ...parentCredentials.map((pc, i) => ({ role: 'padre' + (i + 1), email: pc.email, password: 'demo1234' })),
@@ -174,7 +210,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const count = Math.max(1, Math.min(60, body.students || 20))
+    const count = Math.max(101, body.students || 150)
 
     const result = await dumpInto(payload.institutionId as string, count)
     return NextResponse.json({ success: true, ...result })
