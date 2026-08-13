@@ -1,6 +1,6 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Manrope, JetBrains_Mono } from 'next/font/google'
+import { Inter, Manrope, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import { SbToastProvider } from "@/components/ui/sb"
 import { DesignProvider } from "@/contexts/design-context"
@@ -9,6 +9,11 @@ import './globals.css'
 const manrope = Manrope({ 
   subsets: ["latin"],
   variable: '--font-manrope'
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: '--font-inter'
 });
 
 const jetbrainsMono = JetBrains_Mono({ 
@@ -55,7 +60,7 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
-      <body className={`${manrope.variable} ${jetbrainsMono.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body className={`${manrope.variable} ${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`} suppressHydrationWarning>
         <svg aria-hidden="true" style={{position:'absolute',width:0,height:0,overflow:'hidden'}}>
           <defs>
             <filter id="mdGooey">
