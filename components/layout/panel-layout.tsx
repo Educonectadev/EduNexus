@@ -399,7 +399,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  if (pathname === "/padre/tareas" || pathname === "/docente/dashboard") {
+  if (pathname === "/padre/tareas") {
     return (
       <div className="h-screen overflow-hidden bg-black text-white" data-role={role}>
         {children}
