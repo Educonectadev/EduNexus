@@ -550,7 +550,7 @@ export default function DocenteDashboard() {
 
       <div className="flex min-h-0 flex-1 gap-2 p-2">
         {/* Sidebar (desktop) */}
-        <aside className="hidden w-[220px] shrink-0 overflow-hidden rounded-2xl border border-white/[0.06] md:flex">
+        <aside className="hidden w-[232px] shrink-0 overflow-hidden rounded-2xl border border-white/[0.06] md:flex">
           <SidebarContent />
         </aside>
 
