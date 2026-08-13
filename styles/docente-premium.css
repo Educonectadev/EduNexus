@@ -323,40 +323,35 @@ html.dark [data-role="docente"] {
 
 /* ============================================
    Dashboard docente — stepbro note (monocromo, soft)
-   Superficie #000/#101012, texto #E4E2E5, sin sombras,
-   radios 12px, focus/hover por contraste.
+   Superficie #000/#101012, texto #E4E2E5, flat (sin
+   sombras), tarjetas con hairline inset 1px y radios 24px.
    ============================================ */
 .sb-note-dash {
-  --note-bg: #f7f7f8;
-  --note-surface: #ffffff;
-  --note-elevated: #ffffff;
-  --note-text: #111113;
+  --note-bg: #fbf9fc;
+  --note-surface: #fbf9fc;
+  --note-text: #1b1b1e;
   --note-muted: #7e8088;
-  --note-border: rgba(17, 17, 19, 0.08);
-  --note-border-strong: rgba(17, 17, 19, 0.16);
-  --note-fill: rgba(17, 17, 19, 0.04);
-  --note-fill-strong: rgba(17, 17, 19, 0.07);
-  --note-solid-bg: #111113;
+  --note-hairline: #efedf0;
+  --note-hairline-strong: #d5d3d7;
+  --note-fill: #f2f0f3;
+  --note-fill-strong: #e9e7ea;
+  --note-solid-bg: #1b1b1e;
   --note-solid-fg: #ffffff;
 }
 .dark .sb-note-dash {
   --note-bg: #000000;
   --note-surface: #000000;
-  --note-elevated: #101012;
   --note-text: #e4e2e5;
   --note-muted: #7e8088;
-  --note-border: rgba(228, 226, 229, 0.08);
-  --note-border-strong: rgba(228, 226, 229, 0.16);
-  --note-fill: rgba(255, 255, 255, 0.04);
-  --note-fill-strong: rgba(255, 255, 255, 0.07);
+  --note-hairline: #17171a;
+  --note-hairline-strong: #2c2c30;
+  --note-fill: #101012;
+  --note-fill-strong: #17171a;
   --note-solid-bg: #ffffff;
   --note-solid-fg: #000000;
 }
 
-/* flat + radio 12px dentro del dashboard (anula el premium con sombras) */
-.sb-note-dash [class*="rounded-["] {
-  border-radius: 12px !important;
-}
+/* flat dentro del dashboard (anula el premium con sombras) */
 .sb-note-dash [class*="rounded-["][class*="p-"] {
   box-shadow: none !important;
 }

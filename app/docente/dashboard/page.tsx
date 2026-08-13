@@ -32,6 +32,40 @@ interface Horario {
 const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
 
+function SectionHeader({ icon: Icon, title, action }: {
+  icon: React.ComponentType<{ className?: string }>
+  title: string
+  action?: React.ReactNode
+}) {
+  return (
+    <div className="flex items-center justify-between px-1">
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
+        <h2 className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{title}</h2>
+      </div>
+      {action}
+    </div>
+  )
+}
+
+function CardRow({ href, onClick, children, className, highlight }: {
+  href?: string
+  onClick?: () => void
+  children: React.ReactNode
+  className?: string
+  highlight?: boolean
+}) {
+  const base = cn(
+    "block rounded-[24px] border bg-[var(--note-surface)] p-4 transition-all duration-150 hover:-translate-y-px hover:opacity-90",
+    highlight
+      ? "border-[var(--note-hairline-strong)] bg-[var(--note-fill)]"
+      : "border-[var(--note-hairline)] hover:border-[var(--note-hairline-strong)]",
+    className
+  )
+  if (href) return <Link href={href} className={base}>{children}</Link>
+  return <button type="button" onClick={onClick} className={cn(base, "w-full text-left")}>{children}</button>
+}
+
 export default function DocenteDashboard() {
   const user = useAuthStore((s) => s.user)
   const [courses, setCourses] = React.useState<Course[]>([])
@@ -120,14 +154,14 @@ export default function DocenteDashboard() {
   if (loading) {
     return (
       <div className="sb-note-dash">
-        <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 animate-pulse space-y-4">
-          <div className="h-9 w-64 rounded-[12px] bg-[var(--note-fill)]" />
+        <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 animate-pulse space-y-5">
+          <div className="h-9 w-64 rounded-[24px] bg-[var(--note-fill)]" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-[12px] bg-[var(--note-fill)]" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-[24px] bg-[var(--note-fill)]" />)}
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div className="lg:col-span-3 h-64 rounded-[12px] bg-[var(--note-fill)]" />
-            <div className="lg:col-span-2 h-64 rounded-[12px] bg-[var(--note-fill)]" />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <div className="lg:col-span-3 h-64 rounded-[24px] bg-[var(--note-fill)]" />
+            <div className="lg:col-span-2 h-64 rounded-[24px] bg-[var(--note-fill)]" />
           </div>
         </div>
       </div>
@@ -136,20 +170,20 @@ export default function DocenteDashboard() {
 
   return (
     <div className="sb-note-dash">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-4">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
         {/* Header */}
-        <div className="flex items-end justify-between gap-3 pt-2">
+        <header className="flex items-end justify-between gap-3 pt-2">
           <div>
-            <h1 className="text-[24px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">
+            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">
               {greeting}, {user?.full_name?.split(" ")[0] || "Docente"}
             </h1>
-            <p className="mt-1.5 text-sm text-[var(--note-muted)] capitalize">{dateStr}</p>
+            <p className="mt-1 text-sm text-[var(--note-muted)] capitalize">{dateStr}</p>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full border border-[var(--note-border)] bg-[var(--note-elevated)] px-3 py-1.5">
+          <div className="flex items-center gap-2 rounded-full border border-[var(--note-hairline)] bg-[var(--note-fill)] px-3.5 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-[11px] font-medium text-[var(--note-muted)]">Activo</span>
           </div>
-        </div>
+        </header>
 
         {/* Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -157,12 +191,12 @@ export default function DocenteDashboard() {
             const Icon = m.icon
             return (
               <Link key={m.label} href={m.href} className="group block">
-                <div className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-elevated)] p-6 transition-all duration-150 group-hover:-translate-y-px group-hover:opacity-90 group-hover:border-[var(--note-border-strong)]">
+                <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6 transition-all duration-150 group-hover:-translate-y-px group-hover:opacity-90 group-hover:border-[var(--note-hairline-strong)]">
                   <div className="mb-5 h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
                     <Icon className="h-5 w-5 text-[var(--note-text)]" />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">{m.label}</p>
-                  <p className="mt-1 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{m.label}</p>
+                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
                 </div>
               </Link>
             )
@@ -170,36 +204,31 @@ export default function DocenteDashboard() {
         </div>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Left: horario de hoy + cursos */}
-          <div className="lg:col-span-3 space-y-4">
+          <div className="lg:col-span-3 space-y-5">
             {/* Horario de hoy */}
-            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
-              <header className="flex items-center justify-between px-6 pt-6 pb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-[var(--note-muted)]" />
-                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Horario de hoy</h2>
-                </div>
-                <Link href="/docente/horarios" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver semana</Link>
-              </header>
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={Calendar}
+                title="Horario de hoy"
+                action={<Link href="/docente/horarios" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver semana</Link>}
+              />
               {todaySchedule.length === 0 ? (
-                <div className="px-6 pb-6">
-                  <div className="rounded-[12px] bg-[var(--note-fill)] p-6 text-center">
-                    <Calendar className="h-6 w-6 mx-auto text-[var(--note-muted)]/40 mb-2" />
-                    <p className="text-xs text-[var(--note-muted)]">No tienes clases hoy</p>
+                <CardRow>
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
+                    <Calendar className="h-5 w-5 text-[var(--note-muted)]/40" />
+                    No tienes clases hoy
                   </div>
-                </div>
+                </CardRow>
               ) : (
-                <div className="px-6 pb-6 space-y-2">
-                  {todaySchedule.map(h => {
-                    const isNext = nextClass?.id === h.id
-                    return (
-                      <div key={h.id} className={cn(
-                        "flex items-center gap-3 rounded-[12px] border p-3 transition-colors duration-150",
-                        isNext ? "border-[var(--note-border-strong)] bg-[var(--note-fill-strong)]" : "border-[var(--note-border)] bg-[var(--note-fill)]"
-                      )}>
+                todaySchedule.map(h => {
+                  const isNext = nextClass?.id === h.id
+                  return (
+                    <CardRow key={h.id} highlight={isNext} href="/docente/horarios">
+                      <div className="flex items-center gap-3">
                         <div className={cn(
-                          "h-10 w-14 rounded-[10px] flex flex-col items-center justify-center shrink-0",
+                          "h-10 w-16 rounded-[12px] flex flex-col items-center justify-center shrink-0",
                           isNext ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "bg-[var(--note-fill-strong)] text-[var(--note-muted)]"
                         )}>
                           <span className="text-[10px] font-bold leading-none">{h.start_time.slice(0, 5)}</span>
@@ -219,124 +248,118 @@ export default function DocenteDashboard() {
                           <span className="text-[9px] font-semibold uppercase tracking-wider rounded-full bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] px-2.5 py-1">Siguiente</span>
                         )}
                       </div>
-                    )
-                  })}
-                </div>
+                    </CardRow>
+                  )
+                })
               )}
             </section>
 
             {/* Mis cursos */}
-            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
-              <header className="flex items-center justify-between px-6 pt-6 pb-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
-                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Mis cursos</h2>
-                </div>
-                <Link href="/docente/cursos" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver todos</Link>
-              </header>
-              <div className="divide-y divide-[var(--note-border)]">
-                {courses.length === 0 ? (
-                  <div className="px-6 pb-8 pt-2 text-center">
-                    <BookOpen className="h-8 w-8 mx-auto text-[var(--note-muted)]/40 mb-2" />
-                    <p className="text-sm text-[var(--note-muted)]">Sin cursos asignados</p>
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={BookOpen}
+                title="Mis cursos"
+                action={<Link href="/docente/cursos" className="text-xs font-medium text-[var(--note-text)] opacity-50 transition-opacity duration-150 hover:opacity-100">Ver todos</Link>}
+              />
+              {courses.length === 0 ? (
+                <CardRow>
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--note-muted)]">
+                    <BookOpen className="h-5 w-5 text-[var(--note-muted)]/40" />
+                    Sin cursos asignados
                   </div>
-                ) : courses.slice(0, 4).map(c => (
-                  <Link key={c.id} href={`/docente/cursos/${c.id}`} className="flex items-center gap-3 px-6 py-3.5 transition-colors duration-150 hover:bg-[var(--note-fill)] group">
-                    <div className="h-9 w-9 rounded-[10px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
-                      <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
+                </CardRow>
+              ) : (
+                courses.slice(0, 4).map(c => (
+                  <CardRow key={c.id} href={`/docente/cursos/${c.id}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
+                        <BookOpen className="h-4 w-4 text-[var(--note-muted)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--note-text)] truncate">{c.name}</p>
+                        <p className="text-[11px] text-[var(--note-muted)]">{c.grade} · Sección {c.section}</p>
+                      </div>
+                      <span className="text-[11px] text-[var(--note-muted)] shrink-0">{c.students} alumnos</span>
+                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[var(--note-text)] truncate">{c.name}</p>
-                      <p className="text-[11px] text-[var(--note-muted)]">{c.grade} · Sección {c.section}</p>
-                    </div>
-                    <span className="text-[11px] text-[var(--note-muted)] shrink-0">{c.students} alumnos</span>
-                    <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
-                  </Link>
-                ))}
-              </div>
+                  </CardRow>
+                ))
+              )}
             </section>
           </div>
 
           {/* Right: asistencia + acciones */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-5">
             {/* Asistencia hoy */}
-            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
-              <header className="flex items-center justify-between px-6 pt-6 pb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-[var(--note-muted)]" />
-                  <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Asistencia de hoy</h2>
-                </div>
-                {attS && (
+            <section className="space-y-2.5">
+              <SectionHeader
+                icon={Clock}
+                title="Asistencia de hoy"
+                action={attS ? (
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium ${attS.color}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${attS.dot}`} /> {attS.label}
                   </span>
-                )}
-              </header>
-              <div className="px-6 pb-6 space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-[12px] bg-[var(--note-fill)] p-4">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
-                      <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Entrada</span>
-                    </div>
-                    <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
-                    {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.start_time}</p>}
+                ) : undefined}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <CardRow>
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <LogIn className={`h-3 w-3 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Entrada</span>
                   </div>
-                  <div className="rounded-[12px] bg-[var(--note-fill)] p-4">
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
-                      <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Salida</span>
-                    </div>
-                    <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
-                    {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.end_time}</p>}
+                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedIn?.slice(0, 5) || "--:--"}</p>
+                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.start_time}</p>}
+                </CardRow>
+                <CardRow>
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <LogOut className={`h-3 w-3 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[var(--note-muted)]">Salida</span>
                   </div>
-                </div>
-                {!checkedIn && (
-                  <button onClick={() => handleCheck("check-in")}
-                    className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
-                    <LogIn className="h-4 w-4" /> Marcar Entrada
-                  </button>
-                )}
-                {checkedIn && !checkedOut && (
-                  <button onClick={() => handleCheck("check-out")}
-                    className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
-                    <LogOut className="h-4 w-4" /> Marcar Salida
-                  </button>
-                )}
-                {checkedIn && checkedOut && (
-                  <Link href="/docente/asistencia">
-                    <div className="w-full h-11 rounded-[12px] border border-[var(--note-border-strong)] text-[var(--note-text)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:bg-[var(--note-fill)]">
-                      <LogIn className="h-4 w-4" /> Ver detalle de asistencia
-                    </div>
-                  </Link>
-                )}
+                  <p className={`text-[22px] font-bold leading-none tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>{checkedOut?.slice(0, 5) || "--:--"}</p>
+                  {schedule && <p className="text-[9px] text-[var(--note-muted)] mt-1.5">Prog. {schedule.end_time}</p>}
+                </CardRow>
               </div>
+              {!checkedIn && (
+                <button onClick={() => handleCheck("check-in")}
+                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
+                  <LogIn className="h-4 w-4" /> Marcar Entrada
+                </button>
+              )}
+              {checkedIn && !checkedOut && (
+                <button onClick={() => handleCheck("check-out")}
+                  className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:opacity-90">
+                  <LogOut className="h-4 w-4" /> Marcar Salida
+                </button>
+              )}
+              {checkedIn && checkedOut && (
+                <Link href="/docente/asistencia">
+                  <div className="w-full h-11 rounded-[12px] border border-[var(--note-hairline-strong)] text-[var(--note-text)] text-sm font-medium flex items-center justify-center gap-2 transition-all duration-150 hover:-translate-y-px hover:bg-[var(--note-fill)]">
+                    <LogIn className="h-4 w-4" /> Ver detalle de asistencia
+                  </div>
+                </Link>
+              )}
             </section>
 
             {/* Quick actions */}
-            <section className="rounded-[12px] border border-[var(--note-border)] bg-[var(--note-surface)] overflow-hidden">
-              <header className="px-6 pt-6 pb-4">
-                <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--note-muted)]">Acciones rápidas</h2>
-              </header>
-              <div className="divide-y divide-[var(--note-border)]">
-                {quickActions.map(a => {
-                  const Icon = a.icon
-                  return (
-                    <Link key={a.label} href={a.href}>
-                      <div className="flex items-center gap-3 px-6 py-3.5 transition-colors duration-150 hover:bg-[var(--note-fill)] group">
-                        <div className="h-8 w-8 rounded-[10px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0 transition-colors duration-150 group-hover:bg-[var(--note-solid-bg)]">
-                          <Icon className="h-4 w-4 text-[var(--note-muted)] group-hover:text-[var(--note-solid-fg)] transition-colors duration-150" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--note-text)]">{a.label}</p>
-                          <p className="text-[11px] text-[var(--note-muted)]">{a.desc}</p>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
+            <section className="space-y-2.5">
+              <SectionHeader icon={UserCheck} title="Acciones rápidas" />
+              {quickActions.map(a => {
+                const Icon = a.icon
+                return (
+                  <CardRow key={a.label} href={a.href}>
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
+                        <Icon className="h-4 w-4 text-[var(--note-muted)]" />
                       </div>
-                    </Link>
-                  )
-                })}
-              </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[var(--note-text)]">{a.label}</p>
+                        <p className="text-[11px] text-[var(--note-muted)]">{a.desc}</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-[var(--note-muted)]/40 group-hover:text-[var(--note-text)] transition-colors shrink-0" />
+                    </div>
+                  </CardRow>
+                )
+              })}
             </section>
           </div>
         </div>
