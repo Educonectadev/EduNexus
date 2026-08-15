@@ -1,369 +1,802 @@
 /* ============================================
-   DASHBOARD DOCENTE - Minimalista Blanco y Negro
-   Diseño limpio, sin dependencias complejas
+   DASHBOARD DOCENTE — Minimalista Blanco y Negro
+   Clases td-* usadas por los componentes
    ============================================ */
 
-/* --- Contenedor Principal --- */
-.main-dashboard {
-  background: #ffffff;
-  min-height: 100vh;
-  padding: 20px;
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+/* --- Animación de entrada --- */
+.td-fade-in {
+  animation: td-fade-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes td-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Sidebar --- */
-.sidebar {
-  width: 237px;
-  background: #f8f9fa;
-  border-right: 1px solid #e3e6e8;
-  flex-shrink: 0;
-}
-
-.sidebar-brand {
-  padding: 20px;
-  border-bottom: 1px solid #e3e6e8;
-}
-
-.sidebar-brand h1 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2d3748;
-  margin: 0;
-}
-
-.sidebar-brand span {
-  color: #4a5568;
-  font-size: 14px;
-}
-
-.sidebar-nav {
-  padding: 10px 0;
-}
-
-.sidebar-nav a {
-  display: block;
-  padding: 8px 20px;
-  color: #2d3748;
-  text-decoration: none;
-  font-size: 14px;
-  border-radius: 6px;
-  margin: 4px 12px;
-  transition: all 150ms ease;
-}
-
-.sidebar-nav a:hover,
-.sidebar-nav a.active {
-  background: #edf2f7;
-  color: #1a202c;
-}
-
-.sidebar-bottom {
-  padding: 20px;
-  border-top: 1px solid #e3e6e8;
-}
-
-.sidebar-bottom a {
-  display: block;
-  padding: 8px 20px;
-  color: #4a5568;
-  text-decoration: none;
-  font-size: 13px;
-  border-radius: 6px;
-  margin: 4px 0;
-  transition: all 150ms ease;
-}
-
-.sidebar-bottom a:hover {
-  background: #edf2f7;
-  color: #1a202c;
-}
-
-/* --- Área Principal --- */
-.main-content {
-  margin-left: 237px;
-  padding: 20px;
-  min-height: 100vh;
+/* --- Contenedor principal --- */
+.td-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
 /* --- Header --- */
-.header {
+.td-header {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 24px;
+  margin-bottom: 0;
 }
 
-.header h2 {
+.td-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.td-title {
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #1a202c;
+  color: #0f172a;
   margin: 0;
 }
 
-.header .greeting {
-  color: #4a5568;
-  font-size: 14px;
-}
-
-.header .date {
-  color: #718096;
-  font-size: 13px;
-}
-
-/* --- Stats Grid --- */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f5;
-  border-radius: 12px;
-  padding: 20px;
+.td-header-actions {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 150ms ease;
-}
-
-.stat-card:hover {
-  border-color: #cbd3e0;
-  transform: translateY(-2px);
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.stat-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #718096;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a202c;
-}
-
-/* --- Grid Principal (2 columnas) --- */
-.main-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-/* --- Horario de Hoy --- */
-.schedule-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f5;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.schedule-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 16px 0;
-}
-
-.schedule-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f1f5f8;
-}
-
-.schedule-item:last-child {
-  border-bottom: none;
-}
-
-.schedule-time {
-  color: #2d3748;
-  font-weight: 500;
-}
-
-.schedule-course {
-  color: #4a5568;
-}
-
-/* --- Asistencia de Hoy --- */
-.attendance-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f5;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.attendance-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 16px 0;
-}
-
-.attendance-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 12px 0;
-}
-
-.attendance-summary .item {
-  text-align: center;
-  padding: 8px;
-}
-
-.attendance-summary .label {
-  font-size: 11px;
-  font-weight: 500;
-  color: #718096;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.attendance-summary .value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a202c;
-}
-
-.attendance-actions {
-  margin-top: 16px;
-  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.attendance-actions .btn {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #cbd3e0;
-  border-radius: 8px;
+.td-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
   background: #ffffff;
-  color: #1a202c;
-  font-size: 13px;
-  font-weight: 500;
+  color: #64748b;
   cursor: pointer;
   transition: all 150ms ease;
 }
-
-.attendance-actions .btn:hover {
-  background: #f7fafc;
-  border-color: #a0aec0;
+.td-icon-btn:hover {
+  background: #f8f9fa;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+.td-icon-btn-svg {
+  width: 16px;
+  height: 16px;
 }
 
-/* --- Mis Cursos --- */
-.courses-section {
-  background: #ffffff;
-  border: 1px solid #e2e8f5;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.courses-section h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 16px 0;
-}
-
-.course-item {
+.td-user {
   display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f1f5f8;
+  align-items: center;
+  gap: 8px;
 }
 
-.course-item:last-child {
-  border-bottom: none;
-}
-
-.course-name {
-  color: #1a202c;
-  font-weight: 500;
-}
-
-.course-stats {
-  color: #718096;
+.td-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 12px;
+  font-weight: 600;
 }
 
-/* --- Acciones Rápidas --- */
-.quick-actions {
+.td-greeting-wrap {
+  padding-bottom: 4px;
+}
+
+.td-greeting {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.td-greeting-name {
+  color: #0f172a;
+}
+
+.td-date-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.td-date-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.td-date {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* --- Stats Grid --- */
+.td-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.td-stat-card {
   background: #ffffff;
-  border: 1px solid #e2e8f5;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 150ms ease;
+}
+.td-stat-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.td-stat-icon {
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.td-stat-icon-svg {
+  width: 18px;
+  height: 18px;
+  color: #475569;
+}
+
+.td-stat-label {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
+}
+
+.td-stat-value {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1;
+}
+
+/* --- Grid principal (2 columnas) --- */
+.td-main-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+.td-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Card base --- */
+.td-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   padding: 20px;
 }
 
-.quick-actions h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 12px 0;
+.td-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
-.action-link {
-  display: block;
-  padding: 8px 0;
-  color: #4a5568;
+.td-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.td-card-title-icon {
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+}
+
+.td-card-title {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.td-card-link {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
   text-decoration: none;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   transition: color 150ms ease;
 }
+.td-card-link:hover {
+  color: #0f172a;
+}
+.td-card-link-icon {
+  width: 12px;
+  height: 12px;
+}
+.td-card-link--xs {
+  font-size: 11px;
+}
 
-.action-link:hover {
-  color: #1a202c;
+/* --- Schedule --- */
+.td-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.td-schedule-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 150ms ease;
+}
+.td-schedule-item:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.td-schedule-item--skeleton {
+  height: 56px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: td-shimmer 1.5s infinite;
+  border: none;
+}
+@keyframes td-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.td-schedule-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.td-schedule-time-start {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.td-schedule-time-sep {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.td-schedule-time-end {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.td-schedule-body {
+  min-width: 0;
+}
+.td-schedule-course {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.td-schedule-meta {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.td-schedule-meta-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Class status badges */
+.td-class-status {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.td-class-status--now {
+  background: #dcfce7;
+  color: #166534;
+}
+.td-class-status--done {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+.td-class-status--next {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* --- Empty state --- */
+.td-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+.td-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.td-empty-icon-svg {
+  width: 22px;
+  height: 22px;
+  color: #94a3b8;
+}
+.td-empty-text {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* --- Attendance --- */
+.td-att-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.td-att-cell {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+
+.td-att-cell-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.td-att-cell-icon {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+}
+.td-att-cell-icon--ok {
+  color: #16a34a;
+}
+.td-att-cell-icon--ok-warn {
+  color: #ca8a04;
+}
+.td-att-cell-label {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.td-att-time {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+.td-att-time--muted {
+  color: #cbd5e1;
+}
+
+.td-att-prog {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+}
+
+/* CTA button */
+.td-att-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+.td-att-cta:hover {
+  background: #1e293b;
+}
+.td-att-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.td-att-cta--ghost {
+  background: transparent;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+.td-att-cta--ghost:hover {
+  background: #f8fafc;
+}
+.td-att-cta-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Students summary */
+.td-att-students {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.td-att-students-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.td-att-students-title {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  flex: 1;
+}
+
+.td-att-students-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.td-att-stat {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.td-att-stat--present {
+  border-color: #dcfce7;
+  background: #f0fdf4;
+}
+.td-att-stat--absent {
+  border-color: #fee2e2;
+  background: #fef2f2;
+}
+.td-att-stat--late {
+  border-color: #fef3c7;
+  background: #fffbeb;
+}
+
+.td-att-stat-value {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  display: block;
+}
+.td-att-stat-label {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 2px;
+  display: block;
+}
+
+.td-att-students-empty {
+  text-align: center;
+  padding: 16px;
+}
+.td-att-students-empty-text {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 12px 0;
+}
+.td-att-students-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.td-att-students-cta:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* --- Courses grid --- */
+.td-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.td-course-card {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 150ms ease;
+}
+.td-course-card:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.td-course-card--skeleton {
+  height: 100px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: td-shimmer 1.5s infinite;
+  border: none;
+}
+
+.td-course-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.td-course-icon-svg {
+  width: 16px;
+  height: 16px;
+  color: #475569;
+}
+
+.td-course-body {
+  flex: 1;
+  min-width: 0;
+}
+.td-course-name {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.td-course-meta {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+.td-course-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+.td-course-students {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.td-course-students-icon {
+  width: 12px;
+  height: 12px;
+}
+.td-course-chevron {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+}
+
+/* --- Quick actions --- */
+.td-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.td-action {
+  display: grid;
+  grid-template-columns: 36px 1fr 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-decoration: none;
+  color: inherit;
+  transition: all 150ms ease;
+}
+.td-action:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.td-action-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.td-action-icon-svg {
+  width: 16px;
+  height: 16px;
+  color: #475569;
+}
+
+.td-action-body {
+  min-width: 0;
+}
+.td-action-label {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+.td-action-desc {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td-action-chevron {
+  width: 14px;
+  height: 14px;
+  color: #cbd5e1;
 }
 
 /* --- Responsivo --- */
 @media (max-width: 1024px) {
-  .main-grid {
+  .td-main-grid {
     grid-template-columns: 1fr;
   }
-  
-  .stats-grid {
+
+  .td-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  .main-content {
-    margin-left: 0;
-  }
-  
-  .sidebar {
-    width: 100%;
-    border-right: none;
-  }
-  
-  .sidebar-nav a,
-  .sidebar-bottom a {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-  
-  .stats-grid {
+
+  .td-courses-grid {
     grid-template-columns: 1fr;
   }
-  
-  .main-dashboard {
+}
+
+@media (max-width: 640px) {
+  .td-container {
+    padding: 16px;
+  }
+
+  .td-header {
+    padding: 12px 16px;
+  }
+
+  .td-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .td-stat-card {
+    padding: 16px;
+  }
+
+  .td-stat-value {
+    font-size: 22px;
+  }
+
+  .td-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .td-att-students-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .td-schedule-item {
+    grid-template-columns: 80px 1fr auto;
     padding: 10px;
   }
-  
-  .header {
-    padding: 15px;
+
+  .td-greeting {
+    font-size: 20px;
+  }
+
+  .td-title {
+    font-size: 18px;
   }
 }
