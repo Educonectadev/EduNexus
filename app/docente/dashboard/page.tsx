@@ -150,12 +150,7 @@ export default function DocenteDashboard() {
 
   return (
     <div data-td-scope="dashboard" className="td-fade-in">
-      <TeacherHeader
-        title="Inicio"
-        greeting={greeting}
-        teacherName={teacherName}
-        dateStr={dateStr}
-      />
+      <TeacherHeader title="Inicio" />
 
       <div className="td-container">
         <TeacherStats

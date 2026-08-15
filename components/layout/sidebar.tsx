@@ -141,7 +141,7 @@ export function Sidebar() {
       className={cn(
         "relative flex flex-col fixed sidebar-fixed left-0 top-0 bottom-0 z-50",
         "w-64 shrink-0",
-        isCollapsed ? "w-[237px]" : "w-[237px]"
+        isCollapsed ? "w-[64px]" : "w-[237px]"
       )}
     >
       <div className="flex h-16 items-center border-b border-border/50 px-4">

@@ -1,1174 +1,726 @@
 /* ============================================
-   Dashboard DOCENTE — Rediseño minimalista
-   Sidebar 237px + contenido principal con grid,
-   tarjetas grandes (radius 30px), tipografía Inter.
-   Light + dark theme via next-themes.
+   FORCE REDESIGN - DO NOT REMOVE !important
+   Dashboard DOCENTE - Estructura grid estricta
    ============================================ */
 
-[data-role="docente"] {
-  --td-font: "Inter", "DM Sans", system-ui, -apple-system, sans-serif;
-  --td-radius: 30px;
-  --td-radius-lg: 30px;
-  --td-radius-md: 18px;
-  --td-radius-sm: 12px;
-  --td-sidebar-w: 237px;
-  --td-sidebar-w-collapsed: 64px;
+html[data-td-scope="dashboard"] [data-role="docente"],
+[data-td-scope="dashboard"] [data-role="docente"] {
+  --td-font: "Inter", "DM Sans", system-ui, -apple-system, sans-serif !important;
+  --td-radius: 30px !important;
+  --td-radius-lg: 30px !important;
+  --td-radius-md: 18px !important;
+  --td-radius-sm: 12px !important;
+  --td-sidebar-w: 237px !important;
+  --td-sidebar-w-collapsed: 64px !important;
 
-  --td-bg: #f4f4f5;
-  --td-surface: #ffffff;
-  --td-surface-2: #f8f8f9;
-  --td-text: #0a0a0a;
-  --td-muted: #666464;
-  --td-muted-2: #8e8c91;
-  --td-hairline: rgba(10, 10, 10, 0.06);
-  --td-hairline-strong: rgba(10, 10, 10, 0.12);
-  --td-fill: #f2f2f3;
-  --td-fill-strong: #e9e9eb;
-  --td-solid-bg: #0a0a0a;
-  --td-solid-fg: #ffffff;
-  --td-accent: #0a0a0a;
+  --td-bg: #f4f4f5 !important;
+  --td-surface: #ffffff !important;
+  --td-surface-2: #f8f8f9 !important;
+  --td-text: #0a0a0a !important;
+  --td-muted: #666464 !important;
+  --td-muted-2: #8e8c91 !important;
+  --td-hairline: rgba(10, 10, 10, 0.06) !important;
+  --td-hairline-strong: rgba(10, 10, 10, 0.12) !important;
+  --td-fill: #f2f2f3 !important;
+  --td-fill-strong: #e9e9eb !important;
+  --td-solid-bg: #0a0a0a !important;
+  --td-solid-fg: #ffffff !important;
+  --td-accent: #0a0a0a !important;
 }
 
-.dark[data-role="docente"],
-html.dark [data-role="docente"] {
-  --td-bg: #0a0a0a;
-  --td-surface: #131314;
-  --td-surface-2: #161617;
-  --td-text: #f5f5f5;
-  --td-muted: #a1a0a5;
-  --td-muted-2: #6f6e74;
-  --td-hairline: rgba(255, 255, 255, 0.06);
-  --td-hairline-strong: rgba(255, 255, 255, 0.12);
-  --td-fill: #1a1a1c;
-  --td-fill-strong: #202022;
-  --td-solid-bg: #f5f5f5;
-  --td-solid-fg: #0a0a0a;
-  --td-accent: #f5f5f5;
+.dark html[data-td-scope="dashboard"] [data-role="docente"],
+html[data-td-scope="dashboard"] .dark [data-role="docente"],
+html.dark [data-td-scope="dashboard"] [data-role="docente"] {
+  --td-bg: #0a0a0a !important;
+  --td-surface: #131314 !important;
+  --td-surface-2: #161617 !important;
+  --td-text: #f5f5f5 !important;
+  --td-muted: #a1a0a5 !important;
+  --td-muted-2: #6f6e74 !important;
+  --td-hairline: rgba(255, 255, 255, 0.06) !important;
+  --td-hairline-strong: rgba(255, 255, 255, 0.12) !important;
+  --td-fill: #1a1a1c !important;
+  --td-fill-strong: #202022 !important;
+  --td-solid-bg: #f5f5f5 !important;
+  --td-solid-fg: #0a0a0a !important;
+  --td-accent: #f5f5f5 !important;
 }
 
-/* ===== Layout root del dashboard docente ===== */
-[data-role="docente"] {
-  font-family: var(--td-font);
-}
-
-[data-role="docente"] .flex.h-screen {
-  background: var(--td-bg) !important;
-}
-
-/* ===== Sidebar fijo 237px (override del panel-layout) ===== */
-[data-role="docente"] aside.bg-sb-surface {
+/* ===== SIDEBAR - FORZAR 237px ===== */
+[data-td-scope="dashboard"] html[data-td-scope="dashboard"] [data-role="docense"],
+[data-td-scope="dashboard"] [data-role="docente"] aside,
+[data-td-scope="dashboard"] body[data-td-scope="dashboard"] [data-role="docente"] aside {
   width: var(--td-sidebar-w) !important;
-  background: var(--td-surface) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-right: 1px solid var(--td-hairline) !important;
-  box-shadow: none !important;
-  font-family: var(--td-font);
+  min-width: var(--td-sidebar-w) !important;
+  max-width: var(--td-sidebar-w) !important;
+  flex: 0 0 var(--td-sidebar-w) !important;
 }
-[data-role="docente"] aside.bg-sb-surface.w-\[64px\],
-[data-role="docente"] aside.bg-sb-surface[class*="w-[64px]"] {
+
+/* Colapsado */
+[data-td-scope="dashboard"] [data-role="docente"] aside.collapsed,
+[data-td-scope="desktop"] [data-role="docente"] aside.collapsed {
   width: var(--td-sidebar-w-collapsed) !important;
 }
 
-[data-role="docente"] aside.bg-sb-surface a,
-[data-role="docente"] aside.bg-sb-surface button {
-  border-radius: 10px !important;
+/* Logo/texto en sidebar */
+[data-td-scope="dashboard"] [data-role="docente"] aside .font-semibold,
+[data-td-scope="dashboard"] [data-role="docente"] aside .text-foreground,
+[data-td-scope="dashboard"] [data-role="docente"] aside .text-sb-on-surface {
+  color: var(--td-text) !important;
+  font-family: var(--td-font) !important;
 }
 
-/* Logo / nombre de marca en sidebar */
-[data-role="docente"] aside .text-sb-on-surface {
-  color: var(--td-text) !important;
+/* ===== LAYOUT PRINCIPAL - GRID FORZADO ===== */
+[data-td-scope="dashboard"] .td-container {
+  padding: 0 !important;
+  width: 100% !important;
 }
-[data-role="docente"] aside .text-sb-on-surface.tracking-tight,
-[data-role="docente"] aside span.tracking-tight {
-  font-family: var(--td-font);
+
+[data-td-scope="dashboard"] .td-main-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+  gap: 24px !important;
+  width: 100% !important;
+}
+
+/* Forzar que td-col sea una columna flex pero dentro del grid */
+[data-td-scope="dashboard"] .td-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+/* ===== STATS GRID - 4 COLUMNAS ===== */
+[data-td-scope="dashboard"] .td-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+}
+
+/* Asegurar que las stat cards tengan ancho completo en el grid */
+[data-td-scope="dashboard"] .td-stat-card {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius) !important;
+  padding: 28px !important;
+  min-height: 150px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+/* Titulos y valores dentro de stat cards */
+[data-td-scope="dashboard"] .td-stat-label {
+  font-family: var(--td-font) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: var(--td-muted) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+[data-td-scope="dashboard"] .td-stat-value {
+  font-family: var(--td-font) !important;
+  font-size: 40px !important;
+  font-weight: 700 !important;
+  color: var(--td-text) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* ===== HORARIO DE HOY - TARGA GRANDE IZQUIERDA ===== */
+[data-td-scope="dashboard"] .td-card {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius) !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Header de la tarjeta */
+[data-td-scope="dashboard"] .td-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 16px !important;
+}
+
+[data-td-scope="dashboard"] .td-card-title {
+  font-family: var(--td-font) !important;
+  font-size: 26px !important;
   font-weight: 600 !important;
-  font-size: 15px !important;
-  letter-spacing: -0.02em !important;
   color: var(--td-text) !important;
+  margin: 0 !important;
 }
 
-/* Section headers del sidebar */
-[data-role="docente"] aside h3.uppercase {
+[data-td-scope="dashboard"] .td-card-link {
+  font-family: var(--td-font) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--td-muted) !important;
+  text-decoration: none !important;
+}
+
+/* Lista de schedule items */
+[data-td-scope="dashboard"] .td-schedule-list {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+/* Cada item del schedule */
+[data-td-scope="dashboard"] .td-schedule-item {
+  background: var(--td-surface-2) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius-md) !important;
+  padding: 16px !important;
+  display: grid !important;
+  grid-template-columns: 96px 1fr auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+  transition: all 200ms ease !important;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item:hover {
+  background: var(--td-fill) !important;
+  border-color: var(--td-hairline-strong) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Hora del schedule */
+[data-td-scope="dashboard"] .td-schedule-time {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  align-items: center !important;
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: 14px !important;
+  padding: 6px 8px !important;
+}
+
+[data-td-scope="dashboard"] .td-schedule-time-start,
+[data-td-scope="dashboard"] .td-schedule-time-end {
+  font-family: var(--td-font) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--td-text) !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1 !important;
+}
+
+[data-td-scope="dashboard"] .td-schedule-time-sep {
+  font-size: 10px !important;
+  color: var(--td-muted-2) !important;
+  line-height: 1 !important;
+}
+
+[data-td-scope="dashboard"] .td-schedule-course {
+  font-family: var(--td-font) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--td-text) !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Meta info (grado, sección, aula) */
+[data-td-scope="dashboard"] .td-schedule-meta {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-top: 4px !important;
+  font-family: var(--td-font) !important;
+  font-size: 12px !important;
+  color: var(--td-muted) !important;
+  letter-spacing: 0.01em !important;
+  flex-wrap: wrap !important;
+}
+
+[data-td-scope="dashboard"] .td-class-status {
   font-family: var(--td-font) !important;
   font-size: 10px !important;
   font-weight: 600 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
-  color: var(--td-muted-2) !important;
-  padding-left: 14px !important;
-  margin-bottom: 6px !important;
+  padding: 4px 8px !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
 }
 
-/* Items de navegación del sidebar */
-[data-role="docente"] aside nav a,
-[data-role="docente"] aside nav button {
+/* ===== ASISTENCIA DE HOY - TARGA GRANDE DERECHA ===== */
+[data-td-scope="dashboard"] .td-att-students {
+  background: var(--td-surface-2) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius-md) !important;
+  padding: 20px !important;
+}
+
+[data-td-scope="dashboard"] .td-att-students-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 16px !important;
+}
+
+[data-td-scope="dashboard"] .td-att-students-title {
   font-family: var(--td-font) !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.005em !important;
+  font-weight: 600 !important;
   color: var(--td-text) !important;
-  opacity: 0.78;
-  transition: background 180ms ease, color 180ms ease, opacity 180ms ease;
-  height: 38px !important;
-  padding: 0 12px !important;
-  gap: 11px !important;
+  margin: 0 !important;
+  flex: 1 !important;
 }
-[data-role="docente"] aside nav a:hover,
-[data-role="docente"] aside nav button:hover {
-  background: var(--td-fill) !important;
-  opacity: 1;
-  transform: none !important;
+
+[data-td-scope="dashboard"] .td-att-students-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 12px !important;
 }
-[data-role="docente"] aside nav a.bg-sb-on-surface,
-[data-role="docente"] aside nav button.bg-sb-on-surface {
+
+[data-td-scope="dashboard"] .td-att-stat {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: 14px !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+[data-td-scope="dashboard"] .td-att-stat-value {
+  font-family: var(--td-font) !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  color: var(--td-text) !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1 !important;
+}
+
+[data-td-scope="dashboard"] .td-att-stat-label {
+  font-family: var(--td-font) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--td-muted) !important;
+  letter-spacing: 0.005em !important;
+}
+
+/* Botón tomar asistencia */
+[data-td-scope="dashboard"] .td-att-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
   background: var(--td-solid-bg) !important;
   color: var(--td-solid-fg) !important;
-  opacity: 1 !important;
+  font-family: var(--td-font) !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
-  box-shadow: 0 4px 16px -8px rgba(0,0,0,0.4);
+  letter-spacing: -0.005em !important;
+  height: 44px !important;
+  padding: 0 18px !important;
+  border-radius: 14px !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  margin-top: 12px !important;
 }
 
-/* Iconos del sidebar (estado normal y activo) */
-[data-role="docente"] aside nav [class*="h-[16px]"] {
-  color: var(--td-text);
-  opacity: 0.85;
-}
-[data-role="docente"] aside nav a.bg-sb-on-surface [class*="h-[16px]"],
-[data-role="docente] aside nav button.bg-sb-on-surface [class*="h-[16px]"] {
-  color: var(--td-solid-fg) !important;
-  opacity: 1 !important;
+/* ===== MIS CURSOS - ABAJO DEL HORARIO ===== */
+[data-td-scope="dashboard"] .td-card[aria-label="Mis cursos"] {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius) !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin-top: 24px !important;
 }
 
-/* Bottom: tema + colapsar */
-[data-role="docente"] aside button.text-sb-on-surface-variant,
-[data-role="docente"] aside a.text-sb-on-surface-variant {
-  color: var(--td-muted) !important;
-  font-size: 13px !important;
-  opacity: 1 !important;
+/* Header de cursos */
+[data-td-scope="dashboard"] .td-card-title-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 16px !important;
 }
-[data-role="docente"] aside button.text-sb-on-surface-variant:hover,
-[data-role="docente"] aside a.text-sb-on-surface-variant:hover {
+
+[data-td-scope="dashboard"] .td-course-card {
+  background: var(--td-surface-2) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius-md) !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+/* Nombre del curso */
+[data-td-scope="dashboard"] .td-course-name {
+  font-family: var(--td-font) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
   color: var(--td-text) !important;
-  background: var(--td-fill) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Account section dividers */
-[data-role="docente"] aside .border-t {
-  border-color: var(--td-hairline) !important;
+//* Meta (grado/section) */
+[data-td-scope="dashboard"] .td-course-meta {
+  margin-top: 4px !important;
+  font-family: var(--td-font) !important;
+  font-size: 12px !important;
+  color: var(--td-muted) !important;
 }
 
-/* ===== Header del panel docente (override) ===== */
-[data-role="docente"] > .flex.h-screen > div.flex-1 > header {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: none !important;
-  height: auto !important;
+/* Foot con alumnos */
+[data-td-scope="dashboard"] .td-course-foot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-top: 8px !important;
+  border-top: 1px solid var(--td-hairline) !important;
+  margin-top: 8px !important;
+}
+
+/* ===== RESPONSIVE - DESKTOP ===== */
+@media (min-width: 1024px) and [data-td-scope="dashboard"] {
+  /* Grid principal 2 columnas */
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+  }
+  
+  /* Stats 4 columnas */
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  
+  /* Schedule + Attendance side by side */
+  [data-td-scope="dashboard"] .td-col:first-child {
+    width: 65% !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-col:last-child {
+    width: 35% !important;
+  }
+}
+
+/* ===== RESPONSIVE - TABLET ===== */
+@media (min-width: 768px) and (max-width: 1023px) and [data-td-scope="dashboard"] {
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-col {
+    flex-direction: column !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-col:first-child,
+  [data-td-scope="dashboard"] .td-col:last-child {
+    width: 100% !important;
+  }
+}
+
+/* ===== RESPONSIVE - MÓVIL ===== */
+@media (max-width: 767px) and [data-td-scope="dashboard"] {
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-col {
+    width: 100% !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-card,
+  [data-td-scope="dashboard"] .td-stat-card {
+    padding: 20px !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-schedule-item {
+    grid-template-columns: 80px 1fr !important;
+  }
+  
+  [data-td-scope="dashboard"] .td-course-card {
+    padding: 12px !important;
+  }
+}
+
+/* ===== OVERFLOW Y SCROLL ===== */
+[data-td-scope="dashboard"] main,
+[data-td-scope="dashboard"] .td-main-grid,
+[data-td-scope="dashboard"] .td-col {
+  overflow-x: hidden !important;
+  width: 100% !important;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item,
+[data-td-scope="dashboard"] .td-course-card {
+  min-width: 0 !important;
+}
+
+/* ===== FOCUS ===== */
+[data-td-scope="dashboard"] .td-card:focus-visible,
+[data-td-scope="dashboard"] .td-stat-card:focus-visible {
+  outline: 2px solid var(--td-solid-bg) !important;
+  outline-offset: 2px !important;
+}
+/* ===== FORCE GRID LAYOUT - CRITICAL ===== */
+[data-td-scope="dashboard"] {
+  /* Fuerza display grid en el contenedor principal */
+  display: grid !important;
+}
+
+/* Fuerza el main a ser grid */
+[data-td-scope="dashboard"] .td-main-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+  gap: 24px !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* Anula cualquier flex o block anterior */
+[data-td-scope="dashboard"] .td-main-grid > * {
+  display: block !important;  /* Cada child será un grid area */
+  flex: none !important;
+  float: none !important;
+}
+
+/* Stats grid FORCED */
+[data-td-scope="dashboard"] .td-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  width: auto !important;
+}
+
+/* Cada stat card debe ocupar 1 columna */
+[data-td-scope="dashboard"] .td-stat-card {
+  flex: 0 0 25% !important;
+  max-width: 25% !important;
+  width: 25% !important;
+}
+
+/* Contenedor principal - asegurar que ocupa el espacio */
+[data-td-scope="dashboard"] .td-container {
   padding: 0 !important;
-  min-height: 0 !important;
+  width: 100% !important;
 }
 
-/* Oculta el header del panel-layout SOLO en el dashboard docente.
-   El nuevo header vive dentro del contenido principal. */
-[data-td-scope="dashboard"] > .flex.h-screen > div.flex-1 > header.flex.items-center.justify-between.h-14 {
-  display: none !important;
-}
-[data-td-scope="dashboard"] > .flex.h-screen > div.flex-1 > header.flex.items-center.justify-between.h-14 + div {
-  display: none !important;
+/* Columna left (schedule + courses) */
+[data-td-scope="dashboard"] .td-col:first-child {
+  flex: 0 0 65% !important;
+  max-width: 65% !important;
+  width: 65% !important;
 }
 
-/* ===== Main: fondo gris claro/oscuro, sin padding propio ===== */
-[data-role="docente"] > .flex.h-screen > div.flex-1 > main {
-  background: var(--td-bg);
-  font-family: var(--td-font);
+/* Columna right (attendance + quick-actions) */
+[data-td-scope="dashboard"] .td-col:last-child {
+  flex: 0 0 35% !important;
+  max-width: 35% !important;
+  width: 35% !important;
 }
 
-[data-td-scope="dashboard"] > .flex.h-screen > div.flex-1 > main {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
-  padding-top: 0 !important;
-}
-[data-td-scope="dashboard"] > .flex.h-screen > div.flex-1 > main > div {
-  padding: 0 !important;
-}
-
-/* ===== Animación de entrada del dashboard ===== */
-.td-fade-in {
-  animation: td-fade-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes td-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================
-   HEADER DEL DASHBOARD (dentro del main)
-   ============================================ */
-.td-header {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(20px, 2.2vw, 32px);
-  padding: clamp(20px, 2.4vw, 32px) clamp(20px, 2.6vw, 36px) 0;
-}
-.td-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.td-title {
-  font-family: var(--td-font);
-  font-size: clamp(20px, 1.6vw, 30px);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--td-text);
-  line-height: 1.1;
-}
-.td-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.td-icon-btn {
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  border: 1px solid var(--td-hairline);
-  background: var(--td-surface);
-  color: var(--td-text);
-  cursor: pointer;
-  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
-}
-.td-icon-btn:hover {
-  background: var(--td-fill);
-  transform: translateY(-1px);
-  border-color: var(--td-hairline-strong);
-}
-.td-icon-btn:active { transform: translateY(0) scale(0.96); }
-.td-icon-btn-svg {
-  width: 18px;
-  height: 18px;
-}
-
-.td-user {
-  display: inline-flex;
-  align-items: center;
-  gap: 10x;
-  padding: 4px 12px 4px 4px;
-  border-radius: 999px;
-  border: 1px solid var(--td-hairline);
-  background: var(--td-surface);
-  cursor: pointer;
-  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
-}
-.td-user:hover {
-  background: var(--td-fill);
-  transform: translateY(-1px);
-  border-color: var(--td-hairline-strong);
-}
-.td-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: var(--td-solid-bg);
-  color: var(--td-solid-fg);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  font-family: var(--td-font);
-}
-.td-user-info {
-  display: none;
-  flex-direction: column;
-  text-align: left;
-  line-height: 1.1;
-}
-@media (min-width: 640px) {
-  .td-user-info { display: inline-flex; }
-}
-.td-user-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--td-text);
-  font-family: var(--td-font);
-  max-width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.td-user-role {
-  display: inline-block;
-  margin-top: 2px;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--td-muted);
-  padding: 2px 6px;
-  background: var(--td-fill);
-  border-radius: 999px;
-  width: max-content;
-}
-.td-user-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--td-muted);
-  display: none;
-}
-@media (min-width: 640px) {
-  .td-user-chevron { display: inline; }
-}
-
-.td-greeting-wrap {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.td-greeting {
-  font-family: var(--td-font);
-  font-size: clamp(24px, 2.4vw, 35px);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--td-text);
-  line-height: 1.1;
-  margin: 0;
-}
-.td-greeting-name {
-  color: var(--td-text);
-}
-.td-date-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  color: var(--td-muted);
-  font-family: var(--td-font);
-  font-size: 13px;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-.td-date-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--td-muted);
-}
-.td-date {
-  letter-spacing: -0.005em;
-}
-
-/* ============================================
-   CONTENEDOR PRINCIPAL
-   ============================================ */
-.td-container {
-  width: 100%;
-  max-width: 1480px;
-  margin: 0 auto;
-  padding: clamp(20px, 2.4vw, 32px) clamp(20px, 2.6vw, 36px) clamp(32px, 3.6vw, 56px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(20px, 2.2vw, 28px);
-}
-
-/* ============================================
-   STATS (4 tarjetas)
-   ============================================ */
-.td-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(12px, 1.4vw, 20px);
-}
+/* Responsivo: en mobile, las columnas se apilan naturalmente */
 @media (max-width: 1023px) {
-  .td-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 520px) {
-  .td-stats-grid { grid-template-columns: 1fr; }
-}
-
-.td-stat-card {
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius);
-  padding: clamp(20px, 2vw, 28px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 1.2vw, 16px);
-  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
-  min-height: 150px;
-}
-.td-stat-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--td-hairline-strong);
-  box-shadow: 0 6px 20px -10px rgba(0,0,0,0.18);
-}
-.td-stat-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--td-fill);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.td-stat-icon-svg {
-  width: 18px;
-  height: 18px;
-  color: var(--td-text);
-}
-.td-stat-label {
-  font-family: var(--td-font);
-  font-size: clamp(14px, 1vw, 16px);
-  font-weight: 500;
-  color: var(--td-muted);
-  letter-spacing: -0.005em;
-  margin: 0;
-}
-.td-stat-value {
-  font-family: var(--td-font);
-  font-size: clamp(28px, 2.4vw, 40px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: var(--td-text);
-  line-height: 1;
-  margin: 0;
-}
-
-/* ============================================
-   LAYOUT PRINCIPAL (2 columnas: horario + estadísticas/cursos)
-   ============================================ */
-.td-main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
-  gap: clamp(16px, 1.8vw, 24px);
-}
-@media (max-width: 1023px) {
-  .td-main-grid { grid-template-columns: 1fr; }
-}
-
-/* Columna izquierda: Horario + Cursos */
-.td-col {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 1.8vw, 24px);
-  min-width: 0;
-}
-
-/* ============================================
-   CARDS base
-   ============================================ */
-.td-card {
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius);
-  padding: clamp(20px, 2vw, 28px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 1.6vw, 20px);
-  transition: border-color 200ms ease, box-shadow 200ms ease;
-}
-.td-card:hover {
-  border-color: var(--td-hairline-strong);
-}
-.td-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.td-card-title-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 10x;
-}
-.td-card-title-icon {
-  width: 18px;
-  height: 18px;
-  color: var(--td-text);
-}
-.td-card-title {
-  font-family: var(--td-font);
-  font-size: clamp(20px, 1.5vw, 26px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--td-text);
-  margin: 0;
-  line-height: 1.2;
-}
-.td-card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--td-font);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--td-muted);
-  text-decoration: none;
-  transition: color 180ms ease, transform 180ms ease;
-  border-radius: 999px;
-  padding: 4px 10px;
-}
-.td-card-link:hover {
-  color: var(--td-text);
-  background: var(--td-fill);
-}
-.td-card-link--xs {
-  font-size: 11px;
-  padding: 3px 8px;
-}
-.td-card-link-icon {
-  width: 12px;
-  height: 12px;
-}
-
-/* ============================================
-   HORARIO DE HOY
-   ============================================ */
-.td-schedule-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.td-schedule-item {
-  display: grid;
-  grid-template-columns: 96px 1fr auto;
-  gap: 16px;
-  align-items: center;
-  padding: 14px 16px;
-  background: var(--td-surface-2);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius-md);
-  transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
-}
-.td-schedule-item:hover {
-  background: var(--td-fill);
-  border-color: var(--td-hairline-strong);
-  transform: translateY(-1px);
-}
-.td-schedule-item--skeleton {
-  height: 64px;
-  background: var(--td-fill);
-  border-color: var(--td-hairline);
-  animation: td-pulse 1.4s ease-in-out infinite;
-}
-@keyframes td-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
-.td-schedule-time {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: center;
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  border-radius: 14px;
-  padding: 8px 6px;
-  font-family: var(--td-font);
-}
-.td-schedule-time-start,
-.td-schedule-time-end {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--td-text);
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-.td-schedule-time-sep {
-  font-size: 10px;
-  color: var(--td-muted-2);
-  line-height: 1;
-}
-.td-schedule-body {
-  min-width: 0;
-}
-.td-schedule-course {
-  font-family: var(--td-font);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--td-text);
-  letter-spacing: -0.01em;
-  margin: 0;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.td-schedule-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 4px;
-  font-family: var(--td-font);
-  font-size: 12px;
-  color: var(--td-muted);
-  letter-spacing: 0.01em;
-  flex-wrap: wrap;
-}
-.td-schedule-meta-icon {
-  width: 12px;
-  height: 12px;
-  display: inline;
-  vertical-align: -2px;
-  margin-right: 2px;
-}
-.td-class-status {
-  font-family: var(--td-font);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 5px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.td-class-status--now {
-  background: var(--td-solid-bg);
-  color: var(--td-solid-fg);
-}
-.td-class-status--next {
-  background: var(--td-fill-strong);
-  color: var(--td-text);
-}
-.td-class-status--done {
-  background: var(--td-fill);
-  color: var(--td-muted);
-}
-@media (max-width: 640px) {
-  .td-schedule-item {
-    grid-template-columns: 80px 1fr;
-    grid-template-rows: auto auto;
-    row-gap: 8px;
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr !important;
   }
-  .td-class-status {
-    grid-column: 2 / 3;
-    justify-self: start;
+  [data-td-scope="dashboard"] .td-col {
+    width: 100% !important;
   }
-  .td-schedule-course,
-  .td-schedule-meta {
-    white-space: normal;
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
-/* ============================================
-   ASISTENCIA DE HOY
-   ============================================ */
-.td-att-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--td-font);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 5px 10px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.td-att-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: currentColor;
-}
-.td-att-pill--present { background: rgba(16,185,129,0.12); color: #059669; }
-.td-att-pill--late { background: rgba(245,158,11,0.14); color: #b45309; }
-.td-att-pill--absent { background: rgba(239,68,68,0.12); color: #dc2626; }
-.td-att-pill--justified { background: rgba(59,130,246,0.12); color: #2563eb; }
-.td-att-pill--early { background: rgba(249,115,22,0.14); color: #c2410c; }
-.dark .td-att-pill--present { background: rgba(16,185,129,0.16); color: #34d399; }
-.dark .td-att-pill--late { background: rgba(245,158,11,0.18); color: #fbbf24; }
-.dark .td-att-pill--absent { background: rgba(239,68,68,0.18); color: #f87171; }
-.dark .td-att-pill--justified { background: rgba(59,130,246,0.18); color: #60a5fa; }
-.dark .td-att-pill--early { background: rgba(249,115,22,0.18); color: #fb923c; }
-
-.td-att-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.td-att-cell {
-  background: var(--td-surface-2);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius-md);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.td-att-cell-head {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.td-att-cell-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--td-muted-2);
-}
-.td-att-cell-icon--ok { color: #059669; }
-.td-att-cell-icon--ok-warn { color: #b45309; }
-.td-att-cell-label {
-  font-family: var(--td-font);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--td-muted);
-}
-.td-att-time {
-  font-family: var(--td-font);
-  font-size: clamp(22px, 1.6vw, 28px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--td-text);
-  line-height: 1;
-  margin: 0;
-}
-.td-att-time--muted { color: var(--td-muted-2); }
-.td-att-prog {
-  font-family: var(--td-font);
-  font-size: 11px;
-  color: var(--td-muted);
-  margin: 0;
-  letter-spacing: 0.01em;
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
-.td-att-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: var(--td-solid-bg);
-  color: var(--td-solid-fg);
-  font-family: var(--td-font);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  height: 44px;
-  padding: 0 18px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-.td-att-cta:hover { transform: translateY(-1px); opacity: 0.92; }
-.td-att-cta:active { transform: translateY(0) scale(0.98); }
-.td-att-cta:disabled { opacity: 0.6; cursor: not-allowed; }
-.td-att-cta--ghost {
-  background: transparent;
-  color: var(--td-text);
-  border-color: var(--td-hairline-strong);
-}
-.td-att-cta--ghost:hover {
-  background: var(--td-fill);
-}
-.td-att-cta-icon {
-  width: 16px;
-  height: 16px;
-}
-
-/* Resumen de alumnos */
-.td-att-students {
-  background: var(--td-surface-2);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius-md);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.td-att-students-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.td-att-students-title {
-  font-family: var(--td-font);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--td-text);
-  margin: 0;
-  flex: 1;
-  letter-spacing: -0.01em;
-}
-.td-att-students-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-.td-att-stat {
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  border-radius: 14px;
-  padding: 12px 12px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.td-att-stat-value {
-  font-family: var(--td-font);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--td-text);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.td-att-stat-label {
-  font-family: var(--td-font);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--td-muted);
-  letter-spacing: 0.005em;
-}
-.td-att-stat--present { border-color: rgba(16,185,129,0.18); }
-.td-att-stat--absent { border-color: rgba(239,68,68,0.18); }
-.td-att-stat--late { border-color: rgba(245,158,11,0.20); }
-
-.td-att-students-empty {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
-}
-.td-att-students-empty-text {
-  font-family: var(--td-font);
-  font-size: 13px;
-  color: var(--td-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-.td-att-students-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--td-fill);
-  color: var(--td-text);
-  border: 1px solid var(--td-hairline-strong);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-family: var(--td-font);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 180ms ease, transform 180ms ease;
-}
-.td-att-students-cta:hover {
-  background: var(--td-fill-strong);
-  transform: translateY(-1px);
-}
-
-/* ============================================
-   MIS CURSOS
-   ============================================ */
-.td-courses-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(10px, 1.2vw, 16px);
-}
-@media (max-width: 640px) {
-  .td-courses-grid { grid-template-columns: 1fr; }
-}
-.td-course-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  background: var(--td-surface-2);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius-md);
-  padding: 16px;
-  text-decoration: none;
-  color: inherit;
-  transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
-}
-.td-course-card:hover {
-  background: var(--td-fill);
-  border-color: var(--td-hairline-strong);
-  transform: translateY(-1px);
-}
-.td-course-card--skeleton {
-  height: 120px;
-  background: var(--td-fill);
-  border-color: var(--td-hairline);
-  animation: td-pulse 1.4s ease-in-out infinite;
-}
-.td-course-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.td-course-icon-svg {
-  width: 18px;
-  height: 18px;
-  color: var(--td-text);
-}
-.td-course-body { min-width: 0; }
-.td-course-name {
-  font-family: var(--td-font);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--td-text);
-  letter-spacing: -0.01em;
-  margin: 0;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.td-course-meta {
-  margin-top: 4px;
-  font-family: var(--td-font);
-  font-size: 12px;
-  color: var(--td-muted);
-  letter-spacing: 0.01em;
-}
-.td-course-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px solid var(--td-hairline);
-}
-.td-course-students {
-  display: inline-flex;
-  align-items: center;
-  gap: 6x;
-  font-family: var(--td-font);
-  font-size: 12px;
-  color: var(--td-muted);
-  font-weight: 500;
-}
-.td-course-students-icon {
-  width: 14px;
-  height: 14px;
-}
-.td-course-chevron {
-  width: 16px;
-  height: 16px;
-  color: var(--td-muted-2);
-  transition: color 180ms ease, transform 180ms ease;
-}
-.td-course-card:hover .td-course-chevron {
-  color: var(--td-text);
-  transform: translateX(2px);
-}
-
-/* ============================================
-   ACCIONES RÁPIDAS
-   ============================================ */
-.td-actions-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-@media (max-width: 640px) {
-  .td-actions-grid { grid-template-columns: 1fr; }
-}
-.td-action {
-  display: grid;
-  grid-template-columns: 38px 1fr 18px;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--td-surface-2);
-  border: 1px solid var(--td-hairline);
-  border-radius: var(--td-radius-md);
-  text-decoration: none;
-  color: inherit;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-.td-action:hover {
-  background: var(--td-fill);
-  border-color: var(--td-hairline-strong);
-  transform: translateY(-1px);
-}
-.td-action-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.td-action-icon-svg {
-  width: 16px;
-  height: 16px;
-  color: var(--td-text);
-}
-.td-action-body { min-width: 0; }
-.td-action-label {
-  font-family: var(--td-font);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--td-text);
-  letter-spacing: -0.005em;
-  margin: 0;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.td-action-desc {
-  margin-top: 2px;
-  font-family: var(--td-font);
-  font-size: 11px;
-  color: var(--td-muted);
-  letter-spacing: 0.005em;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.td-action-chevron {
-  width: 14px;
-  height: 14px;
-  color: var(--td-muted-2);
-  transition: transform 180ms ease, color 180ms ease;
-}
-.td-action:hover .td-action-chevron {
-  color: var(--td-text);
-  transform: translateX(2px);
-}
-
-/* ============================================
-   ESTADO VACÍO
-   ============================================ */
-.td-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 10px;
-  padding: 32px 12px;
-  background: var(--td-surface-2);
-  border: 1px dashed var(--td-hairline-strong);
-  border-radius: var(--td-radius-md);
-}
-.td-empty-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: var(--td-surface);
-  border: 1px solid var(--td-hairline);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.td-empty-icon-svg {
-  width: 20px;
-  height: 20px;
-  color: var(--td-muted-2);
-}
-.td-empty-text {
-  font-family: var(--td-font);
-  font-size: 13px;
-  color: var(--td-muted);
-  letter-spacing: 0.005em;
-  margin: 0;
-  max-width: 320px;
-  line-height: 1.4;
-}
-
-/* ============================================
-   OVERRIDES para no romper con sb-note (clases heredadas)
-   ============================================ */
-.td-container,
-.td-card,
-.td-stat-card,
-.td-schedule-item,
-.td-att-cell,
-.td-att-students,
-.td-course-card,
-.td-action {
-  box-shadow: none !important;
-}
-.td-card,
-.td-stat-card,
-.td-schedule-item,
-.td-att-cell,
-.td-att-students,
-.td-course-card,
-.td-action,
-.td-empty,
-.td-schedule-time,
-.td-course-icon,
-.td-action-icon,
-.td-att-stat {
-  outline: none !important;
-}
-
-/* A11y focus */
-.td-card:focus-visible,
-.td-stat-card:focus-visible,
-.td-action:focus-visible,
-.td-icon-btn:focus-visible,
-.td-user:focus-visible,
-.td-att-cta:focus-visible,
-.td-att-students-cta:focus-visible {
-  outline: 2px solid var(--td-solid-bg);
-  outline-offset: 2px;
-}
-
-/* Scrollbar sutil dentro del dashboard */
-[data-role="docente"] main::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-[data-role="docente"] main::-webkit-scrollbar-track { background: transparent; }
-[data-role="docente"] main::-webkit-scrollbar-thumb {
-  background: var(--td-hairline-strong);
-  border-radius: 999px;
-}
-[data-role="docente"] main { scrollbar-width: thin; scrollbar-color: var(--td-hairline-strong) transparent; }
-
-/* Tablet: sidebar más compacto y tipografía intermedia */
-@media (max-width: 1023px) and (min-width: 768px) {
-  [data-role="docente"] aside.bg-sb-surface { width: 200px !important; }
-  [data-role="docente"] aside.bg-sb-surface.w-\[64px\],
-  [data-role="docente"] aside.bg-sb-surface[class*="w-[64px]"] { width: 64px !important; }
-  .td-stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .td-stat-card { min-height: 130px; padding: 18px; }
-  .td-stat-value { font-size: 30px; }
-  .td-greeting { font-size: 30px; }
-}
-
-/* Móvil: sidebar oculto (lo gestiona el panel-layout con bottom nav) */
+/* Móvil extremo */
 @media (max-width: 767px) {
-  [data-role="docente"] aside.bg-sb-surface { display: none !important; }
-  .td-header-actions .td-user { padding: 4px; }
-  .td-user-info { display: none !important; }
-  .td-user-chevron { display: none !important; }
-  .td-card,
-  .td-stat-card { padding: 18px; }
-  .td-greeting { font-size: 26px; }
-  .td-title { font-size: 18px; }
-  .td-header { padding: 16px 16px 0; }
-  .td-container { padding: 16px 16px 100px; }
-  .td-schedule-item { padding: 12px; gap: 10px; }
-  .td-att-grid { grid-template-columns: 1fr; }
-  .td-att-students-grid { grid-template-columns: repeat(3, 1fr); }
-  .td-att-stat-value { font-size: 18px; }
-  .td-att-time { font-size: 22px; }
-  .td-actions-grid { grid-template-columns: 1fr; }
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  [data-td-scope="dashboard"] .td-col {
+    width: 100% !important;
+  }
+}
+
+/* ===== DIRECT CLASS OVERRIDES - MORE SPECIFIC ===== */
+
+/* Forzar grid en contenedores td-* directamente */
+.td-main-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+  gap: 24px !important;
+}
+
+.td-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+
+/* Stat cards - cada una ocupa 1/4 del ancho */
+.td-stat-card {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius) !important;
+  padding: 28px !important;
+  min-height: 150px !important;
+  flex: 0 0 25% !important;
+  max-width: 25% !important;
+  width: 25% !important;
+}
+
+/* Content column widths */
+.td-col:first-child {
+  flex: 0 0 65% !important;
+  max-width: 65% !important;
+  width: 65% !important;
+}
+
+.td-col:last-child {
+  flex: 0 0 35% !important;
+  max-width: 35% !important;
+  width: 35% !important;
+}
+
+/* Schedule + Attendance side by side en desktop */
+@media (min-width: 1024px) {
+  .td-col:first-child {
+    width: 65% !important;
+  }
+  .td-col:last-child {
+    width: 35% !important;
+  }
+}
+
+/* Responsivo: tablet - 2 columnas de stats */
+@media (max-width: 1023px) {
+  .td-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .td-col {
+    width: 100% !important;
+  }
+}
+
+/* Responsivo: móvil - 1 columna */
+@media (max-width: 767px) {
+  .td-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .td-col {
+    width: 100% !important;
+  }
+}
+
+/* Tarjetas principales */
+.td-card {
+  background: var(--td-surface) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius) !important;
+  padding: 24px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Header de tarjeta */
+.td-card-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Schedule items */
+.td-schedule-list {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.td-schedule-item {
+  background: var(--td-surface-2) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius-md) !important;
+  padding: 16px !important;
+  display: grid !important;
+  grid-template-columns: 96px 1fr auto !important;
+  gap: 12px !important;
+  align-items: center !important;
+}
+
+/* Attendance students */
+.td-att-students-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+/* Cours cards */
+.td-course-card {
+  background: var(--td-surface-2) !important;
+  border: 1px solid var(--td-hairline) !important;
+  border-radius: var(--td-radius-md) !important;
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Asegurar que los grids children tengan width: 100% */
+.td-schedule-item > *,
+.td-course-card > *,
+.td-stat-card > * {
+  width: 100% !important;
+}
+
+/* Quitar cualquier display: flex o flex-col no deseado */
+.td-main-grid > *,
+.td-stats-grid > *,
+.td-course-card > *,
+.td-schedule-item > * {
+  display: block !important;
+  flex: none !important;
+}
+
+/* Quitar overflow hidden que pueda cortar contenido */
+.td-card,
+.td-stat-card,
+.td-schedule-item,
+.td-course-card {
+  overflow: visible !important;
 }

@@ -2,6 +2,7 @@
 
 import "@/frontend.css"
 import "@/styles/docente-premium.css"
+import "@/styles/teacher-dashboard.css"
 
 import * as React from "react"
 import Link from "next/link"
