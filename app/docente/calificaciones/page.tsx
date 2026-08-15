@@ -217,7 +217,7 @@ function CalificacionesInner() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         {/* Header */}
         <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
@@ -269,7 +269,7 @@ function CalificacionesInner() {
             <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] h-64 animate-pulse" />
           </div>
         ) : students.length === 0 ? (
-          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-16 text-center">
+          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
             <BookMarked className="h-10 w-10 mx-auto mb-3 text-[var(--note-muted)]/40" />
             <p className="text-sm font-medium text-[var(--note-muted)]">
               {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
@@ -295,8 +295,8 @@ function CalificacionesInner() {
                 { label: "Total Alumnos", value: students.length, icon: BookMarked },
               ].map(s => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6">
-                  <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-5">
+                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
+                  <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-3">
                     <s.icon className="h-5 w-5 text-[var(--note-text)]" />
                   </div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
@@ -315,7 +315,7 @@ function CalificacionesInner() {
                     <motion.div key={s.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25, delay: i * 0.03 }}
                       onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-5 py-4 hover:bg-[var(--note-fill)] transition-colors border-b border-[var(--note-hairline)] last:border-0 cursor-pointer group">
+                      className="flex items-center justify-between px-4 py-3 hover:bg-[var(--note-fill)] transition-colors border-b border-[var(--note-hairline)] last:border-0 cursor-pointer group">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`h-10 w-10 rounded-[12px] ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
                           <span className="text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
@@ -350,8 +350,8 @@ function CalificacionesInner() {
               <SbModalHeader title="" onClose={() => setDetailOpen(false)} />
               <SbModalBody>
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className={`h-14 w-14 rounded-[16px] ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`h-12 w-12 rounded-[16px] ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
                       <span className="text-base font-bold text-white">{getInitials(studentName(selected))}</span>
                     </div>
                     <div className="flex-1">
@@ -367,7 +367,7 @@ function CalificacionesInner() {
                   </div>
 
                   {selected.grades.length > 0 && (
-                    <div className="rounded-[16px] bg-[var(--note-fill)] p-4 mb-5">
+                    <div className="rounded-[16px] bg-[var(--note-fill)] p-3 mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <BarChart3 className="h-4 w-4 text-[var(--note-muted)]" />
@@ -386,7 +386,7 @@ function CalificacionesInner() {
                     </div>
                   )}
 
-                  <div className="mb-5">
+                  <div className="mb-4">
                     <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-3">Historial de Notas</p>
                     <div className="space-y-2">
                       {selected.grades.map((g) => (

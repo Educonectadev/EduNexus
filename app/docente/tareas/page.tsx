@@ -224,7 +224,7 @@ function TareasInner() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         {/* Header */}
         <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
@@ -246,8 +246,8 @@ function TareasInner() {
           ].map(s => {
             const Icon = s.icon
             return (
-              <div key={s.label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
-                <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-4">
+              <div key={s.label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
+                <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-3">
                   <Icon className="h-4.5 w-4.5 text-[var(--note-text)]" />
                 </div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
@@ -305,7 +305,7 @@ function TareasInner() {
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
                   className={`group rounded-[24px] border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] ${isOverdue ? 'border-red-500/30' : 'border-[var(--note-hairline)]'}`}>
-                  <div className="p-5">
+                  <div className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
@@ -333,7 +333,7 @@ function TareasInner() {
                     </div>
 
                     {/* Progress */}
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
                           <Users className="h-3.5 w-3.5 text-[var(--note-muted)]/50" />
@@ -392,14 +392,14 @@ function TareasInner() {
           </AnimatePresence>
 
           {!loading && filtered.length === 0 && (
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-12 text-center">
+            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
               <ClipboardList className="h-10 w-10 text-[var(--note-muted)]/40 mx-auto mb-3" />
               <p className="text-sm text-[var(--note-muted)]">No hay tareas en esta categoria</p>
             </div>
           )}
 
           {loading && (
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-12 text-center">
+            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
               <div className="h-6 w-6 border-2 border-[var(--note-hairline-strong)] border-t-[var(--note-text)] rounded-full animate-spin mx-auto mb-3" />
               <p className="text-sm text-[var(--note-muted)]">Cargando tareas...</p>
             </div>

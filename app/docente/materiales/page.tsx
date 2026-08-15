@@ -144,7 +144,7 @@ function MaterialesInner() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         {/* Header */}
         <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
@@ -198,7 +198,7 @@ function MaterialesInner() {
                 const Icon = getIconForType(m.file_type)
                 return (
                   <motion.div key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.02 }}
-                    className="group rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4 transition-all duration-150 hover:border-[var(--note-hairline-strong)]">
+                    className="group rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] px-4 py-3 transition-all duration-150 hover:border-[var(--note-hairline-strong)]">
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
                         <Icon className="h-4 w-4 text-[var(--note-text)]" />
@@ -234,7 +234,7 @@ function MaterialesInner() {
               })}
             </AnimatePresence>
             {!loading && filtered.length === 0 && (
-              <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-10 text-center">
+              <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
                 <FileText className="h-8 w-8 mx-auto mb-2 text-[var(--note-muted)]/40" />
                 <p className="text-sm text-[var(--note-muted)]">Sin materiales</p>
               </div>

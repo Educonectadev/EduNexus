@@ -76,7 +76,7 @@ function AsistenciaInner() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         <header className="pt-2">
           <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Asistencia</h1>
           <p className="mt-1 text-sm text-[var(--note-muted)]">Control de tu marcación y la asistencia de tus alumnos</p>
@@ -148,7 +148,7 @@ function MiAsistencia() {
 
   if (loading) {
     return (
-      <div className="space-y-5">
+      <div className="space-y-3">
         <div className="animate-pulse grid grid-cols-3 gap-3">
           {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />)}
         </div>
@@ -164,7 +164,7 @@ function MiAsistencia() {
   const hasPending = !!pendingCheckout
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-5">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
       {/* Jornada card */}
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
         <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--note-hairline)]">
@@ -260,7 +260,7 @@ function MiAsistencia() {
 
       {/* Weekly overview */}
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
-        <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+        <div className="px-4 pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <NoteChip icon={Flame} label="" />
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Últimos 7 días</p>
@@ -269,7 +269,7 @@ function MiAsistencia() {
             {history.length} registros
           </span>
         </div>
-        <div className="px-5 pb-5 flex items-end justify-between gap-2">
+        <div className="px-4 pb-4 flex items-end justify-between gap-2">
           {weekDays.map((d) => {
             const isToday = getLocalDateStr() === d.iso
             return (
@@ -289,7 +289,7 @@ function MiAsistencia() {
 
       {/* History */}
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
-        <div className="px-5 pt-5 pb-3">
+        <div className="px-4 pt-4 pb-2">
           <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Historial reciente</p>
         </div>
         {history.length === 0 ? (
@@ -533,16 +533,16 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   ]
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-5">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
       {/* Selector */}
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]">
-        <div className="px-5 pt-5 pb-3">
+        <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <NoteChip icon={Users} label="" />
             <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Seleccionar curso y fecha</p>
           </div>
         </div>
-        <div className="px-5 pb-5">
+        <div className="px-4 pb-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-[var(--note-muted)]">Curso</p>
@@ -653,8 +653,8 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               const Icon = s.icon
               return (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
-                  <div className={`h-9 w-9 rounded-[12px] flex items-center justify-center mb-4 ${s.bg}`}>
+                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
+                  <div className={`h-9 w-9 rounded-[12px] flex items-center justify-center mb-3 ${s.bg}`}>
                     <Icon className={`h-4 w-4 ${s.color}`} />
                   </div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
@@ -666,7 +666,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
           {/* Student list */}
           <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
-            <div className="px-5 pt-5 pb-4">
+            <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
                   <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Lista de alumnos</p>
@@ -751,14 +751,14 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       )}
 
       {loaded && students.length === 0 && (
-        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-14 text-center">
+        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
           <UserX className="h-10 w-10 mx-auto text-[var(--note-muted)]/40 mb-3" />
           <p className="text-sm text-[var(--note-muted)]">No hay alumnos en este curso</p>
         </div>
       )}
 
       {!loaded && courses.length === 0 && (
-        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-14 text-center">
+        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
           <Users className="h-10 w-10 mx-auto text-[var(--note-muted)]/40 mb-3" />
           <p className="text-sm text-[var(--note-muted)]">Sin cursos asignados</p>
         </div>

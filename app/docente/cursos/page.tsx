@@ -43,7 +43,7 @@ export default function CursosPage() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         {/* Header */}
         <header className="pt-2">
           <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Mis Cursos</h1>
@@ -55,9 +55,9 @@ export default function CursosPage() {
           {metrics.map((m) => {
             const Icon = m.icon
             return (
-              <div key={m.label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6">
+              <div key={m.label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
                 <NoteIconChip icon={Icon} />
-                <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{m.label}</p>
+                <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{m.label}</p>
                 <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{m.value}</p>
               </div>
             )
@@ -80,7 +80,7 @@ export default function CursosPage() {
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-12 text-center">
+          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
             <BookOpen className="h-10 w-10 text-[var(--note-muted)]/40 mx-auto mb-3" />
             <p className="text-sm text-[var(--note-muted)]">Sin cursos asignados</p>
           </div>

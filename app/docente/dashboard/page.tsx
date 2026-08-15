@@ -166,7 +166,7 @@ export default function DocenteDashboard() {
     : 0
 
   return (
-    <div className="sb-note-dash space-y-5">
+    <div className="sb-note-dash space-y-3">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -218,7 +218,7 @@ export default function DocenteDashboard() {
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-          className="space-y-5">
+          className="space-y-3">
 
           {/* Row 1: Horario + Distribución */}
           <div className="note-grid-2">
@@ -266,7 +266,7 @@ export default function DocenteDashboard() {
 
             {/* Distribución */}
             <div className="note-card">
-              <h3 className="note-card-title mb-4">Distribución Asistencia</h3>
+              <h3 className="note-card-title mb-3">Distribución Asistencia</h3>
               {studentSummary && studentSummary.total > 0 ? (
                 <div className="space-y-4">
                   {[
@@ -307,7 +307,7 @@ export default function DocenteDashboard() {
           <div className="note-grid-2">
             {/* Resumen rápido */}
             <div className="note-card">
-              <h3 className="note-card-title mb-4">Resumen Rápido</h3>
+              <h3 className="note-card-title mb-3">Resumen Rápido</h3>
               <div className="space-y-0.5">
                 {[
                   { label: "Horarios asignados", value: loading ? "—" : horarios.length, icon: Calendar },
@@ -328,7 +328,7 @@ export default function DocenteDashboard() {
 
             {/* Asistencia docente */}
             <div className="note-card">
-              <h3 className="note-card-title mb-4">Mi Asistencia</h3>
+              <h3 className="note-card-title mb-3">Mi Asistencia</h3>
               <div className="note-grid-2-inner mb-3">
                 <div className="note-att-cell">
                   <p className="note-att-label">Entrada</p>
@@ -405,11 +405,11 @@ export default function DocenteDashboard() {
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-          className="space-y-5">
+          className="space-y-3">
 
           {/* Barras por día */}
           <div className="note-card">
-            <h3 className="note-card-title mb-4">Horarios por Día</h3>
+            <h3 className="note-card-title mb-3">Horarios por Día</h3>
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => <div key={i} className="note-skeleton h-8" />)}
@@ -443,7 +443,7 @@ export default function DocenteDashboard() {
 
           {/* Lista detallada */}
           <div className="note-card">
-            <h3 className="note-card-title mb-4">Detalle Semanal</h3>
+            <h3 className="note-card-title mb-3">Detalle Semanal</h3>
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3, 4, 5].map((i) => <div key={i} className="note-skeleton h-12" />)}
@@ -481,7 +481,7 @@ export default function DocenteDashboard() {
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-          className="space-y-5">
+          className="space-y-3">
 
           {/* Stats resumen */}
           <div className="note-stats-grid-3">
@@ -506,7 +506,7 @@ export default function DocenteDashboard() {
           <div className="note-grid-2">
             {/* Asistencia docente */}
             <div className="note-card">
-              <h3 className="note-card-title mb-4">Mi Asistencia</h3>
+              <h3 className="note-card-title mb-3">Mi Asistencia</h3>
               <div className="note-grid-2-inner mb-3">
                 <div className="note-att-cell">
                   <p className="note-att-label">Entrada</p>
@@ -538,7 +538,7 @@ export default function DocenteDashboard() {
 
             {/* Distribución */}
             <div className="note-card">
-              <h3 className="note-card-title mb-4">Distribución del Día</h3>
+              <h3 className="note-card-title mb-3">Distribución del Día</h3>
               {studentSummary && studentSummary.total > 0 ? (
                 <div className="space-y-4">
                   {[

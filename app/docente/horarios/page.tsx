@@ -52,7 +52,7 @@ export default function DocenteHorariosPage() {
 
   return (
     <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
         {/* Header */}
         <header className="pt-2">
           <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Mis Horarios</h1>
@@ -62,11 +62,11 @@ export default function DocenteHorariosPage() {
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-3">
           {metrics.map(({ icon: Icon, label, value }) => (
-            <div key={label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-6">
+            <div key={label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
               <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
                 <Icon className="h-5 w-5 text-[var(--note-text)]" />
               </div>
-              <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{label}</p>
+              <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{label}</p>
               <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{value}</p>
             </div>
           ))}
@@ -89,7 +89,7 @@ export default function DocenteHorariosPage() {
         </div>
 
         {loading && (
-          <div className="flex justify-center py-16">
+          <div className="flex justify-center py-10">
             <div className="w-6 h-6 rounded-full border-2 border-[var(--note-hairline-strong)] border-t-[var(--note-text)] animate-spin" />
           </div>
         )}
@@ -158,7 +158,7 @@ export default function DocenteHorariosPage() {
         )}
 
         {!loading && horarios.length === 0 && (
-          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-16 text-center">
+          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
             <Calendar className="h-8 w-8 mx-auto mb-3 text-[var(--note-muted)]/40" />
             <p className="text-sm text-[var(--note-muted)]">Aún no tienes horarios asignados</p>
             <p className="text-xs text-[var(--note-muted)]/50 mt-1">El secretario asignará tus cursos y horarios</p>
