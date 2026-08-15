@@ -143,30 +143,46 @@ function MaterialesInner() {
   }
 
   return (
-    <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
         {/* Header */}
-        <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <motion.header
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8"
+        >
           <div>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Materiales</h1>
-            <p className="mt-1 text-sm text-[var(--note-muted)]">Materiales de tus cursos y biblioteca institucional</p>
+            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
+              <span className="w-8 h-px bg-foreground/30" />Panel Docente
+            </span>
+            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] font-display text-foreground">Materiales</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Materiales de tus cursos y biblioteca institucional</p>
           </div>
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setUploadOpen(true)} disabled={!courses.length}>
             <Upload className="h-4 w-4" /> Subir
           </SbBtn>
-        </header>
+        </motion.header>
 
         {error && (
-          <div className="rounded-[12px] bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600 flex items-center justify-between">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600 flex items-center justify-between"
+          >
             <span>{error}</span>
-            <button onClick={() => setError(null)} className="p-1 hover:bg-red-500/10 rounded-[12px]"><X className="h-4 w-4" /></button>
-          </div>
+            <button onClick={() => setError(null)} className="p-1 hover:bg-red-500/10 rounded-xl"><X className="h-4 w-4" /></button>
+          </motion.div>
         )}
 
         {/* Search + filter */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="flex flex-col sm:flex-row gap-3"
+        >
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--note-muted)]/50" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <SbInput placeholder="Buscar materiales..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: "36px" }} />
           </div>
           <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="sbf-native-select sm:w-64">
@@ -175,57 +191,62 @@ function MaterialesInner() {
               <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
             ))}
           </select>
-        </div>
+        </motion.div>
 
         {loading ? (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 mt-6">
             {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4 animate-pulse">
+              <div key={i} className="rounded-xl border border-foreground/10 bg-foreground/5 p-4 animate-pulse">
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill-strong)]" />
+                  <div className="h-10 w-10 rounded-xl bg-foreground/10" />
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 w-48 rounded bg-[var(--note-fill-strong)]" />
-                    <div className="h-3 w-32 rounded bg-[var(--note-fill-strong)]" />
+                    <div className="h-4 w-48 rounded bg-foreground/10" />
+                    <div className="h-3 w-32 rounded bg-foreground/10" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 mt-6">
             <AnimatePresence>
               {filtered.map((m, i) => {
                 const Icon = getIconForType(m.file_type)
                 return (
-                  <motion.div key={m.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ delay: i * 0.02 }}
-                    className="group rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] px-4 py-3 transition-all duration-150 hover:border-[var(--note-hairline-strong)]">
+                  <motion.div key={m.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 12 }}
+                    transition={{ delay: i * 0.02 }}
+                    className="group rounded-xl border border-foreground/10 bg-foreground/5 px-4 py-3 transition-all duration-150 hover:border-foreground/20"
+                  >
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center shrink-0">
-                        <Icon className="h-4 w-4 text-[var(--note-text)]" />
+                      <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center shrink-0">
+                        <Icon className="h-4 w-4 text-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[var(--note-text)] truncate">{m.name}</p>
-                        <p className="text-xs text-[var(--note-muted)] truncate">
+                        <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
                           {m.course_name ? `${m.course_name}${m.grade ? ` · ${m.grade} "${m.section}"` : ""} · ` : ""}
                           {formatSize(m.file_size)} · {formatDate(m.created_at)}
                         </p>
-                        {m.description && <p className="text-xs text-[var(--note-muted)]/70 truncate mt-0.5">{m.description}</p>}
+                        {m.description && <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{m.description}</p>}
                       </div>
-                      <span className={`text-[10px] font-medium px-2.5 py-1 rounded-[12px] shrink-0 hidden sm:inline-flex items-center gap-1 ${
-                        m.source === "propio" ? "bg-[var(--note-fill)] text-[var(--note-muted)]" : "bg-[var(--note-fill)] text-[var(--note-muted)]/60"
+                      <span className={`text-[10px] font-medium px-2.5 py-1 rounded-xl shrink-0 hidden sm:inline-flex items-center gap-1 ${
+                        m.source === "propio" ? "bg-foreground/10 text-muted-foreground" : "bg-foreground/10 text-muted-foreground/60"
                       }`}>
                         <Library className="h-3 w-3" /> {m.source === "propio" ? "Mis materiales" : "Biblioteca"}
                       </span>
                       {m.file_url && (
                         <a href={m.file_url} target="_blank" rel="noreferrer" download
-                          className="p-2 rounded-[12px] hover:bg-[var(--note-fill)] transition-colors shrink-0">
-                          <Download className="h-4 w-4 text-[var(--note-muted)]/60" />
+                          className="p-2 rounded-xl hover:bg-foreground/10 transition-colors shrink-0">
+                          <Download className="h-4 w-4 text-muted-foreground/60" />
                         </a>
                       )}
                       {m.source === "propio" && (
                         <button onClick={() => handleDelete(m)}
-                          className="p-2 rounded-[12px] hover:bg-red-500/10 hover:text-red-500 transition-colors shrink-0">
-                          <Trash2 className="h-4 w-4 text-[var(--note-muted)]/60" />
+                          className="p-2 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-colors shrink-0">
+                          <Trash2 className="h-4 w-4 text-muted-foreground/60" />
                         </button>
                       )}
                     </div>
@@ -234,9 +255,9 @@ function MaterialesInner() {
               })}
             </AnimatePresence>
             {!loading && filtered.length === 0 && (
-              <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-                <FileText className="h-8 w-8 mx-auto mb-2 text-[var(--note-muted)]/40" />
-                <p className="text-sm text-[var(--note-muted)]">Sin materiales</p>
+              <div className="rounded-xl border border-foreground/10 bg-foreground/5 py-20 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="text-sm text-muted-foreground">Sin materiales</p>
               </div>
             )}
           </div>
@@ -248,26 +269,26 @@ function MaterialesInner() {
           <SbModalBody>
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Curso</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
                 <select value={upCourseId} onChange={e => setUpCourseId(e.target.value)} className="sbf-native-select w-full">
                   <option value="">Seleccionar curso...</option>
                   {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Nombre</label>
-                <input value={upName} onChange={e => setUpName(e.target.value)} placeholder="Guía de álgebra - Cap. 3" className="sb-input rounded-[12px] text-sm h-10 w-full" />
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nombre</label>
+                <input value={upName} onChange={e => setUpName(e.target.value)} placeholder="Guía de álgebra - Cap. 3" className="sb-input rounded-xl text-sm h-10 w-full" />
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Descripción (opcional)</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Descripción (opcional)</label>
                 <textarea value={upDescription} onChange={e => setUpDescription(e.target.value)} rows={2} placeholder="Breve descripción del material"
-                  className="sb-input rounded-[12px] text-sm w-full resize-none" />
+                  className="sb-input rounded-xl text-sm w-full resize-none" />
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Archivo</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Archivo</label>
                 <input ref={fileInputRef} type="file" onChange={e => setUpFile(e.target.files?.[0] || null)}
-                  className="block w-full text-sm text-[var(--note-muted)]/60 file:mr-3 file:rounded-[12px] file:border-0 file:bg-[var(--note-fill-strong)] file:px-3 file:py-2 file:text-xs file:font-medium file:text-[var(--note-text)] hover:file:bg-[var(--note-fill)]" />
-                {upFile && <p className="text-xs text-[var(--note-muted)] mt-1.5">{upFile.name} · {formatSize(upFile.size)}</p>}
+                  className="block w-full text-sm text-muted-foreground/60 file:mr-3 file:rounded-xl file:border-0 file:bg-foreground/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-foreground hover:file:bg-foreground/20" />
+                {upFile && <p className="text-xs text-muted-foreground mt-1.5">{upFile.name} · {formatSize(upFile.size)}</p>}
               </div>
             </div>
           </SbModalBody>

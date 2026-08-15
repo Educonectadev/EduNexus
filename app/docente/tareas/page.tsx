@@ -223,13 +223,17 @@ function TareasInner() {
   }
 
   return (
-    <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16 space-y-8">
         {/* Header */}
-        <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Tareas</h1>
-            <p className="mt-1 text-sm text-[var(--note-muted)]">Gestiona las tareas de tus alumnos</p>
+            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
+              <span className="w-8 h-px bg-foreground/30" />
+              Panel Docente
+            </span>
+            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] font-display text-foreground">Tareas</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Gestiona las tareas de tus alumnos</p>
           </div>
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" /> Nueva tarea
@@ -237,7 +241,7 @@ function TareasInner() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden">
           {[
             { label: "Total", value: tasks.length, icon: ClipboardList },
             { label: "Pendientes", value: counts.pending, icon: Clock },
@@ -246,12 +250,12 @@ function TareasInner() {
           ].map(s => {
             const Icon = s.icon
             return (
-              <div key={s.label} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
-                <div className="h-9 w-9 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-3">
-                  <Icon className="h-4.5 w-4.5 text-[var(--note-text)]" />
+              <div key={s.label} className="bg-background p-5 lg:p-6">
+                <div className="h-9 w-9 rounded-xl bg-foreground/5 flex items-center justify-center mb-3">
+                  <Icon className="h-4.5 w-4.5 text-foreground" />
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
-                <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-[var(--note-text)]">{s.value}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
+                <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-foreground">{s.value}</p>
               </div>
             )
           })}
@@ -260,9 +264,9 @@ function TareasInner() {
         {/* Search + Filters */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--note-muted)]/50" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              className="sb-input rounded-[12px] text-sm h-10 w-full pl-9" />
+              className="sb-input rounded-xl text-sm h-10 w-full pl-9" />
           </div>
           <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="sbf-native-select sm:w-56">
             <option value="">Todos los cursos</option>
@@ -290,7 +294,7 @@ function TareasInner() {
         </div>
 
         {/* Task list */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <AnimatePresence>
             {filtered.map((t, i) => {
               const sc = statusConfig[t.status]
@@ -301,33 +305,33 @@ function TareasInner() {
               const course = courses.find(c => c.id === t.course_id)
 
               return (
-                <motion.div key={t.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
-                  className={`group rounded-[24px] border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] ${isOverdue ? 'border-red-500/30' : 'border-[var(--note-hairline)]'}`}>
-                  <div className="p-4">
+                  className={`group rounded-xl border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] ${isOverdue ? 'border-red-500/30' : 'border-foreground/10'}`}>
+                  <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[12px] ${sc.bg} ${sc.color}`}>
+                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-xl ${sc.bg} ${sc.color}`}>
                             <span className={`h-1.5 w-1.5 rounded-full ${sc.dot}`} />
                             {sc.label}
                           </span>
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-[12px] ${pc.bg} ${pc.color}`}>
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-xl ${pc.bg} ${pc.color}`}>
                             {pc.label}
                           </span>
                           {isOverdue && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-[12px] bg-red-500/10 text-red-500">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-xl bg-red-500/10 text-red-500">
                               <AlertTriangle className="h-3 w-3" /> Vencida
                             </span>
                           )}
                         </div>
-                        <p className="text-sm font-semibold text-[var(--note-text)]">{t.title}</p>
+                        <p className="text-sm font-semibold text-foreground">{t.title}</p>
                         {t.description && (
-                          <p className="text-xs text-[var(--note-muted)] mt-1 line-clamp-2">{t.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-[var(--note-muted)]/40">
+                      <div className="flex items-center gap-1.5 text-muted-foreground/40">
                         <Eye className="h-4 w-4" />
                       </div>
                     </div>
@@ -336,12 +340,12 @@ function TareasInner() {
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
-                          <Users className="h-3.5 w-3.5 text-[var(--note-muted)]/50" />
-                          <span className="text-[10px] text-[var(--note-muted)] font-medium">{t.delivered_count}/{t.total_students} entregas</span>
+                          <Users className="h-3.5 w-3.5 text-muted-foreground/50" />
+                          <span className="text-[10px] text-muted-foreground font-medium">{t.delivered_count}/{t.total_students} entregas</span>
                         </div>
-                        <span className="text-[10px] text-[var(--note-muted)] font-medium">{Math.round(progress)}%</span>
+                        <span className="text-[10px] text-muted-foreground font-medium">{Math.round(progress)}%</span>
                       </div>
-                      <div className="h-2 bg-[var(--note-fill-strong)] rounded-full overflow-hidden">
+                      <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${progress}%` }}
@@ -355,31 +359,31 @@ function TareasInner() {
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center gap-4 px-5 py-3 bg-[var(--note-fill)] border-t border-[var(--note-hairline)]">
+                  <div className="flex items-center gap-4 px-5 py-3 bg-foreground/5 border-t border-foreground/10">
                     {course && (
                       <div className="flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-[var(--note-muted)]/60" />
-                        <span className="text-[10px] text-[var(--note-muted)] font-medium">{course.name} - {course.grade}{course.section}</span>
+                        <BookOpen className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <span className="text-[10px] text-muted-foreground font-medium">{course.name} - {course.grade}{course.section}</span>
                       </div>
                     )}
                     {t.subject && (
                       <div className="flex items-center gap-1.5">
-                        <GraduationCap className="h-3.5 w-3.5 text-[var(--note-muted)]/60" />
-                        <span className="text-[10px] text-[var(--note-muted)] font-medium">{t.subject}</span>
+                        <GraduationCap className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <span className="text-[10px] text-muted-foreground font-medium">{t.subject}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-[var(--note-muted)]/60" />
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                       {t.start_date ? (
                         <span className={`text-[10px] font-medium ${
-                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-[var(--note-muted)]'
+                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-muted-foreground'
                         }`}>
                           {new Date(t.start_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} → {new Date(t.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
                           {isOverdue ? ' (vencida)' : daysLeft === 0 ? ' (hoy)' : ''}
                         </span>
                       ) : (
                         <span className={`text-[10px] font-medium ${
-                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-[var(--note-muted)]'
+                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-muted-foreground'
                         }`}>
                           {isOverdue ? `Vencida hace ${Math.abs(daysLeft)} dias` : daysLeft === 0 ? 'Vence hoy' : daysLeft === 1 ? 'Vence manana' : `Vence en ${daysLeft} dias`}
                         </span>
@@ -392,16 +396,16 @@ function TareasInner() {
           </AnimatePresence>
 
           {!loading && filtered.length === 0 && (
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-              <ClipboardList className="h-10 w-10 text-[var(--note-muted)]/40 mx-auto mb-3" />
-              <p className="text-sm text-[var(--note-muted)]">No hay tareas en esta categoria</p>
+            <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
+              <ClipboardList className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-sm text-muted-foreground">No hay tareas en esta categoria</p>
             </div>
           )}
 
           {loading && (
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-              <div className="h-6 w-6 border-2 border-[var(--note-hairline-strong)] border-t-[var(--note-text)] rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-sm text-[var(--note-muted)]">Cargando tareas...</p>
+            <div className="rounded-xl border border-foreground/10 bg-background py-8 text-center">
+              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Cargando tareas...</p>
             </div>
           )}
         </div>
@@ -412,7 +416,7 @@ function TareasInner() {
           <SbModalBody>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Curso *</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso *</label>
                 <select value={formData.course_id} onChange={e => setFormData({...formData, course_id: e.target.value})}
                   className="sbf-native-select w-full">
                   <option value="">Seleccionar curso</option>
@@ -423,19 +427,19 @@ function TareasInner() {
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Titulo de la tarea *</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Titulo de la tarea *</label>
                 <input placeholder="Ej: Ejercicios de algebra - Cap. 3" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
-                  className="sb-input rounded-[12px] text-sm h-10 w-full" />
+                  className="sb-input rounded-xl text-sm h-10 w-full" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Asignatura</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Asignatura</label>
                   <input placeholder="Ej: Matematica" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}
-                    className="sb-input rounded-[12px] text-sm h-10 w-full" />
+                    className="sb-input rounded-xl text-sm h-10 w-full" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Prioridad</label>
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Prioridad</label>
                   <select value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value as any})}
                     className="sbf-native-select w-full">
                     <option value="low">Baja</option>
@@ -445,28 +449,28 @@ function TareasInner() {
                 </div>
               </div>
 
-              <div className="rounded-[16px] bg-[var(--note-fill)] p-4 space-y-3">
-                <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider">Fechas de la tarea</p>
+              <div className="rounded-xl bg-foreground/5 p-4 space-y-3">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Fechas de la tarea</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-medium text-[var(--note-muted)] mb-1 block">Fecha de inicio</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Fecha de inicio</label>
                     <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})}
-                      className="sb-input rounded-[12px] text-sm h-10 w-full" />
-                    <p className="text-[9px] text-[var(--note-muted)]/60 mt-1">Desde cuando esta disponible</p>
+                      className="sb-input rounded-xl text-sm h-10 w-full" />
+                    <p className="text-[9px] text-muted-foreground/60 mt-1">Desde cuando esta disponible</p>
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-[var(--note-muted)] mb-1 block">Fecha de vencimiento *</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Fecha de vencimiento *</label>
                     <input type="date" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})}
-                      className="sb-input rounded-[12px] text-sm h-10 w-full" />
-                    <p className="text-[9px] text-[var(--note-muted)]/60 mt-1">Ultimo dia para entregar</p>
+                      className="sb-input rounded-xl text-sm h-10 w-full" />
+                    <p className="text-[9px] text-muted-foreground/60 mt-1">Ultimo dia para entregar</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Descripcion e instrucciones</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Descripcion e instrucciones</label>
                 <textarea placeholder="Describe detalladamente la tarea: objetivos, requisitos, criterios de evaluacion, material de referencia..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="sb-input rounded-[12px] text-sm h-24 w-full resize-none" />
+                  className="sb-input rounded-xl text-sm h-24 w-full resize-none" />
               </div>
             </motion.div>
           </SbModalBody>
@@ -484,24 +488,24 @@ function TareasInner() {
               <SbModalBody>
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-[16px] bg-[var(--note-fill)] p-3">
-                      <p className="text-[10px] text-[var(--note-muted)] uppercase tracking-wider mb-1">Estado</p>
-                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[12px] ${statusConfig[selectedTask.status].bg} ${statusConfig[selectedTask.status].color}`}>
+                    <div className="rounded-xl bg-foreground/5 p-3">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Estado</p>
+                      <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-xl ${statusConfig[selectedTask.status].bg} ${statusConfig[selectedTask.status].color}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${statusConfig[selectedTask.status].dot}`} />
                         {statusConfig[selectedTask.status].label}
                       </span>
                     </div>
-                    <div className="rounded-[16px] bg-[var(--note-fill)] p-3">
-                      <p className="text-[10px] text-[var(--note-muted)] uppercase tracking-wider mb-1">Prioridad</p>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-[12px] ${priorityConfig[selectedTask.priority].bg} ${priorityConfig[selectedTask.priority].color}`}>
+                    <div className="rounded-xl bg-foreground/5 p-3">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Prioridad</p>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-xl ${priorityConfig[selectedTask.priority].bg} ${priorityConfig[selectedTask.priority].color}`}>
                         {priorityConfig[selectedTask.priority].label}
                       </span>
                     </div>
-                    <div className="col-span-2 rounded-[16px] bg-[var(--note-fill)] p-3">
-                      <p className="text-[10px] text-[var(--note-muted)] uppercase tracking-wider mb-1">Fechas</p>
+                    <div className="col-span-2 rounded-xl bg-foreground/5 p-3">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Fechas</p>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-3.5 w-3.5 text-[var(--note-muted)]" />
-                        <span className="text-xs font-medium text-[var(--note-text)]">
+                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-xs font-medium text-foreground">
                           {selectedTask.start_date
                             ? `${new Date(selectedTask.start_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })} → ${new Date(selectedTask.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}`
                             : `Hasta el ${new Date(selectedTask.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}`
@@ -510,28 +514,28 @@ function TareasInner() {
                       </div>
                     </div>
                     {selectedTask.description && (
-                      <div className="col-span-2 rounded-[16px] bg-[var(--note-fill)] p-3">
-                        <p className="text-[10px] text-[var(--note-muted)] uppercase tracking-wider mb-1">Descripcion</p>
-                        <p className="text-xs text-[var(--note-text)] whitespace-pre-line">{selectedTask.description}</p>
+                      <div className="col-span-2 rounded-xl bg-foreground/5 p-3">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Descripcion</p>
+                        <p className="text-xs text-foreground whitespace-pre-line">{selectedTask.description}</p>
                       </div>
                     )}
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-semibold text-[var(--note-text)] flex items-center gap-2">
-                        <Users className="h-4 w-4 text-[var(--note-muted)]" />
+                      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
                         Alumnos ({selectedTask.students?.length || 0})
                       </h3>
-                      <div className="flex items-center gap-3 text-[10px] text-[var(--note-muted)]">
+                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
                         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-500" /> {selectedTask.delivered_count} entregadas</span>
                         <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" /> {(selectedTask.total_students || 0) - selectedTask.delivered_count} pendientes</span>
                       </div>
                     </div>
 
-                    <div className="rounded-[16px] bg-[var(--note-fill)] overflow-hidden">
+                    <div className="rounded-xl bg-foreground/5 overflow-hidden">
                       {selectedTask.students && selectedTask.students.length > 0 ? (
-                        <div className="divide-y divide-[var(--note-hairline)]">
+                        <div className="divide-y divide-foreground/10">
                           {selectedTask.students.map((student, i) => {
                             const ss = submissionStatusConfig[student.submission_status] || submissionStatusConfig.pending
                             const isEditing = editingSubmission?.studentId === student.student_id
@@ -540,30 +544,30 @@ function TareasInner() {
                                 initial={{ opacity: 0, x: -8 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.03 }}
-                                className="px-4 py-3 hover:bg-[var(--note-surface)] transition-colors">
+                                className="px-4 py-3 hover:bg-background transition-colors">
                                 <div className="flex items-center justify-between gap-3">
                                   <div className="flex items-center gap-3 min-w-0">
-                                    <div className="h-8 w-8 rounded-[12px] bg-[var(--note-fill-strong)] flex items-center justify-center text-[10px] font-bold text-[var(--note-muted)] shrink-0">
+                                    <div className="h-8 w-8 rounded-xl bg-foreground/10 flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">
                                       {student.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-xs font-semibold text-[var(--note-text)] truncate">{student.full_name}</p>
-                                      <p className="text-[10px] text-[var(--note-muted)]">DNI: {student.dni || 'N/A'} - {student.grade}{student.section}</p>
+                                      <p className="text-xs font-semibold text-foreground truncate">{student.full_name}</p>
+                                      <p className="text-[10px] text-muted-foreground">DNI: {student.dni || 'N/A'} - {student.grade}{student.section}</p>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
                                     {student.submission_grade != null && (
-                                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-[12px]">
+                                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-xl">
                                         {student.submission_grade}
                                       </span>
                                     )}
-                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-[12px] ${ss.bg} ${ss.color}`}>
+                                    <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-xl ${ss.bg} ${ss.color}`}>
                                       <span className={`h-1.5 w-1.5 rounded-full ${ss.dot}`} />
                                       {ss.label}
                                     </span>
                                     {student.submission_status === 'pending' && (
                                       <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
-                                        className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-[12px] transition-colors">
+                                        className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-xl transition-colors">
                                         Marcar entrega
                                       </button>
                                     )}
@@ -577,8 +581,8 @@ function TareasInner() {
                                           feedback: student.feedback || "",
                                         })
                                       }}
-                                        className={`text-[10px] font-medium px-2.5 py-1 rounded-[12px] transition-colors ${
-                                          isEditing ? 'text-[var(--note-text)] bg-[var(--note-fill-strong)]' : 'text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/20'
+                                        className={`text-[10px] font-medium px-2.5 py-1 rounded-xl transition-colors ${
+                                          isEditing ? 'text-foreground bg-foreground/10' : 'text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/20'
                                         }`}>
                                         {student.submission_status === 'graded' ? (isEditing ? 'Cerrar' : 'Editar nota') : (isEditing ? 'Cerrar' : 'Calificar')}
                                       </button>
@@ -589,21 +593,21 @@ function TareasInner() {
                                 {isEditing && (
                                   <div className="mt-3 pl-11 flex items-start gap-2">
                                     <div className="w-20">
-                                      <label className="text-[9px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1 block">Nota</label>
+                                      <label className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">Nota</label>
                                       <input type="number" min={0} max={20} step="0.5" value={editingSubmission.grade}
                                         onChange={e => setEditingSubmission(prev => prev ? { ...prev, grade: e.target.value } : prev)}
                                         placeholder="0-20"
-                                        className="sb-input rounded-[12px] text-sm h-9 w-full text-center" />
+                                        className="sb-input rounded-xl text-sm h-9 w-full text-center" />
                                     </div>
                                     <div className="flex-1">
-                                      <label className="text-[9px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1 block">Comentario</label>
+                                      <label className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">Comentario</label>
                                       <input value={editingSubmission.feedback}
                                         onChange={e => setEditingSubmission(prev => prev ? { ...prev, feedback: e.target.value } : prev)}
                                         placeholder="Retroalimentación para el alumno"
-                                        className="sb-input rounded-[12px] text-sm h-9 w-full" />
+                                        className="sb-input rounded-xl text-sm h-9 w-full" />
                                     </div>
                                     <button onClick={() => handleGradeSubmission(selectedTask.id, student)} disabled={gradingTaskId === student.student_id}
-                                      className="h-9 px-4 rounded-[12px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors disabled:opacity-50 mt-5 shrink-0">
+                                      className="h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors disabled:opacity-50 mt-5 shrink-0">
                                       {gradingTaskId === student.student_id ? "Guardando..." : "Guardar"}
                                     </button>
                                   </div>
@@ -613,9 +617,9 @@ function TareasInner() {
                           })}
                         </div>
                       ) : (
-                        <div className="py-8 text-center">
-                          <Users className="h-8 w-8 text-[var(--note-muted)]/40 mx-auto mb-2" />
-                          <p className="text-xs text-[var(--note-muted)]">No hay alumnos inscritos en este curso</p>
+                        <div className="py-20 text-center">
+                          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                          <p className="text-sm text-muted-foreground">No hay alumnos inscritos en este curso</p>
                         </div>
                       )}
                     </div>
@@ -626,8 +630,8 @@ function TareasInner() {
           )}
           {detailLoading && (
             <div className="py-12 text-center">
-              <div className="h-6 w-6 border-2 border-[var(--note-hairline-strong)] border-t-[var(--note-text)] rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-sm text-[var(--note-muted)]">Cargando detalles...</p>
+              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Cargando detalles...</p>
             </div>
           )}
         </SbModal>

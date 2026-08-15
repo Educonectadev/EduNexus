@@ -43,12 +43,12 @@ const MAX_SCORE = 20
 function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
 
 function getAvatarColor(_name: string) {
-  return "bg-[var(--note-fill-strong)]"
+  return "bg-foreground/10"
 }
 
 function getGradeColor(g: number) { return g >= 18 ? "font-bold" : g >= 11 ? "" : "opacity-60" }
-function getGradeBg(g: number) { return g >= 18 ? "bg-[var(--note-fill-strong)]" : g >= 11 ? "bg-[var(--note-fill)]" : "bg-[var(--note-fill-strong)]" }
-function getGradeBarColor(g: number) { return g >= 18 ? "bg-[var(--note-text)]" : g >= 11 ? "bg-[var(--note-muted)]" : "bg-[var(--note-muted)]" }
+function getGradeBg(g: number) { return g >= 18 ? "bg-foreground/10" : g >= 11 ? "bg-foreground/5" : "bg-foreground/10" }
+function getGradeBarColor(g: number) { return g >= 18 ? "bg-foreground" : g >= 11 ? "bg-muted-foreground" : "bg-muted-foreground" }
 
 function calcAverage(grades: Grade[]) {
   if (grades.length === 0) return 0
@@ -216,13 +216,16 @@ function CalificacionesInner() {
   const registerStudents = registerCourseId === courseId ? students : []
 
   return (
-    <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16 space-y-6">
         {/* Header */}
-        <header className="pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Calificaciones</h1>
-            <p className="mt-1 text-sm text-[var(--note-muted)]">Gestiona las notas de tus alumnos</p>
+            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
+              <span className="w-8 h-px bg-foreground/30" />Panel Docente
+            </span>
+            <h1 className="font-display text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-foreground">Calificaciones</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Gestiona las notas de tus alumnos</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="nb-select-wrap">
@@ -256,22 +259,22 @@ function CalificacionesInner() {
         </header>
 
         {error && (
-          <div className="rounded-[12px] bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
+          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="animate-pulse space-y-4">
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />)}
+          <div className="animate-pulse space-y-6">
+            <div className="grid grid-cols-3 gap-px bg-foreground/10 rounded-xl overflow-hidden">
+              {[1, 2, 3].map(i => <div key={i} className="h-28 bg-background" />)}
             </div>
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] h-64 animate-pulse" />
+            <div className="rounded-xl border border-foreground/10 bg-foreground/5 h-64 animate-pulse" />
           </div>
         ) : students.length === 0 ? (
-          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-            <BookMarked className="h-10 w-10 mx-auto mb-3 text-[var(--note-muted)]/40" />
-            <p className="text-sm font-medium text-[var(--note-muted)]">
+          <div className="rounded-xl border border-foreground/10 bg-foreground/5 py-20 text-center">
+            <BookMarked className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-sm font-medium text-muted-foreground">
               {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
             </p>
           </div>
@@ -288,52 +291,52 @@ function CalificacionesInner() {
         ) : (
           <>
             {/* Stats */}
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-3">
+            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-px bg-foreground/10 rounded-xl overflow-hidden">
               {[
                 { label: "Promedio General", value: avgGeneral.toFixed(1), icon: BarChart3 },
                 { label: "Mejor Nota", value: bestScore, icon: TrendingUp },
                 { label: "Total Alumnos", value: students.length, icon: BookMarked },
               ].map(s => (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
-                  <div className="h-10 w-10 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center mb-3">
-                    <s.icon className="h-5 w-5 text-[var(--note-text)]" />
+                <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-background p-5 lg:p-6">
+                  <div className="h-10 w-10 rounded-xl bg-foreground/5 flex items-center justify-center mb-3">
+                    <s.icon className="h-5 w-5 text-foreground" />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
-                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-[var(--note-text)]">{s.value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
+                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-foreground">{s.value}</p>
                 </motion.div>
               ))}
             </motion.div>
 
             {/* Student list */}
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
+            <div className="rounded-xl border border-foreground/10 bg-foreground/5 overflow-hidden">
               <AnimatePresence>
                 {students.map((s, i) => {
                   const avg = calcAverage(s.grades)
                   const trend = getTrend(s.grades)
                   return (
-                    <motion.div key={s.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+                    <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25, delay: i * 0.03 }}
                       onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-[var(--note-fill)] transition-colors border-b border-[var(--note-hairline)] last:border-0 cursor-pointer group">
+                      className="flex items-center justify-between px-4 py-3 hover:bg-foreground/5 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`h-10 w-10 rounded-[12px] ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
+                        <div className={`h-10 w-10 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
                           <span className="text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-[var(--note-text)] truncate">{studentName(s)}</p>
+                          <p className="text-sm font-medium text-foreground truncate">{studentName(s)}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] text-[var(--note-muted)]">{s.grades.length} notas</span>
+                            <span className="text-[10px] text-muted-foreground">{s.grades.length} notas</span>
                             {s.grades.slice(-4).map((g, j) => (
-                              <span key={j} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-[6px] ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
+                              <span key={j} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xl ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
                             ))}
-                            {s.grades.length > 4 && <span className="text-[10px] text-[var(--note-muted)]">+{s.grades.length - 4}</span>}
+                            {s.grades.length > 4 && <span className="text-[10px] text-muted-foreground">+{s.grades.length - 4}</span>}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
-                        <span className={`text-lg font-bold ${avg === 0 ? "text-[var(--note-muted)]/40" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
+                        <span className={`text-lg font-bold ${avg === 0 ? "text-muted-foreground/40" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
                       </div>
                     </motion.div>
                   )
@@ -351,31 +354,31 @@ function CalificacionesInner() {
               <SbModalBody>
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`h-12 w-12 rounded-[16px] ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
+                    <div className={`h-12 w-12 rounded-xl ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
                       <span className="text-base font-bold text-white">{getInitials(studentName(selected))}</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-lg font-semibold text-[var(--note-text)]">{studentName(selected)}</p>
-                      <p className="text-xs text-[var(--note-muted)] mt-0.5">{courseLabel} · {selected.grades.length} calificaciones</p>
+                      <p className="text-lg font-semibold text-foreground">{studentName(selected)}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{courseLabel} · {selected.grades.length} calificaciones</p>
                     </div>
                     <div className="text-right">
-                      <p className={`text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-[var(--note-muted)]/40"}`}>
+                      <p className={`text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-muted-foreground/40"}`}>
                         {selected.grades.length ? calcAverage(selected.grades) : "—"}
                       </p>
-                      <p className="text-[10px] text-[var(--note-muted)]">Promedio</p>
+                      <p className="text-[10px] text-muted-foreground">Promedio</p>
                     </div>
                   </div>
 
                   {selected.grades.length > 0 && (
-                    <div className="rounded-[16px] bg-[var(--note-fill)] p-3 mb-4">
+                    <div className="rounded-xl bg-foreground/5 p-3 mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4 text-[var(--note-muted)]" />
-                          <span className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider">Rendimiento</span>
+                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Rendimiento</span>
                         </div>
                         <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
                       </div>
-                      <div className="h-3 rounded-full bg-[var(--note-fill-strong)] overflow-hidden">
+                      <div className="h-3 rounded-full bg-foreground/10 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%` }}
@@ -387,42 +390,42 @@ function CalificacionesInner() {
                   )}
 
                   <div className="mb-4">
-                    <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-3">Historial de Notas</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Historial de Notas</p>
                     <div className="space-y-2">
                       {selected.grades.map((g) => (
-                        <div key={g.id} className="flex items-center gap-3 rounded-[16px] bg-[var(--note-fill)] px-4 py-3 group">
+                        <div key={g.id} className="flex items-center gap-3 rounded-xl bg-foreground/5 px-4 py-3 group">
                           {editGradeId === g.id ? (
                             <>
                               <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
-                                className="sb-input rounded-[12px] text-sm h-8 w-16 text-center" autoFocus />
+                                className="sb-input rounded-xl text-sm h-8 w-16 text-center" autoFocus />
                               <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
-                                className="h-8 px-3 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-xs font-medium hover:opacity-90 transition-all">
+                                className="h-8 px-3 rounded-xl bg-foreground text-background text-xs font-medium hover:opacity-90 transition-all">
                                 Guardar
                               </button>
                               <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                                className="h-8 px-3 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-muted)] text-xs font-medium hover:opacity-90 transition-all">
+                                className="h-8 px-3 rounded-xl bg-foreground/10 text-muted-foreground text-xs font-medium hover:opacity-90 transition-all">
                                 Cancelar
                               </button>
                             </>
                           ) : (
                             <>
-                              <div className={`h-9 w-9 rounded-[12px] flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
+                              <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
                                 <span className={`text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[var(--note-text)]">{g.period}</p>
-                                <p className="text-[10px] text-[var(--note-muted)]">
+                                <p className="text-sm font-medium text-foreground">{g.period}</p>
+                                <p className="text-[10px] text-muted-foreground">
                                   {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
                                   {g.notes ? ` · ${g.notes}` : ""}
                                 </p>
                               </div>
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
-                                  className="h-7 w-7 rounded-[12px] flex items-center justify-center text-[var(--note-muted)] hover:text-[var(--note-text)] hover:bg-[var(--note-fill-strong)] transition-colors">
+                                  className="h-7 w-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors">
                                   <Pencil className="h-3.5 w-3.5" />
                                 </button>
                                 <button onClick={() => handleDeleteGrade(g.id)}
-                                  className="h-7 w-7 rounded-[12px] flex items-center justify-center text-[var(--note-muted)] hover:text-red-500 hover:bg-red-500/10 transition-colors">
+                                  className="h-7 w-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors">
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                               </div>
@@ -431,16 +434,16 @@ function CalificacionesInner() {
                         </div>
                       ))}
                       {selected.grades.length === 0 && (
-                        <div className="text-center py-8 rounded-[16px] border border-dashed border-[var(--note-hairline-strong)]">
-                          <BookMarked className="h-8 w-8 mx-auto mb-2 text-[var(--note-muted)]/40" />
-                          <p className="text-sm text-[var(--note-muted)]">Sin calificaciones</p>
+                        <div className="text-center py-20 rounded-xl border border-dashed border-foreground/10">
+                          <BookMarked className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                          <p className="text-sm text-muted-foreground">Sin calificaciones</p>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="rounded-[16px] bg-[var(--note-fill)] p-4">
-                    <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-3">Agregar Nota</p>
+                  <div className="rounded-xl bg-foreground/5 p-4">
+                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Agregar Nota</p>
                     <div className="grid grid-cols-3 gap-2">
                       <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
                         className="sbf-native-select text-sm">
@@ -448,12 +451,12 @@ function CalificacionesInner() {
                         {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
                       <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
-                        className="sb-input rounded-[12px] text-sm h-9" />
+                        className="sb-input rounded-xl text-sm h-9" />
                       <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)}
-                        className="sb-input rounded-[12px] text-sm h-9" />
+                        className="sb-input rounded-xl text-sm h-9" />
                     </div>
                     <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
-                      className="w-full mt-2 h-9 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-xs font-medium disabled:opacity-30 hover:opacity-90 transition-all">
+                      className="w-full mt-2 h-9 rounded-xl bg-foreground text-background text-xs font-medium disabled:opacity-30 hover:opacity-90 transition-all">
                       Agregar
                     </button>
                   </div>
@@ -469,14 +472,14 @@ function CalificacionesInner() {
           <SbModalBody>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Curso</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
                 <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }}
                   className="sbf-native-select w-full">
                   {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Alumno</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Alumno</label>
                 <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} disabled={registerCourseId !== courseId}
                   className="sbf-native-select w-full disabled:opacity-50">
                   <option value="">{registerCourseId === courseId ? "Seleccionar alumno..." : "Selecciona primero el curso en la vista"}</option>
@@ -484,16 +487,16 @@ function CalificacionesInner() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Bimestre</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bimestre</label>
                 <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="sbf-native-select w-full">
                   <option value="">Seleccionar bimestre...</option>
                   {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
+                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
                 <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
-                  className="sb-input rounded-[12px] text-sm h-10 w-full" />
+                  className="sb-input rounded-xl text-sm h-10 w-full" />
               </div>
             </motion.div>
           </SbModalBody>
@@ -538,25 +541,25 @@ function TablaNotas({
     onSaveCell(studentId, period, value)
   }
 
-  const avgClass = (avg: number) => avg === 0 ? "text-[var(--note-muted)]/40" : avg >= 11 ? "text-emerald-600" : "text-red-500"
+  const avgClass = (avg: number) => avg === 0 ? "text-muted-foreground/40" : avg >= 11 ? "text-emerald-600" : "text-red-500"
 
   return (
-    <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
+    <div className="rounded-xl border border-foreground/10 bg-foreground/5 overflow-hidden">
       {saveError && (
         <div className="px-5 pt-4">
-          <div className="rounded-[12px] bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div>
+          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div>
         </div>
       )}
-      <div className="px-5 pt-5 pb-4 border-b border-[var(--note-hairline)]">
+      <div className="px-5 pt-5 pb-4 border-b border-foreground/10">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Libro de notas</p>
-            <p className="text-[11px] text-[var(--note-muted)] mt-0.5">Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Libro de notas</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
           </div>
-          <div className="flex items-center gap-3 text-[10px] text-[var(--note-muted)]">
+          <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Aprobado (11+)</span>
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400" /> Desaprobado</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--note-fill-strong)]" /> Sin nota</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-foreground/10" /> Sin nota</span>
           </div>
         </div>
       </div>
@@ -564,29 +567,29 @@ function TablaNotas({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="bg-[var(--note-fill)] text-left">
-              <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Alumno</th>
+            <tr className="bg-foreground/5 text-left">
+              <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Alumno</th>
               {PERIODS.map(p => (
-                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">
+                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   B{p.split(" ")[1]}
                 </th>
               ))}
-              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Promedio</th>
+              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Promedio</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--note-hairline)]">
+          <tbody className="divide-y divide-foreground/10">
             {students.map(s => {
               const avg = calcAverage(s.grades)
               return (
-                <tr key={s.id} className="hover:bg-[var(--note-fill)] transition-colors">
+                <tr key={s.id} className="hover:bg-foreground/5 transition-colors">
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`h-8 w-8 rounded-[12px] ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
+                      <div className={`h-8 w-8 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
                         <span className="text-[9px] font-bold text-white">{getInitials(studentName(s))}</span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-[var(--note-text)] truncate max-w-[160px]">{studentName(s)}</p>
-                        <p className="text-[9px] text-[var(--note-muted)]">{s.code}</p>
+                        <p className="text-xs font-medium text-foreground truncate max-w-[160px]">{studentName(s)}</p>
+                        <p className="text-[9px] text-muted-foreground">{s.code}</p>
                       </div>
                     </div>
                   </td>
@@ -595,7 +598,7 @@ function TablaNotas({
                     const key = cellKey(s.id, p)
                     const value = drafts[key] !== undefined ? drafts[key] : g ? String(g.score) : ""
                     const isSaving = savingCell === key
-                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-[var(--note-muted)]/50"
+                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-muted-foreground/50"
                     return (
                       <td key={p} className="px-3 py-2 text-center">
                         <div className="relative inline-block">
@@ -609,12 +612,12 @@ function TablaNotas({
                             onChange={e => setDrafts(prev => ({ ...prev, [key]: e.target.value }))}
                             onBlur={() => commit(s.id, p)}
                             onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
-                            className={`w-14 h-9 rounded-[12px] text-center text-sm font-semibold bg-[var(--note-fill)] focus:outline-none focus:ring-2 focus:ring-[var(--note-muted)]/40 transition-all ${color}`}
+                            className={`w-14 h-9 rounded-xl text-center text-sm font-semibold bg-foreground/5 focus:outline-none focus:ring-2 focus:ring-muted-foreground/40 transition-all ${color}`}
                           />
                           {isSaving && (
                             <span className="absolute -top-1 -right-1 h-2.5 w-2.5">
-                              <span className="absolute inset-0 rounded-full bg-[var(--note-muted)]/30 animate-ping" />
-                              <span className="absolute inset-0 rounded-full bg-[var(--note-text)]" />
+                              <span className="absolute inset-0 rounded-full bg-muted-foreground/30 animate-ping" />
+                              <span className="absolute inset-0 rounded-full bg-foreground" />
                             </span>
                           )}
                         </div>

@@ -50,7 +50,7 @@ function getBarConfig(status: string | null) {
 
 function NoteChip({ icon: Icon, className, label }: { icon: React.ComponentType<{ className?: string }>; className?: string; label: string }) {
   return (
-    <div className="h-8 w-8 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center shrink-0">
+    <div className="h-8 w-8 rounded-xl bg-[var(--note-fill)] flex items-center justify-center shrink-0">
       <Icon className={cn("h-4 w-4", className)} />
     </div>
   )
@@ -75,11 +75,14 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-3">
-        <header className="pt-2">
-          <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Asistencia</h1>
-          <p className="mt-1 text-sm text-[var(--note-muted)]">Control de tu marcación y la asistencia de tus alumnos</p>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <header className="mb-8">
+          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
+            <span className="w-8 h-px bg-foreground/30" />Panel Docente
+          </span>
+          <h1 className="text-4xl lg:text-5xl font-display font-bold tracking-tight text-foreground">Asistencia</h1>
+          <p className="mt-2 text-muted-foreground">Control de tu marcación y la asistencia de tus alumnos</p>
         </header>
 
         <div className="nb-rail">
@@ -150,9 +153,9 @@ function MiAsistencia() {
     return (
       <div className="space-y-3">
         <div className="animate-pulse grid grid-cols-3 gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-xl border border-foreground/10 bg-foreground/5" />)}
         </div>
-        <div className="animate-pulse h-24 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />
+        <div className="animate-pulse h-24 rounded-xl border border-foreground/10 bg-foreground/5" />
       </div>
     )
   }
@@ -164,17 +167,17 @@ function MiAsistencia() {
   const hasPending = !!pendingCheckout
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
       {/* Jornada card */}
-      <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
-        <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--note-hairline)]">
+      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
+        <div className="px-5 py-4 flex items-center justify-between border-b border-foreground/10">
           <div className="flex items-center gap-3">
             <NoteChip icon={Clock} label="" />
             <div>
-              <p className="text-sm font-semibold text-[var(--note-text)] capitalize">
+              <p className="text-sm font-semibold text-foreground capitalize">
                 {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
               </p>
-              <p className="text-[11px] text-[var(--note-muted)] mt-0.5">
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 {!checkedIn
                   ? schedule
                     ? `Horario hoy: ${schedule.start_time} — ${schedule.end_time}`
@@ -186,48 +189,48 @@ function MiAsistencia() {
             </div>
           </div>
           {s && (
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[12px] text-[11px] font-medium ${s.color}`}>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${s.color}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
               {s.label}
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-2 divide-x divide-[var(--note-hairline)]">
+        <div className="grid grid-cols-2 divide-x divide-foreground/10">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <LogIn className={`h-3.5 w-3.5 ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`} />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Entrada</span>
+              <LogIn className={`h-3.5 w-3.5 ${checkedIn ? "text-foreground" : "text-muted-foreground/40"}`} />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Entrada</span>
             </div>
-            <p className={`text-xl font-bold tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>
+            <p className={`text-xl font-bold tracking-tight ${checkedIn ? "text-foreground" : "text-muted-foreground/40"}`}>
               {checkedIn?.slice(0, 5) || "--:--"}
             </p>
-            {schedule && <p className="text-[10px] text-[var(--note-muted)] mt-0.5">Programada: {schedule.start_time}</p>}
+            {schedule && <p className="text-[10px] text-muted-foreground mt-0.5">Programada: {schedule.start_time}</p>}
           </div>
           <div className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <LogOut className={`h-3.5 w-3.5 ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`} />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Salida</span>
+              <LogOut className={`h-3.5 w-3.5 ${checkedOut ? "text-foreground" : "text-muted-foreground/40"}`} />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Salida</span>
             </div>
-            <p className={`text-xl font-bold tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>
+            <p className={`text-xl font-bold tracking-tight ${checkedOut ? "text-foreground" : "text-muted-foreground/40"}`}>
               {checkedOut?.slice(0, 5) || "--:--"}
             </p>
-            {schedule && <p className="text-[10px] text-[var(--note-muted)] mt-0.5">Programada: {schedule.end_time}</p>}
+            {schedule && <p className="text-[10px] text-muted-foreground mt-0.5">Programada: {schedule.end_time}</p>}
           </div>
         </div>
 
         <div className="px-5 pb-5 pt-1">
           {hasPending && (
-            <div className="rounded-[16px] bg-[var(--note-fill)] border border-[var(--note-hairline-strong)] p-4">
+            <div className="rounded-xl bg-foreground/5 border border-foreground/10 p-4">
               <div className="flex items-start gap-3">
-                <LogOut className="h-4 w-4 text-[var(--note-muted)] mt-0.5 shrink-0" />
+                <LogOut className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-[var(--note-text)]">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
-                  <p className="text-xs text-[var(--note-muted)] mt-0.5">
+                  <p className="text-sm font-semibold text-foreground">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida. Completa la salida pendiente antes de marcar una nueva entrada.
                   </p>
                   <button onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}
-                    className="mt-3 w-full h-10 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+                    className="mt-3 w-full h-10 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
                     {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
                     Marcar Salida
                   </button>
@@ -237,20 +240,20 @@ function MiAsistencia() {
           )}
           {!hasPending && !checkedIn && (
             <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
-              className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
               Marcar Entrada
             </button>
           )}
           {!hasPending && checkedIn && !checkedOut && (
             <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
-              className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
               Marcar Salida
             </button>
           )}
           {!hasPending && checkedIn && checkedOut && (
-            <div className="w-full h-11 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-text)] text-sm font-semibold flex items-center justify-center gap-2">
+            <div className="w-full h-11 rounded-xl bg-foreground/10 text-foreground text-sm font-semibold flex items-center justify-center gap-2">
               <Check className="h-4 w-4" />
               Jornada completada
             </div>
@@ -259,13 +262,13 @@ function MiAsistencia() {
       </div>
 
       {/* Weekly overview */}
-      <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
+      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <NoteChip icon={Flame} label="" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Últimos 7 días</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Últimos 7 días</p>
           </div>
-          <span className="text-[10px] font-medium px-2 py-1 rounded-[12px] bg-[var(--note-fill)] text-[var(--note-muted)]">
+          <span className="text-[10px] font-medium px-2 py-1 rounded-lg bg-foreground/5 text-muted-foreground">
             {history.length} registros
           </span>
         </div>
@@ -274,12 +277,12 @@ function MiAsistencia() {
             const isToday = getLocalDateStr() === d.iso
             return (
               <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                <div className="h-20 w-full max-w-[34px] rounded-[12px] bg-[var(--note-fill)] flex items-end overflow-hidden">
+                <div className="h-20 w-full max-w-[34px] rounded-lg bg-foreground/5 flex items-end overflow-hidden">
                   <div className={`w-full h-full transition-all duration-500 ${getBarConfig(d.status)}`} style={{ height: d.status ? "100%" : "8%" }} />
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className={`text-[9px] font-semibold uppercase ${isToday ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/50"}`}>{d.label}</span>
-                  <span className={`text-[10px] font-medium ${isToday ? "text-[var(--note-text)]" : "text-[var(--note-muted)]"}`}>{d.day}</span>
+                  <span className={`text-[9px] font-semibold uppercase ${isToday ? "text-foreground" : "text-muted-foreground/50"}`}>{d.label}</span>
+                  <span className={`text-[10px] font-medium ${isToday ? "text-foreground" : "text-muted-foreground"}`}>{d.day}</span>
                 </div>
               </div>
             )
@@ -288,31 +291,31 @@ function MiAsistencia() {
       </div>
 
       {/* History */}
-      <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
+      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
         <div className="px-4 pt-4 pb-2">
-          <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Historial reciente</p>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Historial reciente</p>
         </div>
         {history.length === 0 ? (
-          <div className="px-5 py-10 text-center">
-            <Calendar className="h-8 w-8 mx-auto text-[var(--note-muted)]/40 mb-2" />
-            <p className="text-sm text-[var(--note-muted)]">Aún no tienes registros de asistencia</p>
+          <div className="py-20 text-center">
+            <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">Aún no tienes registros de asistencia</p>
           </div>
         ) : (
-          <div className="divide-y divide-[var(--note-hairline)]">
+          <div className="divide-y divide-foreground/10">
             {history.slice(0, 10).map((h: any) => {
               const sc = STATUS_CONFIG[h.status] || STATUS_CONFIG.present
               return (
-                <div key={h.id} className="flex items-center justify-between px-5 py-3 hover:bg-[var(--note-fill)] transition-colors">
+                <div key={h.id} className="flex items-center justify-between px-5 py-3 hover:bg-foreground/5 transition-colors">
                   <div className="flex items-center gap-3">
                     <NoteChip icon={Calendar} label="" />
-                    <span className="text-sm text-[var(--note-text)] capitalize">
+                    <span className="text-sm text-foreground capitalize">
                       {new Date(h.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-[var(--note-muted)]">Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}</span>
-                    <span className="text-xs text-[var(--note-muted)]">Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}</span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-[12px] ${sc.color}`}>
+                    <span className="text-xs text-muted-foreground">Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}</span>
+                    <span className="text-xs text-muted-foreground">Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}</span>
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg ${sc.color}`}>
                       <span className={`h-1 w-1 rounded-full ${sc.dot}`} />
                       {sc.label}
                     </span>
@@ -366,7 +369,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 rounded-[12px] border px-3 text-sm font-medium transition-all cursor-pointer text-left"
+        className="h-10 w-full flex items-center gap-2 rounded-xl border px-3 text-sm font-medium transition-all cursor-pointer text-left"
         style={{
           borderColor: date ? "var(--note-hairline-strong)" : "var(--note-hairline)",
           background: date ? "var(--note-fill)" : "transparent",
@@ -382,21 +385,21 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute z-30 top-full mt-2 left-0 w-[300px] rounded-[16px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4"
+            className="absolute z-30 top-full mt-2 left-0 w-[300px] rounded-xl border border-foreground/10 bg-background p-4"
             style={{ boxShadow: "0 24px 48px -16px rgba(0,0,0,0.45)" }}
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.37, 0.35, 0, 1] }}>
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-[var(--note-text)] capitalize">{MonthNames[month]} {year}</p>
+              <p className="text-sm font-semibold text-foreground capitalize">{MonthNames[month]} {year}</p>
               <div className="flex gap-1">
                 <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
-                  className="h-7 w-7 rounded-[12px] flex items-center justify-center hover:bg-[var(--note-fill)] transition-colors text-[var(--note-muted)]">
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-foreground/5 transition-colors text-muted-foreground">
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
                 <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
-                  className="h-7 w-7 rounded-[12px] flex items-center justify-center hover:bg-[var(--note-fill)] transition-colors text-[var(--note-muted)]">
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-foreground/5 transition-colors text-muted-foreground">
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -404,7 +407,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
 
             <div className="grid grid-cols-7 mb-1">
               {WEEKDAYS.map(d => (
-                <div key={d} className="text-center py-1"><span className="text-[10px] font-semibold text-[var(--note-muted)]/50 uppercase tracking-wider">{d}</span></div>
+                <div key={d} className="text-center py-1"><span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">{d}</span></div>
               ))}
             </div>
 
@@ -419,12 +422,12 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                   <button key={day} onClick={() => !isFuture && selectDate(day)}
                     disabled={isFuture}
                     className={cn(
-                      "h-8 w-full rounded-[12px] flex items-center justify-center text-[12px] font-medium transition-colors",
-                      isFuture && "text-[var(--note-muted)]/30 cursor-not-allowed",
+                      "h-8 w-full rounded-lg flex items-center justify-center text-[12px] font-medium transition-colors",
+                      isFuture && "text-muted-foreground/30 cursor-not-allowed",
                       isSelected && !isToday && "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]",
-                      isToday && !isSelected && "bg-[var(--note-fill)] text-[var(--note-text)] ring-1 ring-[var(--note-hairline-strong)]",
+                      isToday && !isSelected && "bg-foreground/5 text-foreground ring-1 ring-foreground/10",
                       isToday && isSelected && "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]",
-                      !isSelected && !isToday && !isFuture && "text-[var(--note-text)]/70 hover:bg-[var(--note-fill)]"
+                      !isSelected && !isToday && !isFuture && "text-foreground/70 hover:bg-foreground/5"
                     )}>{day}</button>
                 )
               })}
@@ -519,33 +522,33 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const marked = counts.present + counts.late + counts.absent + counts.justified
 
   const statusChips: { status: StudentStatus; label: string; title: string; activeClass: string; inactiveClass: string }[] = [
-    { status: "present", label: "P", title: "Presente", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
-    { status: "late", label: "T", title: "Tardanza", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
-    { status: "absent", label: "F", title: "Falta", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
-    { status: "justified", label: "J", title: "Justificado", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
+    { status: "present", label: "P", title: "Presente", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-foreground/10 text-muted-foreground hover:text-foreground" },
+    { status: "late", label: "T", title: "Tardanza", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-foreground/10 text-muted-foreground hover:text-foreground" },
+    { status: "absent", label: "F", title: "Falta", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-foreground/10 text-muted-foreground hover:text-foreground" },
+    { status: "justified", label: "J", title: "Justificado", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-foreground/10 text-muted-foreground hover:text-foreground" },
   ]
 
   const summary = [
-    { label: "Presentes", value: counts.present, color: "text-[var(--note-text)]", bg: "bg-[var(--note-fill)]", icon: UserCheck },
-    { label: "Tardanzas", value: counts.late, color: "text-[var(--note-muted)]", bg: "bg-[var(--note-fill)]", icon: Clock },
-    { label: "Faltas", value: counts.absent, color: "text-[var(--note-muted)]", bg: "bg-[var(--note-fill)]", icon: XCircle },
-    { label: "Justificados", value: counts.justified, color: "text-[var(--note-text)]", bg: "bg-[var(--note-fill)]", icon: Check },
+    { label: "Presentes", value: counts.present, color: "text-foreground", bg: "bg-foreground/5", icon: UserCheck },
+    { label: "Tardanzas", value: counts.late, color: "text-muted-foreground", bg: "bg-foreground/5", icon: Clock },
+    { label: "Faltas", value: counts.absent, color: "text-muted-foreground", bg: "bg-foreground/5", icon: XCircle },
+    { label: "Justificados", value: counts.justified, color: "text-foreground", bg: "bg-foreground/5", icon: Check },
   ]
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
       {/* Selector */}
-      <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]">
+      <div className="rounded-xl border border-foreground/10 bg-background">
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <NoteChip icon={Users} label="" />
-            <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Seleccionar curso y fecha</p>
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Seleccionar curso y fecha</p>
           </div>
         </div>
         <div className="px-4 pb-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-[var(--note-muted)]">Curso</p>
+              <p className="text-xs font-medium text-muted-foreground">Curso</p>
               <select value={selectedCourse} onChange={e => { setSelectedCourse(e.target.value); setStatsLoaded(false); setStats([]) }}
                 className={`sbf-native-select w-full ${selectedCourse ? "has-value" : ""}`}>
                 <option value="">Seleccionar curso</option>
@@ -553,11 +556,11 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </select>
             </div>
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-[var(--note-muted)]">Fecha</p>
+              <p className="text-xs font-medium text-muted-foreground">Fecha</p>
               <DatePickerDropdown date={date} onSelect={setDate} />
             </div>
             <button onClick={handleCargar} disabled={loading || !selectedCourse}
-              className="h-10 px-4 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30 hover:opacity-90 transition-all">
+              className="h-10 px-4 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30 hover:opacity-90 transition-all">
               {loading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Search className="h-4 w-4" />}
               Cargar alumnos
             </button>
@@ -579,61 +582,64 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       )}
 
       {alumnoView === "estadisticas" && selectedCourse && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
-          <div className="px-5 pt-5 pb-3 border-b border-[var(--note-hairline)]">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
+          <div className="px-5 pt-5 pb-3 border-b border-foreground/10">
             <div className="flex items-center gap-2">
               <NoteChip icon={Users} label="" />
               <div>
-                <p className="text-sm font-semibold text-[var(--note-text)]">Asistencia de los últimos 30 días</p>
-                <p className="text-[11px] text-[var(--note-muted)] mt-0.5">Resumen por alumno del curso seleccionado</p>
+                <p className="text-sm font-semibold text-foreground">Asistencia de los últimos 30 días</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Resumen por alumno del curso seleccionado</p>
               </div>
             </div>
           </div>
           {statsLoading ? (
             <div className="py-10 text-center">
-              <div className="h-6 w-6 border-2 border-[var(--note-hairline-strong)] border-t-[var(--note-text)] rounded-full animate-spin mx-auto" />
+              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto" />
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
-                  <tr className="bg-[var(--note-fill)] text-left">
-                    <th className="px-5 py-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Alumno</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">A tiempo</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Tardanzas</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Faltas</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Justific.</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Registros</th>
-                    <th className="px-5 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">% Asistencia</th>
+                  <tr className="bg-foreground/5 text-left">
+                    <th className="px-5 py-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Alumno</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">A tiempo</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Tardanzas</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Faltas</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Justific.</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Registros</th>
+                    <th className="px-5 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">% Asistencia</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--note-hairline)]">
+                <tbody className="divide-y divide-foreground/10">
                   {stats.length === 0 ? (
-                    <tr><td colSpan={7} className="px-5 py-10 text-center text-sm text-[var(--note-muted)]">Sin registros de asistencia en el curso</td></tr>
+                    <tr><td colSpan={7} className="py-20 text-center">
+                      <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-sm text-muted-foreground">Sin registros de asistencia en el curso</p>
+                    </td></tr>
                   ) : stats.map(s => (
-                    <tr key={s.id} className="hover:bg-[var(--note-fill)] transition-colors">
+                    <tr key={s.id} className="hover:bg-foreground/5 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className={`h-8 w-8 rounded-[12px] ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
+                          <div className={`h-8 w-8 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
                             <span className="text-[9px] font-bold text-white">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-[var(--note-text)] truncate">{s.apellidos}, {s.nombres}</p>
-                            <p className="text-[9px] text-[var(--note-muted)]">DNI: {s.dni}</p>
+                            <p className="text-xs font-medium text-foreground truncate">{s.apellidos}, {s.nombres}</p>
+                            <p className="text-[9px] text-muted-foreground">DNI: {s.dni}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-[var(--note-text)]">{s.present}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-[var(--note-muted)]">{s.late}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-foreground">{s.present}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-muted-foreground">{s.late}</td>
                       <td className="px-3 py-3 text-center text-sm font-semibold text-red-500">{s.absent}</td>
                       <td className="px-3 py-3 text-center text-sm font-semibold text-blue-600">{s.justified}</td>
-                      <td className="px-3 py-3 text-center text-xs text-[var(--note-muted)]">{s.total}</td>
+                      <td className="px-3 py-3 text-center text-xs text-muted-foreground">{s.total}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 justify-end">
-                          <div className="w-24 h-1.5 rounded-full bg-[var(--note-fill-strong)] overflow-hidden">
-                            <div className={`h-full rounded-full ${s.rate >= 80 ? "bg-[var(--note-text)]" : s.rate >= 60 ? "bg-[var(--note-muted)]" : "bg-[var(--note-muted)] opacity-60"}`} style={{ width: `${s.rate}%` }} />
+                          <div className="w-24 h-1.5 rounded-full bg-foreground/10 overflow-hidden">
+                            <div className={`h-full rounded-full ${s.rate >= 80 ? "bg-foreground" : s.rate >= 60 ? "bg-muted-foreground" : "bg-muted-foreground opacity-60"}`} style={{ width: `${s.rate}%` }} />
                           </div>
-                            <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-[var(--note-text)]" : s.rate >= 60 ? "text-[var(--note-muted)]" : "text-[var(--note-muted)] opacity-60"}`}>{s.rate}%</span>
+                            <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-foreground" : s.rate >= 60 ? "text-muted-foreground" : "text-muted-foreground opacity-60"}`}>{s.rate}%</span>
                         </div>
                       </td>
                     </tr>
@@ -648,52 +654,52 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       {loaded && students.length > 0 && alumnoView === "registro" && (
         <>
           {/* Summary */}
-          <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden">
             {summary.map(s => {
               const Icon = s.icon
               return (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4">
-                  <div className={`h-9 w-9 rounded-[12px] flex items-center justify-center mb-3 ${s.bg}`}>
+                <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-background p-5 lg:p-6">
+                  <div className={`h-9 w-9 rounded-xl flex items-center justify-center mb-3 ${s.bg}`}>
                     <Icon className={`h-4 w-4 ${s.color}`} />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">{s.label}</p>
-                  <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-[var(--note-text)]">{s.value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
+                  <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-foreground">{s.value}</p>
                 </motion.div>
               )
             })}
           </motion.div>
 
           {/* Student list */}
-          <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
+          <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
-                  <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Lista de alumnos</p>
-                  <p className="text-[11px] text-[var(--note-muted)] mt-0.5">{filtered.length} de {students.length} alumnos</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Lista de alumnos</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{filtered.length} de {students.length} alumnos</p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={handleMarkAllPresent}
-                    className="h-9 px-3.5 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-text)] text-xs font-semibold hover:opacity-90 transition-colors flex items-center gap-1.5">
+                    className="h-9 px-3.5 rounded-xl bg-foreground/10 text-foreground text-xs font-semibold hover:opacity-90 transition-colors flex items-center gap-1.5">
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos presentes
                   </button>
                   <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
-                    className="h-9 px-3 rounded-[12px] bg-[var(--note-fill)] text-[var(--note-muted)] text-xs font-medium hover:bg-[var(--note-fill-strong)] disabled:opacity-40 transition-colors">
+                    className="h-9 px-3 rounded-xl bg-foreground/5 text-muted-foreground text-xs font-medium hover:bg-foreground/10 disabled:opacity-40 transition-colors">
                     Limpiar
                   </button>
                   <div className="relative w-44">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--note-muted)]/50" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
                     <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                      className="sb-input rounded-[12px] text-sm h-9 pl-9" />
+                      className="sb-input rounded-xl text-sm h-9 pl-9" />
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4 pt-3 border-t border-[var(--note-hairline)]">
+              <div className="flex items-center gap-4 pt-3 border-t border-foreground/10">
                 {statusChips.map(chip => (
                   <div key={chip.status} className="flex items-center gap-1.5">
-                    <span className={`h-4 w-4 rounded-[6px] flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
-                    <span className="text-[10px] text-[var(--note-muted)]">{chip.title}</span>
-                    <span className="text-[10px] font-semibold text-[var(--note-muted)] ml-0.5">
+                    <span className={`h-4 w-4 rounded-lg flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{chip.title}</span>
+                    <span className="text-[10px] font-semibold text-muted-foreground ml-0.5">
                       {students.filter(s => s.status === chip.status).length}
                     </span>
                   </div>
@@ -701,26 +707,26 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </div>
             </div>
 
-            <div className="divide-y divide-[var(--note-hairline)] border-t border-[var(--note-hairline)]">
+            <div className="divide-y divide-foreground/10 border-t border-foreground/10">
               {filtered.map(s => (
                 <div key={s.id} className={cn(
                   "flex items-center justify-between gap-3 px-4 py-3 transition-colors",
-                  s.status ? "bg-[var(--note-fill)]" : "hover:bg-[var(--note-fill)]"
+                  s.status ? "bg-foreground/5" : "hover:bg-foreground/5"
                 )}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-9 w-9 rounded-[12px] ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
+                    <div className={`h-9 w-9 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
                       <span className="text-white text-[10px] font-bold">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[var(--note-text)] truncate">{s.apellidos}, {s.nombres}</p>
-                      <p className="text-[10px] text-[var(--note-muted)]">DNI: {s.dni}</p>
+                      <p className="text-sm font-medium text-foreground truncate">{s.apellidos}, {s.nombres}</p>
+                      <p className="text-[10px] text-muted-foreground">DNI: {s.dni}</p>
                     </div>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     {statusChips.map(chip => (
                       <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
                         className={cn(
-                          "h-7 px-2.5 rounded-[12px] text-[11px] font-semibold transition-all active:scale-95 flex items-center gap-1",
+                          "h-7 px-2.5 rounded-lg text-[11px] font-semibold transition-all active:scale-95 flex items-center gap-1",
                           s.status === chip.status ? chip.activeClass : chip.inactiveClass
                         )}>
                         {chip.label}
@@ -734,15 +740,15 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           </div>
 
           {/* Save bar */}
-          <div className="flex items-center gap-3 sticky bottom-0">
+          <div className="flex items-center gap-3 sticky bottom-0 bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-foreground/10">
             <div className="flex-1 space-y-1">
-              <p className="text-sm font-semibold text-[var(--note-text)]">{marked} de {students.length} marcados</p>
-              <div className="h-1.5 rounded-full bg-[var(--note-fill-strong)] overflow-hidden">
-                <div className="h-full bg-[var(--note-text)] rounded-full transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
+              <p className="text-sm font-semibold text-foreground">{marked} de {students.length} marcados</p>
+              <div className="h-1.5 rounded-full bg-foreground/10 overflow-hidden">
+                <div className="h-full bg-foreground rounded-full transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
               </div>
             </div>
             <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-6 rounded-[12px] text-sm font-semibold bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] hover:opacity-90 active:opacity-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0">
+              className="h-12 px-6 rounded-xl text-sm font-semibold bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] hover:opacity-90 active:opacity-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0">
               {saving ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Check className="h-4 w-4" />}
               Guardar
             </button>
@@ -751,16 +757,16 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       )}
 
       {loaded && students.length === 0 && (
-        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-          <UserX className="h-10 w-10 mx-auto text-[var(--note-muted)]/40 mb-3" />
-          <p className="text-sm text-[var(--note-muted)]">No hay alumnos en este curso</p>
+        <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
+          <UserX className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">No hay alumnos en este curso</p>
         </div>
       )}
 
       {!loaded && courses.length === 0 && (
-        <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center">
-          <Users className="h-10 w-10 mx-auto text-[var(--note-muted)]/40 mb-3" />
-          <p className="text-sm text-[var(--note-muted)]">Sin cursos asignados</p>
+        <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
+          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">Sin cursos asignados</p>
         </div>
       )}
     </motion.div>
