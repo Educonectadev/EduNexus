@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
-import { Calendar, Clock, BookOpen, GraduationCap, UserCheck, ArrowRight } from "@/components/ui/proicons"
+import { Calendar, Clock, BookOpen, GraduationCap, UserCheck, ArrowRight, FileText, ClipboardList } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { PrettyTabs } from "@/components/dashboard/pretty-tabs"
 
@@ -172,6 +172,10 @@ export default function DocenteDashboard() {
   const checkedIn = teacherAtt?.check_in
   const checkedOut = teacherAtt?.check_out
 
+  const attendancePct = studentSummary && studentSummary.total > 0
+    ? Math.round((studentSummary.present / studentSummary.total) * 100)
+    : 0
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -222,56 +226,166 @@ export default function DocenteDashboard() {
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-          className="grid gap-3 md:grid-cols-2">
-          {/* Horario de hoy */}
-          <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Horario de Hoy</h3>
-              <Link href="/docente/horarios" className="text-[11px] text-sb-on-surface-variant/40 hover:text-sb-on-surface-variant transition-colors flex items-center gap-1">
-                Ver semana <ArrowRight className="h-3 w-3" />
-              </Link>
+          className="space-y-3">
+          {/* Row 1: Horario + Distribución */}
+          <div className="grid gap-3 md:grid-cols-2">
+            {/* Horario de hoy */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Horario de Hoy</h3>
+                <Link href="/docente/horarios" className="text-[11px] text-sb-on-surface-variant/40 hover:text-sb-on-surface-variant transition-colors flex items-center gap-1">
+                  Ver semana <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+              {loading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-14 rounded-xl bg-sb-surface-container-high/50 animate-pulse" />
+                  ))}
+                </div>
+              ) : todaySchedule.length === 0 ? (
+                <div className="text-center py-8">
+                  <Calendar className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
+                  <p className="text-[13px] text-sb-on-surface-variant/40">No hay clases hoy</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {todaySchedule.map((it) => {
+                    const status = classStatus(it)
+                    return (
+                      <div key={it.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-sb-surface-container-high/50 transition-colors">
+                        <div className="text-center shrink-0 w-14">
+                          <p className="text-sm font-bold text-sb-on-surface">{it.start_time.slice(0, 5)}</p>
+                          <p className="text-[10px] text-sb-on-surface-variant/40">{it.end_time.slice(0, 5)}</p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-sb-on-surface truncate">{it.course_name}</p>
+                          <p className="text-[11px] text-sb-on-surface-variant/50">
+                            {it.grade} {it.section && `· ${it.section}`}
+                            {it.classroom && ` · ${it.classroom}`}
+                          </p>
+                        </div>
+                        {status && (
+                          <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full shrink-0 ${status.cls}`}>
+                            {status.label}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-14 rounded-xl bg-sb-surface-container-high/50 animate-pulse" />
-                ))}
-              </div>
-            ) : todaySchedule.length === 0 ? (
-              <div className="text-center py-8">
-                <Calendar className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
-                <p className="text-[13px] text-sb-on-surface-variant/40">No hay clases hoy</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {todaySchedule.map((it) => {
-                  const status = classStatus(it)
-                  return (
-                    <div key={it.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-sb-surface-container-high/50 transition-colors">
-                      <div className="text-center shrink-0 w-14">
-                        <p className="text-sm font-bold text-sb-on-surface">{it.start_time.slice(0, 5)}</p>
-                        <p className="text-[10px] text-sb-on-surface-variant/40">{it.end_time.slice(0, 5)}</p>
+
+            {/* Distribución de asistencia */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Distribución Asistencia</h3>
+              {studentSummary && studentSummary.total > 0 ? (
+                <div className="space-y-5">
+                  {[
+                    { label: "Presentes", value: studentSummary.present, total: studentSummary.total, color: "bg-emerald-400" },
+                    { label: "Ausentes", value: studentSummary.absent, total: studentSummary.total, color: "bg-red-400" },
+                    { label: "Tardanzas", value: studentSummary.late, total: studentSummary.total, color: "bg-amber-400" },
+                  ].map((item) => {
+                    const pct = item.total > 0 ? (item.value / item.total) * 100 : 0
+                    return (
+                      <div key={item.label}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-sb-on-surface/70">{item.label}</span>
+                          <span className="text-sm font-bold text-sb-on-surface">{item.value}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-sb-surface-container-high overflow-hidden">
+                          <div className={`h-full rounded-full ${item.color} transition-all duration-700`} style={{ width: `${pct}%` }} />
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-sb-on-surface truncate">{it.course_name}</p>
-                        <p className="text-[11px] text-sb-on-surface-variant/50">
-                          {it.grade} {it.section && `· ${it.section}`}
-                          {it.classroom && ` · ${it.classroom}`}
-                        </p>
-                      </div>
-                      {status && (
-                        <span className={`text-[10px] font-medium px-2.5 py-1 rounded-full shrink-0 ${status.cls}`}>
-                          {status.label}
-                        </span>
-                      )}
+                    )
+                  })}
+                  <div className="pt-3 border-t border-sb-outline-variant/8">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-sb-on-surface/70">Tasa de asistencia</span>
+                      <span className="text-lg font-bold text-sb-on-surface">{attendancePct}%</span>
                     </div>
-                  )
-                })}
-              </div>
-            )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <UserCheck className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
+                  <p className="text-[13px] text-sb-on-surface-variant/40">Sin datos de asistencia hoy</p>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mis cursos */}
+          {/* Row 2: Resumen rápido + Asistencia docente */}
+          <div className="grid gap-3 md:grid-cols-2">
+            {/* Resumen rápido */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Resumen Rápido</h3>
+              <div className="space-y-1">
+                {[
+                  { label: "Horarios asignados", value: loading ? "—" : horarios.length, icon: Calendar, color: "text-purple-500" },
+                  { label: "Horas programadas hoy", value: loading ? "—" : `${hoursToday}h`, icon: Clock, color: "text-blue-500" },
+                  { label: "Cursos activos", value: loading ? "—" : courses.length, icon: BookOpen, color: "text-amber-500" },
+                  { label: "Total alumnos", value: loading ? "—" : totalStudents, icon: GraduationCap, color: "text-emerald-500" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center justify-between py-3 px-3 rounded-xl hover:bg-sb-surface-container-high/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-sb-surface-container-high flex items-center justify-center">
+                        <item.icon className={`h-4 w-4 ${item.color}`} />
+                      </div>
+                      <span className="text-sm text-sb-on-surface/70">{item.label}</span>
+                    </div>
+                    <span className="text-lg font-bold text-sb-on-surface">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Asistencia docente */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Mi Asistencia</h3>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Entrada</p>
+                  <p className={`text-xl font-bold ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
+                    {checkedIn ? checkedIn.slice(0, 5) : "--:--"}
+                  </p>
+                  {schedule?.start_time && (
+                    <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.start_time.slice(0, 5)}</p>
+                  )}
+                </div>
+                <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Salida</p>
+                  <p className={`text-xl font-bold ${checkedOut ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
+                    {checkedOut ? checkedOut.slice(0, 5) : "--:--"}
+                  </p>
+                  {schedule?.end_time && (
+                    <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.end_time.slice(0, 5)}</p>
+                  )}
+                </div>
+              </div>
+              {!checkedIn && (
+                <button onClick={() => handleCheck("check-in")} disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                  Marcar entrada
+                </button>
+              )}
+              {checkedIn && !checkedOut && (
+                <button onClick={() => handleCheck("check-out")} disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                  Marcar salida
+                </button>
+              )}
+              {checkedIn && checkedOut && (
+                <Link href="/docente/asistencia"
+                  className="block w-full py-2.5 rounded-xl border border-sb-outline-variant/20 text-center text-[13px] font-medium text-sb-on-surface hover:bg-sb-surface-container-high/50 transition-colors">
+                  Ver detalle de asistencia
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Row 3: Mis cursos - Full width */}
           <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Mis Cursos</h3>
@@ -280,9 +394,9 @@ export default function DocenteDashboard() {
               </Link>
             </div>
             {loading ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-24 rounded-xl bg-sb-surface-container-high/50 animate-pulse" />
+                  <div key={i} className="h-32 rounded-xl bg-sb-surface-container-high/50 animate-pulse" />
                 ))}
               </div>
             ) : courses.length === 0 ? (
@@ -291,18 +405,32 @@ export default function DocenteDashboard() {
                 <p className="text-[13px] text-sb-on-surface-variant/40">No tienes cursos asignados</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {courses.slice(0, 4).map((c) => (
-                  <Link key={c.id} href={`/docente/cursos/${c.id}`}
-                    className="p-4 rounded-xl bg-sb-surface-container-high/30 hover:bg-sb-surface-container-high/60 border border-sb-outline-variant/5 transition-all">
-                    <div className="h-8 w-8 rounded-lg bg-sb-surface-container-high flex items-center justify-center mb-3">
-                      <BookOpen className="h-4 w-4 text-sb-on-surface-variant/60" />
-                    </div>
-                    <p className="text-sm font-medium text-sb-on-surface truncate">{c.name}</p>
-                    <p className="text-[11px] text-sb-on-surface-variant/50 mt-0.5">{c.grade} {c.section && `· ${c.section}`}</p>
-                    <p className="text-[10px] text-sb-on-surface-variant/40 mt-2">{c.students} alumnos</p>
-                  </Link>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {courses.map((c, i) => {
+                  const courseColors = [
+                    { bg: "bg-sb-primary/8", icon: "text-sb-primary", border: "border-sb-primary/15" },
+                    { bg: "bg-emerald-500/8", icon: "text-emerald-500", border: "border-emerald-500/15" },
+                    { bg: "bg-amber-500/8", icon: "text-amber-500", border: "border-amber-500/15" },
+                    { bg: "bg-blue-500/8", icon: "text-blue-500", border: "border-blue-500/15" },
+                    { bg: "bg-purple-500/8", icon: "text-purple-500", border: "border-purple-500/15" },
+                    { bg: "bg-pink-500/8", icon: "text-pink-500", border: "border-pink-500/15" },
+                  ]
+                  const color = courseColors[i % courseColors.length]
+                  return (
+                    <Link key={c.id} href={`/docente/cursos/${c.id}`}
+                      className={`p-5 rounded-xl bg-sb-surface hover:bg-sb-surface-container-high/30 border ${color.border} transition-all group`}>
+                      <div className={`h-10 w-10 rounded-xl ${color.bg} flex items-center justify-center mb-4`}>
+                        <BookOpen className={`h-5 w-5 ${color.icon}`} />
+                      </div>
+                      <p className="text-sm font-semibold text-sb-on-surface truncate mb-1">{c.name}</p>
+                      <p className="text-[11px] text-sb-on-surface-variant/50 mb-3">{c.grade} {c.section && `· ${c.section}`}</p>
+                      <div className="flex items-center gap-1.5 text-[10px] text-sb-on-surface-variant/40">
+                        <GraduationCap className="h-3 w-3" />
+                        <span>{c.students} alumnos</span>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
             )}
           </div>
@@ -314,10 +442,56 @@ export default function DocenteDashboard() {
         <motion.div key="horario"
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}>
+          transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
+          className="space-y-3">
+          {/* Horarios por día */}
+          <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+            <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Horarios por Día</h3>
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-12 rounded-xl bg-sb-surface-container-high/50 animate-pulse" />
+                ))}
+              </div>
+            ) : horarios.length === 0 ? (
+              <div className="text-center py-8">
+                <Calendar className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
+                <p className="text-[13px] text-sb-on-surface-variant/40">No hay horarios asignados</p>
+              </div>
+            ) : (() => {
+              const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
+              const maxCount = Math.max(
+                ...dayNames.map((_, i) =>
+                  horarios.filter(h => h.day_of_week === i + 1).length
+                ),
+                1
+              )
+              return (
+                <div className="space-y-3">
+                  {dayNames.map((day, i) => {
+                    const count = horarios.filter(h => h.day_of_week === i + 1).length
+                    const pct = (count / maxCount) * 100
+                    return (
+                      <motion.div key={day} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.04 }}
+                        className="flex items-center gap-4">
+                        <span className="text-xs text-sb-on-surface/50 w-20 shrink-0 font-medium">{day}</span>
+                        <div className="flex-1 h-3 rounded-full bg-sb-surface-container-high overflow-hidden">
+                          <div className="h-full rounded-full bg-sb-primary transition-all duration-700" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-sm font-bold text-sb-on-surface w-8 text-right">{count}</span>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* Lista detallada */}
           <div className="bg-sb-surface rounded-2xl overflow-hidden border border-sb-outline-variant/8">
             <div className="px-6 pt-5 pb-3">
-              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Horario Semanal</h3>
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Detalle Semanal</h3>
             </div>
             <div className="px-6 pb-6">
               {loading ? (
@@ -369,83 +543,125 @@ export default function DocenteDashboard() {
           initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-          className="grid gap-3 md:grid-cols-2">
-          {/* Asistencia del docente */}
-          <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
-            <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Mi Asistencia</h3>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
-                <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Entrada</p>
-                <p className={`text-xl font-bold ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
-                  {checkedIn ? checkedIn.slice(0, 5) : "--:--"}
-                </p>
-                {schedule?.start_time && (
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.start_time.slice(0, 5)}</p>
-                )}
-              </div>
-              <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
-                <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Salida</p>
-                <p className={`text-xl font-bold ${checkedOut ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
-                  {checkedOut ? checkedOut.slice(0, 5) : "--:--"}
-                </p>
-                {schedule?.end_time && (
-                  <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.end_time.slice(0, 5)}</p>
-                )}
+          className="space-y-3">
+          {/* Resumen */}
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/8">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-emerald-500/8 flex items-center justify-center">
+                  <UserCheck className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-sb-on-surface">{studentSummary?.present || 0}</p>
+                  <p className="text-[11px] text-sb-on-surface-variant/50">Presentes</p>
+                </div>
               </div>
             </div>
-            {!checkedIn && (
-              <button onClick={() => handleCheck("check-in")} disabled={loading}
-                className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
-                Marcar entrada
-              </button>
-            )}
-            {checkedIn && !checkedOut && (
-              <button onClick={() => handleCheck("check-out")} disabled={loading}
-                className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
-                Marcar salida
-              </button>
-            )}
-            {checkedIn && checkedOut && (
-              <Link href="/docente/asistencia"
-                className="block w-full py-2.5 rounded-xl border border-sb-outline-variant/20 text-center text-[13px] font-medium text-sb-on-surface hover:bg-sb-surface-container-high/50 transition-colors">
-                Ver detalle de asistencia
-              </Link>
-            )}
+            <div className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/8">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-red-500/8 flex items-center justify-center">
+                  <UserCheck className="h-5 w-5 text-red-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-sb-on-surface">{studentSummary?.absent || 0}</p>
+                  <p className="text-[11px] text-sb-on-surface-variant/50">Ausentes</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-sb-surface rounded-2xl p-5 border border-sb-outline-variant/8">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-amber-500/8 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-sb-on-surface">{studentSummary?.late || 0}</p>
+                  <p className="text-[11px] text-sb-on-surface-variant/50">Tardanzas</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Asistencia de alumnos */}
-          <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest">Asistencia Alumnos</h3>
-              <Link href="/docente/asistencia" className="text-[11px] text-sb-on-surface-variant/40 hover:text-sb-on-surface-variant transition-colors flex items-center gap-1">
-                Tomar asistencia <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-            {studentSummary && studentSummary.total > 0 ? (
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 text-center">
-                  <p className="text-xl font-bold text-emerald-600">{studentSummary.present}</p>
-                  <p className="text-[10px] text-sb-on-surface-variant/50 mt-1">Presentes</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            {/* Asistencia del docente */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Mi Asistencia</h3>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Entrada</p>
+                  <p className={`text-xl font-bold ${checkedIn ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
+                    {checkedIn ? checkedIn.slice(0, 5) : "--:--"}
+                  </p>
+                  {schedule?.start_time && (
+                    <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.start_time.slice(0, 5)}</p>
+                  )}
                 </div>
-                <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/15 text-center">
-                  <p className="text-xl font-bold text-red-600">{studentSummary.absent}</p>
-                  <p className="text-[10px] text-sb-on-surface-variant/50 mt-1">Ausentes</p>
-                </div>
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15 text-center">
-                  <p className="text-xl font-bold text-amber-600">{studentSummary.late}</p>
-                  <p className="text-[10px] text-sb-on-surface-variant/50 mt-1">Tardanzas</p>
+                <div className="p-4 rounded-xl bg-sb-surface-container-high/30 text-center">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase mb-1">Salida</p>
+                  <p className={`text-xl font-bold ${checkedOut ? "text-sb-on-surface" : "text-sb-on-surface-variant/20"}`}>
+                    {checkedOut ? checkedOut.slice(0, 5) : "--:--"}
+                  </p>
+                  {schedule?.end_time && (
+                    <p className="text-[10px] text-sb-on-surface-variant/40 mt-1">Prog. {schedule.end_time.slice(0, 5)}</p>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <UserCheck className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
-                <p className="text-[13px] text-sb-on-surface-variant/40 mb-3">Aún no se ha registrado asistencia hoy</p>
+              {!checkedIn && (
+                <button onClick={() => handleCheck("check-in")} disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                  Marcar entrada
+                </button>
+              )}
+              {checkedIn && !checkedOut && (
+                <button onClick={() => handleCheck("check-out")} disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-sb-on-surface text-sb-surface text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
+                  Marcar salida
+                </button>
+              )}
+              {checkedIn && checkedOut && (
                 <Link href="/docente/asistencia"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sb-on-surface text-sb-surface text-[12px] font-medium hover:opacity-90 transition-opacity">
-                  <UserCheck className="h-3.5 w-3.5" /> Tomar asistencia
+                  className="block w-full py-2.5 rounded-xl border border-sb-outline-variant/20 text-center text-[13px] font-medium text-sb-on-surface hover:bg-sb-surface-container-high/50 transition-colors">
+                  Ver detalle de asistencia
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Distribución detallada */}
+            <div className="bg-sb-surface rounded-2xl p-6 border border-sb-outline-variant/8">
+              <h3 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-5">Distribución del Día</h3>
+              {studentSummary && studentSummary.total > 0 ? (
+                <div className="space-y-4">
+                  {[
+                    { label: "Presentes", value: studentSummary.present, total: studentSummary.total, color: "bg-emerald-400", icon: "✓" },
+                    { label: "Ausentes", value: studentSummary.absent, total: studentSummary.total, color: "bg-red-400", icon: "✕" },
+                    { label: "Tardanzas", value: studentSummary.late, total: studentSummary.total, color: "bg-amber-400", icon: "⏰" },
+                  ].map((item) => {
+                    const pct = item.total > 0 ? (item.value / item.total) * 100 : 0
+                    return (
+                      <div key={item.label} className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 w-28 shrink-0">
+                          <span className={`h-2 w-2 rounded-full ${item.color}`} />
+                          <span className="text-xs text-sb-on-surface/60">{item.label}</span>
+                        </div>
+                        <div className="flex-1 h-2.5 rounded-full bg-sb-surface-container-high overflow-hidden">
+                          <div className={`h-full rounded-full ${item.color} transition-all duration-700`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-sm font-bold text-sb-on-surface w-12 text-right">{item.value}</span>
+                        <span className="text-[10px] text-sb-on-surface-variant/40 w-10 text-right">{Math.round(pct)}%</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <UserCheck className="h-8 w-8 text-sb-on-surface-variant/20 mx-auto mb-2" />
+                  <p className="text-[13px] text-sb-on-surface-variant/40 mb-3">Sin datos de asistencia hoy</p>
+                  <Link href="/docente/asistencia"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sb-on-surface text-sb-surface text-[12px] font-medium hover:opacity-90 transition-opacity">
+                    <UserCheck className="h-3.5 w-3.5" /> Tomar asistencia
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
       )}
