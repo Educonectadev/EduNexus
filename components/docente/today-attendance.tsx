@@ -56,11 +56,6 @@ export function TodayAttendance({
           <Clock className="td-card-title-icon" />
           <h3 className="td-card-title">Asistencia de hoy</h3>
         </div>
-        {status && (
-          <span className={`td-att-pill ${status.cls}`}>
-            <span className="td-att-dot" /> {status.label}
-          </span>
-        )}
       </header>
 
       {/* Resumen del docente: entrada / salida */}

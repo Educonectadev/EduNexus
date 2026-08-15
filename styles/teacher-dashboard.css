@@ -12,7 +12,7 @@
   --td-radius-md: 18px;
   --td-radius-sm: 12px;
   --td-sidebar-w: 237px;
-  --td-sidebar-w-collapsed: 76px;
+  --td-sidebar-w-collapsed: 64px;
 
   --td-bg: #f4f4f5;
   --td-surface: #ffffff;
@@ -184,7 +184,6 @@ html.dark [data-role="docente"] {
   font-family: var(--td-font);
 }
 
-/* En el dashboard, el contenedor del header ya gestiona su padding. */
 [data-td-scope="dashboard"] > .flex.h-screen > div.flex-1 > main {
   padding-left: 0 !important;
   padding-right: 0 !important;
@@ -260,7 +259,7 @@ html.dark [data-role="docente"] {
 .td-user {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 10x;
   padding: 4px 12px 4px 4px;
   border-radius: 999px;
   border: 1px solid var(--td-hairline);
@@ -445,7 +444,7 @@ html.dark [data-role="docente"] {
 }
 
 /* ============================================
-   LAYOUT PRINCIPAL (2 columnas: horario + asistencia)
+   LAYOUT PRINCIPAL (2 columnas: horario + estadísticas/cursos)
    ============================================ */
 .td-main-grid {
   display: grid;
@@ -456,7 +455,7 @@ html.dark [data-role="docente"] {
   .td-main-grid { grid-template-columns: 1fr; }
 }
 
-/* Columna izquierda:Horario + Cursos */
+/* Columna izquierda: Horario + Cursos */
 .td-col {
   display: flex;
   flex-direction: column;
@@ -490,7 +489,7 @@ html.dark [data-role="docente"] {
 .td-card-title-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 10x;
 }
 .td-card-title-icon {
   width: 18px;
@@ -950,7 +949,7 @@ html.dark [data-role="docente"] {
 .td-course-students {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 6x;
   font-family: var(--td-font);
   font-size: 12px;
   color: var(--td-muted);

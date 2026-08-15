@@ -139,33 +139,26 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col glass-sidebar border-r border-border/50 transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
+        "relative flex flex-col fixed sidebar-fixed left-0 top-0 bottom-0 z-50",
+        "w-64 shrink-0",
+        isCollapsed ? "w-[237px]" : "w-[237px]"
       )}
     >
       <div className="flex h-16 items-center border-b border-border/50 px-4">
-        {!isCollapsed ? (
-          <Link href="/" className="flex items-center gap-2.5">
-            <Logo className="h-8 w-8" />
-            <span className="font-semibold text-foreground tracking-tight">EduNexus</span>
-          </Link>
-        ) : (
-          <Link href="/" className="mx-auto">
-            <Logo className="h-8 w-8" />
-          </Link>
-        )}
+        <Link href="/" className="flex items-center gap-2.5">
+          <Logo className="h-8 w-8" />
+          <span className="font-semibold text-foreground tracking-tight">EduNexus</span>
+        </Link>
       </div>
 
-      {!isCollapsed && role && (
-        <div className="px-4 py-3 border-b border-border/50">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Panel</p>
-          <p className="text-sm font-medium text-foreground mt-0.5">
-            {roleTitles[role]}
-          </p>
-        </div>
-      )}
+      <div className="px-4 py-3 border-b border-border/50">
+        <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Panel</p>
+<p className="text-sm font-medium text-foreground mt-0.5">
+{role && roleTitles[role]}
+        </p>
+      </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 overflow-y-auto">
         <nav className="space-y-0.5 p-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -190,7 +183,7 @@ export function Sidebar() {
       </ScrollArea>
 
       <div className="border-t border-border/50 p-2">
-        {!isCollapsed && user && (
+        {user && (
           <div className="flex items-center gap-3 px-3 py-2">
             <Avatar className="h-8 w-8">
               <AvatarImage src={user.avatar_url} alt={user.full_name} />
@@ -223,12 +216,12 @@ export function Sidebar() {
 
       <button
         onClick={toggle}
-        className="absolute -right-3 top-20 h-6 w-6 rounded-full border bg-background/80 backdrop-blur flex items-center justify-center shadow-sm hover:bg-accent transition-colors z-50"
+        className="absolute -right-3 top-20 h-6 w-6 rounded-full border bg-white/20 backdrop-blur flex items-center justify-center shadow-sm hover:bg-white/30 transition-colors z-50"
       >
         {isCollapsed ? (
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-3 w-3 text-black" />
         ) : (
-          <ChevronLeft className="h-3 w-3" />
+          <ChevronLeft className="h-3 w-3 text-black" />
         )}
       </button>
     </aside>

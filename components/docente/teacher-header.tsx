@@ -2,28 +2,34 @@
 
 import * as React from "react"
 import { useAuthStore } from "@/stores/auth-store"
-import { Calendar, Bell, Settings, ChevronDown } from "@/components/ui/proicons"
+import { Bell, Calendar, Settings, ChevronDown, User } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface TeacherHeaderProps {
   title?: string
-  greeting: string
-  teacherName: string
-  dateStr: string
 }
 
-export function TeacherHeader({ title = "Inicio", greeting, teacherName, dateStr }: TeacherHeaderProps) {
+export function TeacherHeader({ title = "Inicio" }: TeacherHeaderProps = {}) {
   const user = useAuthStore((s) => s.user)
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches"
+  const teacherName = user?.full_name || "Docente"
+  const dateStr = new Date().toLocaleDateString("es-PE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+
   const initials = React.useMemo(() => {
-    const name = teacherName || user?.full_name || "Docente"
-    return name
+    return teacherName
       .split(" ")
       .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .toUpperCase()
       .slice(0, 2)
-  }, [teacherName, user])
+  }, [teacherName])
 
   return (
     <header className="td-header">
@@ -48,12 +54,11 @@ export function TeacherHeader({ title = "Inicio", greeting, teacherName, dateStr
             <Settings className="td-icon-btn-svg" />
           </button>
           <div className="td-user">
-            <div className="td-avatar" aria-hidden="true">{initials}</div>
-            <div className="td-user-info">
-              <span className="td-user-name">{teacherName}</span>
-              <span className="td-user-role">Docente</span>
+            <div className="td-avatar" aria-hidden="true">
+              <User className="h-4 w-4 text-black" />
+              <span className="sr-only">{teacherName}</span>
             </div>
-            <ChevronDown className="td-user-chevron" />
+            <span className="sr-only">Docente</span>
           </div>
         </div>
       </div>
@@ -61,7 +66,7 @@ export function TeacherHeader({ title = "Inicio", greeting, teacherName, dateStr
       <div className="td-greeting-wrap">
         <div>
           <h2 className="td-greeting">
-            {greeting}, <span className="td-greeting-name">{teacherName?.split(" ")[0] || "Docente"}</span>
+            {greeting}, <span className="td-greeting-name">{teacherName}</span>
           </h2>
           <div className="td-date-row">
             <Calendar className="td-date-icon" />
