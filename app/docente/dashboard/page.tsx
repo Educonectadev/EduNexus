@@ -95,7 +95,7 @@ export default function DocenteDashboard() {
         setSchedule(a.schedule)
 
         try {
-          const todayIdx = new Date().getDay()
+          const todayIdx = new Date().getDay() === 0 ? 7 : new Date().getDay()
           const todayCourses = (Array.isArray(h) ? h : [])
             .filter((hr: Horario) => hr.day_of_week === todayIdx)
           const courseIds = Array.from(new Set(todayCourses.map((hr: any) => hr.course_id).filter(Boolean)))
@@ -130,7 +130,7 @@ export default function DocenteDashboard() {
 
   const totalStudents = courses.reduce((acc, c) => acc + (c.students || 0), 0)
 
-  const todayIdx = new Date().getDay()
+  const todayIdx = new Date().getDay() === 0 ? 7 : new Date().getDay()
   const todaySchedule: ScheduleItem[] = horarios
     .filter((h) => h.day_of_week === todayIdx)
     .map((h) => ({
