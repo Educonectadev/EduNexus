@@ -401,8 +401,7 @@ html.dark [data-td-scope="dashboard"] [data-role="docente"] {
 }
 
 /* ===== RESPONSIVE - DESKTOP ===== */
-@media (min-width: 1024px) and [data-td-scope="dashboard"] {
-  /* Grid principal 2 columnas */
+@media (min-width: 1024px) {
   [data-td-scope="dashboard"] .td-main-grid {
     grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
   }
@@ -423,7 +422,7 @@ html.dark [data-td-scope="dashboard"] [data-role="docente"] {
 }
 
 /* ===== RESPONSIVE - TABLET ===== */
-@media (min-width: 768px) and (max-width: 1023px) and [data-td-scope="dashboard"] {
+@media (min-width: 768px) and (max-width: 1023px) {
   [data-td-scope="dashboard"] .td-main-grid {
     grid-template-columns: 1fr !important;
   }
@@ -443,7 +442,7 @@ html.dark [data-td-scope="dashboard"] [data-role="docente"] {
 }
 
 /* ===== RESPONSIVE - MÓVIL ===== */
-@media (max-width: 767px) and [data-td-scope="dashboard"] {
+@media (max-width: 767px) {
   [data-td-scope="dashboard"] .td-main-grid {
     grid-template-columns: 1fr !important;
   }
