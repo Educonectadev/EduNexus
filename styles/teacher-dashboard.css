@@ -382,7 +382,7 @@ html.dark [data-td-scope="dashboard"] [data-role="docente"] {
   text-overflow: ellipsis !important;
 }
 
-//* Meta (grado/section) */
+/* Meta (grado/section) */
 [data-td-scope="dashboard"] .td-course-meta {
   margin-top: 4px !important;
   font-family: var(--td-font) !important;
