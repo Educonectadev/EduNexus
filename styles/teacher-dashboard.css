@@ -71,9 +71,15 @@ html.dark [data-td-scope="dashboard"] [data-role="docente"] {
 }
 
 /* ===== LAYOUT PRINCIPAL - GRID FORZADO ===== */
+/* Contenedor principal con fondo gris suave y border-radius */
 [data-td-scope="dashboard"] .td-container {
-  padding: 0 !important;
+  padding: clamp(20px, 2.4vw, 32px) !important;
   width: 100% !important;
+  background: var(--td-surface) !important;
+  border-radius: var(--td-radius) !important;
+  margin: 0 auto !important;
+  max-width: 1480px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
 }
 
 [data-td-scope="dashboard"] .td-main-grid {
