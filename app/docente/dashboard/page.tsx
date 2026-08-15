@@ -2,12 +2,11 @@
 
 import * as React from "react"
 import { useAuthStore } from "@/stores/auth-store"
-import { TeacherHeader } from "@/components/docente/teacher-header"
 import { TeacherStats } from "@/components/docente/teacher-stats"
 import { TodaySchedule, type ScheduleItem } from "@/components/docente/today-schedule"
 import { TodayAttendance } from "@/components/docente/today-attendance"
 import { TeacherCourses, type TeacherCourse } from "@/components/docente/teacher-courses"
-import { QuickActions } from "@/components/docente/quick-actions"
+import { Calendar } from "@/components/ui/proicons"
 
 interface Horario {
   id: string
@@ -150,9 +149,22 @@ export default function DocenteDashboard() {
 
   return (
     <div data-td-scope="dashboard" className="td-fade-in">
-      <TeacherHeader title="Inicio" />
-
       <div className="td-container">
+        {/* Header Section */}
+        <div className="td-header-section">
+          <h1 className="td-title">Inicio</h1>
+          <div className="td-greeting-wrap">
+            <p className="td-greeting">
+              {greeting}, <span className="td-greeting-name">{teacherName}</span>
+            </p>
+            <div className="td-date-row">
+              <Calendar className="td-date-icon" />
+              <span className="td-date">{dateStr}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
         <TeacherStats
           courses={courses.length}
           totalStudents={totalStudents}
@@ -161,10 +173,10 @@ export default function DocenteDashboard() {
           loading={loading}
         />
 
+        {/* Main Grid */}
         <div className="td-main-grid">
           <div className="td-col">
             <TodaySchedule items={todaySchedule} loading={loading} />
-            <TeacherCourses courses={courses} loading={loading} />
           </div>
 
           <div className="td-col">
@@ -177,9 +189,11 @@ export default function DocenteDashboard() {
               onCheckIn={() => handleCheck("check-in")}
               onCheckOut={() => handleCheck("check-out")}
             />
-            <QuickActions />
           </div>
         </div>
+
+        {/* Courses Section */}
+        <TeacherCourses courses={courses} loading={loading} />
       </div>
     </div>
   )

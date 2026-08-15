@@ -3,6 +3,69 @@
    Clases td-* usadas por los componentes
    ============================================ */
 
+/* Dark mode support */
+.dark .td-stat-card,
+.dark .td-card {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+.dark .td-stat-icon,
+.dark .td-course-icon,
+.dark .td-action-icon {
+  background: #2a2a2a;
+}
+
+.dark .td-schedule-item,
+.dark .td-att-cell,
+.dark .td-att-stat,
+.dark .td-course-card,
+.dark .td-action {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+.dark .td-schedule-item:hover,
+.dark .td-course-card:hover,
+.dark .td-action:hover {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+.dark .td-stat-label,
+.dark .td-schedule-meta,
+.dark .td-course-meta,
+.dark .td-att-cell-label,
+.dark .td-att-prog,
+.dark .td-att-stat-label,
+.dark .td-action-desc,
+.dark .td-empty-text,
+.dark .td-date {
+  color: #a0a0a0;
+}
+
+.dark .td-stat-value,
+.dark .td-schedule-course,
+.dark .td-course-name,
+.dark .td-att-time,
+.dark .td-att-stat-value,
+.dark .td-att-students-title,
+.dark .td-action-label,
+.dark .td-card-title,
+.dark .td-title,
+.dark .td-greeting {
+  color: #ffffff;
+}
+
+.dark .td-fade-in {
+  animation: td-fade-in-dark 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes td-fade-in-dark {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- Animación de entrada --- */
 .td-fade-in {
   animation: td-fade-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -14,12 +77,26 @@
 
 /* --- Contenedor principal --- */
 .td-container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* --- Header --- */
+.td-header-section {
+  margin-bottom: 24px;
+}
+
+/* Ensure proper spacing for the teacher dashboard page */
+[data-td-scope="dashboard"] {
+  width: 100%;
+  min-height: 100%;
+}
+
 .td-header {
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
@@ -126,20 +203,22 @@
 /* --- Stats Grid --- */
 .td-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin: 24px 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
 .td-stat-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 30px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   transition: all 150ms ease;
+  min-height: 148px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .td-stat-card:hover {
   border-color: #cbd5e1;
@@ -181,8 +260,9 @@
 /* --- Grid principal (2 columnas) --- */
 .td-main-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
+  width: 100%;
 }
 
 .td-col {
@@ -195,8 +275,11 @@
 .td-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 30px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  position: relative;
 }
 
 .td-card-head {
@@ -584,8 +667,8 @@
 /* --- Courses grid --- */
 .td-courses-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .td-course-card {
@@ -749,7 +832,7 @@
   }
 
   .td-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .td-courses-grid {
@@ -773,10 +856,16 @@
 
   .td-stat-card {
     padding: 16px;
+    min-height: auto;
   }
 
   .td-stat-value {
     font-size: 22px;
+  }
+
+  .td-card {
+    border-radius: 20px;
+    padding: 16px;
   }
 
   .td-actions-grid {
