@@ -1,302 +1,369 @@
 /* ============================================
-   DASHBOARD DOCENTE - Minimalista Visual
-   Estilos directos sobre clases td-*
+   DASHBOARD DOCENTE - Minimalista Blanco y Negro
+   Diseño limpio, sin dependencias complejas
    ============================================ */
 
-/* Contenedor principal - tarjeta padre gris */
-.td-container {
+/* --- Contenedor Principal --- */
+.main-dashboard {
   background: #ffffff;
-  border-radius: 30px;
-  padding: 24px;
-  margin: 0 auto;
-  max-width: 1480px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-/* Grid principal - 2 columnas: stats a la izquierda, contenido a la derecha */
-.td-main-grid {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
-  gap: 24px !important;
-  width: 100% !important;
+/* --- Sidebar --- */
+.sidebar {
+  width: 237px;
+  background: #f8f9fa;
+  border-right: 1px solid #e3e6e8;
+  flex-shrink: 0;
 }
 
-/* Stats - 4 columnas */
-.td-stats-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 20px !important;
-  margin-left: 24px !important;
+.sidebar-brand {
+  padding: 20px;
+  border-bottom: 1px solid #e3e6e8;
 }
 
-/* Cada stat card ocupa 1/4 del ancho */
-.td-stat-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 30px;
-  padding: 24px;
-  min-height: 140px;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  transition: all 200ms ease !important;
-}
-
-.td-stat-card:hover {
-  border-color: #cbd5e1 !important;
-  transform: translateY(-2px) !important;
-}
-
-/* Labels y valores dentro de stat cards */
-.td-stat-label {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #64748b;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.td-stat-value {
-  font-family: "Inter", sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 4px 0 0 0;
-  line-height: 1;
-}
-
-/* Horario de hoy - tarjeta grande izquierda */
-.td-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 30px;
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.td-card-head {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  margin-bottom: 16px !important;
-}
-
-.td-card-title {
-  font-family: "Inter", sans-serif;
-  font-size: 24px;
+.sidebar-brand h1 {
+  font-size: 18px;
   font-weight: 600;
-  color: #0f172a;
+  color: #2d3748;
   margin: 0;
 }
 
-.td-card-link {
-  font-family: "Inter", sans-serif;
+.sidebar-brand span {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.sidebar-nav {
+  padding: 10px 0;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 8px 20px;
+  color: #2d3748;
+  text-decoration: none;
+  font-size: 14px;
+  border-radius: 6px;
+  margin: 4px 12px;
+  transition: all 150ms ease;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background: #edf2f7;
+  color: #1a202c;
+}
+
+.sidebar-bottom {
+  padding: 20px;
+  border-top: 1px solid #e3e6e8;
+}
+
+.sidebar-bottom a {
+  display: block;
+  padding: 8px 20px;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 13px;
+  border-radius: 6px;
+  margin: 4px 0;
+  transition: all 150ms ease;
+}
+
+.sidebar-bottom a:hover {
+  background: #edf2f7;
+  color: #1a202c;
+}
+
+/* --- Área Principal --- */
+.main-content {
+  margin-left: 237px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* --- Header --- */
+.header {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+}
+
+.header .greeting {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.header .date {
+  color: #718096;
+  font-size: 13px;
+}
+
+/* --- Stats Grid --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f5;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 150ms ease;
+}
+
+.stat-card:hover {
+  border-color: #cbd3e0;
+  transform: translateY(-2px);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat-label {
   font-size: 12px;
   font-weight: 500;
-  color: #64748b;
-  text-decoration: none;
+  color: #718096;
+  text-transform: uppercase;
+  margin-bottom: 4px;
 }
 
-/* Lista de schedule */
-.td-schedule-list {
-  display: grid !important;
-  gap: 12px !important;
-}
-
-.td-schedule-item {
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px !important;
-  display: grid !important;
-  grid-template-columns: 80px 1fr !important;
-  gap: 12px !important;
-  align-items: center !important;
-  transition: all 150ms ease !important;
-}
-
-.td-schedule-item:hover {
-  background: #e2e8f0 !important;
-  transform: translateY(-1px) !important;
-}
-
-.td-schedule-time {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+.stat-value {
+  font-size: 24px;
   font-weight: 700;
-  color: #0f172a;
+  color: #1a202c;
 }
 
-.td-schedule-course {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* --- Grid Principal (2 columnas) --- */
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
-/* Asistencia de hoy - tarjeta grande derecha */
-.td-att-students {
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
+/* --- Horario de Hoy --- */
+.schedule-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f5;
+  border-radius: 12px;
   padding: 20px;
 }
 
-.td-att-students-head {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  margin-bottom: 12px !important;
-}
-
-.td-att-students-title {
-  font-family: "Inter", sans-serif;
-  font-size: 13px;
+.schedule-card h3 {
+  font-size: 16px;
   font-weight: 600;
-  color: #0f172a;
-  margin: 0;
-  flex: 1;
+  color: #1a202c;
+  margin: 0 0 16px 0;
 }
 
-.td-att-students-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 8px !important;
-  margin-top: 8px !important;
+.schedule-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f8;
 }
 
-.td-att-stat {
+.schedule-item:last-child {
+  border-bottom: none;
+}
+
+.schedule-time {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.schedule-course {
+  color: #4a5568;
+}
+
+/* --- Asistencia de Hoy --- */
+.attendance-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e2e8f5;
   border-radius: 12px;
-  padding: 12px !important;
-  text-align: center !important;
+  padding: 20px;
 }
 
-.td-att-stat-value {
-  font-family: "Inter", sans-serif;
+.attendance-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 16px 0;
+}
+
+.attendance-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.attendance-summary .item {
+  text-align: center;
+  padding: 8px;
+}
+
+.attendance-summary .label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #718096;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.attendance-summary .value {
   font-size: 20px;
   font-weight: 700;
-  color: #0f172a;
+  color: #1a202c;
 }
 
-.td-att-stat-label {
-  font-family: "Inter", sans-serif;
-  font-size: 10px;
+.attendance-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.attendance-actions .btn {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #cbd3e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1a202c;
+  font-size: 13px;
   font-weight: 500;
-  color: #64748b;
-  text-transform: uppercase;
-  margin-top: 4px;
+  cursor: pointer;
+  transition: all 150ms ease;
 }
 
-/* Mis cursos - debajo */
-.td-course-card {
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px !important;
-  margin-bottom: 12px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
+.attendance-actions .btn:hover {
+  background: #f7fafc;
+  border-color: #a0aec0;
 }
 
-.td-course-name {
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: #0f172a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.td-course-meta {
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  color: #64748b;
-  margin-top: 4px;
-}
-
-.td-course-foot {
-  display: flex !important;
-  justify-content: space-between !important;
-  padding-top: 8px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  margin-top: 8px !important;
-}
-
-/* Acciones rápidas */
-.td-actions-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
-}
-
-.td-action {
-  background: #f8f9fa;
-  border: 1px solid #e2e8f0;
+/* --- Mis Cursos --- */
+.courses-section {
+  background: #ffffff;
+  border: 1px solid #e2e8f5;
   border-radius: 12px;
-  padding: 12px 14px !important;
-  text-decoration: none !important;
-  color: #0f172a !important;
-  display: grid !important;
-  grid-template-columns: 38px 1fr 18px !important;
-  align-items: center !important;
-  gap: 12px !important;
-  transition: all 150ms ease !important;
+  padding: 20px;
 }
 
-.td-action:hover {
-  background: #e2e8f0 !important;
-  transform: translateY(-1px) !important;
+.courses-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 16px 0;
 }
 
-/* Responsivo - Tablet: stats 2 columnas, contenido en columna única */
+.course-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f8;
+}
+
+.course-item:last-child {
+  border-bottom: none;
+}
+
+.course-name {
+  color: #1a202c;
+  font-weight: 500;
+}
+
+.course-stats {
+  color: #718096;
+  font-size: 12px;
+}
+
+/* --- Acciones Rápidas --- */
+.quick-actions {
+  background: #ffffff;
+  border: 1px solid #e2e8f5;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.quick-actions h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 12px 0;
+}
+
+.action-link {
+  display: block;
+  padding: 8px 0;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 150ms ease;
+}
+
+.action-link:hover {
+  color: #1a202c;
+}
+
+/* --- Responsivo --- */
 @media (max-width: 1024px) {
-  .td-main-grid {
-    grid-template-columns: 1fr !important;
+  .main-grid {
+    grid-template-columns: 1fr;
   }
   
-  .td-stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .td-col {
-    width: 100% !important;
+  .main-content {
+    margin-left: 0;
   }
   
-  .td-col:first-child {
-    order: 2 !important;
+  .sidebar {
+    width: 100%;
+    border-right: none;
   }
   
-  .td-col:last-child {
-    order: 1 !important;
-  }
-}
-
-/* Responsivo - Móvil: 1 columna todo */
-@media (max-width: 768px) {
-  .td-stats-grid {
-    grid-template-columns: 1fr !important;
+  .sidebar-nav a,
+  .sidebar-bottom a {
+    padding: 8px 10px;
+    font-size: 12px;
   }
   
-  .td-stat-card {
-    min-height: auto !important;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
   
-  .td-att-students-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  .main-dashboard {
+    padding: 10px;
   }
   
-  .td-actions-grid {
-    grid-template-columns: 1fr !important;
+  .header {
+    padding: 15px;
   }
 }
