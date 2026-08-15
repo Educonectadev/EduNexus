@@ -10,18 +10,15 @@ type Tab = "personal" | "alumnos"
 type StudentStatus = "present" | "late" | "absent" | "justified" | null
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
-  present:    { label: "A tiempo",   color: "bg-emerald-500/10 text-emerald-600",   dot: "bg-emerald-500" },
-  late:       { label: "Tardanza",   color: "bg-amber-500/10 text-amber-600",       dot: "bg-amber-500" },
-  absent:     { label: "Ausente",    color: "bg-red-500/10 text-red-600",           dot: "bg-red-500" },
-  justified:  { label: "Justificado",color: "bg-blue-500/10 text-blue-600",         dot: "bg-blue-500" },
-  early_leave:{ label: "Salida anticipada", color: "bg-orange-500/10 text-orange-600", dot: "bg-orange-500" },
+  present:    { label: "A tiempo",   color: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",   dot: "bg-[var(--note-text)]" },
+  late:       { label: "Tardanza",   color: "bg-[var(--note-fill)] text-[var(--note-muted)]",       dot: "bg-[var(--note-muted)]" },
+  absent:     { label: "Ausente",    color: "bg-[var(--note-fill-strong)] text-[var(--note-muted)]",           dot: "bg-[var(--note-muted)]" },
+  justified:  { label: "Justificado",color: "bg-[var(--note-fill)] text-[var(--note-text)]",         dot: "bg-[var(--note-text)]" },
+  early_leave:{ label: "Salida anticipada", color: "bg-[var(--note-fill)] text-[var(--note-muted)]", dot: "bg-[var(--note-muted)]" },
 }
 
-function getAvatarColor(name: string) {
-  const colors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-pink-500", "bg-cyan-500", "bg-rose-500"]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
+function getAvatarColor(_name: string) {
+  return "bg-[var(--note-fill-strong)]"
 }
 
 function getLocalDateStr(d = new Date()) {
@@ -43,11 +40,11 @@ function getWeekDays(history: any[]) {
 }
 
 function getBarConfig(status: string | null) {
-  if (status === "present") return "bg-emerald-500"
-  if (status === "late") return "bg-amber-500"
-  if (status === "absent") return "bg-red-400"
-  if (status === "justified") return "bg-blue-500"
-  if (status === "early_leave") return "bg-orange-500"
+  if (status === "present") return "bg-[var(--note-text)]"
+  if (status === "late") return "bg-[var(--note-muted)]"
+  if (status === "absent") return "bg-[var(--note-muted)] opacity-60"
+  if (status === "justified") return "bg-[var(--note-text)] opacity-60"
+  if (status === "early_leave") return "bg-[var(--note-muted)]"
   return "bg-[var(--note-fill-strong)]"
 }
 
@@ -172,7 +169,7 @@ function MiAsistencia() {
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
         <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--note-hairline)]">
           <div className="flex items-center gap-3">
-            <NoteChip icon={Clock} />
+            <NoteChip icon={Clock} label="" />
             <div>
               <p className="text-sm font-semibold text-[var(--note-text)] capitalize">
                 {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
@@ -199,7 +196,7 @@ function MiAsistencia() {
         <div className="grid grid-cols-2 divide-x divide-[var(--note-hairline)]">
           <div className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <LogIn className={`h-3.5 w-3.5 ${checkedIn ? "text-emerald-500" : "text-[var(--note-muted)]/40"}`} />
+              <LogIn className={`h-3.5 w-3.5 ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`} />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Entrada</span>
             </div>
             <p className={`text-xl font-bold tracking-tight ${checkedIn ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>
@@ -209,7 +206,7 @@ function MiAsistencia() {
           </div>
           <div className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <LogOut className={`h-3.5 w-3.5 ${checkedOut ? "text-amber-500" : "text-[var(--note-muted)]/40"}`} />
+              <LogOut className={`h-3.5 w-3.5 ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`} />
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)]">Salida</span>
             </div>
             <p className={`text-xl font-bold tracking-tight ${checkedOut ? "text-[var(--note-text)]" : "text-[var(--note-muted)]/40"}`}>
@@ -221,16 +218,16 @@ function MiAsistencia() {
 
         <div className="px-5 pb-5 pt-1">
           {hasPending && (
-            <div className="rounded-[16px] bg-amber-500/10 border border-amber-500/20 p-4">
+            <div className="rounded-[16px] bg-[var(--note-fill)] border border-[var(--note-hairline-strong)] p-4">
               <div className="flex items-start gap-3">
-                <LogOut className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                <LogOut className="h-4 w-4 text-[var(--note-muted)] mt-0.5 shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-amber-600">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
-                  <p className="text-xs text-amber-600/70 mt-0.5">
+                  <p className="text-sm font-semibold text-[var(--note-text)]">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
+                  <p className="text-xs text-[var(--note-muted)] mt-0.5">
                     Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida. Completa la salida pendiente antes de marcar una nueva entrada.
                   </p>
                   <button onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}
-                    className="mt-3 w-full h-10 rounded-[12px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
+                    className="mt-3 w-full h-10 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
                     {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
                     Marcar Salida
                   </button>
@@ -240,20 +237,20 @@ function MiAsistencia() {
           )}
           {!hasPending && !checkedIn && (
             <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
-              className="w-full h-11 rounded-[12px] bg-emerald-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-emerald-400 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
               Marcar Entrada
             </button>
           )}
           {!hasPending && checkedIn && !checkedOut && (
             <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
-              className="w-full h-11 rounded-[12px] bg-amber-500 text-white text-sm font-semibold flex items-center justify-center gap-2 hover:bg-amber-400 transition-all disabled:opacity-50">
+              className="w-full h-11 rounded-[12px] bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
               Marcar Salida
             </button>
           )}
           {!hasPending && checkedIn && checkedOut && (
-            <div className="w-full h-11 rounded-[12px] bg-emerald-500/10 text-emerald-600 text-sm font-semibold flex items-center justify-center gap-2">
+            <div className="w-full h-11 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-text)] text-sm font-semibold flex items-center justify-center gap-2">
               <Check className="h-4 w-4" />
               Jornada completada
             </div>
@@ -265,7 +262,7 @@ function MiAsistencia() {
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
         <div className="px-5 pt-5 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <NoteChip icon={Flame} />
+            <NoteChip icon={Flame} label="" />
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Últimos 7 días</p>
           </div>
           <span className="text-[10px] font-medium px-2 py-1 rounded-[12px] bg-[var(--note-fill)] text-[var(--note-muted)]">
@@ -307,7 +304,7 @@ function MiAsistencia() {
               return (
                 <div key={h.id} className="flex items-center justify-between px-5 py-3 hover:bg-[var(--note-fill)] transition-colors">
                   <div className="flex items-center gap-3">
-                    <NoteChip icon={Calendar} />
+                    <NoteChip icon={Calendar} label="" />
                     <span className="text-sm text-[var(--note-text)] capitalize">
                       {new Date(h.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
                     </span>
@@ -522,17 +519,17 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const marked = counts.present + counts.late + counts.absent + counts.justified
 
   const statusChips: { status: StudentStatus; label: string; title: string; activeClass: string; inactiveClass: string }[] = [
-    { status: "present", label: "P", title: "Presente", activeClass: "bg-emerald-500 text-white", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)]/40 hover:text-emerald-500" },
-    { status: "late", label: "T", title: "Tardanza", activeClass: "bg-amber-500 text-white", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)]/40 hover:text-amber-500" },
-    { status: "absent", label: "F", title: "Falta", activeClass: "bg-red-500 text-white", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)]/40 hover:text-red-500" },
-    { status: "justified", label: "J", title: "Justificado", activeClass: "bg-blue-500 text-white", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)]/40 hover:text-blue-500" },
+    { status: "present", label: "P", title: "Presente", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
+    { status: "late", label: "T", title: "Tardanza", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
+    { status: "absent", label: "F", title: "Falta", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
+    { status: "justified", label: "J", title: "Justificado", activeClass: "bg-[var(--note-text)] text-[var(--note-solid-fg)]", inactiveClass: "bg-[var(--note-fill-strong)] text-[var(--note-muted)] hover:text-[var(--note-text)]" },
   ]
 
   const summary = [
-    { label: "Presentes", value: counts.present, color: "text-emerald-600", bg: "bg-emerald-500/8", icon: UserCheck },
-    { label: "Tardanzas", value: counts.late, color: "text-amber-600", bg: "bg-amber-500/8", icon: Clock },
-    { label: "Faltas", value: counts.absent, color: "text-red-500", bg: "bg-red-500/8", icon: XCircle },
-    { label: "Justificados", value: counts.justified, color: "text-blue-600", bg: "bg-blue-500/8", icon: Check },
+    { label: "Presentes", value: counts.present, color: "text-[var(--note-text)]", bg: "bg-[var(--note-fill)]", icon: UserCheck },
+    { label: "Tardanzas", value: counts.late, color: "text-[var(--note-muted)]", bg: "bg-[var(--note-fill)]", icon: Clock },
+    { label: "Faltas", value: counts.absent, color: "text-[var(--note-muted)]", bg: "bg-[var(--note-fill)]", icon: XCircle },
+    { label: "Justificados", value: counts.justified, color: "text-[var(--note-text)]", bg: "bg-[var(--note-fill)]", icon: Check },
   ]
 
   return (
@@ -541,7 +538,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]">
         <div className="px-5 pt-5 pb-3">
           <div className="flex items-center gap-2">
-            <NoteChip icon={Users} />
+            <NoteChip icon={Users} label="" />
             <p className="text-[10px] font-semibold text-[var(--note-muted)] uppercase tracking-[0.12em]">Seleccionar curso y fecha</p>
           </div>
         </div>
@@ -585,7 +582,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] overflow-hidden">
           <div className="px-5 pt-5 pb-3 border-b border-[var(--note-hairline)]">
             <div className="flex items-center gap-2">
-              <NoteChip icon={Users} />
+              <NoteChip icon={Users} label="" />
               <div>
                 <p className="text-sm font-semibold text-[var(--note-text)]">Asistencia de los últimos 30 días</p>
                 <p className="text-[11px] text-[var(--note-muted)] mt-0.5">Resumen por alumno del curso seleccionado</p>
@@ -626,17 +623,17 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-emerald-600">{s.present}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-amber-600">{s.late}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-[var(--note-text)]">{s.present}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-[var(--note-muted)]">{s.late}</td>
                       <td className="px-3 py-3 text-center text-sm font-semibold text-red-500">{s.absent}</td>
                       <td className="px-3 py-3 text-center text-sm font-semibold text-blue-600">{s.justified}</td>
                       <td className="px-3 py-3 text-center text-xs text-[var(--note-muted)]">{s.total}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 justify-end">
                           <div className="w-24 h-1.5 rounded-full bg-[var(--note-fill-strong)] overflow-hidden">
-                            <div className={`h-full rounded-full ${s.rate >= 80 ? "bg-emerald-400" : s.rate >= 60 ? "bg-amber-400" : "bg-red-400"}`} style={{ width: `${s.rate}%` }} />
+                            <div className={`h-full rounded-full ${s.rate >= 80 ? "bg-[var(--note-text)]" : s.rate >= 60 ? "bg-[var(--note-muted)]" : "bg-[var(--note-muted)] opacity-60"}`} style={{ width: `${s.rate}%` }} />
                           </div>
-                          <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-emerald-600" : s.rate >= 60 ? "text-amber-600" : "text-red-500"}`}>{s.rate}%</span>
+                            <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-[var(--note-text)]" : s.rate >= 60 ? "text-[var(--note-muted)]" : "text-[var(--note-muted)] opacity-60"}`}>{s.rate}%</span>
                         </div>
                       </td>
                     </tr>
@@ -677,7 +674,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={handleMarkAllPresent}
-                    className="h-9 px-3.5 rounded-[12px] bg-emerald-500/10 text-emerald-600 text-xs font-semibold hover:bg-emerald-500/20 transition-colors flex items-center gap-1.5">
+                    className="h-9 px-3.5 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-text)] text-xs font-semibold hover:opacity-90 transition-colors flex items-center gap-1.5">
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos presentes
                   </button>
                   <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}

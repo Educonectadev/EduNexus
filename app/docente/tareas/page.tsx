@@ -48,21 +48,21 @@ interface TaskDetail extends Task {
 }
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string; bg: string; dot: string }> = {
-  pending: { icon: Clock, color: 'text-amber-600', label: 'Pendiente', bg: 'bg-amber-500/10', dot: 'bg-amber-500' },
-  delivered: { icon: CheckCircle2, color: 'text-blue-600', label: 'Entregada', bg: 'bg-blue-500/10', dot: 'bg-blue-500' },
-  graded: { icon: CheckCircle2, color: 'text-emerald-600', label: 'Calificada', bg: 'bg-emerald-500/10', dot: 'bg-emerald-500' },
+  pending: { icon: Clock, color: 'text-[var(--note-muted)]', label: 'Pendiente', bg: 'bg-[var(--note-fill)]', dot: 'bg-[var(--note-muted)]' },
+  delivered: { icon: CheckCircle2, color: 'text-[var(--note-text)]', label: 'Entregada', bg: 'bg-[var(--note-fill-strong)]', dot: 'bg-[var(--note-text)]' },
+  graded: { icon: CheckCircle2, color: 'text-[var(--note-text)]', label: 'Calificada', bg: 'bg-[var(--note-fill-strong)]', dot: 'bg-[var(--note-text)]' },
 }
 
 const priorityConfig: Record<string, { color: string; label: string; bg: string }> = {
-  high: { color: 'text-red-500', label: 'Alta', bg: 'bg-red-500/10' },
-  medium: { color: 'text-amber-500', label: 'Media', bg: 'bg-amber-500/10' },
-  low: { color: 'text-sb-on-surface-variant/40', label: 'Baja', bg: 'bg-sb-surface-container' },
+  high: { color: 'text-[var(--note-text)]', label: 'Alta', bg: 'bg-[var(--note-fill-strong)]' },
+  medium: { color: 'text-[var(--note-muted)]', label: 'Media', bg: 'bg-[var(--note-fill)]' },
+  low: { color: 'text-[var(--note-muted)]', label: 'Baja', bg: 'bg-[var(--note-fill)]' },
 }
 
 const submissionStatusConfig: Record<string, { color: string; label: string; bg: string; dot: string }> = {
-  pending: { color: 'text-amber-600', label: 'Pendiente', bg: 'bg-amber-500/10', dot: 'bg-amber-500' },
-  submitted: { color: 'text-blue-600', label: 'Entregada', bg: 'bg-blue-500/10', dot: 'bg-blue-500' },
-  graded: { color: 'text-emerald-600', label: 'Calificada', bg: 'bg-emerald-500/10', dot: 'bg-emerald-500' },
+  pending: { color: 'text-[var(--note-muted)]', label: 'Pendiente', bg: 'bg-[var(--note-fill)]', dot: 'bg-[var(--note-muted)]' },
+  submitted: { color: 'text-[var(--note-text)]', label: 'Entregada', bg: 'bg-[var(--note-fill-strong)]', dot: 'bg-[var(--note-text)]' },
+  graded: { color: 'text-[var(--note-text)]', label: 'Calificada', bg: 'bg-[var(--note-fill-strong)]', dot: 'bg-[var(--note-text)]' },
 }
 
 export default function TareasPage() {

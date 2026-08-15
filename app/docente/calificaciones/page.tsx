@@ -42,16 +42,13 @@ const MAX_SCORE = 20
 
 function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
 
-function getAvatarColor(name: string) {
-  const colors = ["bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-amber-500", "bg-pink-500", "bg-cyan-500", "bg-rose-500"]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
+function getAvatarColor(_name: string) {
+  return "bg-[var(--note-fill-strong)]"
 }
 
-function getGradeColor(g: number) { return g >= 18 ? "text-emerald-600" : g >= 11 ? "text-[var(--note-text)]" : "text-red-500" }
-function getGradeBg(g: number) { return g >= 18 ? "bg-emerald-500/10" : g >= 11 ? "bg-[var(--note-fill-strong)]" : "bg-red-500/10" }
-function getGradeBarColor(g: number) { return g >= 18 ? "bg-emerald-400" : g >= 11 ? "bg-amber-400" : "bg-red-400" }
+function getGradeColor(g: number) { return g >= 18 ? "font-bold" : g >= 11 ? "" : "opacity-60" }
+function getGradeBg(g: number) { return g >= 18 ? "bg-[var(--note-fill-strong)]" : g >= 11 ? "bg-[var(--note-fill)]" : "bg-[var(--note-fill-strong)]" }
+function getGradeBarColor(g: number) { return g >= 18 ? "bg-[var(--note-text)]" : g >= 11 ? "bg-[var(--note-muted)]" : "bg-[var(--note-muted)]" }
 
 function calcAverage(grades: Grade[]) {
   if (grades.length === 0) return 0
