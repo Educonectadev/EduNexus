@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
 import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Flame, Clock, ChevronDown, ChevronLeft, ChevronRight } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
@@ -492,19 +493,122 @@ function MiAsistencia() {
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 const MonthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
+/* ─── Portal Select (curso dropdown) ─── */
+function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
+  value: string
+  onChange: (v: string) => void
+  options: { value: string; label: string }[]
+  placeholder: string
+  icon?: React.ElementType
+}) {
+  const [open, setOpen] = React.useState(false)
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = React.useState({ top: 0, left: 0, width: 0 })
+
+  React.useEffect(() => {
+    if (open && triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect()
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width })
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [open])
+
+  const selected = options.find(o => o.value === value)
+
+  return (
+    <>
+      <button ref={triggerRef} type="button" onClick={() => setOpen(!open)}
+        className="h-10 w-full flex items-center gap-2 px-3 text-[13px] font-medium transition-all cursor-pointer text-left"
+        style={{
+          borderRadius: "14px",
+          border: `1.5px solid ${value ? "var(--sb-primary)" : "var(--sb-outline-variant)"}`,
+          background: value ? "color-mix(in srgb, var(--sb-primary) 8%, transparent)" : "transparent",
+          color: value ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
+          fontFamily: FONT,
+        }}
+      >
+        {Icon && <Icon className="h-4 w-4 shrink-0 opacity-50" />}
+        <span className="flex-1 truncate">{selected?.label || placeholder}</span>
+        <ChevronDown className={cn("h-4 w-4 shrink-0 opacity-40 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && createPortal(
+        <AnimatePresence>
+          <motion.div
+            className="fixed z-[9999]"
+            style={{ top: pos.top, left: pos.left, width: pos.width }}
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
+          >
+            <div className="max-h-[260px] overflow-y-auto py-1.5"
+              style={{
+                background: "var(--sb-surface)",
+                borderRadius: "16px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                boxShadow: "0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)",
+              }}
+            >
+              {options.map(opt => {
+                const isSelected = opt.value === value
+                return (
+                  <button key={opt.value} type="button"
+                    onClick={() => { onChange(opt.value); setOpen(false) }}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors"
+                    style={{
+                      background: isSelected ? "color-mix(in srgb, var(--sb-primary) 10%, transparent)" : "transparent",
+                      color: isSelected ? "var(--sb-primary)" : "var(--sb-on-surface)",
+                      fontFamily: FONT,
+                    }}
+                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
+                  >
+                    <span className="flex-1">{opt.label}</span>
+                    {isSelected && <Check className="h-4 w-4" style={{ color: "var(--sb-primary)" }} />}
+                  </button>
+                )
+              })}
+            </div>
+          </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
+  )
+}
+
+/* ─── Portal Date Picker ─── */
 function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: string) => void }) {
   const [open, setOpen] = React.useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = React.useState({ top: 0, left: 0, width: 0 })
   const current = new Date(date + "T12:00:00")
   const [viewDate, setViewDate] = React.useState(new Date(current.getFullYear(), current.getMonth(), 1))
 
   React.useEffect(() => {
+    if (open && triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect()
+      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width })
+    }
+  }, [open])
+
+  React.useEffect(() => {
+    if (!open) return
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
-  }, [])
+  }, [open])
 
   const year = viewDate.getFullYear()
   const month = viewDate.getMonth()
@@ -526,15 +630,13 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   const display = date ? safeFormatDate(date) : ""
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 px-3 text-sm font-medium transition-all cursor-pointer text-left"
+    <>
+      <button ref={triggerRef} type="button" onClick={() => setOpen(!open)}
+        className="h-10 w-full flex items-center gap-2 px-3 text-[13px] font-medium transition-all cursor-pointer text-left"
         style={{
           borderRadius: "14px",
           border: `1.5px solid ${date ? "var(--sb-primary)" : "var(--sb-outline-variant)"}`,
-          background: date ? "var(--sb-surface-container)" : "transparent",
+          background: date ? "color-mix(in srgb, var(--sb-primary) 8%, transparent)" : "transparent",
           color: date ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
           fontFamily: FONT,
         }}
@@ -544,81 +646,86 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
         <ChevronDown className={cn("h-4 w-4 shrink-0 opacity-40 transition-transform", open && "rotate-180")} />
       </button>
 
-      <AnimatePresence>
-        {open && (
+      {open && createPortal(
+        <AnimatePresence>
           <motion.div
-            className="absolute z-30 top-full mt-2 left-0 w-[300px] p-4"
-            style={{
-              background: "var(--sb-surface)",
-              borderRadius: "16px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-              boxShadow: "0 8px 32px -4px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04)",
-            }}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            className="fixed z-[9999]"
+            style={{ top: pos.top, left: pos.left, width: Math.max(pos.width, 300) }}
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: [0.37, 0.35, 0, 1] }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
-                {MonthNames[month]} {year}
-              </p>
-              <div className="flex gap-1">
-                <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
-                  className="h-7 w-7 flex items-center justify-center transition-colors"
-                  style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                </button>
-                <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
-                  className="h-7 w-7 flex items-center justify-center transition-colors"
-                  style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                >
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
+            <div className="p-4"
+              style={{
+                background: "var(--sb-surface)",
+                borderRadius: "16px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                boxShadow: "0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)",
+              }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                  {MonthNames[month]} {year}
+                </p>
+                <div className="flex gap-1">
+                  <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
+                    className="h-7 w-7 flex items-center justify-center transition-colors"
+                    style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                  </button>
+                  <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
+                    className="h-7 w-7 flex items-center justify-center transition-colors"
+                    style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                  >
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-7 mb-1">
+                {WEEKDAYS.map(d => (
+                  <div key={d} className="text-center py-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.4, fontFamily: FONT }}>{d}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-px">
+                {days.map((day, i) => {
+                  if (day === null) return <div key={`e-${i}`} />
+                  const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                  const isToday = dateStr === today
+                  const isSelected = dateStr === date
+                  const isFuture = dateStr > today
+                  return (
+                    <button key={day} onClick={() => !isFuture && selectDate(day)} disabled={isFuture}
+                      className="h-8 w-full flex items-center justify-center text-[12px] font-medium transition-colors"
+                      style={{
+                        borderRadius: "8px",
+                        background: isSelected ? "var(--sb-on-surface)" : isToday ? "var(--sb-surface-container-high)" : "transparent",
+                        color: isSelected ? "var(--sb-surface)" : isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface)",
+                        opacity: isFuture ? 0.25 : 1,
+                        cursor: isFuture ? "not-allowed" : "pointer",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      {day}
+                    </button>
+                  )
+                })}
               </div>
             </div>
-
-            <div className="grid grid-cols-7 mb-1">
-              {WEEKDAYS.map(d => (
-                <div key={d} className="text-center py-1">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.4, fontFamily: FONT }}>{d}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 gap-px">
-              {days.map((day, i) => {
-                if (day === null) return <div key={`e-${i}`} />
-                const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                const isToday = dateStr === today
-                const isSelected = dateStr === date
-                const isFuture = dateStr > today
-                return (
-                  <button key={day} onClick={() => !isFuture && selectDate(day)} disabled={isFuture}
-                    className="h-8 w-full flex items-center justify-center text-[12px] font-medium transition-colors"
-                    style={{
-                      borderRadius: "8px",
-                      background: isSelected ? "var(--sb-on-surface)" : isToday ? "var(--sb-surface-container-high)" : "transparent",
-                      color: isSelected ? "var(--sb-surface)" : isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface)",
-                      opacity: isFuture ? 0.25 : 1,
-                      cursor: isFuture ? "not-allowed" : "pointer",
-                      fontFamily: FONT,
-                    }}
-                  >
-                    {day}
-                  </button>
-                )
-              })}
-            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
   )
 }
 
@@ -741,11 +848,13 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
             <div className="space-y-1.5">
               <p className="text-xs font-medium" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Curso</p>
-              <select value={selectedCourse} onChange={e => { setSelectedCourse(e.target.value); setStatsLoaded(false); setStats([]) }}
-                className={`sbf-native-select w-full ${selectedCourse ? "has-value" : ""}`}>
-                <option value="">Seleccionar curso</option>
-                {courses.map(c => <option key={c.id} value={c.id}>{c.name} - {c.grade} {c.section}</option>)}
-              </select>
+              <PortalSelect
+                value={selectedCourse}
+                onChange={v => { setSelectedCourse(v); setStatsLoaded(false); setStats([]) }}
+                placeholder="Seleccionar curso"
+                icon={Users}
+                options={courses.map(c => ({ value: c.id, label: `${c.name} - ${c.grade} ${c.section}` }))}
+              />
             </div>
             <div className="space-y-1.5">
               <p className="text-xs font-medium" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Fecha</p>
