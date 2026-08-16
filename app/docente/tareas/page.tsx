@@ -708,7 +708,6 @@ function TareasInner() {
           )}
         </SbModal>
       </div>
-      </div>
     </div>
   )
 }

@@ -320,7 +320,6 @@ function MaterialesInner() {
           </SbModalFooter>
         </SbModal>
       </div>
-      </div>
     </div>
   )
 }
