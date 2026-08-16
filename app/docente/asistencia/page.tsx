@@ -503,19 +503,23 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
 }) {
   const [open, setOpen] = React.useState(false)
   const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const panelRef = React.useRef<HTMLDivElement>(null)
   const [pos, setPos] = React.useState({ top: 0, left: 0, width: 0 })
 
   React.useEffect(() => {
     if (open && triggerRef.current) {
       const r = triggerRef.current.getBoundingClientRect()
-      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width })
+      setPos({ top: r.bottom + 4, left: r.left, width: r.width })
     }
   }, [open])
 
   React.useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (triggerRef.current?.contains(t)) return
+      if (panelRef.current?.contains(t)) return
+      setOpen(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
@@ -541,45 +545,43 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
       </button>
 
       {open && createPortal(
-        <AnimatePresence>
-          <motion.div
-            className="fixed z-[9999]"
-            style={{ top: pos.top, left: pos.left, width: pos.width }}
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
+        <motion.div
+          ref={panelRef}
+          className="fixed z-[9999]"
+          style={{ top: pos.top, left: pos.left, width: pos.width }}
+          initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
+        >
+          <div className="max-h-[260px] overflow-y-auto py-1.5"
+            style={{
+              background: "var(--sb-surface)",
+              borderRadius: "16px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+              boxShadow: "0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)",
+            }}
           >
-            <div className="max-h-[260px] overflow-y-auto py-1.5"
-              style={{
-                background: "var(--sb-surface)",
-                borderRadius: "16px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-                boxShadow: "0 12px 40px -8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)",
-              }}
-            >
-              {options.map(opt => {
-                const isSelected = opt.value === value
-                return (
-                  <button key={opt.value} type="button"
-                    onClick={() => { onChange(opt.value); setOpen(false) }}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors"
-                    style={{
-                      background: isSelected ? "color-mix(in srgb, var(--sb-primary) 10%, transparent)" : "transparent",
-                      color: isSelected ? "var(--sb-primary)" : "var(--sb-on-surface)",
-                      fontFamily: FONT,
-                    }}
-                    onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
-                    onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
-                  >
-                    <span className="flex-1">{opt.label}</span>
-                    {isSelected && <Check className="h-4 w-4" style={{ color: "var(--sb-primary)" }} />}
-                  </button>
-                )
-              })}
-            </div>
-          </motion.div>
-        </AnimatePresence>,
+            {options.map(opt => {
+              const isSelected = opt.value === value
+              return (
+                <button key={opt.value} type="button"
+                  onClick={() => { onChange(opt.value); setOpen(false) }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors"
+                  style={{
+                    background: isSelected ? "color-mix(in srgb, var(--sb-primary) 10%, transparent)" : "transparent",
+                    color: isSelected ? "var(--sb-primary)" : "var(--sb-on-surface)",
+                    fontFamily: FONT,
+                  }}
+                  onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                  onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
+                >
+                  <span className="flex-1">{opt.label}</span>
+                  {isSelected && <Check className="h-4 w-4" style={{ color: "var(--sb-primary)" }} />}
+                </button>
+              )
+            })}
+          </div>
+        </motion.div>,
         document.body
       )}
     </>
@@ -590,6 +592,7 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
 function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: string) => void }) {
   const [open, setOpen] = React.useState(false)
   const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const panelRef = React.useRef<HTMLDivElement>(null)
   const [pos, setPos] = React.useState({ top: 0, left: 0, width: 0 })
   const current = new Date(date + "T12:00:00")
   const [viewDate, setViewDate] = React.useState(new Date(current.getFullYear(), current.getMonth(), 1))
@@ -597,14 +600,17 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   React.useEffect(() => {
     if (open && triggerRef.current) {
       const r = triggerRef.current.getBoundingClientRect()
-      setPos({ top: r.bottom + window.scrollY + 4, left: r.left + window.scrollX, width: r.width })
+      setPos({ top: r.bottom + 4, left: r.left, width: Math.max(r.width, 300) })
     }
   }, [open])
 
   React.useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) setOpen(false)
+      const t = e.target as Node
+      if (triggerRef.current?.contains(t)) return
+      if (panelRef.current?.contains(t)) return
+      setOpen(false)
     }
     document.addEventListener("mousedown", handler)
     return () => document.removeEventListener("mousedown", handler)
@@ -647,15 +653,14 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
       </button>
 
       {open && createPortal(
-        <AnimatePresence>
-          <motion.div
-            className="fixed z-[9999]"
-            style={{ top: pos.top, left: pos.left, width: Math.max(pos.width, 300) }}
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
-          >
+        <motion.div
+          ref={panelRef}
+          className="fixed z-[9999]"
+          style={{ top: pos.top, left: pos.left, width: pos.width }}
+          initial={{ opacity: 0, y: -6, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.15, ease: [0.37, 0.35, 0, 1] }}
+        >
             <div className="p-4"
               style={{
                 background: "var(--sb-surface)",
@@ -721,8 +726,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 })}
               </div>
             </div>
-          </motion.div>
-        </AnimatePresence>,
+          </motion.div>,
         document.body
       )}
     </>
