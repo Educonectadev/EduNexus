@@ -109,7 +109,7 @@ export default function DocenteDashboard() {
 
   return (
     <div
-      className="w-full min-h-full rounded-[25px] overflow-hidden"
+      className="w-full h-full rounded-[25px] overflow-hidden"
       style={{ background: "#BABABA" }}
     >
       <div className="p-6 md:p-8">
