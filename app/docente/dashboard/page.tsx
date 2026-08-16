@@ -112,7 +112,7 @@ export default function DocenteDashboard() {
       className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       style={{ background: "#BABABA" }}
     >
-      <div className="p-6 md:p-8">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
 
         {/* ═══════════════ HEADER ═══════════════ */}
         <div className="flex items-start justify-between mb-8">
