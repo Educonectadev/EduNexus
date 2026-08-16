@@ -249,27 +249,27 @@ html.dark [data-role="docente"] {
 }
 .dark[data-role="docente"] aside.bg-sb-surface,
 html.dark [data-role="docente"] aside.bg-sb-surface {
-  background: #1a1a1e !important;
-  border-right: 1px solid #2a2a2e !important;
+  background: #000000 !important;
+  border-right: 1px solid #1a1a1a !important;
 }
 .dark[data-role="docente"] aside a[class*="bg-sb-on-surface"],
 html.dark [data-role="docente"] aside a[class*="bg-sb-on-surface"],
 .dark[data-role="docente"] aside button[class*="bg-sb-on-surface"],
 html.dark [data-role="docente"] aside button[class*="bg-sb-on-surface"] {
-  background: #2a2a2e !important;
+  background: #1a1a1a !important;
   box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.4);
 }
 .dark[data-role="docente"] aside,
 html.dark [data-role="docente"] aside {
-  border-color: #2a2a2e !important;
+  border-color: #1a1a1a !important;
 }
 .dark[data-role="docente"] aside span,
 html.dark [data-role="docente"] aside span {
-  color: #d4d4d8 !important;
+  color: #ffffff !important;
 }
 .dark[data-role="docente"] aside svg,
 html.dark [data-role="docente"] aside svg {
-  color: #a1a1aa !important;
+  color: #ffffff !important;
 }
 
 /* ─── Header glass ────────────────────────── */
