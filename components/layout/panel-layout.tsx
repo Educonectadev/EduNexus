@@ -635,7 +635,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Minimal Header */}
+        {/* Minimal Header - hidden for docente dashboard (has its own header) */}
+        {!pathname.startsWith("/docente/dashboard") && (
         <header className="flex items-center justify-between h-14 px-6 shrink-0">
           <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageName}</h1>
           <div className="flex items-center gap-2">
@@ -674,6 +675,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             </button>
           </div>
         </header>
+        )}
 
         {/* Trial banner (free institutions) */}
         {trialInfo && !trialInfo.isExpired && role && (
@@ -691,7 +693,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6" style={{ background: "#f5f5f5" }}>
+        <main className={cn(
+          "flex-1 overflow-auto pb-32 md:pb-6",
+          pathname.startsWith("/docente/dashboard") ? "p-2" : "px-6"
+        )} style={{ background: pathname.startsWith("/docente/dashboard") ? "transparent" : "#f5f5f5" }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}

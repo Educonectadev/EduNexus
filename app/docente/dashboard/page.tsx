@@ -3,8 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
-import { Calendar, Clock, BookOpen, GraduationCap, TrendingUp, Users, ChevronDown, ArrowUpRight, Settings, Search } from "@/components/ui/proicons"
-import { motion } from "framer-motion"
+import { Calendar, Clock, BookOpen, GraduationCap, Users, ChevronDown, Bell, Sun, Moon } from "@/components/ui/proicons"
+import { useTheme } from "next-themes"
 
 interface Horario {
   id: string
@@ -25,7 +25,6 @@ interface TeacherCourse {
   students: number
 }
 
-const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 const WEEK_DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 function toMin(t: string) {
@@ -37,31 +36,31 @@ export default function DocenteDashboard() {
   const user = useAuthStore((s) => s.user)
   const [courses, setCourses] = React.useState<TeacherCourse[]>([])
   const [horarios, setHorarios] = React.useState<Horario[]>([])
-  const [teacherAtt, setTeacherAtt] = React.useState<any>(null)
   const [studentSummary, setStudentSummary] = React.useState<{
     present: number; absent: number; late: number; justified?: number; total: number
   } | null>(null)
   const [loading, setLoading] = React.useState(true)
+  const { theme, setTheme } = useTheme()
 
   const today = new Date()
   const hour = today.getHours()
   const greeting = hour < 12 ? "Buenos días" : hour < 18 ? "Buenas tardes" : "Buenas noches"
-  const teacherName = user?.full_name || "Docente"
+  const teacherName = user?.full_name?.split(" ")[0] || "Docente"
+
+  const dateStr = today.toISOString().split("T")[0]
+  const dateFormatted = today.toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
 
   React.useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const dateStr = today.toISOString().split("T")[0]
-        const [c, h, a] = await Promise.all([
+        const [c, h] = await Promise.all([
           fetch("/api/docente/cursos").then(r => r.json()),
           fetch("/api/docente/horarios").then(r => r.json()),
-          fetch(`/api/docente/attendance?date=${dateStr}`).then(r => r.json()),
         ])
         if (cancelled) return
         setCourses(Array.isArray(c) ? c : [])
         setHorarios(Array.isArray(h) ? h : [])
-        setTeacherAtt(a.attendance)
 
         try {
           const todayIdx = today.getDay() === 0 ? 7 : today.getDay()
@@ -108,298 +107,205 @@ export default function DocenteDashboard() {
     ? Math.round((studentSummary.present / studentSummary.total) * 100)
     : 0
 
-  // Weekly class counts (Mon-Sat)
-  const weeklyCounts = [1, 2, 3, 4, 5, 6].map(d => horarios.filter(h => h.day_of_week === d).length)
-  const maxWeekly = Math.max(...weeklyCounts, 1)
-
-  const dateLabel = `${today.toLocaleDateString("es-PE", { day: "numeric", month: "short" })} - ${today.toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}`
-
   return (
-    <div className="w-full p-1.5">
+    <div
+      className="w-full min-h-full rounded-[25px] overflow-hidden"
+      style={{ background: "#BABABA" }}
+    >
+      <div className="p-6 md:p-8">
 
-      {/* ═══ HEADER ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 p-5 rounded-[20px] mb-1.5"
-        style={{ background: "#fff", border: "1px solid #eee" }}
-      >
-        <h1 className="text-[32px] sm:text-[40px] font-bold leading-[1.05]" style={{ color: "#1a1a1a", fontFamily: FONT, letterSpacing: "-0.03em" }}>
-          Tu Resumen<br />Docente
-        </h1>
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium rounded-[12px]" style={{
-            background: "#fff",
-            color: "#666",
-            fontFamily: FONT,
-            border: "1px solid #e8e8e8",
-          }}>
-            <Calendar className="h-4 w-4" />
-            <span>{dateLabel}</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-[13px] font-medium rounded-[12px]" style={{
-            background: "#fff",
-            color: "#666",
-            fontFamily: FONT,
-            border: "1px solid #e8e8e8",
-          }}>
-            <Settings className="h-4 w-4" />
-            <span>Filtro</span>
-            <ChevronDown className="h-3.5 w-3.5" />
-          </button>
-          <Link href="/docente/asistencia" className="flex items-center gap-2 px-5 py-2.5 text-[13px] font-medium rounded-[12px]" style={{
-            background: "#1a1a1a",
-            color: "#fff",
-            fontFamily: FONT,
-          }}>
-            <span>Exportar</span>
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </motion.div>
-
-      {/* ═══ 3 STAT CARDS ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mb-1.5"
-      >
-        {/* Card 1: Dark - Asistencia */}
-        <div className="p-5 rounded-[20px]" style={{ background: "#1a1a1a" }}>
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.5)", fontFamily: FONT }}>
-              Asistencia hoy
-            </span>
-            <div className="h-8 w-8 flex items-center justify-center rounded-[10px]" style={{ background: "rgba(255,255,255,0.1)" }}>
-              <ArrowUpRight className="h-4 w-4 text-white" />
-            </div>
-          </div>
-          <p className="text-[38px] font-bold text-white leading-none" style={{ fontFamily: FONT, letterSpacing: "-0.03em" }}>
-            {loading ? "—" : `${attendancePct}%`}
-          </p>
-          <p className="text-[11px] mt-3" style={{ color: "rgba(255,255,255,0.4)", fontFamily: FONT }}>
-            {studentSummary ? `Presentes • ${studentSummary.present} de ${studentSummary.total}` : "Sin datos de hoy"}
-          </p>
-        </div>
-
-        {/* Card 2: Light - Alumnos */}
-        <div className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}>
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-[12px] font-medium" style={{ color: "#999", fontFamily: FONT }}>
-              Total alumnos
-            </span>
-            <div className="h-8 w-8 flex items-center justify-center rounded-[10px]" style={{ background: "#f5f5f5" }}>
-              <ArrowUpRight className="h-4 w-4" style={{ color: "#bbb" }} />
-            </div>
-          </div>
-          <p className="text-[38px] font-bold leading-none" style={{ color: "#1a1a1a", fontFamily: FONT, letterSpacing: "-0.03em" }}>
-            {loading ? "—" : totalStudents.toLocaleString()}
-          </p>
-          <p className="text-[11px] mt-3" style={{ color: "#999", fontFamily: FONT }}>
-            Cursos • {courses.length} activos
-          </p>
-        </div>
-
-        {/* Card 3: Light - Clases */}
-        <div className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}>
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-[12px] font-medium" style={{ color: "#999", fontFamily: FONT }}>
-              Clases hoy
-            </span>
-            <div className="h-8 w-8 flex items-center justify-center rounded-[10px]" style={{ background: "#f5f5f5" }}>
-              <ArrowUpRight className="h-4 w-4" style={{ color: "#bbb" }} />
-            </div>
-          </div>
-          <p className="text-[38px] font-bold leading-none" style={{ color: "#1a1a1a", fontFamily: FONT, letterSpacing: "-0.03em" }}>
-            {loading ? "—" : todaySchedule.length}
-          </p>
-          <p className="text-[11px] mt-3" style={{ color: "#999", fontFamily: FONT }}>
-            Horas • {hoursToday}h de carga
-          </p>
-        </div>
-      </motion.div>
-
-      {/* ═══ TWO COLUMNS ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-1.5 mb-1.5"
-      >
-        {/* ═══ LEFT: Horario Semanal (Sales Funnel) ═══ */}
-        <div className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}>
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-[14px] font-semibold" style={{ color: "#1a1a1a", fontFamily: FONT }}>Horario semanal</p>
-              <p className="text-[11px] mt-0.5" style={{ color: "#999", fontFamily: FONT }}>Clases por día</p>
-            </div>
-            <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-[8px]" style={{
-              background: "#f5f5f5",
-              color: "#666",
-              fontFamily: FONT,
-            }}>
-              Semanal <ChevronDown className="h-3 w-3" />
-            </button>
-          </div>
-
-          {/* Bar Chart */}
-          <div className="flex items-end justify-between gap-2" style={{ height: "160px" }}>
-            {WEEK_DAYS.map((day, i) => {
-              const count = weeklyCounts[i]
-              const pct = maxWeekly > 0 ? (count / maxWeekly) * 100 : 0
-              const isToday = i + 1 === todayIdx
-              return (
-                <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full">
-                  <div className="w-full flex-1 relative flex items-end">
-                    <div
-                      className="w-full transition-all duration-700 ease-out"
-                      style={{
-                        height: `${Math.max(pct, 6)}%`,
-                        borderRadius: "8px 8px 4px 4px",
-                        background: isToday ? "#4ADE80" : "#e8e8e8",
-                      }}
-                    />
-                    {isToday && count > 0 && (
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-[6px] text-[10px] font-bold text-white whitespace-nowrap" style={{ background: "#1a1a1a" }}>
-                        {count}h
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-[11px] font-medium" style={{
-                    color: isToday ? "#4ADE80" : "#bbb",
-                    fontFamily: FONT,
-                  }}>
-                    {day}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* ═══ RIGHT: Asistencia (Orders) ═══ */}
-        <div className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}>
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <p className="text-[14px] font-semibold" style={{ color: "#1a1a1a", fontFamily: FONT }}>Asistencia de alumnos</p>
-              <p className="text-[11px] mt-0.5" style={{ color: "#999", fontFamily: FONT }}>Resumen por curso</p>
-            </div>
-            <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-[8px]" style={{
-              background: "#f5f5f5",
-              color: "#666",
-              fontFamily: FONT,
-            }}>
-              Hoy <ChevronDown className="h-3 w-3" />
-            </button>
-          </div>
-
-          {/* Table with colored cells */}
+        {/* ═══════════════ HEADER ═══════════════ */}
+        <div className="flex items-start justify-between mb-8">
           <div>
-            {/* Header */}
-            <div className="flex items-center gap-2 pb-2 mb-2" style={{ borderBottom: "1px solid #f0f0f0" }}>
-              <span className="flex-1 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "#ccc", fontFamily: FONT }}>Curso</span>
-              <span className="w-9 text-center text-[10px] font-semibold" style={{ color: "#ccc", fontFamily: FONT }}>P</span>
-              <span className="w-9 text-center text-[10px] font-semibold" style={{ color: "#ccc", fontFamily: FONT }}>T</span>
-              <span className="w-9 text-center text-[10px] font-semibold" style={{ color: "#ccc", fontFamily: FONT }}>F</span>
-              <span className="w-9 text-center text-[10px] font-semibold" style={{ color: "#ccc", fontFamily: FONT }}>J</span>
+            <p className="text-[14px] font-medium mb-1" style={{ color: "#666" }}>Inicio</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "#000" }}>
+              {greeting},<br />{teacherName}
+            </h1>
+            <p className="text-[13px] mt-2" style={{ color: "#666" }}>{dateFormatted}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="h-10 w-10 flex items-center justify-center rounded-full" style={{ background: "#fff" }}>
+              <Bell className="h-5 w-5" style={{ color: "#000" }} />
+            </button>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-10 w-10 flex items-center justify-center rounded-full"
+              style={{ background: "#fff" }}
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "#000" }} />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "#000" }} />
+            </button>
+            <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center" style={{ background: "#000" }}>
+              <span className="text-[12px] font-bold text-white">
+                {user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+              </span>
             </div>
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-medium" style={{ background: "#000", color: "#fff" }}>
+              Docente
+            </span>
+          </div>
+        </div>
 
-            {courses.length === 0 && !loading ? (
-              <div className="py-8 text-center">
-                <p className="text-[11px]" style={{ color: "#ccc", fontFamily: FONT }}>Sin cursos registrados</p>
+        {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {/* Cursos */}
+          <div className="p-5 rounded-[30px]" style={{ background: "#fff" }}>
+            <p className="text-[12px] font-medium mb-3" style={{ color: "#666" }}>Mis cursos</p>
+            <p className="text-[32px] font-bold" style={{ color: "#000" }}>
+              {loading ? "—" : courses.length}
+            </p>
+          </div>
+          {/* Alumnos */}
+          <div className="p-5 rounded-[30px]" style={{ background: "#fff" }}>
+            <p className="text-[12px] font-medium mb-3" style={{ color: "#666" }}>Total alumnos</p>
+            <p className="text-[32px] font-bold" style={{ color: "#000" }}>
+              {loading ? "—" : totalStudents.toLocaleString()}
+            </p>
+          </div>
+          {/* Clases hoy */}
+          <div className="p-5 rounded-[30px]" style={{ background: "#fff" }}>
+            <p className="text-[12px] font-medium mb-3" style={{ color: "#666" }}>Clases hoy</p>
+            <p className="text-[32px] font-bold" style={{ color: "#000" }}>
+              {loading ? "—" : todaySchedule.length}
+            </p>
+          </div>
+          {/* Horas */}
+          <div className="p-5 rounded-[30px]" style={{ background: "#fff" }}>
+            <p className="text-[12px] font-medium mb-3" style={{ color: "#666" }}>Horas hoy</p>
+            <p className="text-[32px] font-bold" style={{ color: "#000" }}>
+              {loading ? "—" : `${hoursToday}h`}
+            </p>
+          </div>
+        </div>
+
+        {/* ═══════════════ BOTTOM GRID ═══════════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-4">
+
+          {/* ──── LEFT COLUMN: Horario + Mis Cursos ──── */}
+          <div className="flex flex-col gap-4">
+
+            {/* Horario de hoy */}
+            <div className="p-6 rounded-[30px] flex-1" style={{ background: "#fff" }}>
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-[16px] font-semibold" style={{ color: "#000" }}>Horario de hoy</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full" style={{ background: "#D9D9D9", color: "#666" }}>
+                  Hoy <ChevronDown className="h-3 w-3" />
+                </button>
               </div>
-            ) : courses.slice(0, 5).map((c, i) => {
-              // Color pattern matching the reference (green, black, gray variations)
-              const patterns = [
-                ["#4ADE80", "#1a1a1a", "#d4d4d4", "#999"],
-                ["#4ADE80", "#4ADE80", "#1a1a1a", "#d4d4d4"],
-                ["#d4d4d4", "#4ADE80", "#4ADE80", "#1a1a1a"],
-                ["#1a1a1a", "#d4d4d4", "#999", "#4ADE80"],
-                ["#4ADE80", "#1a1a1a", "#d4d4d4", "#999"],
-              ]
-              const cells = patterns[i % patterns.length]
-              return (
-                <div key={c.id} className="flex items-center gap-2 py-2.5" style={{
-                  borderBottom: i < Math.min(courses.length, 5) - 1 ? "1px solid #f5f5f5" : "none",
-                }}>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-medium truncate" style={{ color: "#1a1a1a", fontFamily: FONT }}>{c.name}</p>
-                    <p className="text-[10px]" style={{ color: "#bbb", fontFamily: FONT }}>{c.grade} {c.section}</p>
-                  </div>
-                  {cells.map((bg, j) => (
-                    <div key={j} className="w-9 flex justify-center">
-                      <div className="h-[18px] w-[30px] rounded-[5px]" style={{ background: bg }} />
+              {todaySchedule.length === 0 ? (
+                <div className="py-8 text-center">
+                  <Clock className="h-8 w-8 mx-auto mb-2" style={{ color: "#D9D9D9" }} />
+                  <p className="text-[13px]" style={{ color: "#999" }}>Sin clases hoy</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {todaySchedule.map((cls) => (
+                    <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px]" style={{ background: "#D9D9D9" }}>
+                      <div className="h-10 w-10 flex items-center justify-center rounded-full" style={{ background: "#fff" }}>
+                        <BookOpen className="h-5 w-5" style={{ color: "#666" }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium truncate" style={{ color: "#000" }}>{cls.course_name}</p>
+                        <p className="text-[11px]" style={{ color: "#666" }}>{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[13px] font-medium" style={{ color: "#000" }}>{cls.start_time}</p>
+                        <p className="text-[11px]" style={{ color: "#666" }}>{cls.end_time}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
-              )
-            })}
-          </div>
-        </div>
-      </motion.div>
+              )}
+            </div>
 
-      {/* ═══ BOTTOM: Próximas Clases (Transactions) ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-        className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <p className="text-[14px] font-semibold" style={{ color: "#1a1a1a", fontFamily: FONT }}>Próximas clases</p>
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-[6px]" style={{
-              background: "#f5f5f5",
-              color: "#999",
-              fontFamily: FONT,
-            }}>
-              {todaySchedule.length} Total
-            </span>
+            {/* Mis Cursos */}
+            <div className="p-6 rounded-[30px]" style={{ background: "#fff" }}>
+              <p className="text-[16px] font-semibold mb-5" style={{ color: "#000" }}>Mis Cursos</p>
+              {courses.length === 0 ? (
+                <div className="py-6 text-center">
+                  <GraduationCap className="h-8 w-8 mx-auto mb-2" style={{ color: "#D9D9D9" }} />
+                  <p className="text-[13px]" style={{ color: "#999" }}>Sin cursos registrados</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {courses.map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px]" style={{ background: "#D9D9D9" }}>
+                      <div className="h-10 w-10 flex items-center justify-center rounded-full" style={{ background: "#fff" }}>
+                        <GraduationCap className="h-5 w-5" style={{ color: "#666" }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium truncate" style={{ color: "#000" }}>{c.name}</p>
+                        <p className="text-[11px]" style={{ color: "#666" }}>{c.grade} {c.section}</p>
+                      </div>
+                      <span className="text-[12px] font-medium" style={{ color: "#666" }}>{c.students} alumnos</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-[8px]" style={{
-              background: "#f5f5f5",
-              color: "#666",
-              fontFamily: FONT,
-            }}>
-              Hoy <ChevronDown className="h-3 w-3" />
-            </button>
-            <button className="h-7 w-7 flex items-center justify-center rounded-[8px]" style={{ background: "#f5f5f5" }}>
-              <Search className="h-3.5 w-3.5" style={{ color: "#999" }} />
-            </button>
-          </div>
-        </div>
 
-        {todaySchedule.length === 0 ? (
-          <div className="py-8 text-center">
-            <Calendar className="h-7 w-7 mx-auto mb-2" style={{ color: "#ddd" }} />
-            <p className="text-[11px]" style={{ color: "#ccc", fontFamily: FONT }}>Sin clases programadas hoy</p>
-          </div>
-        ) : (
-          <div>
-            {todaySchedule.map((cls, i) => (
-              <div key={cls.id} className="flex items-center gap-3 py-2.5" style={{
-                borderBottom: i < todaySchedule.length - 1 ? "1px solid #f5f5f5" : "none",
-              }}>
-                <div className="h-8 w-8 flex items-center justify-center rounded-[10px]" style={{ background: "#f5f5f5" }}>
-                  <BookOpen className="h-4 w-4" style={{ color: "#999" }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-medium" style={{ color: "#1a1a1a", fontFamily: FONT }}>{cls.course_name}</p>
-                  <p className="text-[10px]" style={{ color: "#bbb", fontFamily: FONT }}>{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[12px] font-medium" style={{ color: "#1a1a1a", fontFamily: FONT }}>{cls.start_time}</p>
-                  <p className="text-[10px]" style={{ color: "#ccc", fontFamily: FONT }}>{cls.end_time}</p>
-                </div>
+          {/* ──── RIGHT COLUMN: Asistencia de hoy ──── */}
+          <div className="p-6 rounded-[30px]" style={{ background: "#fff" }}>
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-[16px] font-semibold" style={{ color: "#000" }}>Asistencia de hoy</p>
+              <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full" style={{ background: "#D9D9D9", color: "#666" }}>
+                Resumen <ChevronDown className="h-3 w-3" />
+              </button>
+            </div>
+
+            {/* Attendance summary */}
+            <div className="mb-6">
+              <div className="flex items-end gap-2 mb-2">
+                <span className="text-[48px] font-bold leading-none" style={{ color: "#000" }}>
+                  {loading ? "—" : `${attendancePct}%`}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </motion.div>
+              <p className="text-[13px]" style={{ color: "#666" }}>
+                {studentSummary
+                  ? `${studentSummary.present} presentes de ${studentSummary.total} alumnos`
+                  : "Sin datos de asistencia"}
+              </p>
+            </div>
 
+            {/* Progress bar */}
+            <div className="w-full h-3 rounded-full mb-8" style={{ background: "#D9D9D9" }}>
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${attendancePct}%`,
+                  background: "#000",
+                }}
+              />
+            </div>
+
+            {/* Course breakdown */}
+            <p className="text-[14px] font-semibold mb-4" style={{ color: "#000" }}>Resumen por curso</p>
+            {courses.length === 0 ? (
+              <div className="py-6 text-center">
+                <Users className="h-8 w-8 mx-auto mb-2" style={{ color: "#D9D9D9" }} />
+                <p className="text-[13px]" style={{ color: "#999" }}>Sin cursos</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {courses.map((c) => (
+                  <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px]" style={{ background: "#D9D9D9" }}>
+                    <div className="h-10 w-10 flex items-center justify-center rounded-full" style={{ background: "#fff" }}>
+                      <GraduationCap className="h-5 w-5" style={{ color: "#666" }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium truncate" style={{ color: "#000" }}>{c.name}</p>
+                      <p className="text-[11px]" style={{ color: "#666" }}>{c.grade} {c.section}</p>
+                    </div>
+                    <span className="text-[12px] font-medium" style={{ color: "#666" }}>{c.students} alumnos</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
     </div>
   )
 }
