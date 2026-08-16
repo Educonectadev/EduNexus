@@ -224,7 +224,7 @@ function TareasInner() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="max-w-[800px] mx-auto px-4 py-8 space-y-6">
+      <div className="mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6">
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

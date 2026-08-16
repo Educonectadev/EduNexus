@@ -48,11 +48,43 @@ function getBarConfig(status: string | null) {
   return "bg-[var(--note-fill-strong)]"
 }
 
-function NoteChip({ icon: Icon, className, label }: { icon: React.ComponentType<{ className?: string }>; className?: string; label: string }) {
+function NoteChip({ icon: Icon, className }: { icon: React.ComponentType<{ className?: string }>; className?: string }) {
   return (
-    <div className="h-8 w-8 rounded-xl bg-[var(--note-fill)] flex items-center justify-center shrink-0">
-      <Icon className={cn("h-4 w-4", className)} />
+    <div
+      className="h-8 w-8 flex items-center justify-center shrink-0"
+      style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
+    >
+      <Icon className={cn("h-4 w-4", className)} style={{ color: "var(--sb-on-surface-variant)" }} />
     </div>
+  )
+}
+
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
+
+function Card({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn("overflow-hidden", className)}
+      style={{
+        background: "var(--sb-surface-container)",
+        borderRadius: "16px",
+        border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      className="text-[10px] font-bold uppercase tracking-[0.8px]"
+      style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}
+    >
+      {children}
+    </p>
   )
 }
 
@@ -76,7 +108,7 @@ function AsistenciaInner() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="max-w-[800px] mx-auto px-4 py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-10 py-8">
         <header className="mb-6">
           <span
             className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
@@ -86,20 +118,13 @@ function AsistenciaInner() {
           </span>
           <h1
             className="text-2xl font-semibold mt-2"
-            style={{
-              color: "var(--sb-on-surface)",
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
-              letterSpacing: "-0.02em"
-            }}
+            style={{ color: "var(--sb-on-surface)", fontFamily: FONT, letterSpacing: "-0.02em" }}
           >
             Asistencia
           </h1>
           <p
             className="text-sm mt-1"
-            style={{
-              color: "var(--sb-on-surface-variant)",
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-            }}
+            style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
           >
             Control de tu marcación y la asistencia de tus alumnos
           </p>
@@ -123,6 +148,9 @@ function AsistenciaInner() {
   )
 }
 
+/* ═══════════════════════════════════════════════════════
+   MI ASISTENCIA
+   ═══════════════════════════════════════════════════════ */
 function MiAsistencia() {
   const [attendance, setAttendance] = React.useState<any>(null)
   const [schedule, setSchedule] = React.useState<any>(null)
@@ -173,9 +201,11 @@ function MiAsistencia() {
     return (
       <div className="space-y-3">
         <div className="animate-pulse grid grid-cols-3 gap-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-28 rounded-xl border border-foreground/10 bg-foreground/5" />)}
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-28" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
+          ))}
         </div>
-        <div className="animate-pulse h-24 rounded-xl border border-foreground/10 bg-foreground/5" />
+        <div className="animate-pulse h-24" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
       </div>
     )
   }
@@ -188,23 +218,28 @@ function MiAsistencia() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
-      {/* Jornada card */}
-      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
-        <div className="px-5 py-4 flex items-center justify-between border-b border-foreground/10">
+      {/* ── Jornada Card ── */}
+      <Card>
+        {/* Top row: fecha + status */}
+        <div
+          className="px-5 py-4 flex items-center justify-between"
+          style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
+        >
           <div className="flex items-center gap-3">
-            <NoteChip icon={Clock} label="" />
+            <NoteChip icon={Clock} />
             <div>
-              <p className="text-sm font-semibold text-foreground capitalize">
+              <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
                 {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
               </p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
+              <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
                 {!checkedIn
                   ? schedule
                     ? `Horario hoy: ${schedule.start_time} — ${schedule.end_time}`
                     : "Hoy sin clases programadas"
                   : checkedOut
                     ? `Jornada completada · ${checkedIn.slice(0, 5)} — ${checkedOut.slice(0, 5)}`
-                    : `Entrada ${checkedIn.slice(0, 5)} · salida programada ${schedule?.end_time || "—"}`}
+                    : `Entrada ${checkedIn.slice(0, 5)} · salida programada ${schedule?.end_time || "—"}`
+                }
               </p>
             </div>
           </div>
@@ -216,41 +251,56 @@ function MiAsistencia() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 divide-x divide-foreground/10">
-          <div className="p-4">
+        {/* Entrada / Salida */}
+        <div className="grid grid-cols-2">
+          <div className="p-4" style={{ borderRight: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
             <div className="flex items-center gap-2 mb-1">
-              <LogIn className={`h-3.5 w-3.5 ${checkedIn ? "text-foreground" : "text-muted-foreground/40"}`} />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Entrada</span>
+              <LogIn className="h-3.5 w-3.5" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.4 }} />
+              <SectionLabel>Entrada</SectionLabel>
             </div>
-            <p className={`text-xl font-bold tracking-tight ${checkedIn ? "text-foreground" : "text-muted-foreground/40"}`}>
+            <p className="text-xl font-bold tracking-tight" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.4, fontFamily: FONT }}>
               {checkedIn?.slice(0, 5) || "--:--"}
             </p>
-            {schedule && <p className="text-[10px] text-muted-foreground mt-0.5">Programada: {schedule.start_time}</p>}
+            {schedule && <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Programada: {schedule.start_time}</p>}
           </div>
           <div className="p-4">
             <div className="flex items-center gap-2 mb-1">
-              <LogOut className={`h-3.5 w-3.5 ${checkedOut ? "text-foreground" : "text-muted-foreground/40"}`} />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Salida</span>
+              <LogOut className="h-3.5 w-3.5" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.4 }} />
+              <SectionLabel>Salida</SectionLabel>
             </div>
-            <p className={`text-xl font-bold tracking-tight ${checkedOut ? "text-foreground" : "text-muted-foreground/40"}`}>
+            <p className="text-xl font-bold tracking-tight" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.4, fontFamily: FONT }}>
               {checkedOut?.slice(0, 5) || "--:--"}
             </p>
-            {schedule && <p className="text-[10px] text-muted-foreground mt-0.5">Programada: {schedule.end_time}</p>}
+            {schedule && <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Programada: {schedule.end_time}</p>}
           </div>
         </div>
 
+        {/* Action buttons */}
         <div className="px-5 pb-5 pt-1">
           {hasPending && (
-            <div className="rounded-xl bg-foreground/5 border border-foreground/10 p-4">
+            <div
+              className="p-4"
+              style={{
+                borderRadius: "12px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                background: "var(--sb-surface-container-high)",
+              }}
+            >
               <div className="flex items-start gap-3">
-                <LogOut className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+                <LogOut className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "var(--sb-on-surface-variant)" }} />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida. Completa la salida pendiente antes de marcar una nueva entrada.
+                  <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                    Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
                   </p>
-                  <button onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}
-                    className="mt-3 w-full h-10 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+                  <p className="text-xs mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                    Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida.
+                  </p>
+                  <button
+                    onClick={() => handleCheck("check-out", pendingCheckout.date)}
+                    disabled={actionLoading}
+                    className="mt-3 w-full h-10 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+                  >
                     {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
                     Marcar Salida
                   </button>
@@ -259,82 +309,125 @@ function MiAsistencia() {
             </div>
           )}
           {!hasPending && !checkedIn && (
-            <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
-              className="w-full h-11 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+            <button
+              onClick={() => handleCheck("check-in")}
+              disabled={actionLoading}
+              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+            >
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
               Marcar Entrada
             </button>
           )}
           {!hasPending && checkedIn && !checkedOut && (
-            <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
-              className="w-full h-11 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50">
+            <button
+              onClick={() => handleCheck("check-out")}
+              disabled={actionLoading}
+              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+            >
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
               Marcar Salida
             </button>
           )}
           {!hasPending && checkedIn && checkedOut && (
-            <div className="w-full h-11 rounded-xl bg-foreground/10 text-foreground text-sm font-semibold flex items-center justify-center gap-2">
+            <div
+              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2"
+              style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
+            >
               <Check className="h-4 w-4" />
               Jornada completada
             </div>
           )}
         </div>
-      </div>
+      </Card>
 
-      {/* Weekly overview */}
-      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
-        <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+      {/* ── Weekly Bars ── */}
+      <Card>
+        <div className="px-5 pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <NoteChip icon={Flame} label="" />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Últimos 7 días</p>
+            <NoteChip icon={Flame} />
+            <SectionLabel>Últimos 7 días</SectionLabel>
           </div>
-          <span className="text-[10px] font-medium px-2 py-1 rounded-lg bg-foreground/5 text-muted-foreground">
+          <span
+            className="text-[10px] font-medium px-2 py-1"
+            style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
+          >
             {history.length} registros
           </span>
         </div>
-        <div className="px-4 pb-4 flex items-end justify-between gap-2">
+        <div className="px-5 pb-5 flex items-end justify-between gap-2">
           {weekDays.map((d) => {
             const isToday = getLocalDateStr() === d.iso
             return (
               <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                <div className="h-20 w-full max-w-[34px] rounded-lg bg-foreground/5 flex items-end overflow-hidden">
-                  <div className={`w-full h-full transition-all duration-500 ${getBarConfig(d.status)}`} style={{ height: d.status ? "100%" : "8%" }} />
+                <div
+                  className="h-20 w-full max-w-[34px] flex items-end overflow-hidden"
+                  style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)" }}
+                >
+                  <div
+                    className={`w-full h-full transition-all duration-500 ${getBarConfig(d.status)}`}
+                    style={{ height: d.status ? "100%" : "8%" }}
+                  />
                 </div>
                 <div className="flex flex-col items-center">
-                  <span className={`text-[9px] font-semibold uppercase ${isToday ? "text-foreground" : "text-muted-foreground/50"}`}>{d.label}</span>
-                  <span className={`text-[10px] font-medium ${isToday ? "text-foreground" : "text-muted-foreground"}`}>{d.day}</span>
+                  <span
+                    className="text-[9px] font-semibold uppercase"
+                    style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: isToday ? 1 : 0.5, fontFamily: FONT }}
+                  >
+                    {d.label}
+                  </span>
+                  <span
+                    className="text-[10px] font-medium"
+                    style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", fontFamily: FONT }}
+                  >
+                    {d.day}
+                  </span>
                 </div>
               </div>
             )
           })}
         </div>
-      </div>
+      </Card>
 
-      {/* History */}
-      <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
-        <div className="px-4 pt-4 pb-2">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Historial reciente</p>
+      {/* ── History ── */}
+      <Card>
+        <div className="px-5 pt-4 pb-2">
+          <SectionLabel>Historial reciente</SectionLabel>
         </div>
         {history.length === 0 ? (
-          <div className="py-20 text-center">
-            <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-sm text-muted-foreground">Aún no tienes registros de asistencia</p>
+          <div className="py-16 text-center">
+            <Calendar className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
+            <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+              Aún no tienes registros de asistencia
+            </p>
           </div>
         ) : (
-          <div className="divide-y divide-foreground/10">
-            {history.slice(0, 10).map((h: any) => {
+          <div>
+            {history.slice(0, 10).map((h: any, i: number) => {
               const sc = STATUS_CONFIG[h.status] || STATUS_CONFIG.present
+              const isLast = i === Math.min(history.length, 10) - 1
               return (
-                <div key={h.id} className="flex items-center justify-between px-5 py-3 hover:bg-foreground/5 transition-colors">
+                <div
+                  key={h.id}
+                  className="flex items-center justify-between px-5 py-3 transition-colors"
+                  style={{ borderBottom: isLast ? "none" : "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                >
                   <div className="flex items-center gap-3">
-                    <NoteChip icon={Calendar} label="" />
-                    <span className="text-sm text-foreground capitalize">
+                    <NoteChip icon={Calendar} />
+                    <span className="text-sm capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
                       {new Date(h.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-muted-foreground">Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}</span>
-                    <span className="text-xs text-muted-foreground">Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}</span>
+                    <span className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                      Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}
+                    </span>
+                    <span className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                      Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}
+                    </span>
                     <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg ${sc.color}`}>
                       <span className={`h-1 w-1 rounded-full ${sc.dot}`} />
                       {sc.label}
@@ -345,11 +438,14 @@ function MiAsistencia() {
             })}
           </div>
         )}
-      </div>
+      </Card>
     </motion.div>
   )
 }
 
+/* ═══════════════════════════════════════════════════════
+   DATE PICKER
+   ═══════════════════════════════════════════════════════ */
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 const MonthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
@@ -388,38 +484,59 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
 
   return (
     <div ref={ref} className="relative">
-      <button type="button" onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 rounded-xl border px-3 text-sm font-medium transition-all cursor-pointer text-left"
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="h-10 w-full flex items-center gap-2 px-3 text-sm font-medium transition-all cursor-pointer text-left"
         style={{
-          borderColor: date ? "var(--note-hairline-strong)" : "var(--note-hairline)",
-          background: date ? "var(--note-fill)" : "transparent",
-          color: date ? "var(--note-text)" : "var(--note-muted)",
-        }}>
+          borderRadius: "14px",
+          border: `1.5px solid ${date ? "var(--sb-primary)" : "var(--sb-outline-variant)"}`,
+          background: date ? "var(--sb-surface-container)" : "transparent",
+          color: date ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
+          fontFamily: FONT,
+        }}
+      >
         <Calendar className="h-4 w-4 shrink-0 opacity-50" />
-        <span className="flex-1 truncate capitalize">
-          {date ? display : "Seleccionar fecha"}
-        </span>
+        <span className="flex-1 truncate capitalize">{date ? display : "Seleccionar fecha"}</span>
         <ChevronDown className={cn("h-4 w-4 shrink-0 opacity-40 transition-transform", open && "rotate-180")} />
       </button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute z-30 top-full mt-2 left-0 w-[300px] rounded-xl border border-foreground/10 bg-background p-4"
-            style={{ boxShadow: "0 24px 48px -16px rgba(0,0,0,0.45)" }}
+            className="absolute z-30 top-full mt-2 left-0 w-[300px] p-4"
+            style={{
+              background: "var(--sb-surface)",
+              borderRadius: "16px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+              boxShadow: "0 8px 32px -4px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04)",
+            }}
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: [0.37, 0.35, 0, 1] }}>
+            transition={{ duration: 0.18, ease: [0.37, 0.35, 0, 1] }}
+          >
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-foreground capitalize">{MonthNames[month]} {year}</p>
+              <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                {MonthNames[month]} {year}
+              </p>
               <div className="flex gap-1">
-                <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-foreground/5 transition-colors text-muted-foreground">
+                <button
+                  onClick={() => setViewDate(new Date(year, month - 1, 1))}
+                  className="h-7 w-7 flex items-center justify-center transition-colors"
+                  style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
-                <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-foreground/5 transition-colors text-muted-foreground">
+                <button
+                  onClick={() => setViewDate(new Date(year, month + 1, 1))}
+                  className="h-7 w-7 flex items-center justify-center transition-colors"
+                  style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -427,7 +544,9 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
 
             <div className="grid grid-cols-7 mb-1">
               {WEEKDAYS.map(d => (
-                <div key={d} className="text-center py-1"><span className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider">{d}</span></div>
+                <div key={d} className="text-center py-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.4, fontFamily: FONT }}>{d}</span>
+                </div>
               ))}
             </div>
 
@@ -439,16 +558,22 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 const isSelected = dateStr === date
                 const isFuture = dateStr > today
                 return (
-                  <button key={day} onClick={() => !isFuture && selectDate(day)}
+                  <button
+                    key={day}
+                    onClick={() => !isFuture && selectDate(day)}
                     disabled={isFuture}
-                    className={cn(
-                      "h-8 w-full rounded-lg flex items-center justify-center text-[12px] font-medium transition-colors",
-                      isFuture && "text-muted-foreground/30 cursor-not-allowed",
-                      isSelected && !isToday && "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]",
-                      isToday && !isSelected && "bg-foreground/5 text-foreground ring-1 ring-foreground/10",
-                      isToday && isSelected && "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]",
-                      !isSelected && !isToday && !isFuture && "text-foreground/70 hover:bg-foreground/5"
-                    )}>{day}</button>
+                    className="h-8 w-full flex items-center justify-center text-[12px] font-medium transition-colors"
+                    style={{
+                      borderRadius: "8px",
+                      background: isSelected ? "var(--sb-on-surface)" : isToday ? "var(--sb-surface-container-high)" : "transparent",
+                      color: isSelected ? "var(--sb-surface)" : isToday ? "var(--sb-on-surface)" : isFuture ? "var(--sb-on-surface-variant)" : "var(--sb-on-surface)",
+                      opacity: isFuture ? 0.3 : 1,
+                      cursor: isFuture ? "not-allowed" : "pointer",
+                      fontFamily: FONT,
+                    }}
+                  >
+                    {day}
+                  </button>
                 )
               })}
             </div>
@@ -459,6 +584,9 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   )
 }
 
+/* ═══════════════════════════════════════════════════════
+   ASISTENCIA ALUMNOS
+   ═══════════════════════════════════════════════════════ */
 function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const [courses, setCourses] = React.useState<any[]>([])
   const [selectedCourse, setSelectedCourse] = React.useState(prefillCourse)
@@ -549,26 +677,26 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   ]
 
   const summary = [
-    { label: "Presentes", value: counts.present, color: "text-foreground", bg: "bg-foreground/5", icon: UserCheck },
-    { label: "Tardanzas", value: counts.late, color: "text-muted-foreground", bg: "bg-foreground/5", icon: Clock },
-    { label: "Faltas", value: counts.absent, color: "text-muted-foreground", bg: "bg-foreground/5", icon: XCircle },
-    { label: "Justificados", value: counts.justified, color: "text-foreground", bg: "bg-foreground/5", icon: Check },
+    { label: "Presentes", value: counts.present, icon: UserCheck },
+    { label: "Tardanzas", value: counts.late, icon: Clock },
+    { label: "Faltas", value: counts.absent, icon: XCircle },
+    { label: "Justificados", value: counts.justified, icon: Check },
   ]
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
-      {/* Selector */}
-      <div className="rounded-xl border border-foreground/10 bg-background">
-        <div className="px-4 pt-4 pb-2">
+      {/* ── Selector ── */}
+      <Card>
+        <div className="px-5 pt-4 pb-2">
           <div className="flex items-center gap-2">
-            <NoteChip icon={Users} label="" />
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Seleccionar curso y fecha</p>
+            <NoteChip icon={Users} />
+            <SectionLabel>Seleccionar curso y fecha</SectionLabel>
           </div>
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-5 pb-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">Curso</p>
+              <p className="text-xs font-medium" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Curso</p>
               <select value={selectedCourse} onChange={e => { setSelectedCourse(e.target.value); setStatsLoaded(false); setStats([]) }}
                 className={`sbf-native-select w-full ${selectedCourse ? "has-value" : ""}`}>
                 <option value="">Seleccionar curso</option>
@@ -576,19 +704,28 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </select>
             </div>
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">Fecha</p>
+              <p className="text-xs font-medium" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Fecha</p>
               <DatePickerDropdown date={date} onSelect={setDate} />
             </div>
-            <button onClick={handleCargar} disabled={loading || !selectedCourse}
-              className="h-10 px-4 rounded-xl bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30 hover:opacity-90 transition-all">
+            <button
+              onClick={handleCargar}
+              disabled={loading || !selectedCourse}
+              className="h-10 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-30"
+              style={{
+                borderRadius: "12px",
+                background: "var(--sb-on-surface)",
+                color: "var(--sb-surface)",
+                fontFamily: FONT,
+              }}
+            >
               {loading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Search className="h-4 w-4" />}
               Cargar alumnos
             </button>
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* View toggle */}
+      {/* ── View toggle ── */}
       {selectedCourse && (
         <div className="nb-rail">
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
@@ -601,125 +738,170 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </div>
       )}
 
+      {/* ── Stats Table ── */}
       {alumnoView === "estadisticas" && selectedCourse && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
-          <div className="px-5 pt-5 pb-3 border-b border-foreground/10">
-            <div className="flex items-center gap-2">
-              <NoteChip icon={Users} label="" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">Asistencia de los últimos 30 días</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Resumen por alumno del curso seleccionado</p>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <Card>
+            <div className="px-5 pt-5 pb-3" style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
+              <div className="flex items-center gap-2">
+                <NoteChip icon={Users} />
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>Asistencia de los últimos 30 días</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Resumen por alumno del curso seleccionado</p>
+                </div>
               </div>
             </div>
-          </div>
-          {statsLoading ? (
-            <div className="py-10 text-center">
-              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-sm">
-                <thead>
-                  <tr className="bg-foreground/5 text-left">
-                    <th className="px-5 py-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Alumno</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">A tiempo</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Tardanzas</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Faltas</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Justific.</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Registros</th>
-                    <th className="px-5 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">% Asistencia</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-foreground/10">
-                  {stats.length === 0 ? (
-                    <tr><td colSpan={7} className="py-20 text-center">
-                      <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                      <p className="text-sm text-muted-foreground">Sin registros de asistencia en el curso</p>
-                    </td></tr>
-                  ) : stats.map(s => (
-                    <tr key={s.id} className="hover:bg-foreground/5 transition-colors">
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`h-8 w-8 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
-                            <span className="text-[9px] font-bold text-white">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-medium text-foreground truncate">{s.apellidos}, {s.nombres}</p>
-                            <p className="text-[9px] text-muted-foreground">DNI: {s.dni}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-foreground">{s.present}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-muted-foreground">{s.late}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-red-500">{s.absent}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold text-blue-600">{s.justified}</td>
-                      <td className="px-3 py-3 text-center text-xs text-muted-foreground">{s.total}</td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2 justify-end">
-                          <div className="w-24 h-1.5 rounded-full bg-foreground/10 overflow-hidden">
-                            <div className={`h-full rounded-full ${s.rate >= 80 ? "bg-foreground" : s.rate >= 60 ? "bg-muted-foreground" : "bg-muted-foreground opacity-60"}`} style={{ width: `${s.rate}%` }} />
-                          </div>
-                            <span className={`text-xs font-bold w-9 text-right ${s.rate >= 80 ? "text-foreground" : s.rate >= 60 ? "text-muted-foreground" : "text-muted-foreground opacity-60"}`}>{s.rate}%</span>
-                        </div>
-                      </td>
+            {statsLoading ? (
+              <div className="py-10 text-center">
+                <div className="h-5 w-5 border-2 animate-spin mx-auto" style={{ borderColor: "color-mix(in srgb, var(--sb-on-surface-variant) 20%, transparent)", borderTopColor: "var(--sb-on-surface)", borderRadius: "999px" }} />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[560px] text-sm">
+                  <thead>
+                    <tr style={{ background: "var(--sb-surface-container-high)" }}>
+                      <th className="px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>Alumno</th>
+                      <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>A tiempo</th>
+                      <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>Tardanzas</th>
+                      <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>Faltas</th>
+                      <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>Justific.</th>
+                      <th className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>Registros</th>
+                      <th className="px-5 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45, fontFamily: FONT }}>% Asistencia</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {stats.length === 0 ? (
+                      <tr><td colSpan={7} className="py-16 text-center">
+                        <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
+                        <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Sin registros de asistencia en el curso</p>
+                      </td></tr>
+                    ) : stats.map((s, i) => (
+                      <tr
+                        key={s.id}
+                        className="transition-colors"
+                        style={{ borderBottom: i < stats.length - 1 ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" : "none" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                      >
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`h-8 w-8 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
+                              <span className="text-[9px] font-bold text-white">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-medium truncate" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
+                              <p className="text-[9px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>DNI: {s.dni}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{s.present}</td>
+                        <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>{s.late}</td>
+                        <td className="px-3 py-3 text-center text-sm font-semibold text-red-500">{s.absent}</td>
+                        <td className="px-3 py-3 text-center text-sm font-semibold text-blue-600">{s.justified}</td>
+                        <td className="px-3 py-3 text-center text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>{s.total}</td>
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-2 justify-end">
+                            <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--sb-surface-container-high)" }}>
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${s.rate}%`,
+                                  background: s.rate >= 80 ? "var(--sb-on-surface)" : s.rate >= 60 ? "var(--sb-on-surface-variant)" : "var(--sb-on-surface-variant)",
+                                  opacity: s.rate >= 80 ? 1 : s.rate >= 60 ? 0.6 : 0.4,
+                                }}
+                              />
+                            </div>
+                            <span
+                              className="text-xs font-bold w-9 text-right"
+                              style={{
+                                color: s.rate >= 80 ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
+                                opacity: s.rate >= 80 ? 1 : 0.6,
+                                fontFamily: FONT,
+                              }}
+                            >
+                              {s.rate}%
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
         </motion.div>
       )}
 
+      {/* ── Registro ── */}
       {loaded && students.length > 0 && alumnoView === "registro" && (
         <>
-          {/* Summary */}
-          <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden">
-            {summary.map(s => {
-              const Icon = s.icon
+          {/* Summary cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {summary.map(item => {
+              const Icon = item.icon
               return (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-background p-5 lg:p-6">
-                  <div className={`h-9 w-9 rounded-xl flex items-center justify-center mb-3 ${s.bg}`}>
-                    <Icon className={`h-4 w-4 ${s.color}`} />
+                <div
+                  key={item.label}
+                  className="p-4"
+                  style={{
+                    background: "var(--sb-surface-container)",
+                    borderRadius: "16px",
+                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                  }}
+                >
+                  <div
+                    className="h-8 w-8 flex items-center justify-center mb-2"
+                    style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
+                  >
+                    <Icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
-                  <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-foreground">{s.value}</p>
-                </motion.div>
+                  <SectionLabel>{item.label}</SectionLabel>
+                  <p className="mt-1.5 text-lg font-bold leading-none" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{item.value}</p>
+                </div>
               )
             })}
-          </motion.div>
+          </div>
 
           {/* Student list */}
-          <div className="rounded-xl border border-foreground/10 bg-background overflow-hidden">
-            <div className="px-4 pt-4 pb-3">
+          <Card>
+            <div className="px-5 pt-4 pb-3">
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Lista de alumnos</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{filtered.length} de {students.length} alumnos</p>
+                  <SectionLabel>Lista de alumnos</SectionLabel>
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                    {filtered.length} de {students.length} alumnos
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button onClick={handleMarkAllPresent}
-                    className="h-9 px-3.5 rounded-xl bg-foreground/10 text-foreground text-xs font-semibold hover:opacity-90 transition-colors flex items-center gap-1.5">
+                  <button
+                    onClick={handleMarkAllPresent}
+                    className="h-9 px-3.5 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface)", fontFamily: FONT }}
+                  >
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos presentes
                   </button>
-                  <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
-                    className="h-9 px-3 rounded-xl bg-foreground/5 text-muted-foreground text-xs font-medium hover:bg-foreground/10 disabled:opacity-40 transition-colors">
+                  <button
+                    onClick={handleClearAll}
+                    disabled={students.every(s => s.status === null)}
+                    className="h-9 px-3 text-xs font-medium transition-colors disabled:opacity-40"
+                    style={{ borderRadius: "12px", background: "var(--sb-surface-container)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
+                  >
                     Limpiar
                   </button>
                   <div className="relative w-44">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.5 }} />
                     <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
                       className="sb-input rounded-xl text-sm h-9 pl-9" />
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4 pt-3 border-t border-foreground/10">
+              <div className="flex items-center gap-4 pt-3" style={{ borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
                 {statusChips.map(chip => (
                   <div key={chip.status} className="flex items-center gap-1.5">
                     <span className={`h-4 w-4 rounded-lg flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
-                    <span className="text-[10px] text-muted-foreground">{chip.title}</span>
-                    <span className="text-[10px] font-semibold text-muted-foreground ml-0.5">
+                    <span className="text-[10px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>{chip.title}</span>
+                    <span className="text-[10px] font-semibold ml-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
                       {students.filter(s => s.status === chip.status).length}
                     </span>
                   </div>
@@ -727,19 +909,25 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </div>
             </div>
 
-            <div className="divide-y divide-foreground/10 border-t border-foreground/10">
-              {filtered.map(s => (
-                <div key={s.id} className={cn(
-                  "flex items-center justify-between gap-3 px-4 py-3 transition-colors",
-                  s.status ? "bg-foreground/5" : "hover:bg-foreground/5"
-                )}>
+            <div style={{ borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
+              {filtered.map((s, i) => (
+                <div
+                  key={s.id}
+                  className="flex items-center justify-between gap-3 px-5 py-3 transition-colors"
+                  style={{
+                    borderBottom: i < filtered.length - 1 ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" : "none",
+                    background: s.status ? "var(--sb-surface-container-high)" : "transparent",
+                  }}
+                  onMouseEnter={(e) => { if (!s.status) e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                  onMouseLeave={(e) => { if (!s.status) e.currentTarget.style.background = "transparent" }}
+                >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`h-9 w-9 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
                       <span className="text-white text-[10px] font-bold">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{s.apellidos}, {s.nombres}</p>
-                      <p className="text-[10px] text-muted-foreground">DNI: {s.dni}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
+                      <p className="text-[10px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>DNI: {s.dni}</p>
                     </div>
                   </div>
                   <div className="flex gap-1 shrink-0">
@@ -757,18 +945,37 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
 
           {/* Save bar */}
-          <div className="flex items-center gap-3 sticky bottom-0 bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-foreground/10">
+          <div
+            className="flex items-center gap-3 sticky bottom-0 backdrop-blur-sm p-4"
+            style={{
+              borderRadius: "16px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+              background: "color-mix(in srgb, var(--sb-surface) 80%, transparent)",
+            }}
+          >
             <div className="flex-1 space-y-1">
-              <p className="text-sm font-semibold text-foreground">{marked} de {students.length} marcados</p>
-              <div className="h-1.5 rounded-full bg-foreground/10 overflow-hidden">
-                <div className="h-full bg-foreground rounded-full transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
+              <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                {marked} de {students.length} marcados
+              </p>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--sb-surface-container-high)" }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${students.length ? (marked / students.length) * 100 : 0}%`,
+                    background: "var(--sb-on-surface)",
+                  }}
+                />
               </div>
             </div>
-            <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-6 rounded-xl text-sm font-semibold bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)] hover:opacity-90 active:opacity-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0">
+            <button
+              onClick={handleGuardar}
+              disabled={saving || students.every(s => s.status === null)}
+              className="h-12 px-6 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+            >
               {saving ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Check className="h-4 w-4" />}
               Guardar
             </button>
@@ -776,18 +983,19 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </>
       )}
 
+      {/* ── Empty states ── */}
       {loaded && students.length === 0 && (
-        <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
-          <UserX className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">No hay alumnos en este curso</p>
-        </div>
+        <Card className="py-16 text-center">
+          <UserX className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
+          <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>No hay alumnos en este curso</p>
+        </Card>
       )}
 
       {!loaded && courses.length === 0 && (
-        <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
-          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Sin cursos asignados</p>
-        </div>
+        <Card className="py-16 text-center">
+          <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
+          <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Sin cursos asignados</p>
+        </Card>
       )}
     </motion.div>
   )
