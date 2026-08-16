@@ -702,7 +702,6 @@ function TablaNotas({
           </tbody>
         </table>
       </div>
-      </div>
     </div>
   )
 }

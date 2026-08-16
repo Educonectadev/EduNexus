@@ -647,7 +647,6 @@ export default function DocenteHorariosPage() {
         open={modalOpen}
         onClose={() => { setModalOpen(false); setSelectedHorario(null) }}
       />
-      </div>
     </div>
   )
 }
