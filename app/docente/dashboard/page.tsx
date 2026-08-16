@@ -115,14 +115,15 @@ export default function DocenteDashboard() {
   const dateLabel = `${today.toLocaleDateString("es-PE", { day: "numeric", month: "short" })} - ${today.toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}`
 
   return (
-    <div className="w-full">
+    <div className="w-full p-1.5">
 
       {/* ═══ HEADER ═══ */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6"
+        className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 p-5 rounded-[20px] mb-1.5"
+        style={{ background: "#fff", border: "1px solid #eee" }}
       >
         <h1 className="text-[32px] sm:text-[40px] font-bold leading-[1.05]" style={{ color: "#1a1a1a", fontFamily: FONT, letterSpacing: "-0.03em" }}>
           Tu Resumen<br />Docente
@@ -163,7 +164,7 @@ export default function DocenteDashboard() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 mb-1.5"
       >
         {/* Card 1: Dark - Asistencia */}
         <div className="p-5 rounded-[20px]" style={{ background: "#1a1a1a" }}>
@@ -225,7 +226,7 @@ export default function DocenteDashboard() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-1.5 mb-1.5"
       >
         {/* ═══ LEFT: Horario Semanal (Sales Funnel) ═══ */}
         <div className="p-5 rounded-[20px]" style={{ background: "#fff", border: "1px solid #eee" }}>
