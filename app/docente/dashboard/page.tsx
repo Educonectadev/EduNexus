@@ -115,8 +115,8 @@ export default function DocenteDashboard() {
   const dateLabel = `${today.toLocaleDateString("es-PE", { day: "numeric", month: "short" })} - ${today.toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}`
 
   return (
-    <div className="w-full min-h-screen" style={{ background: "#f5f5f5" }}>
-      <div className="w-full max-w-[1200px] mx-auto px-6 py-6">
+    <div className="w-full min-h-screen">
+      <div className="w-full max-w-[1200px] mx-auto py-6">
 
         {/* ═══ TOP BAR ═══ */}
         <motion.div

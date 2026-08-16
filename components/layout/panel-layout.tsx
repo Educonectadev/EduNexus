@@ -409,27 +409,29 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex h-screen overflow-hidden text-[var(--sb-on-background)]" data-role={role} style={{ background: "var(--sb-background)" }}>
+    <div className="flex h-screen overflow-hidden text-[var(--sb-on-background)]" data-role={role} style={{ background: "#f5f5f5" }}>
 
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className={cn(
-        "hidden md:flex flex-col h-screen w-[64px] border-r border-sb-outline-variant/8 transition-[width] duration-200 ease-out overflow-hidden shrink-0",
-        "bg-sb-surface z-10",
+        "hidden md:flex flex-col h-screen w-[64px] transition-[width] duration-200 ease-out overflow-hidden shrink-0",
+        "z-10",
         sidebarOpen && "w-[240px]"
-      )}>
+      )} style={{ background: "#fff", borderRight: "1px solid #eee" }}>
         {/* Logo */}
         <div className={cn("flex items-center h-14 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
           <Link href="/" className="flex items-center justify-center shrink-0">
-            <Logo className="w-7 h-7" />
+            <div className="h-8 w-8 flex items-center justify-center" style={{ background: "#1a1a1a", borderRadius: "10px" }}>
+              <span className="text-white text-[12px] font-bold">E</span>
+            </div>
           </Link>
           {sidebarOpen && (
-            <span className="text-[13px] font-medium text-sb-on-surface tracking-tight truncate">
+            <span className="text-[14px] font-semibold tracking-tight truncate" style={{ color: "#1a1a1a", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif" }}>
               EduNexus
             </span>
           )}
         </div>
 
-        {/* Nav grouped by sections */}
+        {/* Nav */}
         <nav className={cn(
           "flex flex-col flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
           sidebarOpen ? "px-2 py-3 gap-4" : "px-2 py-3 gap-2"
@@ -438,9 +440,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <div key={section.title} className="flex flex-col gap-px">
               {sidebarOpen && (
                 <h3 className={cn(
-                  "px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50",
+                  "px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider",
                   sIdx > 0 && "mt-1"
-                )}>
+                )} style={{ color: "#bbb" }}>
                   {section.title}
                 </h3>
               )}
@@ -454,49 +456,50 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                   <>
                     {!sidebarOpen && (
                       <motion.span
-                  className="absolute inset-0"
-                  initial={false}
-                  animate={{
-                    borderRadius: active ? 6 : 999,
-                    backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
-                  }}
-                  whileHover={{ backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
-                  transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
-                />
-              )}
-              <motion.span
-                className="relative z-10"
-                whileTap={{ scale: 0.9 }}
-                animate={{
-                  scale: active ? 1.1 : 1,
-                  opacity: active ? 1 : 0.7,
-                }}
-                transition={{ duration: 0.25, ease: "easeInOut" }}
-              >
-                <item.icon className="h-[16px] w-[16px] shrink-0" />
-              </motion.span>
-              {sidebarOpen && (
-                <span className={cn(
-                  "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
-                  active ? "font-medium" : "font-normal"
-                )}>
-                  {item.title}
-                </span>
-              )}
-            </>
-          )
-          const cls = cn(
-            "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-            sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
-            active
-              ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
-              : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
-          )
+                        className="absolute inset-0"
+                        initial={false}
+                        animate={{
+                          borderRadius: active ? 10 : 999,
+                          backgroundColor: active ? "#1a1a1a" : "rgba(0,0,0,0)",
+                        }}
+                        whileHover={{ backgroundColor: active ? "#1a1a1a" : "rgba(0,0,0,0.06)" }}
+                        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                      />
+                    )}
+                    <motion.span
+                      className="relative z-10"
+                      whileTap={{ scale: 0.9 }}
+                      animate={{
+                        scale: active ? 1.1 : 1,
+                        opacity: active ? 1 : 0.7,
+                      }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                    >
+                      <item.icon className="h-[16px] w-[16px] shrink-0" />
+                    </motion.span>
+                    {sidebarOpen && (
+                      <span className={cn(
+                        "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
+                        active ? "font-medium" : "font-normal"
+                      )}>
+                        {item.title}
+                      </span>
+                    )}
+                  </>
+                )
+                const cls = cn(
+                  "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                  sidebarOpen ? "h-9 px-2.5 rounded-[10px]" : "relative justify-center w-9 h-9 mx-auto",
+                  active
+                    ? sidebarOpen ? "text-white" : "text-white"
+                    : "hover:text-gray-900"
+                )
                 const title = !sidebarOpen ? item.title : undefined
+                const style = active ? { color: "#fff" } : { color: "#999" }
                 return isAction ? (
-                  <button key={item.href} onClick={handleAction} className={cls} title={title}>{inner}</button>
+                  <button key={item.href} onClick={handleAction} className={cls} title={title} style={style}>{inner}</button>
                 ) : (
-                  <Link key={item.href} href={item.href} className={cls} title={title}>{inner}</Link>
+                  <Link key={item.href} href={item.href} className={cls} title={title} style={style}>{inner}</Link>
                 )
               })}
             </div>
@@ -635,43 +638,32 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Minimal Header */}
-        <header className="flex items-center justify-between h-14 px-6 shrink-0">
-          <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageName}</h1>
-          <div className="flex items-center gap-2">
+        {/* Pinterest-style Header */}
+        <header className="flex items-center justify-between h-14 px-6 shrink-0" style={{ background: "#f5f5f5" }}>
+          {/* Left: Search */}
+          <div className="relative flex-1 max-w-[320px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#999" }} />
+            <input
+              placeholder="Buscar cursos, alumnos..."
+              className="w-full h-9 pl-10 pr-4 text-[13px] rounded-full border-none outline-none"
+              style={{ background: "#fff", color: "#1a1a1a", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+            />
+          </div>
+
+          {/* Right: Notifications + Avatar */}
+          <div className="flex items-center gap-4 ml-4">
+            <button className="relative flex items-center gap-2 text-[13px] font-medium" style={{ color: "#666", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif" }}>
+              <Bell className="h-5 w-5" />
+              <span className="hidden sm:inline">Notifications</span>
+              <span className="h-5 w-5 flex items-center justify-center text-[10px] font-bold text-white rounded-full" style={{ background: "#1a1a1a" }}>2</span>
+            </button>
             {user && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-sb-surface-container-high mr-1">
-                <div className="h-5 w-5 rounded-full bg-sb-surface-container-highest flex items-center justify-center">
-                  <span className="text-[8px] font-semibold text-sb-on-surface/80">
-                    {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
-                  </span>
+              <div className="h-9 w-9 rounded-full overflow-hidden cursor-pointer" style={{ background: "#1a1a1a" }}>
+                <div className="h-full w-full flex items-center justify-center text-[11px] font-bold text-white">
+                  {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
                 </div>
-                <span className="text-[10px] text-sb-on-surface-variant">{roleLabels[role || ""]}</span>
               </div>
             )}
-
-            <div className="flex md:hidden items-center gap-1 mr-1">
-              <button onClick={() => setSearchOpen(true)}
-                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
-                <Search className="h-[18px] w-[18px]" />
-              </button>
-              <NotificationBell />
-              <button onClick={handleLogout}
-                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
-                <LogOut className="h-[18px] w-[18px]" />
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center">
-              <NotificationBell />
-            </div>
-
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all relative"
-              title="Toggle theme">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            </button>
           </div>
         </header>
 
@@ -691,7 +683,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6">
+        <main className="flex-1 overflow-auto px-6 pb-32 md:pb-6" style={{ background: "#f5f5f5" }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
