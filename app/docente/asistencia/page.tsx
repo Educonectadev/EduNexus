@@ -128,7 +128,7 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="w-full py-6">
+    <div className="w-full py-6 sb-note">
       <header className="mb-5">
         <span
           className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
