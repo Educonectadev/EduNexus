@@ -166,7 +166,8 @@ export default function CursoDetallePage() {
                 </div>
               </div>
             </div>
-        ))}
+          ))}
+        </div>
       </div>
     )
   }
