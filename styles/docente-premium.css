@@ -250,7 +250,7 @@ html.dark [data-role="docente"] {
 .dark[data-role="docente"] aside.bg-sb-surface,
 html.dark [data-role="docente"] aside.bg-sb-surface {
   background: #000000 !important;
-  border-right: 1px solid #1a1a1a !important;
+  border-right: 1px solid #000000 !important;
 }
 .dark[data-role="docente"] aside a[class*="bg-sb-on-surface"],
 html.dark [data-role="docente"] aside a[class*="bg-sb-on-surface"],
@@ -261,7 +261,7 @@ html.dark [data-role="docente"] aside button[class*="bg-sb-on-surface"] {
 }
 .dark[data-role="docente"] aside,
 html.dark [data-role="docente"] aside {
-  border-color: #1a1a1a !important;
+  border-color: #000000 !important;
 }
 .dark[data-role="docente"] aside span,
 html.dark [data-role="docente"] aside span {
