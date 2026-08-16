@@ -81,12 +81,17 @@ export default function CalendarioPage() {
     .slice(0, 6)
 
   return (
-    <div className="w-full py-6 sb-note">
-      <div className="w-full space-y-5">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c] sb-note">
+      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
         <header className="pt-2">
-          <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Calendario</h1>
-          <p className="mt-1 text-sm text-[var(--note-muted)]">Tu horario semanal y eventos de la institución</p>
+          <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+            Calendario
+          </h1>
+          <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+            Tu horario semanal y eventos de la institución
+          </p>
         </header>
 
         {error && (
@@ -216,6 +221,7 @@ export default function CalendarioPage() {
             </div>
           </>
         )}
+      </div>
       </div>
     </div>
   )
