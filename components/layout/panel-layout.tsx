@@ -695,7 +695,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Content */}
         <main className={cn(
           "flex-1 overflow-auto pb-32 md:pb-6",
-          pathname.startsWith("/docente/dashboard") ? "p-1.5 h-full" : "px-6"
+          pathname.startsWith("/docente/dashboard") ? "p-1.5 h-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" : "px-6"
         )} style={{ background: pathname.startsWith("/docente/dashboard") ? "#fff" : "#f5f5f5" }}>
           <AnimatePresence mode="wait">
             <motion.div
