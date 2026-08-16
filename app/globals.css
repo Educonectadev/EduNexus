@@ -104,26 +104,26 @@ html.dark, html .dark {
   --sidebar-border: oklch(0.25 0 0);
   --sidebar-ring: oklch(0.65 0.2 290);
 
-  /* stepbro MD3 surface tokens (dark — OLED black & Purple) */
-  --sb-background: #000000;
-  --sb-on-background: #ffffff;
-  --sb-surface: #000000;
-  --sb-surface-dim: #0a0a0a;
-  --sb-surface-bright: #121212;
-  --sb-surface-container-lowest: #050505;
-  --sb-surface-container-low: #0e0e0e;
-  --sb-surface-container: #141415;
-  --sb-surface-container-high: #1c1c1e;
-  --sb-surface-container-highest: #262629;
-  --sb-on-surface: #ffffff;
+  /* stepbro MD3 surface tokens (dark — softer blacks) */
+  --sb-background: #0a0a0b;
+  --sb-on-background: #f4f4f5;
+  --sb-surface: #0a0a0b;
+  --sb-surface-dim: #0e0e10;
+  --sb-surface-bright: #18181b;
+  --sb-surface-container-lowest: #0c0c0e;
+  --sb-surface-container-low: #101013;
+  --sb-surface-container: #17171a;
+  --sb-surface-container-high: #1f1f23;
+  --sb-surface-container-highest: #27272b;
+  --sb-on-surface: #f4f4f5;
   --sb-on-surface-variant: #a1a1aa;
   --sb-outline: #3f3f46;
-  --sb-outline-variant: #27272a;
+  --sb-outline-variant: #27272b;
   --sb-primary: #ffffff;
-  --sb-on-primary: #000000;
-  --sb-tertiary-container: #1c1c1e;
-  --sb-on-tertiary-container: #ffffff;
-  --sb-neutral-background: 0, 0, 0;
+  --sb-on-primary: #0a0a0b;
+  --sb-tertiary-container: #1f1f23;
+  --sb-on-tertiary-container: #f4f4f5;
+  --sb-neutral-background: 10, 10, 11;
 }
 
 /* ─────────────────────────────────────────────
