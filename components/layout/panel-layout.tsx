@@ -414,7 +414,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className={cn(
         "hidden md:flex flex-col h-screen w-[64px] transition-[width] duration-200 ease-out overflow-hidden shrink-0",
-        "bg-sb-surface z-10",
+        "bg-sb-surface z-10 border-r-0",
         sidebarOpen && "w-[240px]"
       )}>
         {/* Logo */}
