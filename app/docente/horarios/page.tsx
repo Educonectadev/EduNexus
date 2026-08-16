@@ -32,7 +32,8 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 z-50"
+            style={{ background: "rgba(0, 0, 0, 0.6)" }}
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -43,73 +44,211 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
             onClick={onClose}
           >
             <div
-              className="bg-background border border-foreground/10 rounded-2xl w-full max-w-md overflow-hidden"
+              className="w-full max-w-md overflow-hidden"
+              style={{
+                background: "var(--sb-surface)",
+                borderRadius: "20px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
               onClick={e => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="px-6 py-5 border-b border-foreground/10 flex items-center justify-between">
+              <div
+                className="px-5 py-4 flex items-center justify-between"
+                style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
+              >
                 <div>
-                  <p className="text-sm font-mono text-muted-foreground">{DAYS[horario.day_of_week - 1]}</p>
-                  <h2 className="text-xl font-display tracking-tight mt-1">{horario.course_name}</h2>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                    style={{
+                      color: "var(--sb-on-surface-variant)",
+                      opacity: 0.45,
+                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    }}
+                  >
+                    {DAYS[horario.day_of_week - 1]}
+                  </p>
+                  <h2
+                    className="text-base font-semibold mt-1"
+                    style={{
+                      color: "var(--sb-on-surface)",
+                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    }}
+                  >
+                    {horario.course_name}
+                  </h2>
                 </div>
                 <button
                   onClick={onClose}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-foreground/5 transition-colors"
+                  className="h-8 w-8 flex items-center justify-center transition-colors"
+                  style={{
+                    borderRadius: "10px",
+                    color: "var(--sb-on-surface-variant)"
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
                 >
-                  <X className="h-4 w-4 text-muted-foreground" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
               {/* Content */}
-              <div className="px-6 py-5 space-y-5">
+              <div className="px-5 py-4 space-y-4">
                 {/* Time Block */}
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-foreground/5 flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-foreground/70" />
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-10 w-10 flex items-center justify-center"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "12px"
+                    }}
+                  >
+                    <Clock className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
                   <div>
-                    <p className="text-2xl font-display tracking-tight">
+                    <p
+                      className="text-lg font-semibold"
+                      style={{
+                        color: "var(--sb-on-surface)",
+                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                      }}
+                    >
                       {horario.start_time.slice(0, 5)} — {horario.end_time.slice(0, 5)}
                     </p>
-                    <p className="text-sm text-muted-foreground font-mono">{durationStr} de duración</p>
+                    <p
+                      className="text-xs"
+                      style={{
+                        color: "var(--sb-on-surface-variant)",
+                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                      }}
+                    >
+                      {durationStr} de duración
+                    </p>
                   </div>
                 </div>
 
                 {/* Details Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-foreground/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-xs font-mono text-muted-foreground">Grado</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <div
+                    className="p-3"
+                    style={{
+                      background: "var(--sb-surface-container)",
+                      borderRadius: "12px"
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <GraduationCap className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                        style={{
+                          color: "var(--sb-on-surface-variant)",
+                          opacity: 0.45,
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        Grado
+                      </span>
                     </div>
-                    <p className="text-lg font-display">{horario.grade} &quot;{horario.section}&quot;</p>
+                    <p
+                      className="text-sm font-medium"
+                      style={{
+                        color: "var(--sb-on-surface)",
+                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                      }}
+                    >
+                      {horario.grade} &quot;{horario.section}&quot;
+                    </p>
                   </div>
-                  <div className="p-4 rounded-xl bg-foreground/5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-xs font-mono text-muted-foreground">Aula</span>
+                  <div
+                    className="p-3"
+                    style={{
+                      background: "var(--sb-surface-container)",
+                      borderRadius: "12px"
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <MapPin className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                        style={{
+                          color: "var(--sb-on-surface-variant)",
+                          opacity: 0.45,
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        Aula
+                      </span>
                     </div>
-                    <p className="text-lg font-display">{horario.classroom || "Sin asignar"}</p>
+                    <p
+                      className="text-sm font-medium"
+                      style={{
+                        color: "var(--sb-on-surface)",
+                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                      }}
+                    >
+                      {horario.classroom || "Sin asignar"}
+                    </p>
                   </div>
                 </div>
 
                 {/* Course Info */}
-                <div className="p-4 rounded-xl border border-foreground/10">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-foreground/5 flex items-center justify-center">
-                      <BookOpen className="h-5 w-5 text-foreground/70" />
+                <div
+                  className="p-3"
+                  style={{
+                    borderRadius: "12px",
+                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                  }}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="h-8 w-8 flex items-center justify-center"
+                      style={{
+                        background: "var(--sb-surface-container)",
+                        borderRadius: "10px"
+                      }}
+                    >
+                      <BookOpen className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{horario.course_name}</p>
-                      <p className="text-xs text-muted-foreground font-mono">{horario.course_code}</p>
+                      <p
+                        className="text-xs font-medium"
+                        style={{
+                          color: "var(--sb-on-surface)",
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        {horario.course_name}
+                      </p>
+                      <p
+                        className="text-[10px]"
+                        style={{
+                          color: "var(--sb-on-surface-variant)",
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        {horario.course_code}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 border-t border-foreground/10 bg-foreground/5">
-                <p className="text-xs text-muted-foreground text-center">
+              <div
+                className="px-5 py-3"
+                style={{
+                  borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)",
+                  background: "var(--sb-surface-container)"
+                }}
+              >
+                <p
+                  className="text-[10px] text-center"
+                  style={{
+                    color: "var(--sb-on-surface-variant)",
+                    opacity: 0.5,
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
                   Horario recurrente cada {DAYS[horario.day_of_week - 1]}
                 </p>
               </div>
@@ -158,23 +297,39 @@ export default function DocenteHorariosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-12 lg:mb-16"
+          className="mb-8"
         >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-            <span className="w-8 h-px bg-foreground/30" />
+          <span
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+            style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+          >
+            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
             Panel Docente
           </span>
-          <h1 className="text-4xl lg:text-5xl font-display tracking-tight">
+          <h1
+            className="text-2xl font-semibold mt-2"
+            style={{
+              color: "var(--sb-on-surface)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+              letterSpacing: "-0.02em"
+            }}
+          >
             Mis Horarios
           </h1>
-          <p className="mt-3 text-lg text-muted-foreground max-w-xl">
+          <p
+            className="text-sm mt-1"
+            style={{
+              color: "var(--sb-on-surface-variant)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+            }}
+          >
             Tu horario de clases de la semana
           </p>
         </motion.header>
@@ -184,19 +339,47 @@ export default function DocenteHorariosPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-3 gap-px bg-foreground/10 rounded-2xl overflow-hidden mb-12 lg:mb-16"
+          className="grid grid-cols-3 gap-2 mb-8"
         >
           {[
             { label: "Jornada", value: "Lun – Vie", icon: Calendar },
             { label: "Clases", value: `${totalClasses}`, icon: BookOpen },
-            { label: "Horas/semana", value: `${totalHours}h`, icon: Clock },
+            { label: "Horas/sem", value: `${totalHours}h`, icon: Clock },
           ].map((stat) => (
-            <div key={stat.label} className="bg-background p-6 lg:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-mono text-muted-foreground">{stat.label}</span>
+            <div
+              key={stat.label}
+              className="p-4"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "16px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <stat.icon
+                  className="h-3.5 w-3.5"
+                  style={{ color: "var(--sb-on-surface-variant)" }}
+                />
+                <span
+                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                  style={{
+                    color: "var(--sb-on-surface-variant)",
+                    opacity: 0.45,
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
+                  {stat.label}
+                </span>
               </div>
-              <p className="text-3xl lg:text-4xl font-display tracking-tight">{stat.value}</p>
+              <p
+                className="text-xl font-semibold"
+                style={{
+                  color: "var(--sb-on-surface)",
+                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                }}
+              >
+                {stat.value}
+              </p>
             </div>
           ))}
         </motion.div>
@@ -206,16 +389,19 @@ export default function DocenteHorariosPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="flex items-center gap-2 mb-8 overflow-x-auto pb-2"
+          className="flex items-center gap-1.5 mb-6 overflow-x-auto pb-2"
         >
           <button
             onClick={() => setActiveDay(null)}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0",
-              activeDay === null
-                ? "bg-foreground text-background"
-                : "bg-foreground/5 text-muted-foreground hover:bg-foreground/10"
-            )}
+            className="px-3 py-1.5 text-xs font-medium transition-all shrink-0"
+            style={{
+              borderRadius: "10px",
+              border: "1.5px solid",
+              borderColor: activeDay === null ? "transparent" : "var(--sb-outline-variant)",
+              background: activeDay === null ? "var(--sb-on-surface)" : "transparent",
+              color: activeDay === null ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+            }}
           >
             Todos
           </button>
@@ -223,49 +409,111 @@ export default function DocenteHorariosPage() {
             <button
               key={day}
               onClick={() => setActiveDay(activeDay === day ? null : day)}
-              className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0 flex items-center gap-2",
-                activeDay === day
-                  ? "bg-foreground text-background"
+              className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"
+              style={{
+                borderRadius: "10px",
+                border: "1.5px solid",
+                borderColor: activeDay === day ? "transparent" : "var(--sb-outline-variant)",
+                background: activeDay === day
+                  ? "var(--sb-on-surface)"
                   : todayDay === day
-                    ? "bg-foreground/10 text-foreground"
-                    : "bg-foreground/5 text-muted-foreground hover:bg-foreground/10"
-              )}
+                    ? "var(--sb-surface-container-high)"
+                    : "transparent",
+                color: activeDay === day
+                  ? "var(--sb-surface)"
+                  : todayDay === day
+                    ? "var(--sb-on-surface)"
+                    : "var(--sb-on-surface-variant)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
             >
               {label}
-              <span className="font-mono text-xs opacity-60">{items.length}</span>
+              <span style={{ opacity: 0.6 }}>{items.length}</span>
             </button>
           ))}
         </motion.div>
 
         {/* Schedule Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-foreground/10 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="bg-background p-6 animate-pulse">
-                <div className="h-5 w-24 rounded bg-foreground/5 mb-6" />
-                <div className="space-y-4">
-                  <div className="h-16 rounded-xl bg-foreground/5" />
-                  <div className="h-16 rounded-xl bg-foreground/5" />
+              <div
+                key={i}
+                className="p-4 animate-pulse"
+                style={{
+                  background: "var(--sb-surface-container)",
+                  borderRadius: "16px"
+                }}
+              >
+                <div
+                  className="h-4 w-20 mb-4"
+                  style={{
+                    background: "var(--sb-surface-container-high)",
+                    borderRadius: "8px"
+                  }}
+                />
+                <div className="space-y-2">
+                  <div
+                    className="h-14"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "10px"
+                    }}
+                  />
+                  <div
+                    className="h-14"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "10px"
+                    }}
+                  />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-px bg-foreground/10 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {scheduleByDay.map(({ day, label, items }) => {
               if (activeDay !== null && activeDay !== day) return null
               const isToday = todayDay === day
               return (
-                <div key={day} className={cn("bg-background", isToday && "bg-foreground/5")}>
+                <div
+                  key={day}
+                  style={{
+                    background: isToday ? "var(--sb-surface-container-high)" : "var(--sb-surface-container)",
+                    borderRadius: "16px",
+                    border: isToday
+                      ? "1px solid color-mix(in srgb, var(--sb-primary) 30%, transparent)"
+                      : "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                  }}
+                >
                   {/* Day Header */}
-                  <div className="px-5 py-4 border-b border-foreground/10 flex items-center justify-between">
+                  <div
+                    className="px-4 py-3 flex items-center justify-between"
+                    style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
+                  >
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-display">{label}</span>
+                      <Calendar className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
+                      <span
+                        className="text-xs font-medium"
+                        style={{
+                          color: "var(--sb-on-surface)",
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        {label}
+                      </span>
                     </div>
                     {isToday && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-foreground text-background">
+                      <span
+                        className="text-[10px] font-bold px-2 py-0.5"
+                        style={{
+                          borderRadius: "8px",
+                          background: "var(--sb-on-surface)",
+                          color: "var(--sb-surface)",
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
                         HOY
                       </span>
                     )}
@@ -273,11 +521,20 @@ export default function DocenteHorariosPage() {
 
                   {/* Classes */}
                   {items.length === 0 ? (
-                    <div className="px-5 py-10 text-center">
-                      <p className="text-sm text-muted-foreground/50">Sin clases</p>
+                    <div className="px-4 py-8 text-center">
+                      <p
+                        className="text-xs"
+                        style={{
+                          color: "var(--sb-on-surface-variant)",
+                          opacity: 0.4,
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                        }}
+                      >
+                        Sin clases
+                      </p>
                     </div>
                   ) : (
-                    <div className="p-3 space-y-2">
+                    <div className="p-2 space-y-1.5">
                       {items.map((h, idx) => {
                         const next = items[idx + 1]
                         const gap = next ? toMin(next.start_time) - toMin(h.end_time) : null
@@ -286,23 +543,53 @@ export default function DocenteHorariosPage() {
                           <React.Fragment key={h.id}>
                             <button
                               onClick={() => handleHorarioClick(h)}
-                              className="w-full text-left p-4 rounded-xl border border-foreground/10 hover:border-foreground/20 hover:bg-foreground/5 transition-all group"
+                              className="w-full text-left p-3 transition-all"
+                              style={{
+                                borderRadius: "12px",
+                                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "var(--sb-surface-container-high)"
+                                e.currentTarget.style.borderColor = "color-mix(in srgb, var(--sb-outline-variant) 50%, transparent)"
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "transparent"
+                                e.currentTarget.style.borderColor = "color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                              }}
                             >
-                              <div className="flex items-start justify-between gap-2 mb-2">
-                                <h3 className="text-sm font-display group-hover:translate-x-0.5 transition-transform">
+                              <div className="flex items-start justify-between gap-2 mb-1.5">
+                                <h3
+                                  className="text-xs font-medium"
+                                  style={{
+                                    color: "var(--sb-on-surface)",
+                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                                  }}
+                                >
                                   {h.course_name}
                                 </h3>
-                                <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                                <span
+                                  className="text-[10px] shrink-0"
+                                  style={{
+                                    color: "var(--sb-on-surface-variant)",
+                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                                  }}
+                                >
                                   {h.grade} {h.section}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1.5">
+                              <div
+                                className="flex items-center gap-2.5 text-[11px]"
+                                style={{
+                                  color: "var(--sb-on-surface-variant)",
+                                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                                }}
+                              >
+                                <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
-                                  <span className="font-mono">{h.start_time.slice(0, 5)} — {h.end_time.slice(0, 5)}</span>
+                                  <span>{h.start_time.slice(0, 5)} — {h.end_time.slice(0, 5)}</span>
                                 </span>
                                 {h.classroom && (
-                                  <span className="flex items-center gap-1.5">
+                                  <span className="flex items-center gap-1">
                                     <MapPin className="h-3 w-3" />
                                     {h.classroom}
                                   </span>
@@ -310,12 +597,19 @@ export default function DocenteHorariosPage() {
                               </div>
                             </button>
                             {showRecess && (
-                              <div className="flex items-center gap-2 px-2 py-1">
-                                <div className="flex-1 h-px bg-foreground/10" />
-                                <span className="flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider text-muted-foreground/40">
+                              <div className="flex items-center gap-1.5 px-2 py-0.5">
+                                <div className="flex-1 h-px" style={{ background: "var(--sb-outline-variant)", opacity: 0.3 }} />
+                                <span
+                                  className="flex items-center gap-1 text-[9px] uppercase tracking-wider"
+                                  style={{
+                                    color: "var(--sb-on-surface-variant)",
+                                    opacity: 0.3,
+                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                                  }}
+                                >
                                   <Coffee className="h-2.5 w-2.5" /> Receso {gap}m
                                 </span>
-                                <div className="flex-1 h-px bg-foreground/10" />
+                                <div className="flex-1 h-px" style={{ background: "var(--sb-outline-variant)", opacity: 0.3 }} />
                               </div>
                             )}
                           </React.Fragment>
@@ -331,10 +625,37 @@ export default function DocenteHorariosPage() {
 
         {/* Empty State */}
         {!loading && horarios.length === 0 && (
-          <div className="py-20 text-center">
-            <Calendar className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground">Aún no tienes horarios asignados</p>
-            <p className="text-sm text-muted-foreground/60 mt-2">El secretario asignará tus cursos y horarios</p>
+          <div
+            className="py-16 text-center"
+            style={{
+              background: "var(--sb-surface-container)",
+              borderRadius: "20px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+            }}
+          >
+            <Calendar
+              className="h-10 w-10 mx-auto mb-3"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+            />
+            <p
+              className="text-sm font-medium"
+              style={{
+                color: "var(--sb-on-surface)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Aún no tienes horarios asignados
+            </p>
+            <p
+              className="text-xs mt-1"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                opacity: 0.5,
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              El secretario asignará tus cursos y horarios
+            </p>
           </div>
         )}
       </div>

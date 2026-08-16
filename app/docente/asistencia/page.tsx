@@ -75,14 +75,34 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
-        <header className="mb-8">
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-            <span className="w-8 h-px bg-foreground/30" />Panel Docente
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8">
+        <header className="mb-6">
+          <span
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+            style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+          >
+            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
           </span>
-          <h1 className="text-4xl lg:text-5xl font-display font-bold tracking-tight text-foreground">Asistencia</h1>
-          <p className="mt-2 text-muted-foreground">Control de tu marcación y la asistencia de tus alumnos</p>
+          <h1
+            className="text-2xl font-semibold mt-2"
+            style={{
+              color: "var(--sb-on-surface)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+              letterSpacing: "-0.02em"
+            }}
+          >
+            Asistencia
+          </h1>
+          <p
+            className="text-sm mt-1"
+            style={{
+              color: "var(--sb-on-surface-variant)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+            }}
+          >
+            Control de tu marcación y la asistencia de tus alumnos
+          </p>
         </header>
 
         <div className="nb-rail">

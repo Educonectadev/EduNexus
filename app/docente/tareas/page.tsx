@@ -223,17 +223,37 @@ function TareasInner() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16 space-y-8">
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-              <span className="w-8 h-px bg-foreground/30" />
+            <span
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+            >
+              <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
               Panel Docente
             </span>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] font-display text-foreground">Tareas</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Gestiona las tareas de tus alumnos</p>
+            <h1
+              className="text-2xl font-semibold mt-2"
+              style={{
+                color: "var(--sb-on-surface)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              Tareas
+            </h1>
+            <p
+              className="text-sm mt-1"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Gestiona las tareas de tus alumnos
+            </p>
           </div>
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" /> Nueva tarea
@@ -241,7 +261,7 @@ function TareasInner() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-foreground/10 rounded-xl overflow-hidden">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           {[
             { label: "Total", value: tasks.length, icon: ClipboardList },
             { label: "Pendientes", value: counts.pending, icon: Clock },
@@ -250,19 +270,50 @@ function TareasInner() {
           ].map(s => {
             const Icon = s.icon
             return (
-              <div key={s.label} className="bg-background p-5 lg:p-6">
-                <div className="h-9 w-9 rounded-xl bg-foreground/5 flex items-center justify-center mb-3">
-                  <Icon className="h-4.5 w-4.5 text-foreground" />
+              <div
+                key={s.label}
+                className="p-4"
+                style={{
+                  background: "var(--sb-surface-container)",
+                  borderRadius: "16px",
+                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                }}
+              >
+                <div
+                  className="h-8 w-8 flex items-center justify-center mb-2"
+                  style={{
+                    background: "var(--sb-surface-container-high)",
+                    borderRadius: "10px"
+                  }}
+                >
+                  <Icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
-                <p className="mt-1.5 text-xl font-bold leading-none tracking-tight text-foreground">{s.value}</p>
+                <p
+                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                  style={{
+                    color: "var(--sb-on-surface-variant)",
+                    opacity: 0.45,
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
+                  {s.label}
+                </p>
+                <p
+                  className="mt-1.5 text-lg font-bold leading-none"
+                  style={{
+                    color: "var(--sb-on-surface)",
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
+                  {s.value}
+                </p>
               </div>
             )
           })}
         </div>
 
         {/* Search + Filters */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
             <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
@@ -396,16 +447,56 @@ function TareasInner() {
           </AnimatePresence>
 
           {!loading && filtered.length === 0 && (
-            <div className="rounded-xl border border-foreground/10 bg-background py-20 text-center">
-              <ClipboardList className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="text-sm text-muted-foreground">No hay tareas en esta categoria</p>
+            <div
+              className="py-16 text-center"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "20px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
+            >
+              <ClipboardList
+                className="h-10 w-10 mx-auto mb-3"
+                style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+              />
+              <p
+                className="text-xs"
+                style={{
+                  color: "var(--sb-on-surface-variant)",
+                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                }}
+              >
+                No hay tareas en esta categoría
+              </p>
             </div>
           )}
 
           {loading && (
-            <div className="rounded-xl border border-foreground/10 bg-background py-8 text-center">
-              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Cargando tareas...</p>
+            <div
+              className="py-8 text-center"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "20px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
+            >
+              <div
+                className="h-5 w-5 border-2 animate-spin mx-auto mb-2"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--sb-on-surface-variant) 20%, transparent)",
+                  borderTopColor: "var(--sb-on-surface)",
+                  borderRadius: "999px"
+                }}
+              />
+              <p
+                className="text-xs"
+                style={{
+                  color: "var(--sb-on-surface-variant)",
+                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                }}
+              >
+                Cargando tareas...
+              </p>
             </div>
           )}
         </div>

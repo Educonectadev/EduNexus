@@ -31,24 +31,40 @@ export default function CursosPage() {
   const avgStudents = courses.length > 0 ? Math.round(totalStudents / courses.length) : 0
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-12 lg:mb-16"
+          className="mb-8"
         >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-            <span className="w-8 h-px bg-foreground/30" />
+          <span
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+            style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+          >
+            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
             Panel Docente
           </span>
-          <h1 className="text-4xl lg:text-5xl font-display tracking-tight">
+          <h1
+            className="text-2xl font-semibold mt-2"
+            style={{
+              color: "var(--sb-on-surface)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+              letterSpacing: "-0.02em"
+            }}
+          >
             Mis Cursos
           </h1>
-          <p className="mt-3 text-lg text-muted-foreground max-w-xl">
-            Cursos asignados este periodo academic
+          <p
+            className="text-sm mt-1"
+            style={{
+              color: "var(--sb-on-surface-variant)",
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+            }}
+          >
+            Cursos asignados este periodo académico
           </p>
         </motion.header>
 
@@ -57,19 +73,47 @@ export default function CursosPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-3 gap-px bg-foreground/10 rounded-2xl overflow-hidden mb-12 lg:mb-16"
+          className="grid grid-cols-3 gap-2 mb-8"
         >
           {[
             { label: "Cursos", value: loading ? "—" : courses.length, icon: BookOpen },
             { label: "Alumnos", value: loading ? "—" : totalStudents, icon: Users },
-            { label: "Promedio", value: loading ? "—" : `${avgStudents} alumnos/curso`, icon: Clock },
+            { label: "Promedio", value: loading ? "—" : `${avgStudents}/curso`, icon: Clock },
           ].map((stat) => (
-            <div key={stat.label} className="bg-background p-6 lg:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-mono text-muted-foreground">{stat.label}</span>
+            <div
+              key={stat.label}
+              className="p-4"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "16px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <stat.icon
+                  className="h-3.5 w-3.5"
+                  style={{ color: "var(--sb-on-surface-variant)" }}
+                />
+                <span
+                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                  style={{
+                    color: "var(--sb-on-surface-variant)",
+                    opacity: 0.45,
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
+                  {stat.label}
+                </span>
               </div>
-              <p className="text-3xl lg:text-4xl font-display tracking-tight">{stat.value}</p>
+              <p
+                className="text-xl font-semibold"
+                style={{
+                  color: "var(--sb-on-surface)",
+                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                }}
+              >
+                {stat.value}
+              </p>
             </div>
           ))}
         </motion.div>
@@ -79,38 +123,109 @@ export default function CursosPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
+          className="mb-4"
         >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground">
-            <span className="w-8 h-px bg-foreground/30" />
+          <span
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+            style={{
+              color: "var(--sb-on-surface-variant)",
+              opacity: 0.45,
+              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+            }}
+          >
+            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
             {courses.length} cursos asignados
           </span>
         </motion.div>
 
         {/* Course List */}
         {loading ? (
-          <div className="space-y-px">
+          <div className="space-y-2">
             {[1, 2, 3].map(i => (
-              <div key={i} className="border-b border-foreground/10 py-6 animate-pulse">
-                <div className="flex items-center gap-6">
-                  <div className="h-12 w-12 rounded-xl bg-foreground/5" />
-                  <div className="flex-1 space-y-3">
-                    <div className="h-5 w-48 rounded bg-foreground/5" />
-                    <div className="h-4 w-32 rounded bg-foreground/5" />
+              <div
+                key={i}
+                className="py-4 animate-pulse"
+                style={{
+                  borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)"
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className="h-10 w-10 shrink-0"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "12px"
+                    }}
+                  />
+                  <div className="flex-1 space-y-2">
+                    <div
+                      className="h-4 w-40"
+                      style={{
+                        background: "var(--sb-surface-container-high)",
+                        borderRadius: "8px"
+                      }}
+                    />
+                    <div
+                      className="h-3 w-28"
+                      style={{
+                        background: "var(--sb-surface-container-high)",
+                        borderRadius: "8px"
+                      }}
+                    />
                   </div>
-                  <div className="h-4 w-24 rounded bg-foreground/5" />
+                  <div
+                    className="h-3 w-20"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "8px"
+                    }}
+                  />
                 </div>
               </div>
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <div className="py-20 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground">Sin cursos asignados</p>
-            <p className="text-sm text-muted-foreground/60 mt-2">Contacta al administrador para asignar cursos</p>
+          <div
+            className="py-16 text-center"
+            style={{
+              background: "var(--sb-surface-container)",
+              borderRadius: "20px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+            }}
+          >
+            <BookOpen
+              className="h-10 w-10 mx-auto mb-3"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+            />
+            <p
+              className="text-sm font-medium"
+              style={{
+                color: "var(--sb-on-surface)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Sin cursos asignados
+            </p>
+            <p
+              className="text-xs mt-1"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                opacity: 0.5,
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Contacta al administrador para asignar cursos
+            </p>
           </div>
         ) : (
-          <div>
+          <div
+            style={{
+              background: "var(--sb-surface-container)",
+              borderRadius: "20px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+              overflow: "hidden"
+            }}
+          >
             {courses.map((c, i) => (
               <motion.div
                 key={c.id}
@@ -120,43 +235,99 @@ export default function CursosPage() {
               >
                 <Link
                   href={`/docente/cursos/${c.id}`}
-                  className="group flex items-center gap-6 py-6 border-b border-foreground/10 hover:bg-foreground/5 -mx-6 px-6 transition-colors"
+                  className="group flex items-center gap-4 py-4 px-4"
+                  style={{
+                    borderBottom: i < courses.length - 1
+                      ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)"
+                      : "none",
+                    transition: "background 200ms ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "var(--sb-surface-container-high)"
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent"
+                  }}
                 >
                   {/* Icon */}
-                  <div className="h-12 w-12 rounded-xl bg-foreground/5 flex items-center justify-center shrink-0 group-hover:bg-foreground/10 transition-colors">
-                    <BookOpen className="h-5 w-5 text-foreground/70" />
+                  <div
+                    className="h-10 w-10 flex items-center justify-center shrink-0"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "12px",
+                      transition: "background 200ms ease"
+                    }}
+                  >
+                    <BookOpen
+                      className="h-4 w-4"
+                      style={{ color: "var(--sb-on-surface-variant)" }}
+                    />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-display tracking-tight group-hover:translate-x-1 transition-transform duration-300">
+                    <div className="flex items-center gap-2">
+                      <h3
+                        className="text-sm font-medium"
+                        style={{
+                          color: "var(--sb-on-surface)",
+                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+                          transition: "transform 300ms cubic-bezier(0.34, 1.45, 0.5, 1)"
+                        }}
+                      >
                         {c.name}
                       </h3>
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all duration-300 -translate-x-2 group-hover:translate-x-0" />
+                      <ArrowUpRight
+                        className="h-3.5 w-3.5"
+                        style={{
+                          color: "var(--sb-on-surface-variant)",
+                          opacity: 0,
+                          transition: "opacity 200ms, transform 200ms",
+                          transform: "translateX(-4px)"
+                        }}
+                      />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                    <p
+                      className="text-xs mt-0.5"
+                      style={{
+                        color: "var(--sb-on-surface-variant)",
+                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                      }}
+                    >
                       {c.grade} &quot;{c.section}&quot;
                     </p>
                   </div>
 
                   {/* Meta */}
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground shrink-0">
-                    <span className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span className="font-mono">{c.students}</span>
+                  <div
+                    className="flex items-center gap-4 text-xs shrink-0"
+                    style={{
+                      color: "var(--sb-on-surface-variant)",
+                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    }}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5" />
+                      <span style={{ fontWeight: 600 }}>{c.students}</span>
                       <span className="hidden sm:inline">alumnos</span>
                     </span>
                     {c.schedule && (
-                      <span className="hidden md:flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        <span className="font-mono">{c.schedule}</span>
+                      <span className="hidden md:flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span style={{ fontWeight: 600 }}>{c.schedule}</span>
                       </span>
                     )}
                   </div>
 
                   {/* Arrow */}
-                  <ChevronRight className="h-5 w-5 text-muted-foreground/30 group-hover:text-foreground/60 transition-colors shrink-0" />
+                  <ChevronRight
+                    className="h-4 w-4 shrink-0"
+                    style={{
+                      color: "var(--sb-on-surface-variant)",
+                      opacity: 0.3,
+                      transition: "opacity 200ms"
+                    }}
+                  />
                 </Link>
               </motion.div>
             ))}

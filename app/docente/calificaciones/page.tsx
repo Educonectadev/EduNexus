@@ -216,16 +216,36 @@ function CalificacionesInner() {
   const registerStudents = registerCourseId === courseId ? students : []
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16 space-y-6">
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-              <span className="w-8 h-px bg-foreground/30" />Panel Docente
+            <span
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+            >
+              <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
             </span>
-            <h1 className="font-display text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-foreground">Calificaciones</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Gestiona las notas de tus alumnos</p>
+            <h1
+              className="text-2xl font-semibold mt-2"
+              style={{
+                color: "var(--sb-on-surface)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              Calificaciones
+            </h1>
+            <p
+              className="text-sm mt-1"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Gestiona las notas de tus alumnos
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <div className="nb-select-wrap">
@@ -266,15 +286,46 @@ function CalificacionesInner() {
 
         {loading ? (
           <div className="animate-pulse space-y-6">
-            <div className="grid grid-cols-3 gap-px bg-foreground/10 rounded-xl overflow-hidden">
-              {[1, 2, 3].map(i => <div key={i} className="h-28 bg-background" />)}
+            <div className="grid grid-cols-3 gap-2">
+              {[1, 2, 3].map(i => (
+                <div
+                  key={i}
+                  className="h-28"
+                  style={{
+                    background: "var(--sb-surface-container)",
+                    borderRadius: "16px"
+                  }}
+                />
+              ))}
             </div>
-            <div className="rounded-xl border border-foreground/10 bg-foreground/5 h-64 animate-pulse" />
+            <div
+              className="h-64 animate-pulse"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "16px"
+              }}
+            />
           </div>
         ) : students.length === 0 ? (
-          <div className="rounded-xl border border-foreground/10 bg-foreground/5 py-20 text-center">
-            <BookMarked className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-sm font-medium text-muted-foreground">
+          <div
+            className="py-16 text-center"
+            style={{
+              background: "var(--sb-surface-container)",
+              borderRadius: "20px",
+              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+            }}
+          >
+            <BookMarked
+              className="h-10 w-10 mx-auto mb-3"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+            />
+            <p
+              className="text-xs font-medium"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
               {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
             </p>
           </div>
@@ -291,25 +342,61 @@ function CalificacionesInner() {
         ) : (
           <>
             {/* Stats */}
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-px bg-foreground/10 rounded-xl overflow-hidden">
+            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-2">
               {[
                 { label: "Promedio General", value: avgGeneral.toFixed(1), icon: BarChart3 },
                 { label: "Mejor Nota", value: bestScore, icon: TrendingUp },
                 { label: "Total Alumnos", value: students.length, icon: BookMarked },
               ].map(s => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-background p-5 lg:p-6">
-                  <div className="h-10 w-10 rounded-xl bg-foreground/5 flex items-center justify-center mb-3">
-                    <s.icon className="h-5 w-5 text-foreground" />
+                  className="p-4"
+                  style={{
+                    background: "var(--sb-surface-container)",
+                    borderRadius: "16px",
+                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                  }}
+                >
+                  <div
+                    className="h-8 w-8 flex items-center justify-center mb-2"
+                    style={{
+                      background: "var(--sb-surface-container-high)",
+                      borderRadius: "10px"
+                    }}
+                  >
+                    <s.icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{s.label}</p>
-                  <p className="mt-1.5 text-[22px] font-bold leading-none tracking-tight text-foreground">{s.value}</p>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                    style={{
+                      color: "var(--sb-on-surface-variant)",
+                      opacity: 0.45,
+                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    }}
+                  >
+                    {s.label}
+                  </p>
+                  <p
+                    className="mt-1.5 text-lg font-bold leading-none"
+                    style={{
+                      color: "var(--sb-on-surface)",
+                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    }}
+                  >
+                    {s.value}
+                  </p>
                 </motion.div>
               ))}
             </motion.div>
 
             {/* Student list */}
-            <div className="rounded-xl border border-foreground/10 bg-foreground/5 overflow-hidden">
+            <div
+              className="overflow-hidden"
+              style={{
+                background: "var(--sb-surface-container)",
+                borderRadius: "20px",
+                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              }}
+            >
               <AnimatePresence>
                 {students.map((s, i) => {
                   const avg = calcAverage(s.grades)

@@ -143,20 +143,40 @@ function MaterialesInner() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-16">
+    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
+      <div className="max-w-[800px] mx-auto px-4 py-8">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8"
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6"
         >
           <div>
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-4">
-              <span className="w-8 h-px bg-foreground/30" />Panel Docente
+            <span
+              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+            >
+              <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
             </span>
-            <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] font-display text-foreground">Materiales</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Materiales de tus cursos y biblioteca institucional</p>
+            <h1
+              className="text-2xl font-semibold mt-2"
+              style={{
+                color: "var(--sb-on-surface)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              Materiales
+            </h1>
+            <p
+              className="text-sm mt-1"
+              style={{
+                color: "var(--sb-on-surface-variant)",
+                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              }}
+            >
+              Materiales de tus cursos y biblioteca institucional
+            </p>
           </div>
           <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setUploadOpen(true)} disabled={!courses.length}>
             <Upload className="h-4 w-4" /> Subir
@@ -255,9 +275,27 @@ function MaterialesInner() {
               })}
             </AnimatePresence>
             {!loading && filtered.length === 0 && (
-              <div className="rounded-xl border border-foreground/10 bg-foreground/5 py-20 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <p className="text-sm text-muted-foreground">Sin materiales</p>
+              <div
+                className="py-16 text-center"
+                style={{
+                  background: "var(--sb-surface-container)",
+                  borderRadius: "20px",
+                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                }}
+              >
+                <FileText
+                  className="h-10 w-10 mx-auto mb-3"
+                  style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+                />
+                <p
+                  className="text-xs"
+                  style={{
+                    color: "var(--sb-on-surface-variant)",
+                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                  }}
+                >
+                  Sin materiales
+                </p>
               </div>
             )}
           </div>
