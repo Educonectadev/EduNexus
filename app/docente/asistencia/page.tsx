@@ -25,9 +25,20 @@ function getLocalDateStr(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 }
 
+function safeFormatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—"
+  try {
+    const d = new Date(dateStr.includes("T") ? dateStr : dateStr + "T12:00:00")
+    if (isNaN(d.getTime())) return "—"
+    return d.toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })
+  } catch {
+    return "—"
+  }
+}
+
 function getWeekDays(history: any[]) {
   const map: Record<string, any> = {}
-  for (const h of history) map[h.date] = h
+  for (const h of history) { if (h.date) map[h.date] = h }
   const days: { iso: string; label: string; day: number; status: string | null }[] = []
   const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
   for (let i = 6; i >= 0; i--) {
@@ -39,24 +50,22 @@ function getWeekDays(history: any[]) {
   return days
 }
 
-function getBarConfig(status: string | null) {
-  if (status === "present") return "bg-[var(--note-text)]"
-  if (status === "late") return "bg-[var(--note-muted)]"
-  if (status === "absent") return "bg-[var(--note-muted)] opacity-60"
-  if (status === "justified") return "bg-[var(--note-text)] opacity-60"
-  if (status === "early_leave") return "bg-[var(--note-muted)]"
-  return "bg-[var(--note-fill-strong)]"
+function getBarColor(status: string | null) {
+  if (status === "present") return "var(--sb-on-surface)"
+  if (status === "late") return "var(--sb-on-surface-variant)"
+  if (status === "absent") return "var(--sb-on-surface-variant)"
+  if (status === "justified") return "var(--sb-on-surface)"
+  if (status === "early_leave") return "var(--sb-on-surface-variant)"
+  return "var(--sb-outline-variant)"
 }
 
-function NoteChip({ icon: Icon, className }: { icon: React.ComponentType<{ className?: string }>; className?: string }) {
-  return (
-    <div
-      className="h-8 w-8 flex items-center justify-center shrink-0"
-      style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
-    >
-      <Icon className={cn("h-4 w-4", className)} style={{ color: "var(--sb-on-surface-variant)" }} />
-    </div>
-  )
+function getBarOpacity(status: string | null) {
+  if (status === "present") return 0.9
+  if (status === "late") return 0.6
+  if (status === "absent") return 0.35
+  if (status === "justified") return 0.5
+  if (status === "early_leave") return 0.6
+  return 0.15
 }
 
 const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
@@ -88,6 +97,18 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
+function StatusBadge({ label, dot }: { label: string; dot: string }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium"
+      style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface)", fontFamily: FONT }}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      {label}
+    </span>
+  )
+}
+
 export default function AsistenciaPage() {
   return (
     <React.Suspense fallback={null}>
@@ -107,43 +128,41 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="w-full py-6">
-        <header className="mb-6">
-          <span
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
-            style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
-          >
-            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
-          </span>
-          <h1
-            className="text-2xl font-semibold mt-2"
-            style={{ color: "var(--sb-on-surface)", fontFamily: FONT, letterSpacing: "-0.02em" }}
-          >
-            Asistencia
-          </h1>
-          <p
-            className="text-sm mt-1"
-            style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-          >
-            Control de tu marcación y la asistencia de tus alumnos
-          </p>
-        </header>
+    <div className="w-full py-6">
+      <header className="mb-5">
+        <span
+          className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
+          style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
+        >
+          <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
+        </span>
+        <h1
+          className="text-2xl font-semibold mt-2"
+          style={{ color: "var(--sb-on-surface)", fontFamily: FONT, letterSpacing: "-0.02em" }}
+        >
+          Asistencia
+        </h1>
+        <p
+          className="text-sm mt-1"
+          style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
+        >
+          Control de tu marcación y la asistencia de tus alumnos
+        </p>
+      </header>
 
-        <div className="nb-rail">
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              className={cn("nb-chip", tab === t.key && "active")}>
-              <Check className="nb-chip-check" />
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        <AnimatePresence mode="wait">
-          {tab === "personal" ? <MiAsistencia key="personal" /> : <AsistenciaAlumnos key="alumnos" prefillCourse={prefillCourse} />}
-        </AnimatePresence>
+      <div className="nb-rail mb-5">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={cn("nb-chip", tab === t.key && "active")}>
+            <Check className="nb-chip-check" />
+            {t.label}
+          </button>
+        ))}
       </div>
+
+      <AnimatePresence mode="wait">
+        {tab === "personal" ? <MiAsistencia key="personal" /> : <AsistenciaAlumnos key="alumnos" prefillCourse={prefillCourse} />}
+      </AnimatePresence>
     </div>
   )
 }
@@ -200,12 +219,12 @@ function MiAsistencia() {
   if (loading) {
     return (
       <div className="space-y-3">
-        <div className="animate-pulse grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-28" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
+            <div key={i} className="h-32 animate-pulse" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
           ))}
         </div>
-        <div className="animate-pulse h-24" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
+        <div className="h-28 animate-pulse" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
       </div>
     )
   }
@@ -218,182 +237,199 @@ function MiAsistencia() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
-      {/* ── Jornada Card ── */}
-      <Card>
-        {/* Top row: fecha + status */}
-        <div
-          className="px-5 py-4 flex items-center justify-between"
-          style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
-        >
-          <div className="flex items-center gap-3">
-            <NoteChip icon={Clock} />
-            <div>
-              <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
-                {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
-              </p>
-              <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                {!checkedIn
-                  ? schedule
-                    ? `Horario hoy: ${schedule.start_time} — ${schedule.end_time}`
-                    : "Hoy sin clases programadas"
-                  : checkedOut
-                    ? `Jornada completada · ${checkedIn.slice(0, 5)} — ${checkedOut.slice(0, 5)}`
-                    : `Entrada ${checkedIn.slice(0, 5)} · salida programada ${schedule?.end_time || "—"}`
-                }
-              </p>
-            </div>
-          </div>
-          {s && (
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${s.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-              {s.label}
-            </span>
-          )}
-        </div>
 
-        {/* Entrada / Salida */}
-        <div className="grid grid-cols-2">
-          <div className="p-4" style={{ borderRight: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
-            <div className="flex items-center gap-2 mb-1">
-              <LogIn className="h-3.5 w-3.5" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.4 }} />
-              <SectionLabel>Entrada</SectionLabel>
-            </div>
-            <p className="text-xl font-bold tracking-tight" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.4, fontFamily: FONT }}>
-              {checkedIn?.slice(0, 5) || "--:--"}
-            </p>
-            {schedule && <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Programada: {schedule.start_time}</p>}
-          </div>
-          <div className="p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <LogOut className="h-3.5 w-3.5" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.4 }} />
-              <SectionLabel>Salida</SectionLabel>
-            </div>
-            <p className="text-xl font-bold tracking-tight" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.4, fontFamily: FONT }}>
-              {checkedOut?.slice(0, 5) || "--:--"}
-            </p>
-            {schedule && <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Programada: {schedule.end_time}</p>}
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="px-5 pb-5 pt-1">
-          {hasPending && (
-            <div
-              className="p-4"
-              style={{
-                borderRadius: "12px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-                background: "var(--sb-surface-container-high)",
-              }}
-            >
-              <div className="flex items-start gap-3">
-                <LogOut className="h-4 w-4 mt-0.5 shrink-0" style={{ color: "var(--sb-on-surface-variant)" }} />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
-                    Salida pendiente del {new Date(pendingCheckout.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
+      {/* ═══ Jornada + Status ═══ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Jornada card */}
+        <Card className="sm:col-span-2">
+          <div className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-10 w-10 flex items-center justify-center"
+                  style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+                >
+                  <Clock className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                    {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                    Marcaste tu entrada a las {pendingCheckout.check_in?.slice(0, 5)} pero no registraste tu salida.
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                    {!checkedIn
+                      ? schedule
+                        ? `Horario: ${schedule.start_time} — ${schedule.end_time}`
+                        : "Sin clases programadas"
+                      : checkedOut
+                        ? `Completada · ${checkedIn.slice(0, 5)} — ${checkedOut.slice(0, 5)}`
+                        : `Entrada ${checkedIn.slice(0, 5)} · salida ${schedule?.end_time || "—"}`
+                    }
+                  </p>
+                </div>
+              </div>
+              {s && <StatusBadge label={s.label} dot={s.dot} />}
+            </div>
+
+            {/* Entrada / Salida */}
+            <div className="grid grid-cols-2 gap-3">
+              <div
+                className="p-3"
+                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <LogIn className="h-3.5 w-3.5" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.3 }} />
+                  <SectionLabel>Entrada</SectionLabel>
+                </div>
+                <p className="text-2xl font-bold" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.3, fontFamily: FONT }}>
+                  {checkedIn?.slice(0, 5) || "—:——"}
+                </p>
+                {schedule && (
+                  <p className="text-[10px] mt-1" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
+                    Prog. {schedule.start_time}
+                  </p>
+                )}
+              </div>
+              <div
+                className="p-3"
+                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <LogOut className="h-3.5 w-3.5" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.3 }} />
+                  <SectionLabel>Salida</SectionLabel>
+                </div>
+                <p className="text-2xl font-bold" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.3, fontFamily: FONT }}>
+                  {checkedOut?.slice(0, 5) || "—:——"}
+                </p>
+                {schedule && (
+                  <p className="text-[10px] mt-1" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
+                    Prog. {schedule.end_time}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Action */}
+            <div className="mt-4">
+              {hasPending && (
+                <div className="space-y-2">
+                  <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                    Salida pendiente del {safeFormatDate(pendingCheckout.date)}
                   </p>
                   <button
                     onClick={() => handleCheck("check-out", pendingCheckout.date)}
                     disabled={actionLoading}
-                    className="mt-3 w-full h-10 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                    className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                     style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
                   >
                     {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
-                    Marcar Salida
+                    Marcar Salida Pendiente
                   </button>
                 </div>
+              )}
+              {!hasPending && !checkedIn && (
+                <button
+                  onClick={() => handleCheck("check-in")}
+                  disabled={actionLoading}
+                  className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+                >
+                  {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
+                  Marcar Entrada
+                </button>
+              )}
+              {!hasPending && checkedIn && !checkedOut && (
+                <button
+                  onClick={() => handleCheck("check-out")}
+                  disabled={actionLoading}
+                  className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
+                >
+                  {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
+                  Marcar Salida
+                </button>
+              )}
+              {!hasPending && checkedIn && checkedOut && (
+                <div
+                  className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2"
+                  style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
+                >
+                  <Check className="h-4 w-4" />
+                  Jornada completada
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Weekly mini chart */}
+        <Card>
+          <div className="p-5 h-full flex flex-col">
+            <div className="flex items-center gap-2 mb-4">
+              <div
+                className="h-10 w-10 flex items-center justify-center"
+                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+              >
+                <Flame className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
+              </div>
+              <div>
+                <SectionLabel>Semana</SectionLabel>
+                <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
+                  {history.length} registros
+                </p>
               </div>
             </div>
-          )}
-          {!hasPending && !checkedIn && (
-            <button
-              onClick={() => handleCheck("check-in")}
-              disabled={actionLoading}
-              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
-            >
-              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
-              Marcar Entrada
-            </button>
-          )}
-          {!hasPending && checkedIn && !checkedOut && (
-            <button
-              onClick={() => handleCheck("check-out")}
-              disabled={actionLoading}
-              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
-            >
-              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
-              Marcar Salida
-            </button>
-          )}
-          {!hasPending && checkedIn && checkedOut && (
-            <div
-              className="w-full h-11 text-sm font-semibold flex items-center justify-center gap-2"
-              style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-            >
-              <Check className="h-4 w-4" />
-              Jornada completada
+            <div className="flex-1 flex items-end justify-between gap-1.5">
+              {weekDays.map((d) => {
+                const isToday = getLocalDateStr() === d.iso
+                const hasData = !!d.status
+                return (
+                  <div key={d.iso} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div
+                      className="w-full aspect-square max-w-[36px] flex items-center justify-center transition-all"
+                      style={{
+                        borderRadius: "10px",
+                        background: hasData ? getBarColor(d.status) : "var(--sb-surface-container-high)",
+                        opacity: hasData ? getBarOpacity(d.status) : 0.3,
+                      }}
+                    >
+                      {hasData && (
+                        <span className="text-[9px] font-bold" style={{ color: "var(--sb-surface)", fontFamily: FONT }}>
+                          {d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <span
+                        className="text-[8px] font-semibold uppercase"
+                        style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: isToday ? 1 : 0.4, fontFamily: FONT }}
+                      >
+                        {d.label}
+                      </span>
+                      <span
+                        className="text-[10px] font-medium"
+                        style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", fontFamily: FONT }}
+                      >
+                        {d.day}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-          )}
-        </div>
-      </Card>
-
-      {/* ── Weekly Bars ── */}
-      <Card>
-        <div className="px-5 pt-4 pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <NoteChip icon={Flame} />
-            <SectionLabel>Últimos 7 días</SectionLabel>
           </div>
+        </Card>
+      </div>
+
+      {/* ═══ Historial ═══ */}
+      <Card>
+        <div className="px-5 pt-4 pb-3 flex items-center justify-between">
+          <SectionLabel>Historial reciente</SectionLabel>
           <span
             className="text-[10px] font-medium px-2 py-1"
             style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
           >
             {history.length} registros
           </span>
-        </div>
-        <div className="px-5 pb-5 flex items-end justify-between gap-2">
-          {weekDays.map((d) => {
-            const isToday = getLocalDateStr() === d.iso
-            return (
-              <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                <div
-                  className="h-20 w-full max-w-[34px] flex items-end overflow-hidden"
-                  style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)" }}
-                >
-                  <div
-                    className={`w-full h-full transition-all duration-500 ${getBarConfig(d.status)}`}
-                    style={{ height: d.status ? "100%" : "8%" }}
-                  />
-                </div>
-                <div className="flex flex-col items-center">
-                  <span
-                    className="text-[9px] font-semibold uppercase"
-                    style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: isToday ? 1 : 0.5, fontFamily: FONT }}
-                  >
-                    {d.label}
-                  </span>
-                  <span
-                    className="text-[10px] font-medium"
-                    style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", fontFamily: FONT }}
-                  >
-                    {d.day}
-                  </span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </Card>
-
-      {/* ── History ── */}
-      <Card>
-        <div className="px-5 pt-4 pb-2">
-          <SectionLabel>Historial reciente</SectionLabel>
         </div>
         {history.length === 0 ? (
           <div className="py-16 text-center">
@@ -409,30 +445,37 @@ function MiAsistencia() {
               const isLast = i === Math.min(history.length, 10) - 1
               return (
                 <div
-                  key={h.id}
-                  className="flex items-center justify-between px-5 py-3 transition-colors"
+                  key={h.id || i}
+                  className="flex items-center justify-between px-5 py-3.5 transition-colors"
                   style={{ borderBottom: isLast ? "none" : "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
                 >
                   <div className="flex items-center gap-3">
-                    <NoteChip icon={Calendar} />
-                    <span className="text-sm capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
-                      {new Date(h.date + "T00:00:00").toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "short" })}
-                    </span>
+                    <div
+                      className="h-9 w-9 flex items-center justify-center shrink-0"
+                      style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
+                    >
+                      <Calendar className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                    </div>
+                    <div>
+                      <p className="text-sm capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                        {safeFormatDate(h.date)}
+                      </p>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-[11px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                          Ent: {h.check_in ? h.check_in.slice(0, 5) : '—'}
+                        </span>
+                        <span className="text-[11px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                          Sal: {h.check_out ? h.check_out.slice(0, 5) : '—'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                      Ent: {h.check_in ? h.check_in.slice(0, 5) : '--'}
-                    </span>
-                    <span className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                      Sal: {h.check_out ? h.check_out.slice(0, 5) : '--'}
-                    </span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg ${sc.color}`}>
-                      <span className={`h-1 w-1 rounded-full ${sc.dot}`} />
-                      {sc.label}
-                    </span>
-                  </div>
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg ${sc.color}`}>
+                    <span className={`h-1 w-1 rounded-full ${sc.dot}`} />
+                    {sc.label}
+                  </span>
                 </div>
               )
             })}
@@ -480,7 +523,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
     setOpen(false)
   }
 
-  const display = date ? new Date(date + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" }) : ""
+  const display = date ? safeFormatDate(date) : ""
 
   return (
     <div ref={ref} className="relative">
@@ -521,8 +564,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 {MonthNames[month]} {year}
               </p>
               <div className="flex gap-1">
-                <button
-                  onClick={() => setViewDate(new Date(year, month - 1, 1))}
+                <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
                   className="h-7 w-7 flex items-center justify-center transition-colors"
                   style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
@@ -530,8 +572,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
-                <button
-                  onClick={() => setViewDate(new Date(year, month + 1, 1))}
+                <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
                   className="h-7 w-7 flex items-center justify-center transition-colors"
                   style={{ borderRadius: "8px", color: "var(--sb-on-surface-variant)" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container)" }}
@@ -558,16 +599,13 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 const isSelected = dateStr === date
                 const isFuture = dateStr > today
                 return (
-                  <button
-                    key={day}
-                    onClick={() => !isFuture && selectDate(day)}
-                    disabled={isFuture}
+                  <button key={day} onClick={() => !isFuture && selectDate(day)} disabled={isFuture}
                     className="h-8 w-full flex items-center justify-center text-[12px] font-medium transition-colors"
                     style={{
                       borderRadius: "8px",
                       background: isSelected ? "var(--sb-on-surface)" : isToday ? "var(--sb-surface-container-high)" : "transparent",
-                      color: isSelected ? "var(--sb-surface)" : isToday ? "var(--sb-on-surface)" : isFuture ? "var(--sb-on-surface-variant)" : "var(--sb-on-surface)",
-                      opacity: isFuture ? 0.3 : 1,
+                      color: isSelected ? "var(--sb-surface)" : isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface)",
+                      opacity: isFuture ? 0.25 : 1,
                       cursor: isFuture ? "not-allowed" : "pointer",
                       fontFamily: FONT,
                     }}
@@ -653,8 +691,6 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
     } catch {} finally { setSaving(false) }
   }
 
-  const selected = courses.find(c => c.id === selectedCourse)
-
   const filtered = students.filter(s => {
     if (!searchTerm) return true
     const q = searchTerm.toLowerCase()
@@ -685,16 +721,24 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
-      {/* ── Selector ── */}
+      {/* Selector */}
       <Card>
-        <div className="px-5 pt-4 pb-2">
-          <div className="flex items-center gap-2">
-            <NoteChip icon={Users} />
-            <SectionLabel>Seleccionar curso y fecha</SectionLabel>
+        <div className="p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="h-10 w-10 flex items-center justify-center"
+              style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+            >
+              <Users className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
+            </div>
+            <div>
+              <SectionLabel>Seleccionar curso y fecha</SectionLabel>
+              <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
+                Elige el curso y la fecha para registrar asistencia
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="px-5 pb-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
             <div className="space-y-1.5">
               <p className="text-xs font-medium" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Curso</p>
               <select value={selectedCourse} onChange={e => { setSelectedCourse(e.target.value); setStatsLoaded(false); setStats([]) }}
@@ -710,13 +754,8 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
             <button
               onClick={handleCargar}
               disabled={loading || !selectedCourse}
-              className="h-10 px-4 text-sm font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-30"
-              style={{
-                borderRadius: "12px",
-                background: "var(--sb-on-surface)",
-                color: "var(--sb-surface)",
-                fontFamily: FONT,
-              }}
+              className="h-10 px-5 text-sm font-medium flex items-center justify-center gap-2 transition-all disabled:opacity-30"
+              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
             >
               {loading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Search className="h-4 w-4" />}
               Cargar alumnos
@@ -725,7 +764,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </div>
       </Card>
 
-      {/* ── View toggle ── */}
+      {/* View toggle */}
       {selectedCourse && (
         <div className="nb-rail">
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
@@ -738,16 +777,21 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </div>
       )}
 
-      {/* ── Stats Table ── */}
+      {/* Stats Table */}
       {alumnoView === "estadisticas" && selectedCourse && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           <Card>
             <div className="px-5 pt-5 pb-3" style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
-              <div className="flex items-center gap-2">
-                <NoteChip icon={Users} />
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-10 w-10 flex items-center justify-center"
+                  style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
+                >
+                  <Users className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
+                </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>Asistencia de los últimos 30 días</p>
-                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Resumen por alumno del curso seleccionado</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>Asistencia últimos 30 días</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Resumen por alumno</p>
                 </div>
               </div>
             </div>
@@ -773,12 +817,10 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                     {stats.length === 0 ? (
                       <tr><td colSpan={7} className="py-16 text-center">
                         <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
-                        <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Sin registros de asistencia en el curso</p>
+                        <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>Sin registros</p>
                       </td></tr>
                     ) : stats.map((s, i) => (
-                      <tr
-                        key={s.id}
-                        className="transition-colors"
+                      <tr key={s.id} className="transition-colors"
                         style={{ borderBottom: i < stats.length - 1 ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" : "none" }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
@@ -802,25 +844,16 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                         <td className="px-5 py-3">
                           <div className="flex items-center gap-2 justify-end">
                             <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--sb-surface-container-high)" }}>
-                              <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${s.rate}%`,
-                                  background: s.rate >= 80 ? "var(--sb-on-surface)" : s.rate >= 60 ? "var(--sb-on-surface-variant)" : "var(--sb-on-surface-variant)",
-                                  opacity: s.rate >= 80 ? 1 : s.rate >= 60 ? 0.6 : 0.4,
-                                }}
-                              />
+                              <div className="h-full rounded-full" style={{
+                                width: `${s.rate}%`,
+                                background: s.rate >= 80 ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
+                                opacity: s.rate >= 80 ? 0.9 : 0.5,
+                              }} />
                             </div>
-                            <span
-                              className="text-xs font-bold w-9 text-right"
-                              style={{
-                                color: s.rate >= 80 ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
-                                opacity: s.rate >= 80 ? 1 : 0.6,
-                                fontFamily: FONT,
-                              }}
-                            >
-                              {s.rate}%
-                            </span>
+                            <span className="text-xs font-bold w-9 text-right" style={{
+                              color: s.rate >= 80 ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)",
+                              opacity: s.rate >= 80 ? 1 : 0.6, fontFamily: FONT,
+                            }}>{s.rate}%</span>
                           </div>
                         </td>
                       </tr>
@@ -833,27 +866,20 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </motion.div>
       )}
 
-      {/* ── Registro ── */}
+      {/* Registro */}
       {loaded && students.length > 0 && alumnoView === "registro" && (
         <>
-          {/* Summary cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+          {/* Summary */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {summary.map(item => {
               const Icon = item.icon
               return (
-                <div
-                  key={item.label}
-                  className="p-4"
-                  style={{
-                    background: "var(--sb-surface-container)",
-                    borderRadius: "16px",
-                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-                  }}
-                >
-                  <div
-                    className="h-8 w-8 flex items-center justify-center mb-2"
-                    style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
-                  >
+                <div key={item.label} className="p-4" style={{
+                  background: "var(--sb-surface-container)",
+                  borderRadius: "16px",
+                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                }}>
+                  <div className="h-8 w-8 flex items-center justify-center mb-2" style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}>
                     <Icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
                   <SectionLabel>{item.label}</SectionLabel>
@@ -874,19 +900,14 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={handleMarkAllPresent}
+                  <button onClick={handleMarkAllPresent}
                     className="h-9 px-3.5 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                    style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface)", fontFamily: FONT }}
-                  >
-                    <UserCheck className="h-3.5 w-3.5" /> Marcar todos presentes
+                    style={{ borderRadius: "12px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                    <UserCheck className="h-3.5 w-3.5" /> Marcar todos
                   </button>
-                  <button
-                    onClick={handleClearAll}
-                    disabled={students.every(s => s.status === null)}
+                  <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
                     className="h-9 px-3 text-xs font-medium transition-colors disabled:opacity-40"
-                    style={{ borderRadius: "12px", background: "var(--sb-surface-container)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-                  >
+                    style={{ borderRadius: "12px", background: "var(--sb-surface-container)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
                     Limpiar
                   </button>
                   <div className="relative w-44">
@@ -911,8 +932,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
             <div style={{ borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
               {filtered.map((s, i) => (
-                <div
-                  key={s.id}
+                <div key={s.id}
                   className="flex items-center justify-between gap-3 px-5 py-3 transition-colors"
                   style={{
                     borderBottom: i < filtered.length - 1 ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" : "none",
@@ -948,34 +968,26 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           </Card>
 
           {/* Save bar */}
-          <div
-            className="flex items-center gap-3 sticky bottom-0 backdrop-blur-sm p-4"
-            style={{
-              borderRadius: "16px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-              background: "color-mix(in srgb, var(--sb-surface) 80%, transparent)",
-            }}
-          >
+          <div className="flex items-center gap-3 sticky bottom-4 backdrop-blur-sm p-4" style={{
+            borderRadius: "16px",
+            border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+            background: "color-mix(in srgb, var(--sb-surface) 85%, transparent)",
+            boxShadow: "0 4px 24px -4px rgba(0,0,0,0.15)",
+          }}>
             <div className="flex-1 space-y-1">
               <p className="text-sm font-semibold" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
                 {marked} de {students.length} marcados
               </p>
               <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--sb-surface-container-high)" }}>
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${students.length ? (marked / students.length) * 100 : 0}%`,
-                    background: "var(--sb-on-surface)",
-                  }}
-                />
+                <div className="h-full rounded-full transition-all duration-500" style={{
+                  width: `${students.length ? (marked / students.length) * 100 : 0}%`,
+                  background: "var(--sb-on-surface)",
+                }} />
               </div>
             </div>
-            <button
-              onClick={handleGuardar}
-              disabled={saving || students.every(s => s.status === null)}
+            <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
               className="h-12 px-6 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
-              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}
-            >
+              style={{ borderRadius: "12px", background: "var(--sb-on-surface)", color: "var(--sb-surface)", fontFamily: FONT }}>
               {saving ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Check className="h-4 w-4" />}
               Guardar
             </button>
@@ -983,7 +995,6 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </>
       )}
 
-      {/* ── Empty states ── */}
       {loaded && students.length === 0 && (
         <Card className="py-16 text-center">
           <UserX className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
