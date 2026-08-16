@@ -17,7 +17,7 @@ import {
   MessageSquare, Calendar, UserCheck, BookMarked, Search, User,
   ArrowRight, Clock, AlertCircle, X, Layers, Plus,
   LayoutGrid, ArrowLeftRight, Receipt,
-  Sparkles, Bell,
+  Sparkles,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
@@ -413,28 +413,23 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className={cn(
-        "hidden md:flex flex-col h-screen w-[64px] transition-[width] duration-200 ease-out overflow-hidden shrink-0",
-        "z-10",
+        "hidden md:flex flex-col h-screen w-[64px] border-r border-sb-outline-variant/8 transition-[width] duration-200 ease-out overflow-hidden shrink-0",
+        "bg-sb-surface z-10",
         sidebarOpen && "w-[240px]"
-      )} style={{ background: "#fff", borderRight: "1px solid #eee" }}>
+      )}>
         {/* Logo */}
         <div className={cn("flex items-center h-14 shrink-0", sidebarOpen ? "px-4 gap-2.5" : "justify-center")}>
           <Link href="/" className="flex items-center justify-center shrink-0">
-            <div className="h-9 w-9 flex items-center justify-center rounded-full" style={{ background: "#f0f0f0" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
+            <Logo className="w-7 h-7" />
           </Link>
           {sidebarOpen && (
-            <span className="text-[14px] font-semibold tracking-tight truncate" style={{ color: "#1a1a1a", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif" }}>
+            <span className="text-[13px] font-medium text-sb-on-surface tracking-tight truncate">
               EduNexus
             </span>
           )}
         </div>
 
-        {/* Nav */}
+        {/* Nav grouped by sections */}
         <nav className={cn(
           "flex flex-col flex-1 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
           sidebarOpen ? "px-2 py-3 gap-4" : "px-2 py-3 gap-2"
@@ -443,9 +438,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <div key={section.title} className="flex flex-col gap-px">
               {sidebarOpen && (
                 <h3 className={cn(
-                  "px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider",
+                  "px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50",
                   sIdx > 0 && "mt-1"
-                )} style={{ color: "#bbb" }}>
+                )}>
                   {section.title}
                 </h3>
               )}
@@ -459,50 +454,49 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                   <>
                     {!sidebarOpen && (
                       <motion.span
-                        className="absolute inset-0"
-                        initial={false}
-                        animate={{
-                          borderRadius: active ? 12 : 999,
-                          backgroundColor: active ? "#1a1a1a" : "rgba(0,0,0,0)",
-                        }}
-                        whileHover={{ backgroundColor: active ? "#1a1a1a" : "rgba(0,0,0,0.06)" }}
-                        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
-                      />
-                    )}
-                    <motion.span
-                      className="relative z-10"
-                      whileTap={{ scale: 0.9 }}
-                      animate={{
-                        scale: active ? 1.1 : 1,
-                        opacity: active ? 1 : 0.6,
-                      }}
-                      transition={{ duration: 0.25, ease: "easeInOut" }}
-                    >
-                      <item.icon className="h-[18px] w-[18px] shrink-0" />
-                    </motion.span>
-                    {sidebarOpen && (
-                      <span className={cn(
-                        "text-[13px] truncate transition-all duration-300 ease-out",
-                        active ? "font-medium" : "font-normal"
-                      )}>
-                        {item.title}
-                      </span>
-                    )}
-                  </>
-                )
-                const cls = cn(
-                  "group flex items-center gap-3 transition-colors duration-300 ease-out",
-                  sidebarOpen ? "h-10 px-3 rounded-[12px]" : "relative justify-center w-10 h-10 mx-auto",
-                  active
-                    ? sidebarOpen ? "text-white" : "text-white"
-                    : "hover:text-gray-900"
-                )
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{
+                    borderRadius: active ? 6 : 999,
+                    backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                  }}
+                  whileHover={{ backgroundColor: active ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                />
+              )}
+              <motion.span
+                className="relative z-10"
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: active ? 1.1 : 1,
+                  opacity: active ? 1 : 0.7,
+                }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                <item.icon className="h-[16px] w-[16px] shrink-0" />
+              </motion.span>
+              {sidebarOpen && (
+                <span className={cn(
+                  "text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]",
+                  active ? "font-medium" : "font-normal"
+                )}>
+                  {item.title}
+                </span>
+              )}
+            </>
+          )
+          const cls = cn(
+            "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+            sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+            active
+              ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+              : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+          )
                 const title = !sidebarOpen ? item.title : undefined
-                const style = active ? { color: "#fff" } : { color: "#888" }
                 return isAction ? (
-                  <button key={item.href} onClick={handleAction} className={cls} title={title} style={style}>{inner}</button>
+                  <button key={item.href} onClick={handleAction} className={cls} title={title}>{inner}</button>
                 ) : (
-                  <Link key={item.href} href={item.href} className={cls} title={title} style={style}>{inner}</Link>
+                  <Link key={item.href} href={item.href} className={cls} title={title}>{inner}</Link>
                 )
               })}
             </div>
@@ -510,54 +504,130 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Bottom */}
-        <div className={cn("shrink-0 border-t px-2 py-3 space-y-2")} style={{ borderColor: "#f0f0f0" }}>
-          {/* Theme */}
-          <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className={cn(
-              "group flex items-center gap-3 transition-colors duration-300 ease-out w-full",
-              sidebarOpen ? "h-10 px-3 rounded-[12px]" : "justify-center w-10 h-10 mx-auto rounded-[12px]",
+        <div className={cn("shrink-0 border-t border-sb-outline-variant/6 px-2 py-2 space-y-3")}>
+          {/* Herramientas section */}
+          <div className="flex flex-col gap-px">
+            {sidebarOpen && (
+              <h3 className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">
+                Herramientas
+              </h3>
             )}
-            style={{ color: "#888" }}>
-            <div className="relative shrink-0 w-[18px] h-[18px]">
-              <Sun className={cn("absolute inset-0 h-[18px] w-[18px] transition-all duration-200", theme === "dark" ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100")} />
-              <Moon className={cn("absolute inset-0 h-[18px] w-[18px] transition-all duration-200", theme === "dark" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0")} />
-            </div>
-            {sidebarOpen && <span className="text-[13px] truncate">Tema</span>}
-          </button>
-
-          {/* Collapse */}
-          <button onClick={toggleSidebar}
-            className={cn(
-              "group flex items-center gap-3 transition-colors duration-300 ease-out w-full",
-              sidebarOpen ? "h-10 px-3 rounded-[12px]" : "justify-center w-10 h-10 mx-auto rounded-[12px]",
+            {/* AI Assistant Link */}
+            {role === 'secretario' && can("can_ai_assistant") && (
+              <Link
+                href="/secretario/asistente"
+                className={cn(
+                  "group flex items-center gap-2.5 transition-colors duration-300 ease-out w-full",
+                  sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                  pathname.startsWith("/secretario/asistente")
+                    ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+                    : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+                )}
+                title="Asistente IA">
+                {!sidebarOpen && (
+                  <motion.span
+                    className="absolute inset-0"
+                    initial={false}
+                    animate={{
+                      borderRadius: pathname.startsWith("/secretario/asistente") ? 14 : 999,
+                      backgroundColor: pathname.startsWith("/secretario/asistente") ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                    }}
+                    whileHover={{ backgroundColor: pathname.startsWith("/secretario/asistente") ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                  />
+                )}
+                <motion.span
+                  className="relative z-10"
+                  whileTap={{ scale: 0.9 }}
+                  animate={{
+                    scale: pathname.startsWith("/secretario/asistente") ? 1.1 : 1,
+                    opacity: pathname.startsWith("/secretario/asistente") ? 1 : 0.7,
+                  }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                >
+                  <Sparkles className="h-[16px] w-[16px] shrink-0" />
+                </motion.span>
+                {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Asistente IA</span>}
+              </Link>
             )}
-            style={{ color: "#888" }}>
-            <svg className={cn("h-[18px] w-[18px] shrink-0 transition-transform duration-200", !sidebarOpen && "rotate-180")}
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-            {sidebarOpen && <span className="text-[13px] truncate">Colapsar</span>}
-          </button>
 
-          {/* Cuenta */}
-          <div className="border-t pt-2" style={{ borderColor: "#f0f0f0" }}>
+            {/* Theme */}
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              <div className="relative shrink-0 w-[16px] h-[16px]">
+                <Sun className={cn("absolute inset-0 h-[16px] w-[16px] transition-all duration-200", theme === "dark" ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100")} />
+                <Moon className={cn("absolute inset-0 h-[16px] w-[16px] transition-all duration-200", theme === "dark" ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0")} />
+              </div>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Tema</span>}
+            </button>
+
+            {/* Collapse */}
+            <button onClick={toggleSidebar}
+              className={cn(
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/50 hover:bg-sb-surface-container/60 hover:text-sb-on-surface-variant dark:text-sb-solid-fg/45 dark:hover:text-sb-solid-fg"
+              )}>
+              <svg className={cn("h-[16px] w-[16px] shrink-0 transition-transform duration-200", !sidebarOpen && "rotate-180")}
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Colapsar</span>}
+            </button>
+          </div>
+
+          {/* Cuenta section */}
+          <div className="flex flex-col gap-px border-t border-sb-outline-variant/6 pt-2">
+            {sidebarOpen && (
+              <h3 className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">
+                Cuenta
+              </h3>
+            )}
             <Link href="/perfil"
               className={cn(
-                "group flex items-center gap-3 transition-colors duration-300 ease-out w-full",
-                sidebarOpen ? "h-10 px-3 rounded-[12px]" : "justify-center w-10 h-10 mx-auto rounded-[12px]",
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                  pathname === "/perfil"
+                    ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
+                    : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              {!sidebarOpen && (
+                <motion.span
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{
+                    borderRadius: pathname === "/perfil" ? 14 : 999,
+                    backgroundColor: pathname === "/perfil" ? "var(--sb-on-surface)" : "rgba(0,0,0,0)",
+                  }}
+                  whileHover={{ backgroundColor: pathname === "/perfil" ? "var(--sb-on-surface)" : "rgba(0,0,0,0.06)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+                />
               )}
-              style={{ color: pathname === "/perfil" ? "#1a1a1a" : "#888" }}>
-              <User className="h-[18px] w-[18px] shrink-0" />
-              {sidebarOpen && <span className="text-[13px] truncate">Mi perfil</span>}
+              <motion.span
+                className="relative z-10"
+                whileTap={{ scale: 0.9 }}
+                animate={{
+                  scale: pathname === "/perfil" ? 1.1 : 1,
+                  opacity: pathname === "/perfil" ? 1 : 0.7,
+                }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
+              >
+                <User className="h-[16px] w-[16px] shrink-0" />
+              </motion.span>
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Mi perfil</span>}
             </Link>
             <button onClick={handleLogout}
               className={cn(
-                "group flex items-center gap-3 transition-colors duration-300 ease-out w-full",
-                sidebarOpen ? "h-10 px-3 rounded-[12px]" : "justify-center w-10 h-10 mx-auto rounded-[12px]",
-              )}
-              style={{ color: "#888" }}>
-              <LogOut className="h-[18px] w-[18px] shrink-0" />
-              {sidebarOpen && <span className="text-[13px] truncate">Salir</span>}
+                "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
+                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
+              )}>
+              <LogOut className="h-[16px] w-[16px] shrink-0" />
+              {sidebarOpen && <span className="text-[13px] truncate transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:tracking-[0.02em]">Salir</span>}
             </button>
           </div>
         </div>
@@ -565,32 +635,43 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Pinterest-style Header */}
-        <header className="flex items-center justify-between h-14 px-6 shrink-0" style={{ background: "#f5f5f5" }}>
-          {/* Left: Search */}
-          <div className="relative flex-1 max-w-[320px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#999" }} />
-            <input
-              placeholder="Buscar cursos, alumnos..."
-              className="w-full h-9 pl-10 pr-4 text-[13px] rounded-full border-none outline-none"
-              style={{ background: "#fff", color: "#1a1a1a", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
-            />
-          </div>
-
-          {/* Right: Notifications + Avatar */}
-          <div className="flex items-center gap-4 ml-4">
-            <button className="relative flex items-center gap-2 text-[13px] font-medium" style={{ color: "#666", fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif" }}>
-              <Bell className="h-5 w-5" />
-              <span className="hidden sm:inline">Notifications</span>
-              <span className="h-5 w-5 flex items-center justify-center text-[10px] font-bold text-white rounded-full" style={{ background: "#1a1a1a" }}>2</span>
-            </button>
+        {/* Minimal Header */}
+        <header className="flex items-center justify-between h-14 px-6 shrink-0">
+          <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageName}</h1>
+          <div className="flex items-center gap-2">
             {user && (
-              <div className="h-9 w-9 rounded-full overflow-hidden cursor-pointer" style={{ background: "#1a1a1a" }}>
-                <div className="h-full w-full flex items-center justify-center text-[11px] font-bold text-white">
-                  {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-sb-surface-container-high mr-1">
+                <div className="h-5 w-5 rounded-full bg-sb-surface-container-highest flex items-center justify-center">
+                  <span className="text-[8px] font-semibold text-sb-on-surface/80">
+                    {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                  </span>
                 </div>
+                <span className="text-[10px] text-sb-on-surface-variant">{roleLabels[role || ""]}</span>
               </div>
             )}
+
+            <div className="flex md:hidden items-center gap-1 mr-1">
+              <button onClick={() => setSearchOpen(true)}
+                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
+                <Search className="h-[18px] w-[18px]" />
+              </button>
+              <NotificationBell />
+              <button onClick={handleLogout}
+                className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
+                <LogOut className="h-[18px] w-[18px]" />
+              </button>
+            </div>
+
+            <div className="hidden md:flex items-center">
+              <NotificationBell />
+            </div>
+
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hidden md:flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all relative"
+              title="Toggle theme">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </button>
           </div>
         </header>
 
