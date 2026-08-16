@@ -81,8 +81,8 @@ export default function CalendarioPage() {
     .slice(0, 6)
 
   return (
-    <div className="sb-note">
-      <div className="mx-auto w-full max-w-[1034px] px-2 pb-4 space-y-5">
+    <div className="w-full py-6 sb-note">
+      <div className="w-full space-y-5">
         {/* Header */}
         <header className="pt-2">
           <h1 className="text-[26px] sm:text-[30px] leading-tight tracking-[-0.03em] text-[var(--note-text)]">Calendario</h1>
