@@ -242,17 +242,34 @@ html.dark [data-role="docente"] {
 
 /* ─── Sidebar glass ───────────────────────── */
 [data-role="docente"] aside.bg-sb-surface {
-  background: color-mix(in srgb, var(--sb-surface) 72%, transparent) !important;
+  background: color-mix(in srgb, var(--sb-surface) 85%, transparent) !important;
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-right: 1px solid #fff !important;
 }
-[data-role="docente"] aside [class*="rounded-[6px]"] {
-  border-radius: 10px !important;
+.dark[data-role="docente"] aside.bg-sb-surface,
+html.dark [data-role="docente"] aside.bg-sb-surface {
+  background: #1a1a1e !important;
+  border-right: 1px solid #2a2a2e !important;
 }
-[data-role="docente"] aside a[class*="bg-sb-on-surface"],
-[data-role="docente"] aside button[class*="bg-sb-on-surface"] {
+.dark[data-role="docente"] aside a[class*="bg-sb-on-surface"],
+html.dark [data-role="docente"] aside a[class*="bg-sb-on-surface"],
+.dark[data-role="docente"] aside button[class*="bg-sb-on-surface"],
+html.dark [data-role="docente"] aside button[class*="bg-sb-on-surface"] {
+  background: #2a2a2e !important;
   box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.4);
+}
+.dark[data-role="docente"] aside,
+html.dark [data-role="docente"] aside {
+  border-color: #2a2a2e !important;
+}
+.dark[data-role="docente"] aside span,
+html.dark [data-role="docente"] aside span {
+  color: #d4d4d8 !important;
+}
+.dark[data-role="docente"] aside svg,
+html.dark [data-role="docente"] aside svg {
+  color: #a1a1aa !important;
 }
 
 /* ─── Header glass ────────────────────────── */

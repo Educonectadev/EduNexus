@@ -31,308 +31,115 @@ export default function CursosPage() {
   const avgStudents = courses.length > 0 ? Math.round(totalStudents / courses.length) : 0
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="w-full py-6">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
+
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 12 }}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <span
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
-            style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
-          >
-            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
-            Panel Docente
-          </span>
-          <h1
-            className="text-2xl font-semibold mt-2"
-            style={{
-              color: "var(--sb-on-surface)",
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
-              letterSpacing: "-0.02em"
-            }}
-          >
+          <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
             Mis Cursos
           </h1>
-          <p
-            className="text-sm mt-1"
-            style={{
-              color: "var(--sb-on-surface-variant)",
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-            }}
-          >
+          <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
             Cursos asignados este periodo académico
           </p>
-        </motion.header>
+        </motion.div>
 
         {/* Stats Row */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-3 gap-2 mb-8"
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="grid grid-cols-3 gap-4 mb-8"
         >
-          {[
-            { label: "Cursos", value: loading ? "—" : courses.length, icon: BookOpen },
-            { label: "Alumnos", value: loading ? "—" : totalStudents, icon: Users },
-            { label: "Promedio", value: loading ? "—" : `${avgStudents}/curso`, icon: Clock },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="p-4"
-              style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "16px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-              }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <stat.icon
-                  className="h-3.5 w-3.5"
-                  style={{ color: "var(--sb-on-surface-variant)" }}
-                />
-                <span
-                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                  style={{
-                    color: "var(--sb-on-surface-variant)",
-                    opacity: 0.45,
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
-                  {stat.label}
-                </span>
-              </div>
-              <p
-                className="text-xl font-semibold"
-                style={{
-                  color: "var(--sb-on-surface)",
-                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                }}
-              >
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Section Label */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-4"
-        >
-          <span
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
-            style={{
-              color: "var(--sb-on-surface-variant)",
-              opacity: 0.45,
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-            }}
-          >
-            <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />
-            {courses.length} cursos asignados
-          </span>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Cursos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : courses.length}
+            </p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Alumnos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : totalStudents}
+            </p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Promedio</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : `${avgStudents}/curso`}
+            </p>
+          </div>
         </motion.div>
 
         {/* Course List */}
-        {loading ? (
-          <div className="space-y-2">
-            {[1, 2, 3].map(i => (
-              <div
-                key={i}
-                className="py-4 animate-pulse"
-                style={{
-                  borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)"
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="h-10 w-10 shrink-0"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "12px"
-                    }}
-                  />
-                  <div className="flex-1 space-y-2">
-                    <div
-                      className="h-4 w-40"
-                      style={{
-                        background: "var(--sb-surface-container-high)",
-                        borderRadius: "8px"
-                      }}
-                    />
-                    <div
-                      className="h-3 w-28"
-                      style={{
-                        background: "var(--sb-surface-container-high)",
-                        borderRadius: "8px"
-                      }}
-                    />
-                  </div>
-                  <div
-                    className="h-3 w-20"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "8px"
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : courses.length === 0 ? (
-          <div
-            className="py-16 text-center"
-            style={{
-              background: "var(--sb-surface-container)",
-              borderRadius: "20px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-            }}
-          >
-            <BookOpen
-              className="h-10 w-10 mx-auto mb-3"
-              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
-            />
-            <p
-              className="text-sm font-medium"
-              style={{
-                color: "var(--sb-on-surface)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
-              Sin cursos asignados
-            </p>
-            <p
-              className="text-xs mt-1"
-              style={{
-                color: "var(--sb-on-surface-variant)",
-                opacity: 0.5,
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
-              Contacta al administrador para asignar cursos
-            </p>
-          </div>
-        ) : (
-          <div
-            style={{
-              background: "var(--sb-surface-container)",
-              borderRadius: "20px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
-              overflow: "hidden"
-            }}
-          >
-            {courses.map((c, i) => (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 + i * 0.05 }}
-              >
-                <Link
-                  href={`/docente/cursos/${c.id}`}
-                  className="group flex items-center gap-4 py-4 px-4"
-                  style={{
-                    borderBottom: i < courses.length - 1
-                      ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)"
-                      : "none",
-                    transition: "background 200ms ease"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "var(--sb-surface-container-high)"
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent"
-                  }}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]"
+        >
+          <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">
+            {courses.length} cursos asignados
+          </p>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-16 rounded-[20px] animate-pulse bg-[#D9D9D9] dark:bg-[#27272a]" />
+              ))}
+            </div>
+          ) : courses.length === 0 ? (
+            <div className="py-12 text-center">
+              <BookOpen className="h-10 w-10 mx-auto mb-3 text-[#D9D9D9] dark:text-[#3f3f46]" />
+              <p className="text-[14px] font-medium text-[#000] dark:text-[#f4f4f5]">Sin cursos asignados</p>
+              <p className="text-[12px] mt-1 text-[#999] dark:text-[#71717a]">Contacta al administrador para asignar cursos</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {courses.map((c, i) => (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 + i * 0.05 }}
                 >
-                  {/* Icon */}
-                  <div
-                    className="h-10 w-10 flex items-center justify-center shrink-0"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "12px",
-                      transition: "background 200ms ease"
-                    }}
+                  <Link
+                    href={`/docente/cursos/${c.id}`}
+                    className="group flex items-center gap-4 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors"
                   >
-                    <BookOpen
-                      className="h-4 w-4"
-                      style={{ color: "var(--sb-on-surface-variant)" }}
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3
-                        className="text-sm font-medium"
-                        style={{
-                          color: "var(--sb-on-surface)",
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
-                          transition: "transform 300ms cubic-bezier(0.34, 1.45, 0.5, 1)"
-                        }}
-                      >
-                        {c.name}
-                      </h3>
-                      <ArrowUpRight
-                        className="h-3.5 w-3.5"
-                        style={{
-                          color: "var(--sb-on-surface-variant)",
-                          opacity: 0,
-                          transition: "opacity 200ms, transform 200ms",
-                          transform: "translateX(-4px)"
-                        }}
-                      />
+                    <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                      <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
                     </div>
-                    <p
-                      className="text-xs mt-0.5"
-                      style={{
-                        color: "var(--sb-on-surface-variant)",
-                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                      }}
-                    >
-                      {c.grade} &quot;{c.section}&quot;
-                    </p>
-                  </div>
-
-                  {/* Meta */}
-                  <div
-                    className="flex items-center gap-4 text-xs shrink-0"
-                    style={{
-                      color: "var(--sb-on-surface-variant)",
-                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                    }}
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5" />
-                      <span style={{ fontWeight: 600 }}>{c.students}</span>
-                      <span className="hidden sm:inline">alumnos</span>
-                    </span>
-                    {c.schedule && (
-                      <span className="hidden md:flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span style={{ fontWeight: 600 }}>{c.schedule}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[14px] font-medium text-[#000] dark:text-[#f4f4f5]">{c.name}</h3>
+                      <p className="text-[12px] text-[#666] dark:text-[#a1a1aa]">{c.grade} &quot;{c.section}&quot;</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-[12px] text-[#666] dark:text-[#a1a1aa] shrink-0">
+                      <span className="flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5" />
+                        <span className="font-semibold">{c.students}</span>
+                        <span className="hidden sm:inline">alumnos</span>
                       </span>
-                    )}
-                  </div>
-
-                  {/* Arrow */}
-                  <ChevronRight
-                    className="h-4 w-4 shrink-0"
-                    style={{
-                      color: "var(--sb-on-surface-variant)",
-                      opacity: 0.3,
-                      transition: "opacity 200ms"
-                    }}
-                  />
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                      {c.schedule && (
+                        <span className="hidden md:flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5" />
+                          <span className="font-semibold">{c.schedule}</span>
+                        </span>
+                      )}
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] shrink-0" />
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   )

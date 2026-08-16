@@ -216,34 +216,16 @@ function CalificacionesInner() {
   const registerStudents = registerCourseId === courseId ? students : []
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="w-full py-6 space-y-5">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
+      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
-            <span
-              className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
-              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
-            >
-              <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
-            </span>
-            <h1
-              className="text-2xl font-semibold mt-2"
-              style={{
-                color: "var(--sb-on-surface)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif",
-                letterSpacing: "-0.02em"
-              }}
-            >
+            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
               Calificaciones
             </h1>
-            <p
-              className="text-sm mt-1"
-              style={{
-                color: "var(--sb-on-surface-variant)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
+            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
               Gestiona las notas de tus alumnos
             </p>
           </div>
@@ -719,6 +701,7 @@ function TablaNotas({
             })}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   )

@@ -129,24 +129,14 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="w-full py-6 sb-note">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c] sb-note">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
       <header className="mb-5">
-        <span
-          className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"
-          style={{ color: "var(--sb-on-surface-variant)", opacity: 0.45 }}
-        >
-          <span className="w-6 h-px" style={{ background: "var(--sb-outline-variant)" }} />Panel Docente
-        </span>
-        <h1
-          className="text-2xl font-semibold mt-2"
-          style={{ color: "var(--sb-on-surface)", fontFamily: FONT, letterSpacing: "-0.02em" }}
-        >
+        <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+        <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
           Asistencia
         </h1>
-        <p
-          className="text-sm mt-1"
-          style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-        >
+        <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
           Control de tu marcación y la asistencia de tus alumnos
         </p>
       </header>
@@ -164,6 +154,7 @@ function AsistenciaInner() {
       <AnimatePresence mode="wait">
         {tab === "personal" ? <MiAsistencia key="personal" /> : <AsistenciaAlumnos key="alumnos" prefillCourse={prefillCourse} />}
       </AnimatePresence>
+      </div>
     </div>
   )
 }
