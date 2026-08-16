@@ -1,0 +1,3 @@
+{
+  "/api/secretario/horarios/[id]/route": "app/api/secretario/horarios/[id]/route.js"
+}

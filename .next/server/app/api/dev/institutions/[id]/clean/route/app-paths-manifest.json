@@ -1,0 +1,3 @@
+{
+  "/api/dev/institutions/[id]/clean/route": "app/api/dev/institutions/[id]/clean/route.js"
+}

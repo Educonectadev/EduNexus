@@ -1,0 +1,1032 @@
+/* ============================================
+   DASHBOARD DOCENTE — Ultra Minimalista
+   Negro y Blanco puro, GSAP Motion Animations
+   ============================================ */
+
+/* --- Design Tokens --- */
+[data-td-scope="dashboard"] {
+  --td-bg: #000000;
+  --td-surface: #0a0a0a;
+  --td-surface-hover: #111111;
+  --td-surface-active: #1a1a1a;
+  --td-border: #1c1c1c;
+  --td-border-strong: #2a2a2a;
+  --td-text: #ffffff;
+  --td-text-secondary: #888888;
+  --td-text-muted: #555555;
+  --td-accent: #ffffff;
+  --td-accent-dim: #cccccc;
+  --td-radius: 20px;
+  --td-radius-sm: 12px;
+  --td-radius-xs: 8px;
+  --td-transition: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --td-transition-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* --- GSAP Animation Base States --- */
+[data-td-scope="dashboard"] .td-gsap-init {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+[data-td-scope="dashboard"] .td-gsap-slide-up {
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: transform, opacity;
+}
+
+[data-td-scope="dashboard"] .td-gsap-scale-in {
+  opacity: 0;
+  transform: scale(0.92);
+  will-change: transform, opacity;
+}
+
+[data-td-scope="dashboard"] .td-gsap-fade {
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* --- Container --- */
+[data-td-scope="dashboard"] .td-container {
+  padding: 0 24px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+[data-td-scope="dashboard"] .td-header {
+  padding: 32px 24px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+[data-td-scope="dashboard"] .td-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-td-scope="dashboard"] .td-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--td-border);
+  background: transparent;
+  color: var(--td-text-secondary);
+  cursor: pointer;
+  transition: all 200ms var(--td-transition-smooth);
+}
+
+[data-td-scope="dashboard"] .td-icon-btn:hover {
+  background: var(--td-surface-hover);
+  border-color: var(--td-border-strong);
+  color: var(--td-text);
+  transform: scale(1.05);
+}
+
+[data-td-scope="dashboard"] .td-icon-btn:active {
+  transform: scale(0.95);
+}
+
+[data-td-scope="dashboard"] .td-icon-btn-svg {
+  width: 16px;
+  height: 16px;
+}
+
+[data-td-scope="dashboard"] .td-user {
+  display: flex;
+  align-items: center;
+}
+
+[data-td-scope="dashboard"] .td-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--td-text);
+  color: var(--td-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Greeting */
+[data-td-scope="dashboard"] .td-greeting-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-td-scope="dashboard"] .td-greeting {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--td-text);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+[data-td-scope="dashboard"] .td-greeting-name {
+  font-weight: 600;
+}
+
+[data-td-scope="dashboard"] .td-date-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+[data-td-scope="dashboard"] .td-date-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-date {
+  font-size: 13px;
+  color: var(--td-text-muted);
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+/* --- Stats Grid --- */
+[data-td-scope="dashboard"] .td-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--td-border);
+  border-radius: var(--td-radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+[data-td-scope="dashboard"] .td-stat-card {
+  background: var(--td-surface);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: background 300ms var(--td-transition-smooth);
+}
+
+[data-td-scope="dashboard"] .td-stat-card:hover {
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-stat-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: var(--td-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 400ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-stat-card:hover::after {
+  transform: scaleX(1);
+}
+
+[data-td-scope="dashboard"] .td-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--td-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 200ms, transform 200ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-stat-card:hover .td-stat-icon {
+  background: var(--td-border-strong);
+  transform: scale(1.05);
+}
+
+[data-td-scope="dashboard"] .td-stat-icon-svg {
+  width: 16px;
+  height: 16px;
+  color: var(--td-text-secondary);
+}
+
+[data-td-scope="dashboard"] .td-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--td-text-muted);
+  margin: 0;
+}
+
+[data-td-scope="dashboard"] .td-stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--td-text);
+  letter-spacing: -0.04em;
+  margin: 0;
+  line-height: 1;
+}
+
+/* --- Main Grid (2 columns) --- */
+[data-td-scope="dashboard"] .td-main-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+[data-td-scope="dashboard"] .td-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Card Base --- */
+[data-td-scope="dashboard"] .td-card {
+  background: var(--td-surface);
+  border: 1px solid var(--td-border);
+  border-radius: var(--td-radius);
+  overflow: hidden;
+  transition: border-color 300ms var(--td-transition-smooth),
+              transform 400ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-card:hover {
+  border-color: var(--td-border-strong);
+}
+
+[data-td-scope="dashboard"] .td-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-td-scope="dashboard"] .td-card-title-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--td-text);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+[data-td-scope="dashboard"] .td-card-link {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--td-text-muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 200ms var(--td-transition-smooth);
+}
+
+[data-td-scope="dashboard"] .td-card-link:hover {
+  color: var(--td-text);
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-card-link--xs {
+  font-size: 10px;
+  padding: 4px 8px;
+}
+
+[data-td-scope="dashboard"] .td-card-link-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 200ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-card-link:hover .td-card-link-icon {
+  transform: translateX(2px);
+}
+
+/* --- Schedule --- */
+[data-td-scope="dashboard"] .td-schedule-list {
+  padding: 4px 0;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--td-border);
+  transition: background 200ms var(--td-transition-smooth);
+  position: relative;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item:last-child {
+  border-bottom: none;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item:hover {
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-schedule-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--td-text);
+  border-radius: 0 2px 2px 0;
+  transition: height 300ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-schedule-item:hover::before {
+  height: 24px;
+}
+
+[data-td-scope="dashboard"] .td-schedule-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--td-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-td-scope="dashboard"] .td-schedule-time-start {
+  color: var(--td-text);
+}
+
+[data-td-scope="dashboard"] .td-schedule-time-sep {
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-schedule-time-end {
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-schedule-body {
+  flex: 1;
+}
+
+[data-td-scope="dashboard"] .td-schedule-course {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--td-text);
+  margin: 0 0 2px;
+}
+
+[data-td-scope="dashboard"] .td-schedule-meta {
+  font-size: 11px;
+  color: var(--td-text-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[data-td-scope="dashboard"] .td-schedule-meta-icon {
+  width: 11px;
+  height: 11px;
+}
+
+/* Status badges */
+[data-td-scope="dashboard"] .td-class-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+[data-td-scope="dashboard"] .td-class-status--now {
+  background: var(--td-text);
+  color: var(--td-bg);
+}
+
+[data-td-scope="dashboard"] .td-class-status--done {
+  background: var(--td-border);
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-class-status--next {
+  background: transparent;
+  border: 1px solid var(--td-border-strong);
+  color: var(--td-text-secondary);
+}
+
+/* --- Attendance --- */
+[data-td-scope="dashboard"] .td-att-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-att-cell {
+  background: var(--td-surface);
+  padding: 20px 24px;
+}
+
+[data-td-scope="dashboard"] .td-att-cell-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+[data-td-scope="dashboard"] .td-att-cell-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-muted);
+  transition: color 200ms;
+}
+
+[data-td-scope="dashboard"] .td-att-cell-icon--ok {
+  color: var(--td-text);
+}
+
+[data-td-scope="dashboard"] .td-att-cell-icon--ok-warn {
+  color: var(--td-text-secondary);
+}
+
+[data-td-scope="dashboard"] .td-att-cell-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-att-time {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--td-text);
+  letter-spacing: -0.03em;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-td-scope="dashboard"] .td-att-time--muted {
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-att-prog {
+  font-size: 11px;
+  color: var(--td-text-muted);
+  margin: 4px 0 0;
+}
+
+/* Attendance CTA */
+[data-td-scope="dashboard"] .td-att-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 48px);
+  margin: 16px 24px;
+  padding: 12px;
+  border-radius: var(--td-radius-sm);
+  border: 1px solid var(--td-border-strong);
+  background: transparent;
+  color: var(--td-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 250ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-att-cta:hover {
+  background: var(--td-text);
+  color: var(--td-bg);
+  border-color: var(--td-text);
+  transform: scale(1.02);
+}
+
+[data-td-scope="dashboard"] .td-att-cta:active {
+  transform: scale(0.98);
+}
+
+[data-td-scope="dashboard"] .td-att-cta--ghost {
+  border-color: var(--td-border);
+  color: var(--td-text-secondary);
+}
+
+[data-td-scope="dashboard"] .td-att-cta--ghost:hover {
+  background: var(--td-surface-hover);
+  color: var(--td-text);
+  border-color: var(--td-border-strong);
+}
+
+[data-td-scope="dashboard"] .td-att-cta-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Student attendance summary */
+[data-td-scope="dashboard"] .td-att-students {
+  border-top: 1px solid var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-att-students-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-att-students-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--td-text);
+  margin: 0;
+  flex: 1;
+}
+
+[data-td-scope="dashboard"] .td-att-students-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-att-stat {
+  background: var(--td-surface);
+  padding: 16px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background 200ms;
+}
+
+[data-td-scope="dashboard"] .td-att-stat:hover {
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-att-stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--td-text);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-td-scope="dashboard"] .td-att-stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-att-students-empty {
+  padding: 24px;
+  text-align: center;
+}
+
+[data-td-scope="dashboard"] .td-att-students-empty-text {
+  font-size: 12px;
+  color: var(--td-text-muted);
+  margin: 0 0 12px;
+}
+
+[data-td-scope="dashboard"] .td-att-students-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--td-text);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--td-border-strong);
+  transition: all 200ms var(--td-transition-smooth);
+}
+
+[data-td-scope="dashboard"] .td-att-students-cta:hover {
+  background: var(--td-text);
+  color: var(--td-bg);
+  border-color: var(--td-text);
+}
+
+/* --- Courses --- */
+[data-td-scope="dashboard"] .td-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-course-card {
+  background: var(--td-surface);
+  padding: 20px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: background 300ms var(--td-transition-smooth);
+  position: relative;
+}
+
+[data-td-scope="dashboard"] .td-course-card:hover {
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-course-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--td-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 400ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-course-card:hover::after {
+  transform: scaleX(1);
+}
+
+[data-td-scope="dashboard"] .td-course-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--td-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-course-card:hover .td-course-icon {
+  background: var(--td-text);
+}
+
+[data-td-scope="dashboard"] .td-course-icon-svg {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-secondary);
+  transition: color 200ms;
+}
+
+[data-td-scope="dashboard"] .td-course-card:hover .td-course-icon-svg {
+  color: var(--td-bg);
+}
+
+[data-td-scope="dashboard"] .td-course-body {
+  flex: 1;
+}
+
+[data-td-scope="dashboard"] .td-course-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--td-text);
+  margin: 0 0 2px;
+}
+
+[data-td-scope="dashboard"] .td-course-meta {
+  font-size: 11px;
+  color: var(--td-text-muted);
+  margin: 0;
+}
+
+[data-td-scope="dashboard"] .td-course-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-td-scope="dashboard"] .td-course-students {
+  font-size: 11px;
+  color: var(--td-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+[data-td-scope="dashboard"] .td-course-students-icon {
+  width: 12px;
+  height: 12px;
+}
+
+[data-td-scope="dashboard"] .td-course-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-muted);
+  transition: transform 200ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-course-card:hover .td-course-chevron {
+  transform: translateX(3px);
+  color: var(--td-text);
+}
+
+/* --- Quick Actions --- */
+[data-td-scope="dashboard"] .td-actions-grid {
+  padding: 4px 0;
+}
+
+[data-td-scope="dashboard"] .td-action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  text-decoration: none;
+  border-bottom: 1px solid var(--td-border);
+  transition: background 200ms var(--td-transition-smooth);
+  position: relative;
+}
+
+[data-td-scope="dashboard"] .td-action:last-child {
+  border-bottom: none;
+}
+
+[data-td-scope="dashboard"] .td-action:hover {
+  background: var(--td-surface-hover);
+}
+
+[data-td-scope="dashboard"] .td-action::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: var(--td-text);
+  border-radius: 0 2px 2px 0;
+  transition: height 300ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-action:hover::before {
+  height: 20px;
+}
+
+[data-td-scope="dashboard"] .td-action-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--td-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 200ms var(--td-transition);
+}
+
+[data-td-scope="dashboard"] .td-action:hover .td-action-icon {
+  background: var(--td-text);
+}
+
+[data-td-scope="dashboard"] .td-action-icon-svg {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-secondary);
+  transition: color 200ms;
+}
+
+[data-td-scope="dashboard"] .td-action:hover .td-action-icon-svg {
+  color: var(--td-bg);
+}
+
+[data-td-scope="dashboard"] .td-action-body {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-td-scope="dashboard"] .td-action-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--td-text);
+  margin: 0;
+}
+
+[data-td-scope="dashboard"] .td-action-desc {
+  font-size: 11px;
+  color: var(--td-text-muted);
+  margin: 2px 0 0;
+}
+
+[data-td-scope="dashboard"] .td-action-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--td-text-muted);
+  flex-shrink: 0;
+  transition: transform 200ms var(--td-transition), color 200ms;
+}
+
+[data-td-scope="dashboard"] .td-action:hover .td-action-chevron {
+  transform: translateX(3px);
+  color: var(--td-text);
+}
+
+/* --- Empty State --- */
+[data-td-scope="dashboard"] .td-empty {
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-td-scope="dashboard"] .td-empty-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--td-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-td-scope="dashboard"] .td-empty-icon-svg {
+  width: 18px;
+  height: 18px;
+  color: var(--td-text-muted);
+}
+
+[data-td-scope="dashboard"] .td-empty-text {
+  font-size: 12px;
+  color: var(--td-text-muted);
+  margin: 0;
+}
+
+/* --- Skeleton Loading --- */
+[data-td-scope="dashboard"] .td-schedule-item--skeleton,
+[data-td-scope="dashboard"] .td-course-card--skeleton {
+  background: var(--td-surface);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item--skeleton {
+  height: 64px;
+  margin: 0 24px;
+  border-bottom: 1px solid var(--td-border);
+}
+
+[data-td-scope="dashboard"] .td-course-card--skeleton {
+  height: 120px;
+}
+
+[data-td-scope="dashboard"] .td-schedule-item--skeleton::after,
+[data-td-scope="dashboard"] .td-course-card--skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--td-border),
+    transparent
+  );
+  animation: td-shimmer 1.5s infinite;
+}
+
+@keyframes td-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  [data-td-scope="dashboard"] .td-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  [data-td-scope="dashboard"] .td-courses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  [data-td-scope="dashboard"] .td-container {
+    padding: 0 16px 24px;
+  }
+
+  [data-td-scope="dashboard"] .td-header {
+    padding: 24px 16px 20px;
+  }
+
+  [data-td-scope="dashboard"] .td-greeting {
+    font-size: 22px;
+  }
+
+  [data-td-scope="dashboard"] .td-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    border-radius: 16px;
+  }
+
+  [data-td-scope="dashboard"] .td-stat-card {
+    padding: 20px 16px;
+  }
+
+  [data-td-scope="dashboard"] .td-stat-value {
+    font-size: 22px;
+  }
+
+  [data-td-scope="dashboard"] .td-schedule-item {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  [data-td-scope="dashboard"] .td-schedule-time {
+    min-width: 70px;
+    font-size: 11px;
+  }
+
+  [data-td-scope="dashboard"] .td-card {
+    border-radius: 16px;
+  }
+
+  [data-td-scope="dashboard"] .td-card-head {
+    padding: 16px;
+  }
+
+  [data-td-scope="dashboard"] .td-att-cta {
+    width: calc(100% - 32px);
+    margin: 12px 16px;
+  }
+
+  [data-td-scope="dashboard"] .td-action {
+    padding: 12px 16px;
+  }
+}
+
+/* --- Scrollbar --- */
+[data-td-scope="dashboard"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--td-border-strong) transparent;
+}
+
+[data-td-scope="dashboard"] ::-webkit-scrollbar {
+  width: 6px;
+}
+
+[data-td-scope="dashboard"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-td-scope="dashboard"] ::-webkit-scrollbar-thumb {
+  background: var(--td-border-strong);
+  border-radius: 999px;
+}
+
+/* --- Selection --- */
+[data-td-scope="dashboard"] ::selection {
+  background: var(--td-text);
+  color: var(--td-bg);
+}

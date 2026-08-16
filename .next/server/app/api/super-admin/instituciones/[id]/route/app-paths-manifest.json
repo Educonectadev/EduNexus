@@ -1,0 +1,3 @@
+{
+  "/api/super-admin/instituciones/[id]/route": "app/api/super-admin/instituciones/[id]/route.js"
+}
