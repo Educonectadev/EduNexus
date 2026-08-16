@@ -1,11 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Bell, Sun, Moon } from "@/components/ui/proicons"
+import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { useAuthStore } from "@/stores/auth-store"
-import { useTheme } from "next-themes"
 
 interface Course {
   id: string
@@ -27,8 +25,6 @@ interface Horario {
 }
 
 export default function CursosPage() {
-  const user = useAuthStore((s) => s.user)
-  const { theme, setTheme } = useTheme()
   const [courses, setCourses] = React.useState<Course[]>([])
   const [horarios, setHorarios] = React.useState<Horario[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -64,36 +60,14 @@ export default function CursosPage() {
       <div className="p-6 md:p-8 pb-24 md:pb-8">
 
         {/* ═══════════════ HEADER ═══════════════ */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
-              Mis Cursos
-            </h1>
-            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
-              Cursos asignados este periodo académico
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a]">
-              <Bell className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
-            </button>
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] relative"
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
-            </button>
-            <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-[#000] dark:bg-[#f4f4f5]">
-              <span className="text-[12px] font-bold text-white dark:text-[#0a0a0b]">
-                {user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
-              </span>
-            </div>
-            <span className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-[#000] dark:bg-[#f4f4f5] text-white dark:text-[#0a0a0b]">
-              Docente
-            </span>
-          </div>
+        <div className="mb-8">
+          <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+            Mis Cursos
+          </h1>
+          <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+            Cursos asignados este periodo académico
+          </p>
         </div>
 
         {/* ═══════════════ 4 STAT CARDS (idénticas al dashboard) ═══════════════ */}
