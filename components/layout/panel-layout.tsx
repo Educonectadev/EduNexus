@@ -413,7 +413,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className={cn(
-        "hidden md:flex flex-col h-screen w-[64px] border-r border-sb-outline-variant/8 transition-[width] duration-200 ease-out overflow-hidden shrink-0",
+        "hidden md:flex flex-col h-screen w-[64px] transition-[width] duration-200 ease-out overflow-hidden shrink-0",
         "bg-sb-surface z-10",
         sidebarOpen && "w-[240px]"
       )}>
@@ -695,8 +695,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Content */}
         <main className={cn(
           "flex-1 overflow-auto pb-32 md:pb-6",
-          pathname.startsWith("/docente/dashboard") ? "p-2" : "px-6"
-        )} style={{ background: pathname.startsWith("/docente/dashboard") ? "transparent" : "#f5f5f5" }}>
+          pathname.startsWith("/docente/dashboard") ? "p-1.5" : "px-6"
+        )} style={{ background: pathname.startsWith("/docente/dashboard") ? "#fff" : "#f5f5f5" }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
