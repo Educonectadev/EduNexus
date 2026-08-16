@@ -217,7 +217,7 @@ function CalificacionesInner() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-6">
+      <div className="w-full py-6 space-y-5">
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>

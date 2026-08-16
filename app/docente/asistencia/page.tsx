@@ -108,7 +108,7 @@ function AsistenciaInner() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-10 py-8">
+      <div className="w-full py-6">
         <header className="mb-6">
           <span
             className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.8px]"

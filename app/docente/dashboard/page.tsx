@@ -164,7 +164,7 @@ export default function DocenteDashboard() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--sb-surface)" }}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-10 py-8">
+      <div className="w-full py-6">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
