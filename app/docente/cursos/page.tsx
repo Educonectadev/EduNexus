@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, GraduationCap, Clock, Calendar, ArrowUpRight, Plus, ChevronRight } from "@/components/ui/proicons"
+import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Bell, Sun, Moon } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
+import { useTheme } from "next-themes"
 
 interface Course {
   id: string
@@ -16,7 +17,6 @@ interface Course {
 
 interface Horario {
   id: string
-  id_course?: string
   day_of_week: number
   start_time: string
   end_time: string
@@ -28,6 +28,7 @@ interface Horario {
 
 export default function CursosPage() {
   const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const [courses, setCourses] = React.useState<Course[]>([])
   const [horarios, setHorarios] = React.useState<Horario[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -50,7 +51,6 @@ export default function CursosPage() {
 
   const totalStudents = courses.reduce((a, c) => a + (c.students || 0), 0)
   const avgStudents = courses.length > 0 ? Math.round(totalStudents / courses.length) : 0
-  const totalSchedules = horarios.length
   const gradesCount = new Set(courses.map(c => c.grade)).size
 
   const today = new Date()
@@ -61,141 +61,125 @@ export default function CursosPage() {
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
-      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-4">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
 
         {/* ═══════════════ HEADER ═══════════════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-2"
-        >
-          <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
-            Mis Cursos
-          </h1>
-          <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
-            Gestiona tus cursos asignados y revisa la información detallada de cada uno
-          </p>
-        </motion.div>
-
-        {/* ═══════════════ STATS CARD (todo dentro de la misma card blanca) ═══════════════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a]">
-              <div className="h-9 w-9 mb-3 flex items-center justify-center rounded-[14px] bg-white dark:bg-[#3f3f46]">
-                <BookOpen className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-              </div>
-              <p className="text-[12px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Cursos</p>
-              <p className="text-[24px] font-bold text-[#000] dark:text-[#f4f4f5]">
-                {loading ? "—" : courses.length}
-              </p>
-            </div>
-            <div className="p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a]">
-              <div className="h-9 w-9 mb-3 flex items-center justify-center rounded-[14px] bg-white dark:bg-[#3f3f46]">
-                <Users className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-              </div>
-              <p className="text-[12px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Alumnos</p>
-              <p className="text-[24px] font-bold text-[#000] dark:text-[#f4f4f5]">
-                {loading ? "—" : totalStudents}
-              </p>
-            </div>
-            <div className="p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a]">
-              <div className="h-9 w-9 mb-3 flex items-center justify-center rounded-[14px] bg-white dark:bg-[#3f3f46]">
-                <GraduationCap className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-              </div>
-              <p className="text-[12px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Grados</p>
-              <p className="text-[24px] font-bold text-[#000] dark:text-[#f4f4f5]">
-                {loading ? "—" : gradesCount}
-              </p>
-            </div>
-            <div className="p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a]">
-              <div className="h-9 w-9 mb-3 flex items-center justify-center rounded-[14px] bg-white dark:bg-[#3f3f46]">
-                <Clock className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-              </div>
-              <p className="text-[12px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Horarios</p>
-              <p className="text-[24px] font-bold text-[#000] dark:text-[#f4f4f5]">
-                {loading ? "—" : totalSchedules}
-              </p>
-            </div>
-          </div>
-
-          {/* Lista de cursos - mismo fondo blanco, items en gris */}
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">
-              {courses.length} cursos asignados
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+              Mis Cursos
+            </h1>
+            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+              Cursos asignados este periodo académico
             </p>
-            <span className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#F5F5F5] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-              Periodo activo
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a]">
+              <Bell className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] relative"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+            <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-[#000] dark:bg-[#f4f4f5]">
+              <span className="text-[12px] font-bold text-white dark:text-[#0a0a0b]">
+                {user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+              </span>
+            </div>
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-[#000] dark:bg-[#f4f4f5] text-white dark:text-[#0a0a0b]">
+              Docente
             </span>
           </div>
+        </div>
 
-          {loading ? (
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="h-[64px] rounded-[20px] animate-pulse bg-[#F5F5F5] dark:bg-[#27272a]" />
-              ))}
-            </div>
-          ) : courses.length === 0 ? (
-            <div className="py-12 text-center">
-              <BookOpen className="h-10 w-10 mx-auto mb-3 text-[#D9D9D9] dark:text-[#3f3f46]" />
-              <p className="text-[14px] font-medium text-[#000] dark:text-[#f4f4f5]">Sin cursos asignados</p>
-              <p className="text-[12px] mt-1 text-[#999] dark:text-[#71717a]">Contacta al administrador para asignar cursos</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {courses.map((c, i) => (
-                <motion.div
-                  key={c.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.05 * i }}
-                >
-                  <Link
-                    href={`/docente/cursos/${c.id}`}
-                    className="group flex items-center gap-4 p-3 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a] hover:bg-[#ebebeb] dark:hover:bg-[#333] transition-colors"
-                  >
-                    <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                      <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-[14px] font-medium text-[#000] dark:text-[#f4f4f5] truncate">{c.name}</h3>
-                      <p className="text-[12px] text-[#666] dark:text-[#a1a1aa]">
-                        {c.grade} &quot;{c.section}&quot; · {avgStudents > 0 ? `${avgStudents} alumnos prom.` : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1 rounded-full bg-white dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa]">
-                        <Users className="h-3 w-3" />
-                        {c.students}
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </motion.div>
+        {/* ═══════════════ 4 STAT CARDS (idénticas al dashboard) ═══════════════ */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Mis cursos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : courses.length}
+            </p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Total alumnos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : totalStudents.toLocaleString()}
+            </p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Promedio/curso</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : avgStudents}
+            </p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Grados</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+              {loading ? "—" : gradesCount}
+            </p>
+          </div>
+        </div>
 
-        {/* ═══════════════ BOTTOM GRID (igual al dashboard) ═══════════════ */}
+        {/* ═══════════════ BOTTOM GRID (idéntico al dashboard) ═══════════════ */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-4">
 
-          {/* ──── LEFT: Resumen + Acciones ──── */}
+          {/* ──── LEFT COLUMN: Acciones rápidas + Mis Cursos ──── */}
           <div className="flex flex-col gap-4">
 
+            {/* Acciones rápidas */}
+            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Acciones rápidas</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                  Gestión <ChevronDown className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/docente/asistencia" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                    <Calendar className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Asistencia</p>
+                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Tomar lista</p>
+                  </div>
+                </Link>
+                <Link href="/docente/calificaciones" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                    <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Notas</p>
+                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Registrar</p>
+                  </div>
+                </Link>
+                <Link href="/docente/tareas" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                    <Clock className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Tareas</p>
+                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Crear / revisar</p>
+                  </div>
+                </Link>
+                <Link href="/docente/materiales" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                    <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Materiales</p>
+                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Subir archivos</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
             {/* Resumen */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]"
-            >
+            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
               <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">Resumen</p>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -204,21 +188,21 @@ export default function CursosPage() {
                     {loading ? "—" : courses.length}
                   </span>
                 </div>
-                <div className="h-px bg-[#F5F5F5] dark:bg-[#27272a]" />
+                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Total alumnos</span>
                   <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : totalStudents}
                   </span>
                 </div>
-                <div className="h-px bg-[#F5F5F5] dark:bg-[#27272a]" />
+                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Promedio por curso</span>
                   <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : `${avgStudents} alumnos`}
                   </span>
                 </div>
-                <div className="h-px bg-[#F5F5F5] dark:bg-[#27272a]" />
+                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Grados diferentes</span>
                   <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
@@ -226,86 +210,81 @@ export default function CursosPage() {
                   </span>
                 </div>
               </div>
-            </motion.div>
-
-            {/* Acciones rápidas */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.25 }}
-              className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]"
-            >
-              <p className="text-[16px] font-semibold mb-4 text-[#000] dark:text-[#f4f4f5]">Acciones rápidas</p>
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/docente/asistencia" className="flex flex-col items-start gap-2 p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a] hover:bg-[#ebebeb] dark:hover:bg-[#333] transition-colors">
-                  <Calendar className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-                  <span className="text-[12px] font-medium text-[#000] dark:text-[#f4f4f5]">Asistencia</span>
-                </Link>
-                <Link href="/docente/calificaciones" className="flex flex-col items-start gap-2 p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a] hover:bg-[#ebebeb] dark:hover:bg-[#333] transition-colors">
-                  <GraduationCap className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-                  <span className="text-[12px] font-medium text-[#000] dark:text-[#f4f4f5]">Notas</span>
-                </Link>
-                <Link href="/docente/tareas" className="flex flex-col items-start gap-2 p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a] hover:bg-[#ebebeb] dark:hover:bg-[#333] transition-colors">
-                  <Plus className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-                  <span className="text-[12px] font-medium text-[#000] dark:text-[#f4f4f5]">Tareas</span>
-                </Link>
-                <Link href="/docente/materiales" className="flex flex-col items-start gap-2 p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a] hover:bg-[#ebebeb] dark:hover:bg-[#333] transition-colors">
-                  <BookOpen className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-                  <span className="text-[12px] font-medium text-[#000] dark:text-[#f4f4f5]">Materiales</span>
-                </Link>
-              </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* ──── RIGHT: Horario de hoy ──── */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]"
-          >
-            <div className="flex items-center justify-between mb-5">
-              <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
-              <Link href="/docente/horarios" className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#F5F5F5] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                Ver todos <ArrowUpRight className="h-3 w-3" />
-              </Link>
+          {/* ──── RIGHT COLUMN: Mis Cursos (lista) + Horario ──── */}
+          <div className="flex flex-col gap-4">
+
+            {/* Mis Cursos */}
+            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                  Todos <ChevronDown className="h-3 w-3" />
+                </button>
+              </div>
+              {courses.length === 0 ? (
+                <div className="py-6 text-center">
+                  <GraduationCap className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos registrados</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {courses.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={`/docente/cursos/${c.id}`}
+                      className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors"
+                    >
+                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                        <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} &quot;{c.section}&quot;</p>
+                      </div>
+                      <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa] shrink-0">{c.students} alumnos</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {loading ? (
-              <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-[64px] rounded-[20px] animate-pulse bg-[#F5F5F5] dark:bg-[#27272a]" />
-                ))}
+            {/* Horario de hoy */}
+            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                  Hoy <ChevronDown className="h-3 w-3" />
+                </button>
               </div>
-            ) : todaySchedule.length === 0 ? (
-              <div className="py-12 text-center">
-                <Clock className="h-10 w-10 mx-auto mb-3 text-[#D9D9D9] dark:text-[#3f3f46]" />
-                <p className="text-[14px] font-medium text-[#000] dark:text-[#f4f4f5]">Sin clases hoy</p>
-                <p className="text-[12px] mt-1 text-[#999] dark:text-[#71717a]">No tienes clases programadas para hoy</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {todaySchedule.map((cls) => (
-                  <div key={cls.id} className="flex items-center gap-4 p-4 rounded-[20px] bg-[#F5F5F5] dark:bg-[#27272a]">
-                    <div className="h-11 w-11 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                      <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+              {todaySchedule.length === 0 ? (
+                <div className="py-8 text-center">
+                  <Clock className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin clases hoy</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {todaySchedule.map((cls) => (
+                    <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
+                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
+                        <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[13px] font-medium text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
-                      <p className="text-[12px] text-[#666] dark:text-[#a1a1aa]">
-                        {cls.grade} &quot;{cls.section}&quot;{cls.classroom ? ` · ${cls.classroom}` : ""}
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
-                      <p className="text-[12px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
