@@ -17,7 +17,7 @@ import {
   MessageSquare, Calendar, UserCheck, BookMarked, Search, User,
   ArrowRight, Clock, AlertCircle, X, Layers, Plus,
   LayoutGrid, ArrowLeftRight, Receipt,
-  Sparkles,
+  Sparkles, Bell,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
