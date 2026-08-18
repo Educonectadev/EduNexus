@@ -2,10 +2,12 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { ClipboardList, Plus, Calendar, Check, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap } from "@/components/ui/proicons"
+import { ClipboardList, Plus, Calendar, Check, CheckCircle2, Clock, AlertTriangle, BookOpen, Users, X, Eye, Search, GraduationCap, Bell, Sun, Moon } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
+import { useAuthStore } from "@/stores/auth-store"
+import { useTheme } from "next-themes"
 
 interface Task {
   id: string
@@ -75,6 +77,8 @@ export default function TareasPage() {
 
 function TareasInner() {
   const searchParams = useSearchParams()
+  const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const prefilterCourse = searchParams.get("curso") || ""
   const [tasks, setTasks] = React.useState<Task[]>([])
   const [courses, setCourses] = React.useState<Course[]>([])
@@ -226,7 +230,7 @@ function TareasInner() {
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
       <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
-        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <header className="flex items-start justify-between mb-5 gap-4">
           <div>
             <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
@@ -236,9 +240,30 @@ function TareasInner() {
               Gestiona las tareas de tus alumnos
             </p>
           </div>
-          <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
-            <Plus className="h-4 w-4" /> Nueva tarea
-          </SbBtn>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            {user && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#27272a]">
+                <div className="h-6 w-6 rounded-full bg-[#F5F5F5] dark:bg-[#3f3f46] flex items-center justify-center">
+                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-[#666] dark:text-[#a1a1aa] truncate max-w-[160px]">
+                  {user.full_name}
+                </span>
+              </div>
+            )}
+            <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity">
+              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
+              <Plus className="h-4 w-4" /> Nueva tarea
+            </SbBtn>
+          </div>
         </header>
 
         {/* Stats */}

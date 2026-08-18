@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { 
   MessageCircle, Send, Search, ArrowLeft, 
-  Circle, CreditCard 
+  Circle, CreditCard, Bell, Sun, Moon
 } from "@/components/ui/proicons"
 import { connectSocket, getSocket } from '@/lib/socket'
+import { useAuthStore } from "@/stores/auth-store"
+import { useTheme } from "next-themes"
 
 const staggerItem = {
   hidden: { opacity: 0, y: 20 },
@@ -33,6 +35,8 @@ interface Message {
 }
 
 export default function MessagesPage() {
+  const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const [contacts, setContacts] = useState<Contact[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
@@ -177,10 +181,33 @@ export default function MessagesPage() {
           selectedContact ? 'hidden md:flex' : 'flex'
         }`}>
           <div className="p-4 border-b border-[#E5E5E5] dark:border-[#27272a]">
-            <h1 className="text-xl font-bold text-[#000] dark:text-[#f4f4f5] flex items-center gap-2">
-              <MessageCircle className="w-5 h-5" />
-              Mensajes
-            </h1>
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-xl font-bold text-[#000] dark:text-[#f4f4f5] flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                Mensajes
+              </h1>
+              <div className="flex items-center gap-2">
+                <button aria-label="Notificaciones" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity">
+                  <Bell className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
+                </button>
+                <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
+                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
+                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+                </button>
+              </div>
+            </div>
+            {user && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5F5F5] dark:bg-[#27272a]">
+                <div className="h-6 w-6 rounded-full bg-[#E5E5E5] dark:bg-[#3f3f46] flex items-center justify-center">
+                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-[#666] dark:text-[#a1a1aa] truncate max-w-[160px]">
+                  {user.full_name}
+                </span>
+              </div>
+            )}
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666] dark:text-[#a1a1aa]" />
               <input
