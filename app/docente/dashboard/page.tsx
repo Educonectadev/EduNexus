@@ -118,25 +118,34 @@ export default function DocenteDashboard() {
             </h1>
             <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">{dateFormatted}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <button className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a]">
-              <Bell className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            {user && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#27272a]">
+                <div className="h-6 w-6 rounded-full bg-[#F5F5F5] dark:bg-[#3f3f46] flex items-center justify-center">
+                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-[#666] dark:text-[#a1a1aa] truncate max-w-[160px]">
+                  {user.full_name}
+                </span>
+              </div>
+            )}
+            <button
+              aria-label="Notificaciones"
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity"
+            >
+              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
             </button>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a]"
+              aria-label="Cambiar tema"
+              title="Cambiar tema"
+              className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity relative"
             >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
             </button>
-            <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-[#000] dark:bg-[#f4f4f5]">
-              <span className="text-[12px] font-bold text-white dark:text-[#0a0a0b]">
-                {user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
-              </span>
-            </div>
-            <span className="px-3 py-1.5 rounded-full text-[12px] font-medium bg-[#000] dark:bg-[#f4f4f5] text-white dark:text-[#0a0a0b]">
-              Docente
-            </span>
           </div>
         </div>
 
