@@ -636,7 +636,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       {/* ===== MAIN ===== */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Minimal Header - hidden for docente dashboard (has its own header) */}
-        {!(pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos")) && (
+        {!(pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos") || pathname.startsWith("/docente/horarios")) && (
         <header className="flex items-center justify-between h-14 px-6 shrink-0">
           <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageName}</h1>
           <div className="flex items-center gap-2">
@@ -695,7 +695,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Content */}
         <main className={cn(
           "flex-1 overflow-auto",
-          (pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos")) ? "p-1.5 h-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-black" : "px-6 pb-32 md:pb-6 bg-[#f5f5f5] dark:bg-black"
+          (pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos") || pathname.startsWith("/docente/horarios")) ? "p-1.5 h-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-black" : "px-6 pb-32 md:pb-6 bg-[#f5f5f5] dark:bg-black"
         )}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -704,7 +704,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-              className={(pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos")) ? "h-full" : ""}>
+              className={(pathname.startsWith("/docente/dashboard") || pathname.startsWith("/docente/cursos") || pathname.startsWith("/docente/horarios")) ? "h-full" : ""}>
               {children}
             </motion.div>
           </AnimatePresence>

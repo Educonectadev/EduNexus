@@ -2,8 +2,10 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users } from "@/components/ui/proicons"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Bell, Sun, Moon, ChevronDown } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/stores/auth-store"
+import { useTheme } from "next-themes"
 
 interface Horario {
   id: string; course_id: string; day_of_week: number; start_time: string; end_time: string
@@ -261,6 +263,8 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
 }
 
 export default function DocenteHorariosPage() {
+  const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const [horarios, setHorarios] = React.useState<Horario[]>([])
   const [loading, setLoading] = React.useState(true)
   const [activeDay, setActiveDay] = React.useState<number | null>(null)
@@ -300,70 +304,58 @@ export default function DocenteHorariosPage() {
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-          <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
-            Horarios
-          </h1>
-          <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
-            Tu horario semanal de clases
-          </p>
-        </motion.header>
-
-        {/* Stats Row */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-3 gap-2 mb-8"
-        >
-          {[
-            { label: "Jornada", value: "Lun – Vie", icon: Calendar },
-            { label: "Clases", value: `${totalClasses}`, icon: BookOpen },
-            { label: "Horas/sem", value: `${totalHours}h`, icon: Clock },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="p-4"
-              style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "16px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-              }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <stat.icon
-                  className="h-3.5 w-3.5"
-                  style={{ color: "var(--sb-on-surface-variant)" }}
-                />
-                <span
-                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                  style={{
-                    color: "var(--sb-on-surface-variant)",
-                    opacity: 0.45,
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
-                  {stat.label}
+        <div className="flex items-start justify-between mb-8 gap-4">
+          <div>
+            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+              Horarios
+            </h1>
+            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+              Tu horario semanal de clases
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            {user && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#27272a]">
+                <div className="h-6 w-6 rounded-full bg-[#F5F5F5] dark:bg-[#3f3f46] flex items-center justify-center">
+                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-[#666] dark:text-[#a1a1aa] truncate max-w-[160px]">
+                  {user.full_name}
                 </span>
               </div>
-              <p
-                className="text-xl font-semibold"
-                style={{
-                  color: "var(--sb-on-surface)",
-                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                }}
-              >
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </motion.div>
+            )}
+            <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity">
+              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Jornada</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">Lun – Vie</p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Clases</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalClasses}</p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Horas/sem</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalHours}h</p>
+          </div>
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Cursos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
+          </div>
+        </div>
 
         {/* Day Filters */}
         <motion.div
