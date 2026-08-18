@@ -1,3 +1,0 @@
-module.exports=[32172,(a,b,c)=>{"use strict";b.exports=a.r(926948).vendored["react-ssr"].ReactServerDOMTurbopackClient},224361,(a,b,c)=>{b.exports=a.x("util",()=>require("util"))},254799,(a,b,c)=>{b.exports=a.x("crypto",()=>require("crypto"))},251096,a=>{"use strict";var b=a.i(444513),c=a.i(861698);function d({className:a}){let{resolvedTheme:d}=(0,c.useTheme)(),e="dark"===d;return(0,b.jsxs)("svg",{viewBox:"0 0 48 48",className:a||"h-8 w-8","aria-label":"EduNexus",children:[(0,b.jsx)("rect",{width:"48",height:"48",rx:"10",fill:e?"#ffffff":"#111111"}),(0,b.jsx)("path",{d:"M14 12 h20 v4 h-15 v5 h13 v4 h-13 v7 h15 v4 h-20 z",fill:e?"#000000":"#ffffff"})]})}a.s(["Logo",()=>d])}];
-
-//# sourceMappingURL=%5Broot-of-the-server%5D__b53b6c6c._.js.map

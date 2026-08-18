@@ -166,18 +166,30 @@ export default function CursoDetallePage() {
                 </div>
               </div>
             </div>
-          ))}
+        ))}
         </div>
       </div>
     )
   }
 
   if (error) {
-    return <SbEmpty icon={BookOpen} title="No se pudo cargar el curso" description={error} />
+    return (
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
+        <div className="p-6 md:p-8 pb-24 md:pb-8">
+          <SbEmpty icon={BookOpen} title="No se pudo cargar el curso" description={error} />
+        </div>
+      </div>
+    )
   }
 
   if (!course) {
-    return <SbEmpty icon={BookOpen} title="Curso no encontrado" description="El curso no existe o no está asignado." />
+    return (
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
+        <div className="p-6 md:p-8 pb-24 md:pb-8">
+          <SbEmpty icon={BookOpen} title="Curso no encontrado" description="El curso no existe o no está asignado." />
+        </div>
+      </div>
+    )
   }
 
   const initials = (name: string) =>
