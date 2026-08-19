@@ -307,11 +307,11 @@ export default function DocenteHorariosPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
               Horarios
             </h1>
-            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+            <p className="text-[13px] mt-2 text-[#a1a1aa]">
               Tu horario semanal de clases
             </p>
           </div>
@@ -319,19 +319,19 @@ export default function DocenteHorariosPage() {
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
                 <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#000] dark:text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
           </div>
         </div>
@@ -339,20 +339,20 @@ export default function DocenteHorariosPage() {
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Jornada</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">Lun – Vie</p>
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Jornada</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">Lun – Vie</p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Clases</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalClasses}</p>
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Clases</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">{totalClasses}</p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Horas/sem</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalHours}h</p>
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Horas/sem</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">{totalHours}h</p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Cursos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Cursos</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
           </div>
         </div>
 

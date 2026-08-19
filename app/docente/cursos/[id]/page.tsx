@@ -205,17 +205,17 @@ export default function CursoDetallePage() {
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
-      <Link href="/docente/cursos" className="inline-flex items-center gap-1.5 text-sm text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:hover:text-[#f4f4f5] transition-colors">
+      <Link href="/docente/cursos" className="inline-flex items-center gap-1.5 text-sm text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">
         <ArrowLeft className="h-4 w-4" />
         Mis Cursos
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="pt-2">
-        <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-        <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+        <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
+        <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
           {course.name}
         </h1>
-        <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+        <p className="text-[13px] mt-2 text-[#a1a1aa]">
           {course.grade} - Sección {course.section} · Código {course.code}
         </p>
       </motion.div>
@@ -228,10 +228,10 @@ export default function CursoDetallePage() {
             <motion.div key={a.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.04 }}>
               <Link href={a.href} className="block p-5 rounded-[30px] bg-white dark:bg-[#17171a] hover:shadow-md transition-all">
                 <div className="h-11 w-11 rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] flex items-center justify-center mb-3">
-                  <Icon className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+                  <Icon className="h-5 w-5 text-[#f4f4f5]" />
                 </div>
-                <p className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">{a.label}</p>
-                <p className="text-[12px] text-[#666] dark:text-[#a1a1aa] mt-0.5">{a.desc}</p>
+                <p className="text-[14px] font-semibold text-[#f4f4f5]">{a.label}</p>
+                <p className="text-[12px] text-[#a1a1aa] mt-0.5">{a.desc}</p>
               </Link>
             </motion.div>
           )
@@ -242,17 +242,17 @@ export default function CursoDetallePage() {
       <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 gap-3 mt-6">
         <motion.div variants={staggerItem} className="rounded-[30px] bg-white dark:bg-[#17171a] p-6">
           <div className="mb-5 h-10 w-10 rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+            <GraduationCap className="h-5 w-5 text-[#f4f4f5]" />
           </div>
-          <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Alumnos</p>
-          <p className="mt-1.5 text-[22px] font-bold text-[#000] dark:text-[#f4f4f5]">{students.length}</p>
+          <p className="text-[12px] font-medium text-[#a1a1aa]">Alumnos</p>
+          <p className="mt-1.5 text-[22px] font-bold text-[#f4f4f5]">{students.length}</p>
         </motion.div>
         <motion.div variants={staggerItem} className="rounded-[30px] bg-white dark:bg-[#17171a] p-6">
           <div className="mb-5 h-10 w-10 rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] flex items-center justify-center">
-            <UserRound className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+            <UserRound className="h-5 w-5 text-[#f4f4f5]" />
           </div>
-          <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Docentes</p>
-          <p className="mt-1.5 text-[22px] font-bold text-[#000] dark:text-[#f4f4f5]">{teachers.length}</p>
+          <p className="text-[12px] font-medium text-[#a1a1aa]">Docentes</p>
+          <p className="mt-1.5 text-[22px] font-bold text-[#f4f4f5]">{teachers.length}</p>
         </motion.div>
       </motion.div>
 
@@ -283,15 +283,15 @@ export default function CursoDetallePage() {
                   <span className="text-white text-xs font-bold">{initials(`${s.first_name} ${s.last_name}`)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate">{s.first_name} {s.last_name}</p>
-                  <p className="text-xs text-[#666] dark:text-[#a1a1aa]">{s.code}{s.document_number ? ` · DNI ${s.document_number}` : ""}</p>
+                  <p className="text-sm font-medium text-[#f4f4f5] truncate">{s.first_name} {s.last_name}</p>
+                  <p className="text-xs text-[#a1a1aa]">{s.code}{s.document_number ? ` · DNI ${s.document_number}` : ""}</p>
                 </div>
                 {s.gender && (
                   <SbBadge color={s.gender === "F" ? "bg-pink-500/10 text-pink-500" : "bg-blue-500/10 text-blue-500"}>
                     {s.gender === "F" ? "Femenino" : "Masculino"}
                   </SbBadge>
                 )}
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#000] dark:text-[#f4f4f5] bg-[#F5F5F5] dark:bg-[#27272a] px-2.5 py-1 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-[#f4f4f5] bg-[#F5F5F5] dark:bg-[#27272a] px-2.5 py-1 rounded-[12px] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   Ver ficha
                 </span>
               </motion.button>
@@ -312,10 +312,10 @@ export default function CursoDetallePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate">{t.full_name}</p>
+                    <p className="text-sm font-medium text-[#f4f4f5] truncate">{t.full_name}</p>
                     <BadgeCheck className="h-4 w-4 text-emerald-500 shrink-0" />
                   </div>
-                  <p className="text-xs text-[#666] dark:text-[#a1a1aa] flex items-center gap-1">
+                  <p className="text-xs text-[#a1a1aa] flex items-center gap-1">
                     <Mail className="h-3 w-3" /> {t.email}
                   </p>
                 </div>
@@ -328,11 +328,11 @@ export default function CursoDetallePage() {
 
       <div className="mt-6 bg-white dark:bg-[#17171a] rounded-[30px] p-4 flex items-start gap-3">
           <div className="h-8 w-8 rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] flex items-center justify-center shrink-0">
-            <BookOpen className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
+            <BookOpen className="h-4 w-4 text-[#f4f4f5]" />
           </div>
           <div>
-            <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5]">Información del curso</p>
-            <p className="text-xs text-[#666] dark:text-[#a1a1aa] mt-0.5">
+            <p className="text-sm font-medium text-[#f4f4f5]">Información del curso</p>
+            <p className="text-xs text-[#a1a1aa] mt-0.5">
               {course.name} · {course.grade} - Sección {course.section} · Código {course.code}
             </p>
           </div>
@@ -354,17 +354,17 @@ export default function CursoDetallePage() {
               {fichaLoading ? (
                 <div className="p-10 flex flex-col items-center gap-3">
                   <div className="h-8 w-8 border-2 border-[#E5E5E5] dark:border-[#3f3f46] border-t-[#000] dark:border-t-[#f4f4f5] rounded-full animate-spin" />
-                  <p className="text-sm text-[#666] dark:text-[#a1a1aa]">Cargando ficha...</p>
+                  <p className="text-sm text-[#a1a1aa]">Cargando ficha...</p>
                 </div>
               ) : !ficha ? (
                 <div className="p-10 text-center">
-                  <p className="text-sm text-[#666] dark:text-[#a1a1aa]">No se pudo cargar la ficha del alumno</p>
+                  <p className="text-sm text-[#a1a1aa]">No se pudo cargar la ficha del alumno</p>
                   <SbBtn rounded className="mt-4" onClick={() => setFichaOpen(false)}>Cerrar</SbBtn>
                 </div>
               ) : (
                 <div>
                   <button onClick={() => setFichaOpen(false)}
-                    className="absolute right-3 top-3 h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#F5F5F5] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:hover:text-[#f4f4f5] transition-colors z-10">
+                    className="absolute right-3 top-3 h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#F5F5F5] dark:bg-[#27272a] text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors z-10">
                     <X className="h-4 w-4" />
                   </button>
 
@@ -374,14 +374,14 @@ export default function CursoDetallePage() {
                       <span className="text-lg font-bold text-white">{initials(`${ficha.student.first_name} ${ficha.student.last_name}`)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-lg font-bold text-[#000] dark:text-[#f4f4f5] truncate">{ficha.student.first_name} {ficha.student.last_name}</p>
-                      <p className="text-xs text-[#666] dark:text-[#a1a1aa] mt-0.5">{ficha.course?.name || "Sin curso"} · {ficha.student.grade} &quot;{ficha.student.section}&quot;</p>
+                      <p className="text-lg font-bold text-[#f4f4f5] truncate">{ficha.student.first_name} {ficha.student.last_name}</p>
+                      <p className="text-xs text-[#a1a1aa] mt-0.5">{ficha.course?.name || "Sin curso"} · {ficha.student.grade} &quot;{ficha.student.section}&quot;</p>
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {ficha.student.document_number && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa]">DNI: {ficha.student.document_number}</span>
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#a1a1aa]">DNI: {ficha.student.document_number}</span>
                         )}
                         {ficha.student.gender && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa]">{ficha.student.gender === "F" ? "Femenino" : "Masculino"}</span>
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#a1a1aa]">{ficha.student.gender === "F" ? "Femenino" : "Masculino"}</span>
                         )}
                         {ficha.student.academic_condition && ficha.student.academic_condition !== "studying" && (
                           <span className="text-[10px] font-medium px-2 py-0.5 rounded-[6px] bg-amber-500/10 text-amber-600">{ficha.student.academic_condition}</span>
@@ -394,16 +394,16 @@ export default function CursoDetallePage() {
                     {/* Notas */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
+                        <p className="text-[10px] font-semibold text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
                           <BookMarked className="h-3.5 w-3.5" /> Notas en el curso
                         </p>
                         {ficha.grades.length > 0 && (
-                          <span className="text-sm font-bold text-[#000] dark:text-[#f4f4f5]">{calcAverage(ficha.grades)}</span>
+                          <span className="text-sm font-bold text-[#f4f4f5]">{calcAverage(ficha.grades)}</span>
                         )}
                       </div>
                       {ficha.grades.length === 0 ? (
                         <div className="rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] py-6 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin calificaciones registradas</p>
+                          <p className="text-xs text-[#a1a1aa]">Sin calificaciones registradas</p>
                         </div>
                       ) : (
                         <div className="grid grid-cols-4 gap-2">
@@ -411,11 +411,11 @@ export default function CursoDetallePage() {
                             const g = ficha.grades.find(x => x.period === p)
                             return (
                               <div key={p} className="rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] p-3 text-center">
-                                <p className="text-[9px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1.5">B{p.split(" ")[1]}</p>
+                                <p className="text-[9px] text-[#a1a1aa] uppercase tracking-wider mb-1.5">B{p.split(" ")[1]}</p>
                                 {g ? (
                                   <p className={`text-lg font-bold ${Number(g.score) >= 11 ? "text-emerald-600" : "text-red-500"}`}>{Number(g.score)}</p>
                                 ) : (
-                                  <p className="text-lg font-bold text-[#666] dark:text-[#a1a1aa]">—</p>
+                                  <p className="text-lg font-bold text-[#a1a1aa]">—</p>
                                 )}
                               </div>
                             )
@@ -427,14 +427,14 @@ export default function CursoDetallePage() {
                     {/* Asistencia */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
+                        <p className="text-[10px] font-semibold text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
                           <UserCheck className="h-3.5 w-3.5" /> Asistencia
                         </p>
-                        <span className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa]">{ficha.attendance.total} registros</span>
+                        <span className="text-[11px] font-medium text-[#a1a1aa]">{ficha.attendance.total} registros</span>
                       </div>
                       {ficha.attendance.total === 0 ? (
                         <div className="rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] py-6 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin registros de asistencia</p>
+                          <p className="text-xs text-[#a1a1aa]">Sin registros de asistencia</p>
                         </div>
                       ) : (
                         <>
@@ -443,7 +443,7 @@ export default function CursoDetallePage() {
                               <div className={`h-full rounded-[12px] transition-all duration-700 ${ficha.attendance.rate >= 80 ? "bg-emerald-400" : ficha.attendance.rate >= 60 ? "bg-amber-400" : "bg-red-400"}`}
                                 style={{ width: `${ficha.attendance.rate}%` }} />
                             </div>
-                            <span className="text-sm font-bold text-[#000] dark:text-[#f4f4f5]">{ficha.attendance.rate}%</span>
+                            <span className="text-sm font-bold text-[#f4f4f5]">{ficha.attendance.rate}%</span>
                           </div>
                           <div className="grid grid-cols-4 gap-2 mb-3">
                             {[
@@ -454,14 +454,14 @@ export default function CursoDetallePage() {
                             ].map(stat => (
                               <div key={stat.label} className={`rounded-[14px] ${stat.bg} p-2 text-center`}>
                                 <p className={`text-base font-bold ${stat.color}`}>{stat.value}</p>
-                                <p className="text-[9px] text-[#666] dark:text-[#a1a1aa]">{stat.label}</p>
+                                <p className="text-[9px] text-[#a1a1aa]">{stat.label}</p>
                               </div>
                             ))}
                           </div>
                           {ficha.recentAttendance.length > 0 && (
                             <div className="flex gap-1.5 flex-wrap">
                               {ficha.recentAttendance.map(r => (
-                                <span key={r.date} className="inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa]">
+                                <span key={r.date} className="inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-[12px] bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#a1a1aa]">
                                   <span className={`h-1.5 w-1.5 rounded-[12px] ${ATT_DOT[r.status] || "bg-[#666] dark:bg-[#a1a1aa]"}`} />
                                   {new Date(r.date + "T00:00:00").toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}
                                 </span>
@@ -474,26 +474,26 @@ export default function CursoDetallePage() {
 
                     {/* Padres */}
                     <div>
-                      <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <p className="text-[10px] font-semibold text-[#a1a1aa] uppercase tracking-wider mb-3 flex items-center gap-1.5">
                         <Users className="h-3.5 w-3.5" /> Apoderados ({ficha.parents.length})
                       </p>
                       {ficha.parents.length === 0 ? (
                         <div className="rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] py-5 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin apoderados vinculados</p>
+                          <p className="text-xs text-[#a1a1aa]">Sin apoderados vinculados</p>
                         </div>
                       ) : (
                         <div className="space-y-2">
                           {ficha.parents.map(p => (
                             <div key={p.id} className="rounded-[14px] bg-[#F5F5F5] dark:bg-[#27272a] p-3.5 flex items-center gap-3">
                               <div className="h-9 w-9 rounded-[14px] bg-[#E5E5E5] dark:bg-[#3f3f46] flex items-center justify-center shrink-0">
-                                <span className="text-[10px] font-bold text-[#000] dark:text-[#f4f4f5]">{initials(`${p.first_name} ${p.last_name}`)}</span>
+                                <span className="text-[10px] font-bold text-[#f4f4f5]">{initials(`${p.first_name} ${p.last_name}`)}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate capitalize">{p.first_name} {p.last_name}</p>
-                                <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] capitalize">
+                                <p className="text-sm font-medium text-[#f4f4f5] truncate capitalize">{p.first_name} {p.last_name}</p>
+                                <p className="text-[10px] text-[#a1a1aa] capitalize">
                                   {p.relationship}{p.is_primary ? " · Principal" : ""}{p.occupation ? ` · ${p.occupation}` : ""}
                                 </p>
-                                {p.phone && <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] mt-0.5">{p.phone}</p>}
+                                {p.phone && <p className="text-[10px] text-[#a1a1aa] mt-0.5">{p.phone}</p>}
                               </div>
                               <div className="flex gap-1 shrink-0">
                                 {p.phone && (
@@ -505,13 +505,13 @@ export default function CursoDetallePage() {
                                 )}
                                 {p.phone && (
                                   <a href={`tel:${p.phone}`} title="Llamar"
-                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:hover:text-[#f4f4f5] transition-colors">
+                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">
                                     <Phone className="h-4 w-4" />
                                   </a>
                                 )}
                                 {p.email && (
                                   <a href={`mailto:${p.email}`} title="Enviar correo"
-                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:hover:text-[#f4f4f5] transition-colors">
+                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">
                                     <Mail className="h-4 w-4" />
                                   </a>
                                 )}

@@ -233,11 +233,11 @@ function TareasInner() {
         {/* Header */}
         <header className="flex items-start justify-between mb-5 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
               Tareas
             </h1>
-            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+            <p className="text-[13px] mt-2 text-[#a1a1aa]">
               Gestiona las tareas de tus alumnos
             </p>
           </div>
@@ -245,19 +245,19 @@ function TareasInner() {
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
                 <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#000] dark:text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
             <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
               <Plus className="h-4 w-4" /> Nueva tarea

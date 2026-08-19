@@ -67,11 +67,11 @@ export default function CursosPage() {
         {/* ═══════════════ HEADER ═══════════════ */}
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
               Mis Cursos
             </h1>
-            <p className="text-[13px] mt-2 text-[#666] dark:text-[#a1a1aa]">
+            <p className="text-[13px] mt-2 text-[#a1a1aa]">
               Cursos asignados este periodo académico
             </p>
           </div>
@@ -79,11 +79,11 @@ export default function CursosPage() {
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
                 <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#000] dark:text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
                   {user.full_name}
                 </span>
               </div>
@@ -95,8 +95,8 @@ export default function CursosPage() {
               title="Cambiar tema"
               className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative"
             >
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
           </div>
         </div>
@@ -104,26 +104,26 @@ export default function CursosPage() {
         {/* ═══════════════ 4 STAT CARDS (idénticas al dashboard) ═══════════════ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Mis cursos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Mis cursos</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : courses.length}
             </p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Total alumnos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Total alumnos</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Promedio/curso</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Promedio/curso</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : avgStudents}
             </p>
           </div>
           <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Grados</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Grados</p>
+            <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : gradesCount}
             </p>
           </div>
@@ -138,46 +138,46 @@ export default function CursosPage() {
             {/* Acciones rápidas */}
             <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Acciones rápidas</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                <p className="text-[16px] font-semibold text-[#f4f4f5]">Acciones rápidas</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
                   Gestión <ChevronDown className="h-3 w-3" />
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <Link href="/docente/asistencia" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
                   <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <Calendar className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <Calendar className="h-5 w-5 text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Asistencia</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Tomar lista</p>
+                    <p className="text-[13px] font-medium truncate text-[#f4f4f5]">Asistencia</p>
+                    <p className="text-[11px] text-[#a1a1aa]">Tomar lista</p>
                   </div>
                 </Link>
                 <Link href="/docente/calificaciones" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
                   <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <GraduationCap className="h-5 w-5 text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Notas</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Registrar</p>
+                    <p className="text-[13px] font-medium truncate text-[#f4f4f5]">Notas</p>
+                    <p className="text-[11px] text-[#a1a1aa]">Registrar</p>
                   </div>
                 </Link>
                 <Link href="/docente/tareas" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
                   <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <Clock className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <Clock className="h-5 w-5 text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Tareas</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Crear / revisar</p>
+                    <p className="text-[13px] font-medium truncate text-[#f4f4f5]">Tareas</p>
+                    <p className="text-[11px] text-[#a1a1aa]">Crear / revisar</p>
                   </div>
                 </Link>
                 <Link href="/docente/materiales" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
                   <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <BookOpen className="h-5 w-5 text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Materiales</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Subir archivos</p>
+                    <p className="text-[13px] font-medium truncate text-[#f4f4f5]">Materiales</p>
+                    <p className="text-[11px] text-[#a1a1aa]">Subir archivos</p>
                   </div>
                 </Link>
               </div>
@@ -185,32 +185,32 @@ export default function CursosPage() {
 
             {/* Resumen */}
             <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
-              <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">Resumen</p>
+              <p className="text-[16px] font-semibold mb-5 text-[#f4f4f5]">Resumen</p>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Total cursos</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[12px] text-[#a1a1aa]">Total cursos</span>
+                  <span className="text-[14px] font-semibold text-[#f4f4f5]">
                     {loading ? "—" : courses.length}
                   </span>
                 </div>
                 <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Total alumnos</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[12px] text-[#a1a1aa]">Total alumnos</span>
+                  <span className="text-[14px] font-semibold text-[#f4f4f5]">
                     {loading ? "—" : totalStudents}
                   </span>
                 </div>
                 <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Promedio por curso</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[12px] text-[#a1a1aa]">Promedio por curso</span>
+                  <span className="text-[14px] font-semibold text-[#f4f4f5]">
                     {loading ? "—" : `${avgStudents} alumnos`}
                   </span>
                 </div>
                 <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Grados diferentes</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[12px] text-[#a1a1aa]">Grados diferentes</span>
+                  <span className="text-[14px] font-semibold text-[#f4f4f5]">
                     {loading ? "—" : gradesCount}
                   </span>
                 </div>
@@ -224,8 +224,8 @@ export default function CursosPage() {
             {/* Mis Cursos */}
             <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                <p className="text-[16px] font-semibold text-[#f4f4f5]">Mis Cursos</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
                   Todos <ChevronDown className="h-3 w-3" />
                 </button>
               </div>
@@ -243,13 +243,13 @@ export default function CursosPage() {
                       className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors"
                     >
                       <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                        <GraduationCap className="h-5 w-5 text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} &quot;{c.section}&quot;</p>
+                        <p className="text-[13px] font-medium truncate text-[#f4f4f5]">{c.name}</p>
+                        <p className="text-[11px] text-[#a1a1aa]">{c.grade} &quot;{c.section}&quot;</p>
                       </div>
-                      <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa] shrink-0">{c.students} alumnos</span>
+                      <span className="text-[12px] font-medium text-[#a1a1aa] shrink-0">{c.students} alumnos</span>
                     </Link>
                   ))}
                 </div>
@@ -259,8 +259,8 @@ export default function CursosPage() {
             {/* Horario de hoy */}
             <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
+                <p className="text-[16px] font-semibold text-[#f4f4f5]">Horario de hoy</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
                   Hoy <ChevronDown className="h-3 w-3" />
                 </button>
               </div>
@@ -274,15 +274,15 @@ export default function CursosPage() {
                   {todaySchedule.map((cls) => (
                     <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
                       <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                        <BookOpen className="h-5 w-5 text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
+                        <p className="text-[13px] font-medium truncate text-[#f4f4f5]">{cls.course_name}</p>
+                        <p className="text-[11px] text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[13px] font-medium text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
+                        <p className="text-[13px] font-medium text-[#f4f4f5]">{cls.start_time}</p>
+                        <p className="text-[11px] text-[#a1a1aa]">{cls.end_time}</p>
                       </div>
                     </div>
                   ))}
