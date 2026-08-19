@@ -41,9 +41,9 @@ export async function GET(request: NextRequest) {
       `SELECT s.id, s.document_number, s.first_name, s.last_name
        FROM students s
        JOIN enrollments e ON e.student_id = s.id
-       WHERE s.grade = ? AND s.section = ? AND e.status = 'active'
+       WHERE e.course_id = ? AND e.status = 'active'
        ORDER BY s.last_name, s.first_name`,
-      [course.grade, course.section]
+      [courseId]
     )
 
     if (mode === 'stats') {

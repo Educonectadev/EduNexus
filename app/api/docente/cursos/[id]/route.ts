@@ -16,12 +16,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       `SELECT c.id, c.name, c.code, c.grade, c.section, c.status, c.created_at,
               (SELECT COUNT(*) FROM enrollments e
                JOIN students s ON e.student_id = s.id
-               WHERE s.institution_id = ? AND s.grade = c.grade AND s.section = c.section AND e.status = 'active'
+               WHERE e.course_id = c.id AND e.status = 'active'
               ) as student_count
        FROM courses c
        LEFT JOIN teachers t ON c.teacher_id = t.id
        WHERE c.id = ? AND t.user_id = ? AND c.status = 'active'`,
-      [instId, id, userId]
+      [id, userId]
     )
     const course = (courseRows as any[])[0]
     if (!course) {
@@ -41,9 +41,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       `SELECT s.id, s.code, s.first_name, s.last_name, s.document_number, s.gender, s.grade, s.section
        FROM students s
        JOIN enrollments e ON e.student_id = s.id
-       WHERE s.institution_id = ? AND s.grade = ? AND s.section = ? AND e.status = 'active'
+       WHERE e.course_id = ? AND e.status = 'active'
        ORDER BY s.last_name, s.first_name`,
-      [instId, course.grade, course.section]
+      [id]
     )
 
     return NextResponse.json({
