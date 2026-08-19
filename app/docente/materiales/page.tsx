@@ -183,9 +183,13 @@ function MaterialesInner() {
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setUploadOpen(true)} disabled={!courses.length}>
-              <Upload className="h-4 w-4" /> Subir
-            </SbBtn>
+            <button
+              onClick={() => setUploadOpen(true)}
+              disabled={!courses.length}
+              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-2xl bg-white text-black hover:bg-white/90 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Upload className="h-4 w-4" /> Subir material
+            </button>
           </div>
         </motion.header>
 
@@ -205,74 +209,99 @@ function MaterialesInner() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="flex flex-col sm:flex-row gap-3"
+          className="flex flex-col sm:flex-row gap-3 mb-6"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
-            <SbInput placeholder="Buscar materiales..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: "36px" }} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#666]" />
+            <input
+              placeholder="Buscar materiales..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full h-11 pl-11 pr-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+            />
           </div>
-          <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="sbf-native-select sm:w-64">
-            <option value="all">Todos los cursos</option>
+          <select
+            value={courseFilter}
+            onChange={e => setCourseFilter(e.target.value)}
+            className="h-11 px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer sm:w-64"
+          >
+            <option value="all" className="bg-[#1a1a1c] text-white">Todos los cursos</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
+              <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">{c.name} · {c.grade} &quot;{c.section}&quot;</option>
             ))}
           </select>
         </motion.div>
 
         {loading ? (
-          <div className="space-y-2.5 mt-6">
+          <div className="space-y-3 mt-6">
             {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-xl border border-foreground/10 bg-foreground/5 p-4 animate-pulse">
+              <div key={i} className="rounded-2xl bg-white/5 border border-white/10 p-4 animate-pulse">
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-foreground/10" />
+                  <div className="h-12 w-12 rounded-2xl bg-white/10" />
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 w-48 rounded bg-foreground/10" />
-                    <div className="h-3 w-32 rounded bg-foreground/10" />
+                    <div className="h-4 w-48 rounded-lg bg-white/10" />
+                    <div className="h-3 w-32 rounded-lg bg-white/10" />
                   </div>
+                  <div className="h-8 w-20 rounded-xl bg-white/10" />
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-2.5 mt-6">
+          <div className="space-y-3 mt-6">
             <AnimatePresence>
               {filtered.map((m, i) => {
                 const Icon = getIconForType(m.file_type)
+                const isPdf = m.file_type?.includes("pdf")
+                const isImage = m.file_type?.includes("image")
+                const isWord = m.file_type?.includes("word") || m.file_type?.includes("text")
+                const isPpt = m.file_type?.includes("powerpoint") || m.file_type?.includes("presentation")
+                const iconBg = isPdf ? "bg-red-500/20" : isImage ? "bg-purple-500/20" : isWord ? "bg-blue-500/20" : isPpt ? "bg-orange-500/20" : "bg-white/10"
+                const iconColor = isPdf ? "text-red-400" : isImage ? "text-purple-400" : isWord ? "text-blue-400" : isPpt ? "text-orange-400" : "text-white/60"
                 return (
                   <motion.div key={m.id}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 12 }}
-                    transition={{ delay: i * 0.02 }}
-                    className="group rounded-xl border border-foreground/10 bg-foreground/5 px-4 py-3 transition-all duration-150 hover:border-foreground/20"
+                    transition={{ delay: i * 0.03 }}
+                    className="group rounded-2xl bg-white/5 border border-white/10 px-5 py-4 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-black/10"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center shrink-0">
-                        <Icon className="h-4 w-4 text-foreground" />
+                      <div className={`h-12 w-12 rounded-2xl ${iconBg} flex items-center justify-center shrink-0 transition-transform group-hover:scale-110`}>
+                        <Icon className={`h-5 w-5 ${iconColor}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {m.course_name ? `${m.course_name}${m.grade ? ` · ${m.grade} "${m.section}"` : ""} · ` : ""}
-                          {formatSize(m.file_size)} · {formatDate(m.created_at)}
-                        </p>
-                        {m.description && <p className="text-xs text-muted-foreground/70 truncate mt-0.5">{m.description}</p>}
+                        <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          {m.course_name && (
+                            <span className="text-xs text-[#a1a1aa] truncate">
+                              {m.course_name}{m.grade ? ` · ${m.grade} "${m.section}"` : ""}
+                            </span>
+                          )}
+                          <span className="text-[10px] text-[#666]">·</span>
+                          <span className="text-xs text-[#666]">{formatSize(m.file_size)}</span>
+                          <span className="text-[10px] text-[#666]">·</span>
+                          <span className="text-xs text-[#666]">{formatDate(m.created_at)}</span>
+                        </div>
+                        {m.description && <p className="text-xs text-[#666] truncate mt-1">{m.description}</p>}
                       </div>
-                      <span className={`text-[10px] font-medium px-2.5 py-1 rounded-xl shrink-0 hidden sm:inline-flex items-center gap-1 ${
-                        m.source === "propio" ? "bg-foreground/10 text-muted-foreground" : "bg-foreground/10 text-muted-foreground/60"
+                      <span className={`text-[10px] font-semibold px-3 py-1.5 rounded-xl shrink-0 hidden sm:inline-flex items-center gap-1.5 ${
+                        m.source === "propio"
+                          ? "bg-white/10 text-[#a1a1aa]"
+                          : "bg-blue-500/20 text-blue-400"
                       }`}>
-                        <Library className="h-3 w-3" /> {m.source === "propio" ? "Mis materiales" : "Biblioteca"}
+                        <Library className="h-3 w-3" /> {m.source === "propio" ? "Propio" : "Biblioteca"}
                       </span>
                       {m.file_url && (
                         <a href={m.file_url} target="_blank" rel="noreferrer" download
-                          className="p-2 rounded-xl hover:bg-foreground/10 transition-colors shrink-0">
-                          <Download className="h-4 w-4 text-muted-foreground/60" />
+                          className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all shrink-0 group/btn">
+                          <Download className="h-4 w-4 text-[#a1a1aa] group-hover/btn:text-white transition-colors" />
                         </a>
                       )}
                       {m.source === "propio" && (
                         <button onClick={() => handleDelete(m)}
-                          className="p-2 rounded-xl hover:bg-red-500/10 hover:text-red-500 transition-colors shrink-0">
-                          <Trash2 className="h-4 w-4 text-muted-foreground/60" />
+                          className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-red-500/20 transition-all shrink-0 group/btn">
+                          <Trash2 className="h-4 w-4 text-[#666] group-hover/btn:text-red-400 transition-colors" />
                         </button>
                       )}
                     </div>
@@ -281,27 +310,12 @@ function MaterialesInner() {
               })}
             </AnimatePresence>
             {!loading && filtered.length === 0 && (
-              <div
-                className="py-16 text-center"
-                style={{
-                  background: "var(--sb-surface-container)",
-                  borderRadius: "20px",
-                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-                }}
-              >
-                <FileText
-                  className="h-10 w-10 mx-auto mb-3"
-                  style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
-                />
-                <p
-                  className="text-xs"
-                  style={{
-                    color: "var(--sb-on-surface-variant)",
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
-                  Sin materiales
-                </p>
+              <div className="py-20 text-center rounded-2xl bg-white/5 border border-white/10">
+                <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-[#666]" />
+                </div>
+                <p className="text-sm font-medium text-[#a1a1aa] mb-1">Sin materiales</p>
+                <p className="text-xs text-[#666]">Sube tu primer material para comenzar</p>
               </div>
             )}
           </div>
@@ -313,34 +327,88 @@ function MaterialesInner() {
           <SbModalBody>
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
-                <select value={upCourseId} onChange={e => setUpCourseId(e.target.value)} className="sbf-native-select w-full">
-                  <option value="">Seleccionar curso...</option>
-                  {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Curso</label>
+                <select
+                  value={upCourseId}
+                  onChange={e => setUpCourseId(e.target.value)}
+                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer"
+                >
+                  <option value="" className="bg-[#1a1a1c] text-[#666]">Seleccionar curso...</option>
+                  {courses.map(c => (
+                    <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">
+                      {c.name} · {c.grade} &quot;{c.section}&quot;
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nombre</label>
-                <input value={upName} onChange={e => setUpName(e.target.value)} placeholder="Guía de álgebra - Cap. 3" className="sb-input rounded-xl text-sm h-10 w-full" />
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Nombre</label>
+                <input
+                  value={upName}
+                  onChange={e => setUpName(e.target.value)}
+                  placeholder="Guía de álgebra - Cap. 3"
+                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                />
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Descripción (opcional)</label>
-                <textarea value={upDescription} onChange={e => setUpDescription(e.target.value)} rows={2} placeholder="Breve descripción del material"
-                  className="sb-input rounded-xl text-sm w-full resize-none" />
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Descripción (opcional)</label>
+                <textarea
+                  value={upDescription}
+                  onChange={e => setUpDescription(e.target.value)}
+                  rows={2}
+                  placeholder="Breve descripción del material"
+                  className="w-full px-4 py-3 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all resize-none"
+                />
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Archivo</label>
-                <input ref={fileInputRef} type="file" onChange={e => setUpFile(e.target.files?.[0] || null)}
-                  className="block w-full text-sm text-muted-foreground/60 file:mr-3 file:rounded-xl file:border-0 file:bg-foreground/10 file:px-3 file:py-2 file:text-xs file:font-medium file:text-foreground hover:file:bg-foreground/20" />
-                {upFile && <p className="text-xs text-muted-foreground mt-1.5">{upFile.name} · {formatSize(upFile.size)}</p>}
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Archivo</label>
+                <div className="relative">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={e => setUpFile(e.target.files?.[0] || null)}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="h-20 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer">
+                    <Upload className="h-5 w-5 text-[#666]" />
+                    <p className="text-xs text-[#666]">
+                      {upFile ? upFile.name : "Click para seleccionar archivo"}
+                    </p>
+                  </div>
+                </div>
+                {upFile && (
+                  <p className="text-xs text-[#a1a1aa] mt-2 flex items-center gap-1">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
+                    {formatSize(upFile.size)}
+                  </p>
+                )}
               </div>
             </div>
           </SbModalBody>
           <SbModalFooter>
-            <SbBtn rounded onClick={() => setUploadOpen(false)}>Cancelar</SbBtn>
-            <SbBtn variant="filled" rounded disabled={!upName || !upCourseId || !upFile || uploading} onClick={handleUpload}>
-              {uploading ? "Subiendo..." : "Subir"}
-            </SbBtn>
+            <button
+              onClick={() => setUploadOpen(false)}
+              className="h-10 px-5 text-sm font-semibold rounded-2xl bg-white/5 text-[#a1a1aa] hover:bg-white/10 transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              disabled={!upName || !upCourseId || !upFile || uploading}
+              onClick={handleUpload}
+              className="h-10 px-6 text-sm font-bold rounded-2xl bg-white text-black hover:bg-white/90 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
+            >
+              {uploading ? (
+                <>
+                  <span className="animate-spin h-4 w-4 border-2 border-black/30 border-t-black rounded-full" />
+                  Subiendo...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  Subir
+                </>
+              )}
+            </button>
           </SbModalFooter>
         </SbModal>
       </div>
