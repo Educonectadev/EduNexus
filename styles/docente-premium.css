@@ -56,9 +56,9 @@ html.dark [data-role="docente"] {
   letter-spacing: -0.04em;
 }
 
-/* ─── Radios premium (reemplaza rounded-[6px]) ─── */
-[data-role="docente"] [class*="rounded-[6px]"] {
-  border-radius: var(--sb-docente-radius) !important;
+/* ─── Radios premium ─── */
+[data-role="docente"] [class*="rounded-xl"] {
+  border-radius: var(--sb-docente-radius, 12px) !important;
 }
 
 [data-role="docente"] .sb-input,

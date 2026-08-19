@@ -487,7 +487,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           )
           const cls = cn(
             "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-            sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+            sidebarOpen ? "h-8 px-2.5 rounded-xl" : "relative justify-center w-9 h-9 mx-auto",
             active
               ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
               : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
@@ -518,7 +518,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 href="/secretario/asistente"
                 className={cn(
                   "group flex items-center gap-2.5 transition-colors duration-300 ease-out w-full",
-                  sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                  sidebarOpen ? "h-8 px-2.5 rounded-xl" : "relative justify-center w-9 h-9 mx-auto",
                   pathname.startsWith("/secretario/asistente")
                     ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
                     : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
@@ -555,7 +555,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                sidebarOpen ? "h-8 px-2.5 rounded-xl w-full" : "justify-center w-9 h-9 mx-auto rounded-xl",
                 "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
               )}>
               <div className="relative shrink-0 w-[16px] h-[16px]">
@@ -569,7 +569,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={toggleSidebar}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                sidebarOpen ? "h-8 px-2.5 rounded-xl w-full" : "justify-center w-9 h-9 mx-auto rounded-xl",
                 "text-sb-on-surface-variant/50 hover:bg-sb-surface-container/60 hover:text-sb-on-surface-variant dark:text-sb-solid-fg/45 dark:hover:text-sb-solid-fg"
               )}>
               <svg className={cn("h-[16px] w-[16px] shrink-0 transition-transform duration-200", !sidebarOpen && "rotate-180")}
@@ -590,7 +590,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <Link href="/perfil"
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-[6px]" : "relative justify-center w-9 h-9 mx-auto",
+                sidebarOpen ? "h-8 px-2.5 rounded-xl" : "relative justify-center w-9 h-9 mx-auto",
                   pathname === "/perfil"
                     ? sidebarOpen ? "bg-sb-on-surface text-sb-surface" : "text-sb-surface"
                     : "text-sb-on-surface-variant/70 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
@@ -623,7 +623,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button onClick={handleLogout}
               className={cn(
                 "group flex items-center gap-2.5 transition-colors duration-300 ease-out",
-                sidebarOpen ? "h-8 px-2.5 rounded-[6px] w-full" : "justify-center w-9 h-9 mx-auto rounded-[6px]",
+                sidebarOpen ? "h-8 px-2.5 rounded-xl w-full" : "justify-center w-9 h-9 mx-auto rounded-xl",
                 "text-sb-on-surface-variant/70 hover:bg-sb-surface-container/60 hover:text-sb-on-surface dark:text-sb-solid-fg/55 dark:hover:text-sb-solid-fg"
               )}>
               <LogOut className="h-[16px] w-[16px] shrink-0" />
