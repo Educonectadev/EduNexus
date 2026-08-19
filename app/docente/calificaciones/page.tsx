@@ -69,6 +69,8 @@ export default function CalificacionesPage() {
 
 function CalificacionesInner() {
   const searchParams = useSearchParams()
+  const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const prefilterCourse = searchParams.get("curso") || ""
   const [courses, setCourses] = React.useState<Course[]>([])
   const [courseId, setCourseId] = React.useState(prefilterCourse)
@@ -234,7 +236,7 @@ function CalificacionesInner() {
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-[#27272a]">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
                 <div className="h-6 w-6 rounded-full bg-[#F5F5F5] dark:bg-[#3f3f46] flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
