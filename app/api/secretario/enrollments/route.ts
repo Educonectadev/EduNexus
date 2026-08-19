@@ -28,6 +28,37 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
+    // Fix enrollments missing course_id
+    const [result] = await pool.query(
+      `UPDATE enrollments e
+       SET course_id = (
+         SELECT c.id FROM courses c
+         WHERE c.institution_id = e.institution_id
+           AND c.grade = e.grade
+           AND c.section = e.section
+           AND c.status = 'active'
+         LIMIT 1
+       )
+       WHERE e.institution_id = ?
+         AND e.course_id IS NULL
+         AND e.status = 'active'`,
+      [instId]
+    )
+
+    return NextResponse.json({
+      success: true,
+      updated: (result as any).affectedRows || 0
+    })
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Error fixing enrollments', details: error.message }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   let conn: any = null
   try {
@@ -109,10 +140,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Find the course that matches this grade/section
+    const [courseRows] = await conn.query(
+      `SELECT id FROM courses WHERE institution_id = $1 AND grade = $2 AND section = $3 AND status = 'active' LIMIT 1`,
+      [instId, grade, section || 'A']
+    )
+    const courseId = (courseRows as any).rows[0]?.id || null
+
     const result = await conn.query(
-      `INSERT INTO enrollments (institution_id, student_id, grade, section, year, status)
-       VALUES ($1, $2, $3, $4, $5, 'active')`,
-      [instId, studentId, grade, section || 'A', year || new Date().getFullYear()]
+      `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, year, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'active')`,
+      [instId, studentId, courseId, grade, section || 'A', year || new Date().getFullYear()]
     )
 
     if (parent_dni) {

@@ -10,6 +10,33 @@ export async function GET(request: NextRequest) {
     }
     const userId = user.id as string
 
+    // Auto-fix enrollments missing course_id for this teacher's courses
+    await pool.query(
+      `UPDATE enrollments e
+       SET course_id = (
+         SELECT c.id FROM courses c
+         LEFT JOIN teachers t ON c.teacher_id = t.id
+         WHERE c.institution_id = e.institution_id
+           AND c.grade = e.grade
+           AND c.section = e.section
+           AND c.status = 'active'
+           AND t.user_id = ?
+         LIMIT 1
+       )
+       WHERE e.course_id IS NULL
+         AND e.status = 'active'
+         AND EXISTS (
+           SELECT 1 FROM courses c2
+           LEFT JOIN teachers t2 ON c2.teacher_id = t2.id
+           WHERE c2.institution_id = e.institution_id
+             AND c2.grade = e.grade
+             AND c2.section = e.section
+             AND c2.status = 'active'
+             AND t2.user_id = ?
+         )`,
+      [userId, userId]
+    )
+
     const [rows] = await pool.query(
       `SELECT c.id, c.name, c.code, c.grade, c.section, c.status, c.created_at,
               (SELECT COUNT(*) FROM enrollments e
