@@ -147,27 +147,27 @@ export default function DocenteDashboard() {
 
         {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Mis cursos</p>
-            <p className="text-[32px] font-bold text-[#f4f4f5]">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Mis cursos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
               {loading ? "—" : courses.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Total alumnos</p>
-            <p className="text-[32px] font-bold text-[#f4f4f5]">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Total alumnos</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Clases hoy</p>
-            <p className="text-[32px] font-bold text-[#f4f4f5]">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Clases hoy</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
               {loading ? "—" : todaySchedule.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Horas hoy</p>
-            <p className="text-[32px] font-bold text-[#f4f4f5]">
+          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Horas hoy</p>
+            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
               {loading ? "—" : `${hoursToday}h`}
             </p>
           </div>
@@ -180,10 +180,10 @@ export default function DocenteDashboard() {
           <div className="flex flex-col gap-4">
 
             {/* Horario de hoy */}
-            <div className="p-6 rounded-[30px] flex-1 bg-[#17171a]">
+            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#f4f4f5]">Horario de hoy</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
+                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
+                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
                   Hoy <ChevronDown className="h-3 w-3" />
                 </button>
               </div>
@@ -197,15 +197,15 @@ export default function DocenteDashboard() {
                   {todaySchedule.map((cls) => (
                     <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
                       <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <BookOpen className="h-5 w-5 text-[#a1a1aa]" />
+                        <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#f4f4f5]">{cls.course_name}</p>
-                        <p className="text-[11px] text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
+                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[13px] font-medium text-[#f4f4f5]">{cls.start_time}</p>
-                        <p className="text-[11px] text-[#a1a1aa]">{cls.end_time}</p>
+                        <p className="text-[13px] font-medium text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
                       </div>
                     </div>
                   ))}
@@ -214,8 +214,8 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Mis Cursos */}
-            <div className="p-6 rounded-[30px] bg-[#17171a]">
-              <p className="text-[16px] font-semibold mb-5 text-[#f4f4f5]">Mis Cursos</p>
+            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+              <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
               {courses.length === 0 ? (
                 <div className="py-6 text-center">
                   <GraduationCap className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
@@ -226,13 +226,13 @@ export default function DocenteDashboard() {
                   {courses.map((c) => (
                     <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
                       <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <GraduationCap className="h-5 w-5 text-[#a1a1aa]" />
+                        <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#f4f4f5]">{c.name}</p>
-                        <p className="text-[11px] text-[#a1a1aa]">{c.grade} {c.section}</p>
+                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
                       </div>
-                      <span className="text-[12px] font-medium text-[#a1a1aa]">{c.students} alumnos</span>
+                      <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
                     </div>
                   ))}
                 </div>
@@ -241,10 +241,10 @@ export default function DocenteDashboard() {
           </div>
 
           {/* ──── RIGHT COLUMN: Asistencia de hoy ──── */}
-          <div className="p-6 rounded-[30px] bg-[#17171a]">
+          <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
             <div className="flex items-center justify-between mb-5">
-              <p className="text-[16px] font-semibold text-[#f4f4f5]">Asistencia de hoy</p>
-              <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
+              <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Asistencia de hoy</p>
+              <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
                 Resumen <ChevronDown className="h-3 w-3" />
               </button>
             </div>
@@ -252,11 +252,11 @@ export default function DocenteDashboard() {
             {/* Attendance summary */}
             <div className="mb-6">
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-[48px] font-bold leading-none text-[#f4f4f5]">
+                <span className="text-[48px] font-bold leading-none text-[#000] dark:text-[#f4f4f5]">
                   {loading ? "—" : `${attendancePct}%`}
                 </span>
               </div>
-              <p className="text-[13px] text-[#a1a1aa]">
+              <p className="text-[13px] text-[#666] dark:text-[#a1a1aa]">
                 {studentSummary
                   ? `${studentSummary.present} presentes de ${studentSummary.total} alumnos`
                   : "Sin datos de asistencia"}
@@ -272,7 +272,7 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Course breakdown */}
-            <p className="text-[14px] font-semibold mb-4 text-[#f4f4f5]">Resumen por curso</p>
+            <p className="text-[14px] font-semibold mb-4 text-[#000] dark:text-[#f4f4f5]">Resumen por curso</p>
             {courses.length === 0 ? (
               <div className="py-6 text-center">
                 <Users className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
@@ -283,13 +283,13 @@ export default function DocenteDashboard() {
                 {courses.map((c) => (
                   <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
                     <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                      <GraduationCap className="h-5 w-5 text-[#a1a1aa]" />
+                      <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium truncate text-[#f4f4f5]">{c.name}</p>
-                      <p className="text-[11px] text-[#a1a1aa]">{c.grade} {c.section}</p>
+                      <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                      <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
                     </div>
-                    <span className="text-[12px] font-medium text-[#a1a1aa]">{c.students} alumnos</span>
+                    <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
                   </div>
                 ))}
               </div>
