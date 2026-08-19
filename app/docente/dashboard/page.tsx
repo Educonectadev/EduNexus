@@ -146,28 +146,40 @@ export default function DocenteDashboard() {
         </div>
 
         {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Mis cursos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Mis cursos</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : courses.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Total alumnos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <Users className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Total alumnos</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Clases hoy</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <Calendar className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Clases hoy</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : todaySchedule.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Horas hoy</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <Clock className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Horas hoy</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : `${hoursToday}h`}
             </p>
           </div>
@@ -180,32 +192,34 @@ export default function DocenteDashboard() {
           <div className="flex flex-col gap-4">
 
             {/* Horario de hoy */}
-            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                  Hoy <ChevronDown className="h-3 w-3" />
-                </button>
+            <div className="p-5 rounded-[20px] flex-1 bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                  {todaySchedule.length} clases
+                </span>
               </div>
               {todaySchedule.length === 0 ? (
                 <div className="py-8 text-center">
-                  <Clock className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  </div>
                   <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin clases hoy</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {todaySchedule.map((cls) => (
-                    <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <div key={cls.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
+                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                        <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
+                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
                         <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[13px] font-medium text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
+                        <p className="text-[13px] font-semibold text-[#000] dark:text-[#f4f4f5]">{cls.start_time?.slice(0, 5)}</p>
+                        <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time?.slice(0, 5)}</p>
                       </div>
                     </div>
                   ))}
@@ -214,25 +228,32 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Mis Cursos */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
-              <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
+            <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                  {courses.length} cursos
+                </span>
+              </div>
               {courses.length === 0 ? (
-                <div className="py-6 text-center">
-                  <GraduationCap className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                <div className="py-8 text-center">
+                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+                    <GraduationCap className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  </div>
                   <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos registrados</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {courses.map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <div key={c.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
+                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                        <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
                         <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
                       </div>
-                      <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
+                      <span className="text-[11px] font-semibold text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
                     </div>
                   ))}
                 </div>
@@ -241,18 +262,18 @@ export default function DocenteDashboard() {
           </div>
 
           {/* ──── RIGHT COLUMN: Asistencia de hoy ──── */}
-          <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
             <div className="flex items-center justify-between mb-5">
-              <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Asistencia de hoy</p>
-              <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                Resumen <ChevronDown className="h-3 w-3" />
-              </button>
+              <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Asistencia de hoy</p>
+              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                Resumen
+              </span>
             </div>
 
             {/* Attendance summary */}
-            <div className="mb-6">
-              <div className="flex items-end gap-2 mb-2">
-                <span className="text-[48px] font-bold leading-none text-[#000] dark:text-[#f4f4f5]">
+            <div className="mb-5">
+              <div className="flex items-end gap-1 mb-1">
+                <span className="text-[56px] font-bold leading-none tracking-tight text-[#000] dark:text-[#f4f4f5]">
                   {loading ? "—" : `${attendancePct}%`}
                 </span>
               </div>
@@ -264,32 +285,34 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Progress bar */}
-            <div className="w-full h-3 rounded-full mb-8 bg-[#D9D9D9] dark:bg-[#27272a]">
+            <div className="w-full h-2.5 rounded-full mb-6 bg-black/5 dark:bg-white/10">
               <div
-                className="h-full rounded-full transition-all duration-700 bg-[#000] dark:bg-[#f4f4f5]"
+                className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-[#000] to-[#333] dark:from-[#f4f4f5] dark:to-[#a1a1aa]"
                 style={{ width: `${attendancePct}%` }}
               />
             </div>
 
             {/* Course breakdown */}
-            <p className="text-[14px] font-semibold mb-4 text-[#000] dark:text-[#f4f4f5]">Resumen por curso</p>
+            <p className="text-[13px] font-bold mb-3 text-[#000] dark:text-[#f4f4f5]">Resumen por curso</p>
             {courses.length === 0 ? (
-              <div className="py-6 text-center">
-                <Users className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+              <div className="py-8 text-center">
+                <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+                  <Users className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                </div>
                 <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {courses.map((c) => (
-                  <div key={c.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
-                    <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                      <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                  <div key={c.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
+                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                      <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                      <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
                       <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
                     </div>
-                    <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
+                    <span className="text-[11px] font-semibold text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
                   </div>
                 ))}
               </div>
