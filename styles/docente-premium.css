@@ -57,8 +57,8 @@ html.dark [data-role="docente"] {
 }
 
 /* ─── Radios premium ─── */
-[data-role="docente"] [class*="rounded-xl"] {
-  border-radius: var(--sb-docente-radius, 12px) !important;
+[data-role="docente"] aside [class*="rounded-xl"] {
+  border-radius: 10px !important;
 }
 
 [data-role="docente"] .sb-input,
