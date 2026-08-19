@@ -221,7 +221,8 @@ function CalificacionesInner() {
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
       <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
-        <header className="flex items-start justify-between mb-5 gap-4">
+        <header className="mb-5">
+          <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[14px] font-medium mb-1 text-[#666] dark:text-[#a1a1aa]">Panel Docente</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#000] dark:text-[#f4f4f5]">
@@ -252,7 +253,8 @@ function CalificacionesInner() {
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
             </button>
           </div>
-        </header>
+          </div>
+          <div className="flex items-center gap-3 mt-4">
             <div className="nb-select-wrap">
               <select
                 value={courseId}
@@ -277,13 +279,11 @@ function CalificacionesInner() {
                 ))}
               </div>
             )}
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2 ml-auto" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
               <Plus className="h-4 w-4" /> Registrar
             </SbBtn>
           </div>
         </header>
-
-        {error && (
           <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
