@@ -101,29 +101,41 @@ export default function CursosPage() {
           </div>
         </div>
 
-        {/* ═══════════════ 4 STAT CARDS (idénticas al dashboard) ═══════════════ */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Mis cursos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+        {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Mis cursos</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : courses.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Total alumnos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <Users className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Total alumnos</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Promedio/curso</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Promedio/curso</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : avgStudents}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Grados</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">
+          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
+              <Flame className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+            </div>
+            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Grados</p>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
               {loading ? "—" : gradesCount}
             </p>
           </div>
@@ -136,81 +148,78 @@ export default function CursosPage() {
           <div className="flex flex-col gap-4">
 
             {/* Acciones rápidas */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Acciones rápidas</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                  Gestión <ChevronDown className="h-3 w-3" />
-                </button>
+            <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Acciones rápidas</p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/docente/asistencia" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <Calendar className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+              <div className="grid grid-cols-2 gap-2">
+                <Link href="/docente/asistencia" className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                    <Calendar className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Asistencia</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Tomar lista</p>
+                    <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">Asistencia</p>
+                    <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">Tomar lista</p>
                   </div>
                 </Link>
-                <Link href="/docente/calificaciones" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                <Link href="/docente/calificaciones" className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                    <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Notas</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Registrar</p>
+                    <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">Notas</p>
+                    <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">Registrar</p>
                   </div>
                 </Link>
-                <Link href="/docente/tareas" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <Clock className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                <Link href="/docente/tareas" className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                    <Clock className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Tareas</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Crear / revisar</p>
+                    <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">Tareas</p>
+                    <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">Crear / revisar</p>
                   </div>
                 </Link>
-                <Link href="/docente/materiales" className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors">
-                  <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                    <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                <Link href="/docente/materiales" className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+                  <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                    <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">Materiales</p>
-                    <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">Subir archivos</p>
+                    <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">Materiales</p>
+                    <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">Subir archivos</p>
                   </div>
                 </Link>
               </div>
             </div>
 
             {/* Resumen */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
-              <p className="text-[16px] font-semibold mb-5 text-[#000] dark:text-[#f4f4f5]">Resumen</p>
-              <div className="space-y-4">
+            <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+              <p className="text-[15px] font-bold mb-4 text-[#000] dark:text-[#f4f4f5]">Resumen</p>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Total cursos</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[13px] font-bold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : courses.length}
                   </span>
                 </div>
-                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
+                <div className="h-px bg-black/5 dark:bg-white/10" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Total alumnos</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[13px] font-bold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : totalStudents}
                   </span>
                 </div>
-                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
+                <div className="h-px bg-black/5 dark:bg-white/10" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Promedio por curso</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[13px] font-bold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : `${avgStudents} alumnos`}
                   </span>
                 </div>
-                <div className="h-px bg-[#D9D9D9] dark:bg-[#27272a]" />
+                <div className="h-px bg-black/5 dark:bg-white/10" />
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-[#666] dark:text-[#a1a1aa]">Grados diferentes</span>
-                  <span className="text-[14px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+                  <span className="text-[13px] font-bold text-[#000] dark:text-[#f4f4f5]">
                     {loading ? "—" : gradesCount}
                   </span>
                 </div>
@@ -222,34 +231,36 @@ export default function CursosPage() {
           <div className="flex flex-col gap-4">
 
             {/* Mis Cursos */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                  Todos <ChevronDown className="h-3 w-3" />
-                </button>
+            <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                  {courses.length} cursos
+                </span>
               </div>
               {courses.length === 0 ? (
-                <div className="py-6 text-center">
-                  <GraduationCap className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                <div className="py-8 text-center">
+                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+                    <GraduationCap className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  </div>
                   <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos registrados</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {courses.map((c) => (
                     <Link
                       key={c.id}
                       href={`/docente/cursos/${c.id}`}
-                      className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a] hover:bg-[#c9c9c9] dark:hover:bg-[#333] transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group"
                     >
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <GraduationCap className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                        <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
+                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
                         <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} &quot;{c.section}&quot;</p>
                       </div>
-                      <span className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa] shrink-0">{c.students} alumnos</span>
+                      <span className="text-[11px] font-semibold text-[#666] dark:text-[#a1a1aa] shrink-0">{c.students} alumnos</span>
                     </Link>
                   ))}
                 </div>
@@ -257,32 +268,34 @@ export default function CursosPage() {
             </div>
 
             {/* Horario de hoy */}
-            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
-              <div className="flex items-center justify-between mb-5">
-                <p className="text-[16px] font-semibold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
-                <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#666] dark:text-[#a1a1aa]">
-                  Hoy <ChevronDown className="h-3 w-3" />
-                </button>
+            <div className="p-5 rounded-[20px] flex-1 bg-white dark:bg-[#17171a]">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                  {todaySchedule.length} clases
+                </span>
               </div>
               {todaySchedule.length === 0 ? (
                 <div className="py-8 text-center">
-                  <Clock className="h-8 w-8 mx-auto mb-2 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  </div>
                   <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin clases hoy</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   {todaySchedule.map((cls) => (
-                    <div key={cls.id} className="flex items-center gap-3 p-4 rounded-[20px] bg-[#D9D9D9] dark:bg-[#27272a]">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#3f3f46]">
-                        <BookOpen className="h-5 w-5 text-[#666] dark:text-[#a1a1aa]" />
+                    <div key={cls.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
+                        <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
+                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
                         <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[13px] font-medium text-[#000] dark:text-[#f4f4f5]">{cls.start_time}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time}</p>
+                        <p className="text-[13px] font-semibold text-[#000] dark:text-[#f4f4f5]">{cls.start_time?.slice(0, 5)}</p>
+                        <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time?.slice(0, 5)}</p>
                       </div>
                     </div>
                   ))}
