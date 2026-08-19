@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Bell, Sun, Moon } from "@/components/ui/proicons"
+import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Sun, Moon } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
@@ -87,12 +88,7 @@ export default function CursosPage() {
                 </span>
               </div>
             )}
-            <button
-              aria-label="Notificaciones"
-              className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-            >
-              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
-            </button>
+            <NotificationBell />
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Cambiar tema"

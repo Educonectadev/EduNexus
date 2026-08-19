@@ -3,7 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
-import { Calendar, Clock, BookOpen, GraduationCap, Users, ChevronDown, Bell, Sun, Moon } from "@/components/ui/proicons"
+import { Calendar, Clock, BookOpen, GraduationCap, Users, ChevronDown, Sun, Moon } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
 import { useTheme } from "next-themes"
 
 interface Horario {
@@ -131,12 +132,7 @@ export default function DocenteDashboard() {
                 </span>
               </div>
             )}
-            <button
-              aria-label="Notificaciones"
-              className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity"
-            >
-              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
-            </button>
+            <NotificationBell />
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Cambiar tema"

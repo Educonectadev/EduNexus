@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { 
   MessageCircle, Send, Search, ArrowLeft, 
-  Circle, CreditCard, Bell, Sun, Moon
+  Circle, CreditCard, Sun, Moon
 } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
 import { connectSocket, getSocket } from '@/lib/socket'
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
@@ -187,9 +188,7 @@ export default function MessagesPage() {
                 Mensajes
               </h1>
               <div className="flex items-center gap-2">
-                <button aria-label="Notificaciones" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity">
-                  <Bell className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-                </button>
+                <NotificationBell />
                 <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
                   <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />

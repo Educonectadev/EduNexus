@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Bell, Sun, Moon, ChevronDown } from "@/components/ui/proicons"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Sun, Moon, ChevronDown } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
@@ -327,9 +328,7 @@ export default function DocenteHorariosPage() {
                 </span>
               </div>
             )}
-            <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity">
-              <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
-            </button>
+            <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />

@@ -3,7 +3,8 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
-import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Flame, Clock, ChevronDown, ChevronLeft, ChevronRight, Bell, Sun, Moon } from "@/components/ui/proicons"
+import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Flame, Clock, ChevronDown, ChevronLeft, ChevronRight, Sun, Moon } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
@@ -158,9 +159,7 @@ function AsistenciaInner() {
               </span>
             </div>
           )}
-          <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity">
-            <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
-          </button>
+            <NotificationBell />
           <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
             <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
             <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
