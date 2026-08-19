@@ -148,7 +148,7 @@ export default function CursoDetallePage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black">
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
         <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
           <div className="h-6 w-48 bg-[#E5E5E5] dark:bg-[#3f3f46] rounded animate-pulse" />
           <div className="bg-white dark:bg-[#17171a] rounded-[30px] p-5 animate-pulse space-y-3">
@@ -174,7 +174,7 @@ export default function CursoDetallePage() {
 
   if (error) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black">
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
         <div className="p-6 md:p-8 pb-24 md:pb-8">
           <SbEmpty icon={BookOpen} title="No se pudo cargar el curso" description={error} />
         </div>
@@ -184,7 +184,7 @@ export default function CursoDetallePage() {
 
   if (!course) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black">
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
         <div className="p-6 md:p-8 pb-24 md:pb-8">
           <SbEmpty icon={BookOpen} title="Curso no encontrado" description="El curso no existe o no está asignado." />
         </div>
@@ -203,7 +203,7 @@ export default function CursoDetallePage() {
   ]
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black sb-note">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
       <Link href="/docente/cursos" className="inline-flex items-center gap-1.5 text-sm text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:hover:text-[#f4f4f5] transition-colors">
         <ArrowLeft className="h-4 w-4" />
