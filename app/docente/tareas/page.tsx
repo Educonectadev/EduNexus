@@ -228,10 +228,10 @@ function TareasInner() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
-      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
+    <div className="w-full h-full rounded-[20px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+      <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
-        <header className="flex items-start justify-between mb-5 gap-4">
+        <header className="flex items-start justify-between mb-4 gap-4">
           <div>
             <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
@@ -244,7 +244,7 @@ function TareasInner() {
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
+                <div className="h-6 w-6 rounded-xl flex items-center justify-center bg-black/10 dark:bg-white/10">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -266,7 +266,7 @@ function TareasInner() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { label: "Total", value: tasks.length, icon: ClipboardList },
             { label: "Pendientes", value: counts.pending, icon: Clock },
@@ -277,21 +277,10 @@ function TareasInner() {
             return (
               <div
                 key={s.label}
-                className="p-4"
-                style={{
-                  background: "var(--sb-surface-container)",
-                  borderRadius: "16px",
-                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-                }}
+                className="p-4 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors rounded-xl border border-black/5 dark:border-white/10"
               >
-                <div
-                  className="h-8 w-8 flex items-center justify-center mb-2"
-                  style={{
-                    background: "var(--sb-surface-container-high)",
-                    borderRadius: "10px"
-                  }}
-                >
-                  <Icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                <div className="h-9 w-9 flex items-center justify-center mb-2 rounded-xl bg-black/5 dark:bg-white/10">
+                  <Icon className="h-4 w-4 group-hover:scale-110 transition-transform" style={{ color: "var(--sb-on-surface-variant)" }} />
                 </div>
                 <p
                   className="text-[10px] font-bold uppercase tracking-[0.8px]"
@@ -304,7 +293,7 @@ function TareasInner() {
                   {s.label}
                 </p>
                 <p
-                  className="mt-1.5 text-lg font-bold leading-none"
+                  className="mt-1.5 text-[28px] font-bold leading-none"
                   style={{
                     color: "var(--sb-on-surface)",
                     fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
@@ -364,7 +353,7 @@ function TareasInner() {
                 <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
-                  className={`group rounded-xl border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] ${isOverdue ? 'border-red-500/30' : 'border-foreground/10'}`}>
+                  className={`group rounded-xl border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] hover:bg-black/5 dark:hover:bg-white/5 ${isOverdue ? 'border-red-500/30' : 'border-foreground/10'}`}>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -387,7 +376,7 @@ function TareasInner() {
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground/40">
+                      <div className="flex items-center gap-1.5 text-muted-foreground/40 group-hover:scale-110 transition-transform">
                         <Eye className="h-4 w-4" />
                       </div>
                     </div>
@@ -396,7 +385,7 @@ function TareasInner() {
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
-                          <Users className="h-3.5 w-3.5 text-muted-foreground/50" />
+                           <Users className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:scale-110 transition-transform" />
                           <span className="text-[10px] text-muted-foreground font-medium">{t.delivered_count}/{t.total_students} entregas</span>
                         </div>
                         <span className="text-[10px] text-muted-foreground font-medium">{Math.round(progress)}%</span>
@@ -418,18 +407,18 @@ function TareasInner() {
                   <div className="flex items-center gap-4 px-5 py-3 bg-foreground/5 border-t border-foreground/10">
                     {course && (
                       <div className="flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <BookOpen className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] text-muted-foreground font-medium">{course.name} - {course.grade}{course.section}</span>
                       </div>
                     )}
                     {t.subject && (
                       <div className="flex items-center gap-1.5">
-                        <GraduationCap className="h-3.5 w-3.5 text-muted-foreground/60" />
+                        <GraduationCap className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] text-muted-foreground font-medium">{t.subject}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
                       {t.start_date ? (
                         <span className={`text-[10px] font-medium ${
                           isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-muted-foreground'

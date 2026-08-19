@@ -25,11 +25,11 @@ interface CalEvent {
 }
 
 const typeColors: Record<string, string> = {
-  class: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",
-  meeting: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",
-  exam: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",
-  event: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",
-  virtual: "bg-[var(--note-fill-strong)] text-[var(--note-text)]",
+  class: "bg-black/10 dark:bg-white/10 text-[var(--note-text)]",
+  meeting: "bg-black/10 dark:bg-white/10 text-[var(--note-text)]",
+  exam: "bg-black/10 dark:bg-white/10 text-[var(--note-text)]",
+  event: "bg-black/10 dark:bg-white/10 text-[var(--note-text)]",
+  virtual: "bg-black/10 dark:bg-white/10 text-[var(--note-text)]",
 }
 
 const typeDot: Record<string, string> = {
@@ -86,8 +86,8 @@ export default function CalendarioPage() {
     .slice(0, 6)
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
-      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
+    <div className="w-full h-full rounded-[20px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
+      <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-4">
         {/* Header */}
         <header className="flex items-start justify-between pt-2 gap-4">
           <div>
@@ -102,7 +102,7 @@ export default function CalendarioPage() {
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
+                <div className="h-6 w-6 rounded-xl bg-black/10 dark:bg-white/10 flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -113,9 +113,9 @@ export default function CalendarioPage() {
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative group">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5] group-hover:scale-110" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5] group-hover:scale-110" />
             </button>
           </div>
         </header>
@@ -125,26 +125,26 @@ export default function CalendarioPage() {
         )}
 
         {loading ? (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-40 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />
-            <div className="h-64 rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />
+            <div className="space-y-4 animate-pulse">
+            <div className="h-40 rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />
+            <div className="h-64 rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)]" />
           </div>
         ) : (
           <>
             {/* Weekly schedule */}
             {weeklyClasses.length > 0 && (
-              <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
+              <div className="rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-8 w-8 rounded-[12px] bg-[var(--note-fill)] flex items-center justify-center">
-                    <BookOpen className="h-4 w-4 text-[var(--note-text)]" />
-                  </div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)]">Horario semanal</p>
+                <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen className="h-4 w-4 text-[var(--note-text)]" />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                <p className="text-[15px] font-bold uppercase tracking-[0.12em] text-[var(--note-muted)]">Horario semanal</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
                   {WEEK_DAYS.map((day, idx) => {
                     const dayEvents = weeklyClasses.filter(e => e.day_of_week === idx + 1).sort((a, b) => (a.start_time || "").localeCompare(b.start_time || ""))
                     return (
-                      <div key={day} className="rounded-[16px] bg-[var(--note-fill)] p-3 min-h-[90px]">
+                      <div key={day} className="rounded-[16px] bg-black/5 dark:bg-white/5 p-3 min-h-[90px] hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--note-muted)] mb-2">{day}</p>
                         {dayEvents.length === 0 ? (
                           <p className="text-[11px] text-[var(--note-muted)]/40">Libre</p>
@@ -166,16 +166,16 @@ export default function CalendarioPage() {
             )}
 
             {/* Calendar grid */}
-            <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
+            <div className="rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-5">
               <div className="flex items-center justify-between mb-4">
                 <button onClick={() => { if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(y => y - 1) } else setCurrentMonth(m => m - 1) }}
-                  className="p-2 rounded-[12px] hover:bg-[var(--note-fill)] transition-colors">
-                  <ChevronLeft className="h-4 w-4 text-[var(--note-muted)]" />
+                  className="p-2 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <ChevronLeft className="h-4 w-4 text-[var(--note-muted)] group-hover:scale-110 transition-transform" />
                 </button>
                 <p className="text-sm font-medium text-[var(--note-text)]">{monthNames[currentMonth]} {currentYear}</p>
                 <button onClick={() => { if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear(y => y + 1) } else setCurrentMonth(m => m + 1) }}
-                  className="p-2 rounded-[12px] hover:bg-[var(--note-fill)] transition-colors">
-                  <ChevronRight className="h-4 w-4 text-[var(--note-muted)]" />
+                  className="p-2 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                  <ChevronRight className="h-4 w-4 text-[var(--note-muted)] group-hover:scale-110 transition-transform" />
                 </button>
               </div>
               <div className="grid grid-cols-7 gap-1">
@@ -187,7 +187,7 @@ export default function CalendarioPage() {
                   const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()
                   return (
                     <div key={day} className={cn("relative flex flex-col items-center py-2 rounded-[12px] text-sm transition-colors",
-                      isToday ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "text-[var(--note-text)]/70 hover:bg-[var(--note-fill)]")}>
+                      isToday ? "bg-[var(--note-solid-bg)] text-[var(--note-solid-fg)]" : "text-[var(--note-text)]/70 hover:bg-black/10 dark:hover:bg-white/10")}>
                       {day}
                       {dayEvents.length > 0 && (
                         <div className="flex gap-0.5 mt-0.5">
@@ -209,9 +209,9 @@ export default function CalendarioPage() {
 
             {/* Upcoming events */}
             <div className="space-y-2.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--note-muted)] px-1">Próximos eventos</p>
+              <p className="text-[15px] font-bold uppercase tracking-[0.12em] text-[var(--note-muted)] px-1">Próximos eventos</p>
               {upcomingEvents.length === 0 && (
-                <div className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center text-sm text-[var(--note-muted)]">
+                <div className="rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)] py-8 text-center text-sm text-[var(--note-muted)]">
                   <CalendarIcon className="h-8 w-8 mx-auto mb-2 text-[var(--note-muted)]/40" />
                   Sin eventos próximos
                 </div>
@@ -219,8 +219,8 @@ export default function CalendarioPage() {
               <AnimatePresence>
                 {upcomingEvents.map((e, i) => (
                   <motion.div key={e.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    className="rounded-[24px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4 flex items-center gap-4 hover:border-[var(--note-hairline-strong)] transition-colors">
-                    <div className={cn("h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0", typeColors[e.type])}>
+                    className="rounded-[20px] border border-[var(--note-hairline)] bg-[var(--note-surface)] p-4 flex items-center gap-3 hover:border-[var(--note-hairline-strong)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0 bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform", typeColors[e.type])}>
                       {e.type === "virtual" ? <Video className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -235,11 +235,11 @@ export default function CalendarioPage() {
                     </div>
                     {e.meeting_url ? (
                       <a href={e.meeting_url} target="_blank" rel="noreferrer"
-                        className="text-[10px] font-medium px-2.5 py-1 rounded-[12px] bg-[var(--note-fill-strong)] text-[var(--note-text)] shrink-0 hover:opacity-90 transition-opacity">
+                        className="text-[10px] font-medium px-2.5 py-1 rounded-xl bg-black/10 dark:bg-white/10 text-[var(--note-text)] shrink-0 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
                         Unirse
                       </a>
                     ) : (
-                      <span className="text-[10px] font-medium px-2.5 py-1 rounded-[12px] bg-[var(--note-fill)] text-[var(--note-muted)] shrink-0">{typeLabels[e.type]}</span>
+                      <span className="text-[10px] font-medium px-2.5 py-1 rounded-xl bg-black/5 dark:bg-white/10 text-[var(--note-muted)] shrink-0">{typeLabels[e.type]}</span>
                     )}
                   </motion.div>
                 ))}

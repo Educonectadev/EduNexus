@@ -222,10 +222,10 @@ function CalificacionesInner() {
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
-      <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
+      <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
-        <header className="mb-5">
-          <div className="flex items-start justify-between gap-4">
+        <header className="mb-4">
+          <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
@@ -238,7 +238,7 @@ function CalificacionesInner() {
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
+                <div className="h-6 w-6 rounded-xl flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -249,7 +249,7 @@ function CalificacionesInner() {
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative">
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
@@ -364,13 +364,7 @@ function CalificacionesInner() {
                     border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
                   }}
                 >
-                  <div
-                    className="h-8 w-8 flex items-center justify-center mb-2"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "10px"
-                    }}
-                  >
+                  <div className="h-9 w-9 flex items-center justify-center mb-2 bg-black/5 dark:bg-white/10 rounded-xl">
                     <s.icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
                   <p
@@ -413,7 +407,7 @@ function CalificacionesInner() {
                     <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25, delay: i * 0.03 }}
                       onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-foreground/5 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
+                      className="flex items-center justify-between px-4 py-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`h-10 w-10 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
                           <span className="text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
@@ -465,11 +459,11 @@ function CalificacionesInner() {
                   </div>
 
                   {selected.grades.length > 0 && (
-                    <div className="rounded-xl bg-foreground/5 p-3 mb-4">
+                    <div className="rounded-xl bg-black/5 dark:bg-white/5 p-3 mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Rendimiento</span>
+                          <span className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider">Rendimiento</span>
                         </div>
                         <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
                       </div>
@@ -485,10 +479,10 @@ function CalificacionesInner() {
                   )}
 
                   <div className="mb-4">
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Historial de Notas</p>
+                    <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Historial de Notas</p>
                     <div className="space-y-2">
                       {selected.grades.map((g) => (
-                        <div key={g.id} className="flex items-center gap-3 rounded-xl bg-foreground/5 px-4 py-3 group">
+                        <div key={g.id} className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-4 py-3 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
                           {editGradeId === g.id ? (
                             <>
                               <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
@@ -537,8 +531,8 @@ function CalificacionesInner() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-foreground/5 p-4">
-                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Agregar Nota</p>
+                  <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4">
+                    <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Agregar Nota</p>
                     <div className="grid grid-cols-3 gap-2">
                       <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
                         className="sbf-native-select text-sm">
@@ -567,14 +561,14 @@ function CalificacionesInner() {
           <SbModalBody>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
+                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
                 <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }}
                   className="sbf-native-select w-full">
                   {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Alumno</label>
+                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Alumno</label>
                 <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} disabled={registerCourseId !== courseId}
                   className="sbf-native-select w-full disabled:opacity-50">
                   <option value="">{registerCourseId === courseId ? "Seleccionar alumno..." : "Selecciona primero el curso en la vista"}</option>
@@ -582,14 +576,14 @@ function CalificacionesInner() {
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bimestre</label>
+                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bimestre</label>
                 <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="sbf-native-select w-full">
                   <option value="">Seleccionar bimestre...</option>
                   {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
+                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
                 <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
                   className="sb-input rounded-xl text-sm h-10 w-full" />
               </div>

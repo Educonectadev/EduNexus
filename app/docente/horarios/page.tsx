@@ -303,7 +303,7 @@ export default function DocenteHorariosPage() {
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
-      <div className="p-6 md:p-8 pb-24 md:pb-8">
+      <div className="p-5 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <div className="flex items-start justify-between mb-8 gap-4">
           <div>
@@ -318,7 +318,7 @@ export default function DocenteHorariosPage() {
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
+                <div className="h-6 w-6 rounded-xl flex items-center justify-center bg-black/10 dark:bg-white/10">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -329,7 +329,7 @@ export default function DocenteHorariosPage() {
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative">
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
@@ -337,22 +337,42 @@ export default function DocenteHorariosPage() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Jornada</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">Lun – Vie</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Jornada</p>
+              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                <Sun className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
+              </div>
+            </div>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">Lun – Vie</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Clases</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalClasses}</p>
+          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Clases</p>
+              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
+              </div>
+            </div>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalClasses}</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Horas/sem</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalHours}h</p>
+          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Horas/sem</p>
+              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
+              </div>
+            </div>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalHours}h</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
-            <p className="text-[12px] font-medium mb-3 text-[#666] dark:text-[#a1a1aa]">Cursos</p>
-            <p className="text-[32px] font-bold text-[#000] dark:text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
+          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Cursos</p>
+              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
+              </div>
+            </div>
+            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
           </div>
         </div>
 
@@ -365,7 +385,7 @@ export default function DocenteHorariosPage() {
         >
           <button
             onClick={() => setActiveDay(null)}
-            className="px-3 py-1.5 text-xs font-medium transition-all shrink-0"
+            className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 hover:bg-black/10 dark:hover:bg-white/10"
             style={{
               borderRadius: "10px",
               border: "1.5px solid",
@@ -381,7 +401,7 @@ export default function DocenteHorariosPage() {
             <button
               key={day}
               onClick={() => setActiveDay(activeDay === day ? null : day)}
-              className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"
+              className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 flex items-center gap-1.5 hover:bg-black/10 dark:hover:bg-white/10"
               style={{
                 borderRadius: "10px",
                 border: "1.5px solid",
@@ -515,7 +535,7 @@ export default function DocenteHorariosPage() {
                           <React.Fragment key={h.id}>
                             <button
                               onClick={() => handleHorarioClick(h)}
-                              className="w-full text-left p-3 transition-all"
+                              className="w-full text-left p-3 transition-all hover:bg-black/5 dark:hover:bg-white/5"
                               style={{
                                 borderRadius: "12px",
                                 border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
