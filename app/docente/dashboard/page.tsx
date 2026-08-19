@@ -126,7 +126,7 @@ export default function DocenteDashboard() {
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-[11px] text-[#666] dark:text-[#a1a1aa] truncate max-w-[160px]">
+                <span className="text-sm md:text-base font-medium text-[#000] dark:text-[#f4f4f5] whitespace-nowrap">
                   {user.full_name}
                 </span>
               </div>
