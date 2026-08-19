@@ -101,7 +101,7 @@ export default function CalendarioPage() {
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full bg-[#F5F5F5] dark:bg-[#3f3f46] flex items-center justify-center">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -111,10 +111,10 @@ export default function CalendarioPage() {
                 </span>
               </div>
             )}
-            <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity">
+            <button aria-label="Notificaciones" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity">
               <Bell className="h-[18px] w-[18px] text-[#000] dark:text-[#f4f4f5]" />
             </button>
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full bg-white dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
             </button>
