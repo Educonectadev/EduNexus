@@ -103,25 +103,25 @@ export default function CursosPage() {
 
         {/* ═══════════════ 4 STAT CARDS (idénticas al dashboard) ═══════════════ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Mis cursos</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : courses.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Total alumnos</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Promedio/curso</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : avgStudents}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Grados</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : gradesCount}
@@ -136,7 +136,7 @@ export default function CursosPage() {
           <div className="flex flex-col gap-4">
 
             {/* Acciones rápidas */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
                 <p className="text-[16px] font-semibold text-[#f4f4f5]">Acciones rápidas</p>
                 <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
@@ -184,7 +184,7 @@ export default function CursosPage() {
             </div>
 
             {/* Resumen */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] bg-[#17171a]">
               <p className="text-[16px] font-semibold mb-5 text-[#f4f4f5]">Resumen</p>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -222,7 +222,7 @@ export default function CursosPage() {
           <div className="flex flex-col gap-4">
 
             {/* Mis Cursos */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
                 <p className="text-[16px] font-semibold text-[#f4f4f5]">Mis Cursos</p>
                 <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
@@ -257,7 +257,7 @@ export default function CursosPage() {
             </div>
 
             {/* Horario de hoy */}
-            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] flex-1 bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
                 <p className="text-[16px] font-semibold text-[#f4f4f5]">Horario de hoy</p>
                 <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">

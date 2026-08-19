@@ -338,19 +338,19 @@ export default function DocenteHorariosPage() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Jornada</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">Lun – Vie</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Clases</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">{totalClasses}</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Horas/sem</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">{totalHours}h</p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Cursos</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
           </div>

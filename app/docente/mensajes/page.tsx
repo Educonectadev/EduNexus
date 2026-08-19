@@ -178,10 +178,10 @@ export default function MessagesPage() {
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
       <div className="h-full flex">
-        <div className={`w-80 bg-white dark:bg-[#17171a] flex flex-col ${
+        <div className={`w-80 bg-[#17171a] flex flex-col ${
           selectedContact ? 'hidden md:flex' : 'flex'
         }`}>
-          <div className="p-4 border-b border-[#E5E5E5] dark:border-[#27272a]">
+          <div className="p-4 border-b border-[#3f3f46] dark:border-[#27272a]">
             <div className="flex items-center justify-between mb-3">
               <h1 className="text-xl font-bold text-[#f4f4f5] flex items-center gap-2">
                 <MessageCircle className="w-5 h-5" />
@@ -189,15 +189,15 @@ export default function MessagesPage() {
               </h1>
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
+                <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#27272a] hover:opacity-80 transition-opacity relative">
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
                   <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
                 </button>
               </div>
             </div>
             {user && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5F5F5] dark:bg-[#27272a]">
-                <div className="h-6 w-6 rounded-full bg-[#E5E5E5] dark:bg-[#3f3f46] flex items-center justify-center">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#27272a]">
+                <div className="h-6 w-6 rounded-full bg-[#3f3f46] flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
@@ -212,7 +212,7 @@ export default function MessagesPage() {
               <input
                 type="text"
                 placeholder="Buscar contactos..."
-                className="w-full pl-9 pr-4 py-2 bg-[#F5F5F5] dark:bg-[#27272a] border border-[#E5E5E5] dark:border-[#3f3f46] rounded-[6px] text-sm text-[#f4f4f5] placeholder:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
+                className="w-full pl-9 pr-4 py-2 bg-[#27272a] border border-[#3f3f46] dark:border-[#3f3f46] rounded-[6px] text-sm text-[#f4f4f5] placeholder:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
               />
             </div>
           </div>
@@ -228,11 +228,11 @@ export default function MessagesPage() {
                   key={contact.id}
                   onClick={() => selectContact(contact)}
                   className={`w-full p-4 flex items-center gap-3 hover:bg-[#F5F5F5] dark:hover:bg-[#27272a] transition-colors text-left ${
-                    selectedContact?.id === contact.id ? 'bg-[#E5E5E5] dark:bg-[#27272a]' : ''
+                    selectedContact?.id === contact.id ? 'bg-[#27272a]' : ''
                   }`}
                 >
                   <div className="relative">
-                    <div className="w-10 h-10 bg-[#E5E5E5] dark:bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
+                    <div className="w-10 h-10 bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
                       <span className="text-sm font-medium text-[#f4f4f5]">
                         {contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
@@ -258,7 +258,7 @@ export default function MessagesPage() {
 
         <div className={`flex-1 flex flex-col ${!selectedContact ? 'hidden md:flex' : 'flex'}`}>
           {!selectedContact ? (
-            <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#17171a]">
+            <div className="flex-1 flex items-center justify-center bg-[#17171a]">
               <div className="text-center">
                 <MessageCircle className="w-12 h-12 text-[#E5E5E5] dark:text-[#3f3f46] mx-auto mb-4" />
                 <p className="text-[#a1a1aa]">Selecciona un contacto para chatear</p>
@@ -266,14 +266,14 @@ export default function MessagesPage() {
             </div>
           ) : (
             <>
-              <div className="p-4 bg-white dark:bg-[#17171a] border-b border-[#E5E5E5] dark:border-[#27272a] flex items-center gap-3">
+              <div className="p-4 bg-[#17171a] border-b border-[#3f3f46] dark:border-[#27272a] flex items-center gap-3">
                 <button
                   onClick={() => setSelectedContact(null)}
                   className="md:hidden p-2 hover:bg-[#F5F5F5] dark:hover:bg-[#27272a] rounded-[6px]"
                 >
                   <ArrowLeft className="w-5 h-5 text-[#f4f4f5]" />
                 </button>
-                <div className="w-10 h-10 bg-[#E5E5E5] dark:bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
+                <div className="w-10 h-10 bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
                   <span className="text-sm font-medium text-[#f4f4f5]">
                     {selectedContact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </span>
@@ -294,7 +294,7 @@ export default function MessagesPage() {
                   >
                     <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-[6px] ${
                       msg.sender_id === selectedContact.id
-                        ? 'bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#f4f4f5]'
+                        ? 'bg-[#3f3f46] text-[#f4f4f5]'
                         : 'bg-[#000] dark:bg-white text-white dark:text-black'
                     }`}>
                       <p className="text-sm">{msg.message}</p>
@@ -310,7 +310,7 @@ export default function MessagesPage() {
                 ))}
                 {typing && (
                   <div className="flex justify-start">
-                    <div className="bg-[#E5E5E5] dark:bg-[#3f3f46] px-4 py-2 rounded-[6px]">
+                    <div className="bg-[#3f3f46] px-4 py-2 rounded-[6px]">
                       <p className="text-sm text-[#a1a1aa]">Escribiendo...</p>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export default function MessagesPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="p-4 bg-white dark:bg-[#17171a] border-t border-[#E5E5E5] dark:border-[#27272a]">
+              <div className="p-4 bg-[#17171a] border-t border-[#3f3f46] dark:border-[#27272a]">
                 <div className="flex items-center gap-3">
                   <input
                     type="text"
@@ -326,7 +326,7 @@ export default function MessagesPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Escribe un mensaje..."
-                    className="flex-1 px-4 py-3 bg-[#F5F5F5] dark:bg-[#27272a] border border-[#E5E5E5] dark:border-[#3f3f46] rounded-[6px] text-[#f4f4f5] placeholder:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
+                    className="flex-1 px-4 py-3 bg-[#27272a] border border-[#3f3f46] dark:border-[#3f3f46] rounded-[6px] text-[#f4f4f5] placeholder:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
                   />
                   <button
                     onClick={sendMessage}

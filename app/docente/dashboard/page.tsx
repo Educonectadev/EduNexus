@@ -147,25 +147,25 @@ export default function DocenteDashboard() {
 
         {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Mis cursos</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : courses.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Total alumnos</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : totalStudents.toLocaleString()}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Clases hoy</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : todaySchedule.length}
             </p>
           </div>
-          <div className="p-5 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-5 rounded-[30px] bg-[#17171a]">
             <p className="text-[12px] font-medium mb-3 text-[#a1a1aa]">Horas hoy</p>
             <p className="text-[32px] font-bold text-[#f4f4f5]">
               {loading ? "—" : `${hoursToday}h`}
@@ -180,7 +180,7 @@ export default function DocenteDashboard() {
           <div className="flex flex-col gap-4">
 
             {/* Horario de hoy */}
-            <div className="p-6 rounded-[30px] flex-1 bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] flex-1 bg-[#17171a]">
               <div className="flex items-center justify-between mb-5">
                 <p className="text-[16px] font-semibold text-[#f4f4f5]">Horario de hoy</p>
                 <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
@@ -214,7 +214,7 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Mis Cursos */}
-            <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+            <div className="p-6 rounded-[30px] bg-[#17171a]">
               <p className="text-[16px] font-semibold mb-5 text-[#f4f4f5]">Mis Cursos</p>
               {courses.length === 0 ? (
                 <div className="py-6 text-center">
@@ -241,7 +241,7 @@ export default function DocenteDashboard() {
           </div>
 
           {/* ──── RIGHT COLUMN: Asistencia de hoy ──── */}
-          <div className="p-6 rounded-[30px] bg-white dark:bg-[#17171a]">
+          <div className="p-6 rounded-[30px] bg-[#17171a]">
             <div className="flex items-center justify-between mb-5">
               <p className="text-[16px] font-semibold text-[#f4f4f5]">Asistencia de hoy</p>
               <button className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-full bg-[#D9D9D9] dark:bg-[#27272a] text-[#a1a1aa]">
