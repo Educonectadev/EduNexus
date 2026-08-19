@@ -302,7 +302,7 @@ export default function DocenteHorariosPage() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <div className="flex items-start justify-between mb-8 gap-4">

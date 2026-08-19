@@ -86,7 +86,7 @@ export default function CalendarioPage() {
     .slice(0, 6)
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-[#BABABA] dark:bg-[#1a1a1c] sb-note">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-black sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
         <header className="flex items-start justify-between pt-2 gap-4">
