@@ -228,30 +228,24 @@ function TareasInner() {
   }
 
   return (
-    <div className="w-full h-full rounded-[20px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
-      <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
         {/* Header */}
-        <header className="flex items-start justify-between mb-4 gap-4">
+        <header className="flex items-start justify-between mb-6 gap-4">
           <div>
             <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
-              Tareas
-            </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">
-              Gestiona las tareas de tus alumnos
-            </p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">Tareas</h1>
+            <p className="text-[13px] mt-2 text-[#a1a1aa]">Gestiona las tareas de tus alumnos</p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-xl flex items-center justify-center bg-black/10 dark:bg-white/10">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center">
                   <span className="text-[9px] font-semibold text-[#f4f4f5]">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
-                  {user.full_name}
-                </span>
+                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">{user.full_name}</span>
               </div>
             )}
             <NotificationBell />
@@ -259,83 +253,72 @@ function TareasInner() {
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
             </button>
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setDialogOpen(true)}>
+            <button
+              onClick={() => setDialogOpen(true)}
+              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-2xl bg-white text-black hover:bg-white/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
               <Plus className="h-4 w-4" /> Nueva tarea
-            </SbBtn>
+            </button>
           </div>
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
           {[
-            { label: "Total", value: tasks.length, icon: ClipboardList },
-            { label: "Pendientes", value: counts.pending, icon: Clock },
-            { label: "Entregadas", value: counts.delivered, icon: CheckCircle2 },
-            { label: "Calificadas", value: counts.graded, icon: CheckCircle2 },
+            { label: "Total", value: tasks.length, icon: ClipboardList, iconBg: "bg-black/5 dark:bg-white/10" },
+            { label: "Pendientes", value: counts.pending, icon: Clock, iconBg: "bg-amber-500/15" },
+            { label: "Entregadas", value: counts.delivered, icon: CheckCircle2, iconBg: "bg-blue-500/15" },
+            { label: "Calificadas", value: counts.graded, icon: CheckCircle2, iconBg: "bg-emerald-500/15" },
           ].map(s => {
             const Icon = s.icon
             return (
-              <div
-                key={s.label}
-                className="p-4 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors rounded-xl border border-black/5 dark:border-white/10"
-              >
-                <div className="h-9 w-9 flex items-center justify-center mb-2 rounded-xl bg-black/5 dark:bg-white/10">
-                  <Icon className="h-4 w-4 group-hover:scale-110 transition-transform" style={{ color: "var(--sb-on-surface-variant)" }} />
+              <div key={s.label} className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
+                <div className={`h-9 w-9 rounded-xl ${s.iconBg} flex items-center justify-center mb-3`}>
+                  <Icon className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                 </div>
-                <p
-                  className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                  style={{
-                    color: "var(--sb-on-surface-variant)",
-                    opacity: 0.45,
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
-                  {s.label}
-                </p>
-                <p
-                  className="mt-1.5 text-[28px] font-bold leading-none"
-                  style={{
-                    color: "var(--sb-on-surface)",
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
-                  {s.value}
-                </p>
+                <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">{s.label}</p>
+                <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">{s.value}</p>
               </div>
             )
           })}
         </div>
 
         {/* Search + Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+        <div className="flex flex-col sm:flex-row gap-3 mb-5">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#666]" />
             <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              className="sb-input rounded-xl text-sm h-10 w-full pl-9" />
+              className="w-full h-11 pl-11 pr-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
           </div>
-          <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)} className="sbf-native-select sm:w-56">
-            <option value="">Todos los cursos</option>
+          <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
+            className="h-11 px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer sm:w-56">
+            <option value="" className="bg-[#1a1a1c] text-white">Todos los cursos</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id}>{c.name} - {c.grade}{c.section}</option>
+              <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">{c.name} - {c.grade} {c.section}</option>
             ))}
           </select>
-          <div className="nb-rail">
-            {([
-              { key: 'all', label: 'Todas' },
-              { key: 'pending', label: 'Pendientes' },
-              { key: 'delivered', label: 'Entregadas' },
-              { key: 'graded', label: 'Calificadas' },
-            ]).map(f => (
-              <button key={f.key} onClick={() => setFilter(f.key)}
-                className={cn("nb-chip", filter === f.key && "active")}>
-                <Check className="nb-chip-check" />
-                {f.label}
-                <span className="nb-chip-count">
-                  {counts[f.key as keyof typeof counts]}
-                </span>
-              </button>
-            ))}
-          </div>
+        </div>
+
+        {/* Filter tabs */}
+        <div className="flex items-center gap-2 p-1 rounded-2xl bg-white/5 mb-5">
+          {([
+            { key: 'all', label: 'Todas' },
+            { key: 'pending', label: 'Pendientes' },
+            { key: 'delivered', label: 'Entregadas' },
+            { key: 'graded', label: 'Calificadas' },
+          ]).map(f => (
+            <button key={f.key} onClick={() => setFilter(f.key)}
+              className={cn(
+                "flex-1 h-10 text-[12px] font-semibold flex items-center justify-center gap-1.5 rounded-xl transition-all duration-200",
+                filter === f.key
+                  ? "bg-white text-black shadow-md"
+                  : "text-[#a1a1aa] hover:text-white hover:bg-white/10"
+              )}>
+              <Check className="h-3.5 w-3.5" />
+              {f.label}
+              <span className="text-[10px] opacity-60">{counts[f.key as keyof typeof counts]}</span>
+            </button>
+          ))}
         </div>
 
         {/* Task list */}
@@ -353,7 +336,7 @@ function TareasInner() {
                 <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
-                  className={`group rounded-xl border bg-[var(--note-surface)] overflow-hidden cursor-pointer transition-all duration-150 hover:border-[var(--note-hairline-strong)] hover:bg-black/5 dark:hover:bg-white/5 ${isOverdue ? 'border-red-500/30' : 'border-foreground/10'}`}>
+                  className={`group rounded-[20px] bg-white dark:bg-[#17171a] overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg ${isOverdue ? 'ring-1 ring-red-500/30' : ''}`}>
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -366,18 +349,18 @@ function TareasInner() {
                             {pc.label}
                           </span>
                           {isOverdue && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-xl bg-red-500/10 text-red-500">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-xl bg-red-500/15 text-red-400">
                               <AlertTriangle className="h-3 w-3" /> Vencida
                             </span>
                           )}
                         </div>
-                        <p className="text-sm font-semibold text-foreground">{t.title}</p>
+                        <p className="text-[14px] font-bold text-[#000] dark:text-[#f4f4f5]">{t.title}</p>
                         {t.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
+                          <p className="text-[12px] text-[#666] dark:text-[#a1a1aa] mt-1 line-clamp-2">{t.description}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground/40 group-hover:scale-110 transition-transform">
-                        <Eye className="h-4 w-4" />
+                      <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                        <Eye className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                       </div>
                     </div>
 
@@ -385,18 +368,18 @@ function TareasInner() {
                     <div className="mt-3">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
-                           <Users className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:scale-110 transition-transform" />
-                          <span className="text-[10px] text-muted-foreground font-medium">{t.delivered_count}/{t.total_students} entregas</span>
+                          <Users className="h-3.5 w-3.5 text-[#666] dark:text-[#a1a1aa]" />
+                          <span className="text-[10px] text-[#666] dark:text-[#a1a1aa] font-medium">{t.delivered_count}/{t.total_students} entregas</span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-medium">{Math.round(progress)}%</span>
+                        <span className="text-[10px] text-[#666] dark:text-[#a1a1aa] font-medium">{Math.round(progress)}%</span>
                       </div>
-                      <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
+                      <div className="h-2 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${progress}%` }}
                           transition={{ duration: 0.8, delay: 0.2 + i * 0.05 }}
                           className={`h-full rounded-full ${
-                            progress >= 80 ? 'bg-emerald-400' : progress >= 40 ? 'bg-amber-400' : 'bg-red-400'
+                            progress >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : progress >= 40 ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-red-400 to-red-500'
                           }`}
                         />
                       </div>
@@ -404,33 +387,32 @@ function TareasInner() {
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center gap-4 px-5 py-3 bg-foreground/5 border-t border-foreground/10">
+                  <div className="flex items-center gap-4 px-5 py-3 bg-black/[0.03] dark:bg-white/[0.03] border-t border-black/5 dark:border-white/5">
                     {course && (
                       <div className="flex items-center gap-1.5">
-                        <BookOpen className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] text-muted-foreground font-medium">{course.name} - {course.grade}{course.section}</span>
+                        <BookOpen className="h-3.5 w-3.5 text-[#666] dark:text-[#a1a1aa]" />
+                        <span className="text-[10px] text-[#666] dark:text-[#a1a1aa] font-medium">{course.name} - {course.grade} {course.section}</span>
                       </div>
                     )}
                     {t.subject && (
                       <div className="flex items-center gap-1.5">
-                        <GraduationCap className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] text-muted-foreground font-medium">{t.subject}</span>
+                        <GraduationCap className="h-3.5 w-3.5 text-[#666] dark:text-[#a1a1aa]" />
+                        <span className="text-[10px] text-[#666] dark:text-[#a1a1aa] font-medium">{t.subject}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-muted-foreground/60 group-hover:scale-110 transition-transform" />
+                      <Calendar className="h-3.5 w-3.5 text-[#666] dark:text-[#a1a1aa]" />
                       {t.start_date ? (
                         <span className={`text-[10px] font-medium ${
-                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-muted-foreground'
+                          isOverdue ? 'text-red-400' : daysLeft <= 3 ? 'text-amber-400' : 'text-[#666] dark:text-[#a1a1aa]'
                         }`}>
                           {new Date(t.start_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} → {new Date(t.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}
-                          {isOverdue ? ' (vencida)' : daysLeft === 0 ? ' (hoy)' : ''}
                         </span>
                       ) : (
                         <span className={`text-[10px] font-medium ${
-                          isOverdue ? 'text-red-500' : daysLeft <= 3 ? 'text-amber-600' : 'text-muted-foreground'
+                          isOverdue ? 'text-red-400' : daysLeft <= 3 ? 'text-amber-400' : 'text-[#666] dark:text-[#a1a1aa]'
                         }`}>
-                          {isOverdue ? `Vencida hace ${Math.abs(daysLeft)} dias` : daysLeft === 0 ? 'Vence hoy' : daysLeft === 1 ? 'Vence manana' : `Vence en ${daysLeft} dias`}
+                          {isOverdue ? `Vencida hace ${Math.abs(daysLeft)} días` : daysLeft === 0 ? 'Vence hoy' : daysLeft === 1 ? 'Vence mañana' : `Vence en ${daysLeft} días`}
                         </span>
                       )}
                     </div>
@@ -441,56 +423,19 @@ function TareasInner() {
           </AnimatePresence>
 
           {!loading && filtered.length === 0 && (
-            <div
-              className="py-16 text-center"
-              style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "20px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-              }}
-            >
-              <ClipboardList
-                className="h-10 w-10 mx-auto mb-3"
-                style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
-              />
-              <p
-                className="text-xs"
-                style={{
-                  color: "var(--sb-on-surface-variant)",
-                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                }}
-              >
-                No hay tareas en esta categoría
-              </p>
+            <div className="py-20 text-center rounded-[20px] bg-white dark:bg-[#17171a]">
+              <div className="h-16 w-16 rounded-3xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
+                <ClipboardList className="h-7 w-7 text-[#666] dark:text-[#a1a1aa]" />
+              </div>
+              <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] mb-1">No hay tareas en esta categoría</p>
+              <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Crea una nueva tarea para comenzar</p>
             </div>
           )}
 
           {loading && (
-            <div
-              className="py-8 text-center"
-              style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "20px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-              }}
-            >
-              <div
-                className="h-5 w-5 border-2 animate-spin mx-auto mb-2"
-                style={{
-                  borderColor: "color-mix(in srgb, var(--sb-on-surface-variant) 20%, transparent)",
-                  borderTopColor: "var(--sb-on-surface)",
-                  borderRadius: "999px"
-                }}
-              />
-              <p
-                className="text-xs"
-                style={{
-                  color: "var(--sb-on-surface-variant)",
-                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                }}
-              >
-                Cargando tareas...
-              </p>
+            <div className="py-20 text-center rounded-[20px] bg-white dark:bg-[#17171a]">
+              <div className="h-8 w-8 border-2 border-black/10 dark:border-white/10 border-t-[#000] dark:border-t-white rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-sm text-[#666] dark:text-[#a1a1aa]">Cargando tareas...</p>
             </div>
           )}
         </div>
@@ -499,69 +444,66 @@ function TareasInner() {
         <SbModal open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="520px">
           <SbModalHeader title="Nueva tarea" onClose={() => setDialogOpen(false)} />
           <SbModalBody>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+            <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso *</label>
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Curso *</label>
                 <select value={formData.course_id} onChange={e => setFormData({...formData, course_id: e.target.value})}
-                  className="sbf-native-select w-full">
-                  <option value="">Seleccionar curso</option>
+                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer">
+                  <option value="" className="bg-[#1a1a1c] text-[#666]">Seleccionar curso</option>
                   {courses.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} - {c.grade}{c.section} ({c.student_count} alumnos)</option>
+                    <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">{c.name} - {c.grade} {c.section} ({c.student_count} alumnos)</option>
                   ))}
                 </select>
               </div>
-
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Titulo de la tarea *</label>
-                <input placeholder="Ej: Ejercicios de algebra - Cap. 3" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
-                  className="sb-input rounded-xl text-sm h-10 w-full" />
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Título de la tarea *</label>
+                <input placeholder="Ej: Ejercicios de álgebra - Cap. 3" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
+                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Asignatura</label>
-                  <input placeholder="Ej: Matematica" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}
-                    className="sb-input rounded-xl text-sm h-10 w-full" />
+                  <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Asignatura</label>
+                  <input placeholder="Ej: Matemática" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}
+                    className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Prioridad</label>
+                  <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Prioridad</label>
                   <select value={formData.priority} onChange={e => setFormData({...formData, priority: e.target.value as any})}
-                    className="sbf-native-select w-full">
-                    <option value="low">Baja</option>
-                    <option value="medium">Media</option>
-                    <option value="high">Alta</option>
+                    className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer">
+                    <option value="low" className="bg-[#1a1a1c] text-white">Baja</option>
+                    <option value="medium" className="bg-[#1a1a1c] text-white">Media</option>
+                    <option value="high" className="bg-[#1a1a1c] text-white">Alta</option>
                   </select>
                 </div>
               </div>
-
-              <div className="rounded-xl bg-foreground/5 p-4 space-y-3">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Fechas de la tarea</p>
+              <div className="rounded-2xl bg-black/5 dark:bg-white/5 p-4 space-y-3">
+                <p className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider">Fechas de la tarea</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Fecha de inicio</label>
+                    <label className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1 block">Fecha de inicio</label>
                     <input type="date" value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})}
-                      className="sb-input rounded-xl text-sm h-10 w-full" />
-                    <p className="text-[9px] text-muted-foreground/60 mt-1">Desde cuando esta disponible</p>
+                      className="h-10 w-full px-3 text-sm font-medium rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
+                    <p className="text-[9px] text-[#666] dark:text-[#a1a1aa] mt-1">Desde cuándo está disponible</p>
                   </div>
                   <div>
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Fecha de vencimiento *</label>
+                    <label className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1 block">Fecha de vencimiento *</label>
                     <input type="date" value={formData.due_date} onChange={e => setFormData({...formData, due_date: e.target.value})}
-                      className="sb-input rounded-xl text-sm h-10 w-full" />
-                    <p className="text-[9px] text-muted-foreground/60 mt-1">Ultimo dia para entregar</p>
+                      className="h-10 w-full px-3 text-sm font-medium rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
+                    <p className="text-[9px] text-[#666] dark:text-[#a1a1aa] mt-1">Último día para entregar</p>
                   </div>
                 </div>
               </div>
-
               <div>
-                <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Descripcion e instrucciones</label>
-                <textarea placeholder="Describe detalladamente la tarea: objetivos, requisitos, criterios de evaluacion, material de referencia..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="sb-input rounded-xl text-sm h-24 w-full resize-none" />
+                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Descripción e instrucciones</label>
+                <textarea placeholder="Describe detalladamente la tarea..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
+                  className="w-full px-4 py-3 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all resize-none h-24" />
               </div>
-            </motion.div>
+            </div>
           </SbModalBody>
           <SbModalFooter>
-            <SbBtn rounded onClick={() => setDialogOpen(false)}>Cancelar</SbBtn>
-            <SbBtn variant="filled" rounded disabled={!formData.title || !formData.course_id} onClick={handleCreate}>Crear tarea</SbBtn>
+            <button onClick={() => setDialogOpen(false)} className="h-10 px-5 text-sm font-semibold rounded-2xl bg-white/5 text-[#a1a1aa] hover:bg-white/10 transition-all">Cancelar</button>
+            <button disabled={!formData.title || !formData.course_id} onClick={handleCreate}
+              className="h-10 px-6 text-sm font-bold rounded-2xl bg-white text-black hover:bg-white/90 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98]">Crear tarea</button>
           </SbModalFooter>
         </SbModal>
 
@@ -571,26 +513,26 @@ function TareasInner() {
             <>
               <SbModalHeader title={selectedTask.title} onClose={() => { setDetailOpen(false); setSelectedTask(null) }} />
               <SbModalBody>
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                <div className="space-y-5">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl bg-foreground/5 p-3">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Estado</p>
+                    <div className="rounded-2xl bg-black/5 dark:bg-white/5 p-3">
+                      <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Estado</p>
                       <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-xl ${statusConfig[selectedTask.status].bg} ${statusConfig[selectedTask.status].color}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${statusConfig[selectedTask.status].dot}`} />
                         {statusConfig[selectedTask.status].label}
                       </span>
                     </div>
-                    <div className="rounded-xl bg-foreground/5 p-3">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Prioridad</p>
+                    <div className="rounded-2xl bg-black/5 dark:bg-white/5 p-3">
+                      <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Prioridad</p>
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-xl ${priorityConfig[selectedTask.priority].bg} ${priorityConfig[selectedTask.priority].color}`}>
                         {priorityConfig[selectedTask.priority].label}
                       </span>
                     </div>
-                    <div className="col-span-2 rounded-xl bg-foreground/5 p-3">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Fechas</p>
+                    <div className="col-span-2 rounded-2xl bg-black/5 dark:bg-white/5 p-3">
+                      <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Fechas</p>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-foreground">
+                        <Calendar className="h-3.5 w-3.5 text-[#666] dark:text-[#a1a1aa]" />
+                        <span className="text-[12px] font-medium text-[#000] dark:text-[#f4f4f5]">
                           {selectedTask.start_date
                             ? `${new Date(selectedTask.start_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })} → ${new Date(selectedTask.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}`
                             : `Hasta el ${new Date(selectedTask.due_date).toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' })}`
@@ -599,28 +541,28 @@ function TareasInner() {
                       </div>
                     </div>
                     {selectedTask.description && (
-                      <div className="col-span-2 rounded-xl bg-foreground/5 p-3">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Descripcion</p>
-                        <p className="text-xs text-foreground whitespace-pre-line">{selectedTask.description}</p>
+                      <div className="col-span-2 rounded-2xl bg-black/5 dark:bg-white/5 p-3">
+                        <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1">Descripción</p>
+                        <p className="text-[12px] text-[#000] dark:text-[#f4f4f5] whitespace-pre-line">{selectedTask.description}</p>
                       </div>
                     )}
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="text-[13px] font-bold text-[#000] dark:text-[#f4f4f5] flex items-center gap-2">
+                        <Users className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
                         Alumnos ({selectedTask.students?.length || 0})
                       </h3>
-                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-500" /> {selectedTask.delivered_count} entregadas</span>
-                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" /> {(selectedTask.total_students || 0) - selectedTask.delivered_count} pendientes</span>
+                      <div className="flex items-center gap-3 text-[10px] text-[#666] dark:text-[#a1a1aa]">
+                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-400" /> {selectedTask.delivered_count} entregadas</span>
+                        <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-400" /> {(selectedTask.total_students || 0) - selectedTask.delivered_count} pendientes</span>
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-foreground/5 overflow-hidden">
+                    <div className="rounded-2xl bg-black/5 dark:bg-white/5 overflow-hidden">
                       {selectedTask.students && selectedTask.students.length > 0 ? (
-                        <div className="divide-y divide-foreground/10">
+                        <div className="divide-y divide-white/5">
                           {selectedTask.students.map((student, i) => {
                             const ss = submissionStatusConfig[student.submission_status] || submissionStatusConfig.pending
                             const isEditing = editingSubmission?.studentId === student.student_id
@@ -629,20 +571,20 @@ function TareasInner() {
                                 initial={{ opacity: 0, x: -8 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.03 }}
-                                className="px-4 py-3 hover:bg-background transition-colors">
+                                className="px-4 py-3 hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
                                 <div className="flex items-center justify-between gap-3">
                                   <div className="flex items-center gap-3 min-w-0">
-                                    <div className="h-8 w-8 rounded-xl bg-foreground/10 flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">
+                                    <div className="h-8 w-8 rounded-xl bg-black/10 dark:bg-white/10 flex items-center justify-center text-[10px] font-bold text-[#666] dark:text-[#a1a1aa] shrink-0">
                                       {student.full_name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-xs font-semibold text-foreground truncate">{student.full_name}</p>
-                                      <p className="text-[10px] text-muted-foreground">DNI: {student.dni || 'N/A'} - {student.grade}{student.section}</p>
+                                      <p className="text-[12px] font-semibold text-[#000] dark:text-[#f4f4f5] truncate">{student.full_name}</p>
+                                      <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">DNI: {student.dni || 'N/A'} - {student.grade} {student.section}</p>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
                                     {student.submission_grade != null && (
-                                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-xl">
+                                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-xl">
                                         {student.submission_grade}
                                       </span>
                                     )}
@@ -652,7 +594,7 @@ function TareasInner() {
                                     </span>
                                     {student.submission_status === 'pending' && (
                                       <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
-                                        className="text-[10px] font-medium text-blue-600 hover:text-blue-700 bg-blue-500/10 px-2.5 py-1 rounded-xl transition-colors">
+                                        className="text-[10px] font-semibold text-blue-400 hover:text-blue-300 bg-blue-500/15 px-2.5 py-1 rounded-xl transition-colors">
                                         Marcar entrega
                                       </button>
                                     )}
@@ -666,8 +608,8 @@ function TareasInner() {
                                           feedback: student.feedback || "",
                                         })
                                       }}
-                                        className={`text-[10px] font-medium px-2.5 py-1 rounded-xl transition-colors ${
-                                          isEditing ? 'text-foreground bg-foreground/10' : 'text-emerald-600 bg-emerald-500/10 hover:bg-emerald-500/20'
+                                        className={`text-[10px] font-semibold px-2.5 py-1 rounded-xl transition-colors ${
+                                          isEditing ? 'text-[#000] dark:text-[#f4f4f5] bg-white/10' : 'text-emerald-400 bg-emerald-500/15 hover:bg-emerald-500/25'
                                         }`}>
                                         {student.submission_status === 'graded' ? (isEditing ? 'Cerrar' : 'Editar nota') : (isEditing ? 'Cerrar' : 'Calificar')}
                                       </button>
@@ -678,21 +620,21 @@ function TareasInner() {
                                 {isEditing && (
                                   <div className="mt-3 pl-11 flex items-start gap-2">
                                     <div className="w-20">
-                                      <label className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">Nota</label>
+                                      <label className="text-[9px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1 block">Nota</label>
                                       <input type="number" min={0} max={20} step="0.5" value={editingSubmission.grade}
                                         onChange={e => setEditingSubmission(prev => prev ? { ...prev, grade: e.target.value } : prev)}
                                         placeholder="0-20"
-                                        className="sb-input rounded-xl text-sm h-9 w-full text-center" />
+                                        className="h-9 w-full px-2 text-sm font-medium rounded-xl bg-white/5 border border-white/10 text-white text-center focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
                                     </div>
                                     <div className="flex-1">
-                                      <label className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">Comentario</label>
+                                      <label className="text-[9px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1 block">Comentario</label>
                                       <input value={editingSubmission.feedback}
                                         onChange={e => setEditingSubmission(prev => prev ? { ...prev, feedback: e.target.value } : prev)}
                                         placeholder="Retroalimentación para el alumno"
-                                        className="sb-input rounded-xl text-sm h-9 w-full" />
+                                        className="h-9 w-full px-3 text-sm font-medium rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all" />
                                     </div>
                                     <button onClick={() => handleGradeSubmission(selectedTask.id, student)} disabled={gradingTaskId === student.student_id}
-                                      className="h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-400 transition-colors disabled:opacity-50 mt-5 shrink-0">
+                                      className="h-9 px-4 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-400 transition-colors disabled:opacity-50 mt-5 shrink-0">
                                       {gradingTaskId === student.student_id ? "Guardando..." : "Guardar"}
                                     </button>
                                   </div>
@@ -703,20 +645,20 @@ function TareasInner() {
                         </div>
                       ) : (
                         <div className="py-20 text-center">
-                          <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                          <p className="text-sm text-muted-foreground">No hay alumnos inscritos en este curso</p>
+                          <Users className="h-12 w-12 text-[#666] dark:text-[#a1a1aa] opacity-30 mx-auto mb-4" />
+                          <p className="text-[13px] text-[#666] dark:text-[#a1a1aa]">No hay alumnos inscritos en este curso</p>
                         </div>
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </SbModalBody>
             </>
           )}
           {detailLoading && (
             <div className="py-12 text-center">
-              <div className="h-6 w-6 border-2 border-foreground/10 border-t-foreground rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Cargando detalles...</p>
+              <div className="h-6 w-6 border-2 border-white/10 border-t-white rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-[13px] text-[#666] dark:text-[#a1a1aa]">Cargando detalles...</p>
             </div>
           )}
         </SbModal>
