@@ -7,7 +7,9 @@ let socket: any = null
 export function getSocket(): any {
   if (!socket) {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
-      autoConnect: false
+      autoConnect: false,
+      reconnection: false,
+      timeout: 5000,
     })
   }
   return socket

@@ -5,6 +5,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "socket": "tsx server.ts",
+    "dev:all": "concurrently \"pnpm dev\" \"pnpm socket\"",
     "lint": "eslint .",
     "start": "next start"
   },
