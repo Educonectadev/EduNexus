@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Sun, Moon } from "@/components/ui/proicons"
+import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronDown, Sun, Moon, Flame } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { motion } from "framer-motion"
 import Link from "next/link"

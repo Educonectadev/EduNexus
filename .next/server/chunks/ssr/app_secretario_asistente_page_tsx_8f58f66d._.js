@@ -1,3 +1,0 @@
-module.exports=[36631,a=>{"use strict";var b=a.i(444513),c=a.i(56905);function d(){return(0,b.jsxs)("div",{className:"-mx-6 -mt-6 h-[calc(100vh-3.5rem)] md:pb-0 pb-32 flex flex-col",children:[(0,b.jsxs)("div",{className:"px-6 pt-6 pb-4 shrink-0",children:[(0,b.jsx)("h1",{className:"text-xl font-bold tracking-tight text-sb-on-surface",children:"Asistente IA"}),(0,b.jsx)("p",{className:"text-sm text-sb-on-surface-variant/50 mt-1",children:"Tu asistente virtual para tareas administrativas"})]}),(0,b.jsx)("div",{className:"flex-1 min-h-0",children:(0,b.jsx)(c.AIAssistantContent,{})})]})}a.s(["default",()=>d])}];
-
-//# sourceMappingURL=app_secretario_asistente_page_tsx_8f58f66d._.js.map
