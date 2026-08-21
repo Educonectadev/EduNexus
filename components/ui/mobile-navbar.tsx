@@ -185,64 +185,99 @@ export function MobileNavbar({
                       transition={{ duration: 0.2, ease: "easeOut" }}
                     >
                       <div ref={contentRef} className="w-64">
-                        <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sb-surface/45">
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 pt-3 pb-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-sb-surface/40">
                             Opciones
                           </span>
                           <button
                             type="button"
                             onClick={() => setMenuOpen(false)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-sb-surface/10 text-sb-surface/60 transition-colors hover:bg-sb-surface/20 hover:text-sb-surface"
+                            className="flex h-6 w-6 items-center justify-center rounded-full bg-sb-surface/10 text-sb-surface/50 transition-all hover:bg-sb-surface/20 hover:text-sb-surface hover:scale-110"
                             aria-label="Cerrar opciones"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <div className="space-y-1 p-2 pt-1 pb-14">
+
+                        {/* Divider */}
+                        <div className="mx-3 h-px bg-sb-surface/10" />
+
+                        {/* Menu Items */}
+                        <div className="p-2 pb-4 space-y-0.5">
                           {onAiClick && (
-                            <button
+                            <motion.button
                               type="button"
                               onClick={() => { setMenuOpen(false); onAiClick() }}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium text-sb-surface hover:bg-sb-surface/10 rounded-full transition-colors"
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium text-sb-surface rounded-2xl transition-all hover:bg-sb-surface/10 active:scale-[0.98]"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.05 }}
                             >
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-purple-500/25">
                                 <Sparkles className="h-4 w-4" />
                               </span>
-                              Asistente IA
-                            </button>
+                              <span className="flex-1">Asistente IA</span>
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-purple-300">
+                                IA
+                              </span>
+                            </motion.button>
                           )}
-                          <button
+
+                          <motion.button
                             type="button"
                             onClick={() => { setMenuOpen(false); router.push("/perfil") }}
                             className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                              "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-all active:scale-[0.98]",
                               activeHref === "/perfil"
                                 ? "bg-sb-surface text-sb-on-surface font-medium"
                                 : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
                             )}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 }}
                           >
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                            <span className={cn(
+                              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                              activeHref === "/perfil"
+                                ? "bg-sb-on-surface/20 text-sb-surface"
+                                : "bg-sb-surface/10 text-sb-surface/60"
+                            )}>
                               <User className="h-4 w-4" />
                             </span>
-                            Mi perfil
-                          </button>
-                          {optionsItems.map((item) => (
-                            <button
+                            <span className="flex-1">Mi perfil</span>
+                          </motion.button>
+
+                          {/* Divider between sections */}
+                          {optionsItems.length > 0 && (
+                            <div className="my-1.5 mx-2 h-px bg-sb-surface/8" />
+                          )}
+
+                          {optionsItems.map((item, index) => (
+                            <motion.button
                               key={item.href}
                               type="button"
                               onClick={() => { setMenuOpen(false); router.push(item.href) }}
                               className={cn(
-                                "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                                "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-all active:scale-[0.98]",
                                 isActive(item)
                                   ? "bg-sb-surface text-sb-on-surface font-medium"
                                   : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
                               )}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.15 + index * 0.03 }}
                             >
-                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                              <span className={cn(
+                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                                isActive(item)
+                                  ? "bg-sb-on-surface/20 text-sb-surface"
+                                  : "bg-sb-surface/10 text-sb-surface/60"
+                              )}>
                                 <item.icon className="h-4 w-4" />
                               </span>
-                              {item.title}
-                            </button>
+                              <span className="flex-1">{item.title}</span>
+                            </motion.button>
                           ))}
                         </div>
                       </div>
