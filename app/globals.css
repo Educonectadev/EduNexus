@@ -1703,6 +1703,7 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 .t-morph[data-open="true"] {
   width: 224px;
   border-radius: var(--morph-r-open);
+  background-color: var(--sb-on-surface);
   transition:
     width var(--morph-open-dur) var(--morph-ease),
     height var(--morph-open-dur) var(--morph-ease),

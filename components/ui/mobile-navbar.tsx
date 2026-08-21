@@ -161,9 +161,9 @@ export function MobileNavbar({
                     <button
                       type="button"
                       onClick={() => { setMenuOpen(false); onAiClick() }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-sb-surface/10"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-white/10"
                     >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface/10 text-sb-surface/70">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sb-surface">
                         <Sparkles className="h-4 w-4" />
                       </span>
                       Asistente IA
@@ -176,13 +176,13 @@ export function MobileNavbar({
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
                       activeHref === "/perfil"
-                        ? "bg-sb-surface text-sb-on-surface font-medium"
-                        : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
+                        ? "bg-white/20 text-sb-surface font-medium"
+                        : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
                     )}
                   >
                     <span className={cn(
                       "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                      activeHref === "/perfil" ? "bg-sb-on-surface/20 text-sb-surface" : "bg-sb-surface/10 text-sb-surface/60"
+                      activeHref === "/perfil" ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
                     )}>
                       <User className="h-4 w-4" />
                     </span>
@@ -197,13 +197,13 @@ export function MobileNavbar({
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
                         isActive(item)
-                          ? "bg-sb-surface text-sb-on-surface font-medium"
-                          : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
+                          ? "bg-white/20 text-sb-surface font-medium"
+                          : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
                       )}
                     >
                       <span className={cn(
                         "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                        isActive(item) ? "bg-sb-on-surface/20 text-sb-surface" : "bg-sb-surface/10 text-sb-surface/60"
+                        isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
                       )}>
                         <item.icon className="h-4 w-4" />
                       </span>
