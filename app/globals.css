@@ -1670,8 +1670,8 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 
 /* minimal: solo iconos, sin etiquetas ni cápsula */
 .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
-  gap: 0;
-  padding: 0;
+  gap: 2px;
+  padding: 0 2px;
   margin-right: 4rem;
   background: color-mix(in srgb, var(--sb-surface-container) 62%, transparent);
   border: 1px solid var(--sb-outline-variant);

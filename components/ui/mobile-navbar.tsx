@@ -127,7 +127,7 @@ export function MobileNavbar({
           )}
         </AnimatePresence>
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          <div className="mobile-nav-buttons relative flex items-center justify-around">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-[2px]">
             {visibleItems.map((item) => (
               <NavButton
                 key={item.href}
