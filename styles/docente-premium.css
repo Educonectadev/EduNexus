@@ -364,30 +364,17 @@ html.dark [data-role="docente"] aside svg {
   padding: 6px 8px;
 }
 
-/* ─── Scrollbar sutil ─────────────────────── */
+/* ─── Scrollbar invisible pero funcional ─── */
 [data-role="docente"] .overflow-auto,
 [data-role="docente"] .overflow-y-auto,
 [data-role="docente"] .overflow-x-auto {
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--sb-outline-variant) 60%, transparent) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 [data-role="docente"] .overflow-auto::-webkit-scrollbar,
 [data-role="docente"] .overflow-y-auto::-webkit-scrollbar,
 [data-role="docente"] .overflow-x-auto::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-  display: block;
-}
-[data-role="docente"] .overflow-auto::-webkit-scrollbar-thumb,
-[data-role="docente"] .overflow-y-auto::-webkit-scrollbar-thumb,
-[data-role="docente"] .overflow-x-auto::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--sb-outline-variant) 60%, transparent);
-  border-radius: 999px;
-}
-[data-role="docente"] .overflow-auto::-webkit-scrollbar-track,
-[data-role="docente"] .overflow-y-auto::-webkit-scrollbar-track,
-[data-role="docente"] .overflow-x-auto::-webkit-scrollbar-track {
-  background: transparent;
+  display: none;
 }
 
 /* ─── Transición global sutil de entrada ──── */
