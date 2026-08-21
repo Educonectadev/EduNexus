@@ -814,11 +814,11 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   }
   const marked = counts.present + counts.late + counts.absent + counts.justified
 
-  const statusChips: { status: StudentStatus; label: string; title: string; activeClass: string; inactiveClass: string }[] = [
-    { status: "present", label: "P", title: "Presente", activeClass: "bg-[#22c55e] text-white", inactiveClass: "bg-white/10 text-[#a1a1aa] hover:bg-white/20 hover:text-white" },
-    { status: "late", label: "T", title: "Tardanza", activeClass: "bg-[#f59e0b] text-white", inactiveClass: "bg-white/10 text-[#a1a1aa] hover:bg-white/20 hover:text-white" },
-    { status: "absent", label: "F", title: "Falta", activeClass: "bg-[#ef4444] text-white", inactiveClass: "bg-white/10 text-[#a1a1aa] hover:bg-white/20 hover:text-white" },
-    { status: "justified", label: "J", title: "Justificado", activeClass: "bg-[#3b82f6] text-white", inactiveClass: "bg-white/10 text-[#a1a1aa] hover:bg-white/20 hover:text-white" },
+  const statusChips: { status: StudentStatus; label: string; title: string }[] = [
+    { status: "present", label: "P", title: "Presente" },
+    { status: "late", label: "T", title: "Tardanza" },
+    { status: "absent", label: "F", title: "Falta" },
+    { status: "justified", label: "J", title: "Justificado" },
   ]
 
   const summary = [
@@ -865,11 +865,11 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
             <button
               onClick={handleCargar}
               disabled={loading || !selectedCourse}
-              className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98]"
-              style={{ borderRadius: "12px", background: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }}
+              className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30"
+              style={{ borderRadius: "12px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
             >
-              {loading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Search className="h-4 w-4" />}
-              Cargar alumnos
+              {loading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Search className="h-4 w-4" />}
+              Cargar
             </button>
           </div>
         </div>
@@ -877,16 +877,11 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
       {/* View toggle */}
       {selectedCourse && (
-        <div className="flex items-center gap-2 p-1 rounded-2xl bg-white/5 dark:bg-white/5">
+        <div className="nb-rail">
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => { setAlumnoView(key); if (key === "estadisticas") loadStats() }}
-              className={cn(
-                "flex-1 h-10 text-[12px] font-semibold flex items-center justify-center gap-2 rounded-xl transition-all duration-200",
-                alumnoView === key
-                  ? "bg-white text-black shadow-md"
-                  : "text-[#a1a1aa] hover:text-white hover:bg-white/10"
-              )}>
-              <Check className="h-3.5 w-3.5" />
+              className={cn("nb-chip", alumnoView === key && "active")}>
+              <Check className="nb-chip-check" />
               {label}
             </button>
           ))}
@@ -991,15 +986,15 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               const Icon = item.icon
               return (
                 <div key={item.label} className="p-4" style={{
-                  background: "var(--sb-surface-container)",
+                  background: "var(--note-surface)",
                   borderRadius: "16px",
-                  border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)",
+                  border: "1px solid var(--note-hairline)",
                 }}>
-                  <div className="h-8 w-8 flex items-center justify-center mb-2" style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}>
-                    <Icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                  <div className="h-8 w-8 flex items-center justify-center mb-2" style={{ background: "var(--note-fill)", borderRadius: "10px" }}>
+                    <Icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                   </div>
                   <SectionLabel>{item.label}</SectionLabel>
-                  <p className="mt-1.5 text-lg font-bold leading-none" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{item.value}</p>
+                  <p className="mt-1.5 text-lg font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>{item.value}</p>
                 </div>
               )
             })}
@@ -1011,34 +1006,34 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
                   <SectionLabel>Lista de alumnos</SectionLabel>
-                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                     {filtered.length} de {students.length} alumnos
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={handleMarkAllPresent}
-                    className="h-9 px-4 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ borderRadius: "10px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 2px 8px rgba(34,197,94,0.25)" }}>
+                    className="h-9 px-4 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    style={{ borderRadius: "10px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos
                   </button>
                   <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
-                    className="h-9 px-4 text-xs font-semibold transition-all disabled:opacity-40 hover:bg-white/10"
-                    style={{ borderRadius: "10px", background: "rgba(255,255,255,0.1)", color: "#a1a1aa", fontFamily: FONT }}>
+                    className="h-9 px-4 text-xs font-semibold transition-all disabled:opacity-40"
+                    style={{ borderRadius: "10px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                     Limpiar
                   </button>
                   <div className="relative w-44">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.5 }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
                     <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
                       className="sb-input rounded-xl text-sm h-9 pl-9" />
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4 pt-3" style={{ borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
+              <div className="flex items-center gap-4 pt-3" style={{ borderTop: "1px solid var(--note-hairline)" }}>
                 {statusChips.map(chip => (
                   <div key={chip.status} className="flex items-center gap-1.5">
-                    <span className={`h-4 w-4 rounded-lg flex items-center justify-center text-[9px] font-bold ${chip.activeClass}`}>{chip.label}</span>
-                    <span className="text-[10px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>{chip.title}</span>
-                    <span className="text-[10px] font-semibold ml-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
+                    <span className="h-4 w-4 rounded-lg flex items-center justify-center text-[9px] font-bold" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)" }}>{chip.label}</span>
+                    <span className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{chip.title}</span>
+                    <span className="text-[10px] font-semibold ml-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                       {students.filter(s => s.status === chip.status).length}
                     </span>
                   </div>
@@ -1046,35 +1041,34 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </div>
             </div>
 
-            <div style={{ borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}>
+            <div style={{ borderTop: "1px solid var(--note-hairline)" }}>
               {filtered.map((s, i) => (
                 <div key={s.id}
                   className="flex items-center justify-between gap-3 px-5 py-3 transition-colors"
                   style={{
-                    borderBottom: i < filtered.length - 1 ? "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" : "none",
-                    background: s.status ? "var(--sb-surface-container-high)" : "transparent",
+                    borderBottom: i < filtered.length - 1 ? "1px solid var(--note-hairline)" : "none",
+                    background: s.status ? "var(--note-fill)" : "transparent",
                   }}
-                  onMouseEnter={(e) => { if (!s.status) e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
-                  onMouseLeave={(e) => { if (!s.status) e.currentTarget.style.background = "transparent" }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`h-9 w-9 rounded-lg ${getAvatarColor(`${s.nombres} ${s.apellidos}`)} flex items-center justify-center shrink-0`}>
-                      <span className="text-white text-[10px] font-bold">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
+                    <div className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+                      <span className="text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
-                      <p className="text-[10px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>DNI: {s.dni}</p>
+                      <p className="text-sm font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
+                      <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>DNI: {s.dni}</p>
                     </div>
                   </div>
                   <div className="flex gap-1.5 shrink-0">
                     {statusChips.map(chip => (
                       <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
-                        className={cn(
-                          "h-8 px-3 rounded-xl text-[11px] font-bold transition-all active:scale-95 flex items-center gap-1",
-                          s.status === chip.status
-                            ? "bg-white text-black shadow-md"
-                            : "bg-white/10 text-[#a1a1aa] hover:bg-white/20 hover:text-white"
-                        )}>
+                        className="h-8 px-3 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1"
+                        style={{
+                          borderRadius: "10px",
+                          background: s.status === chip.status ? "var(--note-fill-strong)" : "var(--note-fill)",
+                          color: s.status === chip.status ? "var(--note-text)" : "var(--note-muted)",
+                          fontFamily: FONT,
+                        }}>
                         {chip.label}
                         {s.status === chip.status && <Check className="h-3 w-3" />}
                       </button>
@@ -1088,25 +1082,24 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           {/* Save bar */}
           <div className="flex items-center gap-4 sticky bottom-4 backdrop-blur-xl p-4" style={{
             borderRadius: "20px",
-            border: "1px solid rgba(255,255,255,0.1)",
-            background: "rgba(20,20,20,0.95)",
-            boxShadow: "0 8px 32px -4px rgba(0,0,0,0.4)",
+            border: "1px solid var(--note-hairline)",
+            background: "var(--note-surface)",
           }}>
             <div className="flex-1 space-y-1.5">
-              <p className="text-sm font-bold text-white" style={{ fontFamily: FONT }}>
+              <p className="text-sm font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                 {marked} de {students.length} marcados
               </p>
-              <div className="h-2 rounded-full overflow-hidden bg-white/10">
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
                 <div className="h-full rounded-full transition-all duration-500" style={{
                   width: `${students.length ? (marked / students.length) * 100 : 0}%`,
-                  background: "linear-gradient(90deg, #22c55e, #16a34a)",
+                  background: "var(--note-text)",
                 }} />
               </div>
             </div>
             <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-8 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 hover:scale-[1.02] active:scale-[0.98]"
-              style={{ borderRadius: "14px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 4px 16px rgba(34,197,94,0.35)" }}>
-              {saving ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <Check className="h-4 w-4" />}
+              className="h-12 px-8 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+              style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
+              {saving ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Check className="h-4 w-4" />}
               Guardar
             </button>
           </div>
