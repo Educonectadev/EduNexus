@@ -52,6 +52,8 @@ function formatDate(date: string) {
   return new Date(date).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })
 }
 
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
+
 export default function MaterialesPage() {
   return (
     <React.Suspense fallback={null}>
@@ -148,7 +150,7 @@ function MaterialesInner() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <motion.header
@@ -157,36 +159,37 @@ function MaterialesInner() {
           className="flex items-start justify-between mb-6 gap-4"
         >
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Materiales
             </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
               Materiales de tus cursos y biblioteca institucional
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
             <button
               onClick={() => setUploadOpen(true)}
               disabled={!courses.length}
-              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-2xl bg-white text-black hover:bg-white/90 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98]"
+              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-xl transition-all disabled:opacity-30"
+              style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}
             >
               <Upload className="h-4 w-4" /> Subir material
             </button>
@@ -212,22 +215,24 @@ function MaterialesInner() {
           className="flex flex-col sm:flex-row gap-3 mb-6"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#666]" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
             <input
               placeholder="Buscar materiales..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full h-11 pl-11 pr-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
+              className="w-full h-11 pl-11 pr-4 text-sm font-medium rounded-xl transition-all"
+              style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
             />
           </div>
           <select
             value={courseFilter}
             onChange={e => setCourseFilter(e.target.value)}
-            className="h-11 px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer sm:w-64"
+            className="h-11 px-4 text-sm font-medium rounded-xl transition-all cursor-pointer sm:w-64"
+            style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
           >
-            <option value="all" className="bg-[#1a1a1c] text-white">Todos los cursos</option>
+            <option value="all">Todos los cursos</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">{c.name} · {c.grade} &quot;{c.section}&quot;</option>
+              <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
             ))}
           </select>
         </motion.div>
@@ -235,14 +240,14 @@ function MaterialesInner() {
         {loading ? (
           <div className="space-y-3 mt-6">
             {[1, 2, 3].map(i => (
-              <div key={i} className="rounded-2xl bg-white/5 border border-white/10 p-4 animate-pulse">
+              <div key={i} className="rounded-xl p-4 animate-pulse" style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-white/10" />
+                  <div className="h-12 w-12 rounded-xl" style={{ background: "var(--note-fill-strong)" }} />
                   <div className="space-y-2 flex-1">
-                    <div className="h-4 w-48 rounded-lg bg-white/10" />
-                    <div className="h-3 w-32 rounded-lg bg-white/10" />
+                    <div className="h-4 w-48 rounded-lg" style={{ background: "var(--note-fill-strong)" }} />
+                    <div className="h-3 w-32 rounded-lg" style={{ background: "var(--note-fill-strong)" }} />
                   </div>
-                  <div className="h-8 w-20 rounded-xl bg-white/10" />
+                  <div className="h-8 w-20 rounded-xl" style={{ background: "var(--note-fill-strong)" }} />
                 </div>
               </div>
             ))}
@@ -256,52 +261,63 @@ function MaterialesInner() {
                 const isImage = m.file_type?.includes("image")
                 const isWord = m.file_type?.includes("word") || m.file_type?.includes("text")
                 const isPpt = m.file_type?.includes("powerpoint") || m.file_type?.includes("presentation")
-                const iconBg = isPdf ? "bg-red-500/20" : isImage ? "bg-purple-500/20" : isWord ? "bg-blue-500/20" : isPpt ? "bg-orange-500/20" : "bg-white/10"
-                const iconColor = isPdf ? "text-red-400" : isImage ? "text-purple-400" : isWord ? "text-blue-400" : isPpt ? "text-orange-400" : "text-white/60"
+                const iconBg = isPdf ? "rgba(239,68,68,0.15)" : isImage ? "rgba(168,85,247,0.15)" : isWord ? "rgba(59,130,246,0.15)" : isPpt ? "rgba(249,115,22,0.15)" : "var(--note-fill-strong)"
+                const iconColor = isPdf ? "#f87171" : isImage ? "#c084fc" : isWord ? "#60a5fa" : isPpt ? "#fb923c" : "var(--note-muted)"
                 return (
                   <motion.div key={m.id}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 12 }}
                     transition={{ delay: i * 0.03 }}
-                    className="group rounded-2xl bg-white/5 border border-white/10 px-5 py-4 transition-all duration-200 hover:bg-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-black/10"
+                    className="group rounded-xl px-5 py-4 transition-all duration-200"
+                    style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`h-12 w-12 rounded-2xl ${iconBg} flex items-center justify-center shrink-0 transition-transform group-hover:scale-110`}>
-                        <Icon className={`h-5 w-5 ${iconColor}`} />
+                      <div className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110" style={{ background: iconBg }}>
+                        <Icon className="h-5 w-5" style={{ color: iconColor }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{m.name}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{m.name}</p>
                         <div className="flex items-center gap-2 mt-1">
                           {m.course_name && (
-                            <span className="text-xs text-[#a1a1aa] truncate">
+                            <span className="text-xs truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                               {m.course_name}{m.grade ? ` · ${m.grade} "${m.section}"` : ""}
                             </span>
                           )}
-                          <span className="text-[10px] text-[#666]">·</span>
-                          <span className="text-xs text-[#666]">{formatSize(m.file_size)}</span>
-                          <span className="text-[10px] text-[#666]">·</span>
-                          <span className="text-xs text-[#666]">{formatDate(m.created_at)}</span>
+                          <span className="text-[10px]" style={{ color: "var(--note-muted)", opacity: 0.5 }}>·</span>
+                          <span className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{formatSize(m.file_size)}</span>
+                          <span className="text-[10px]" style={{ color: "var(--note-muted)", opacity: 0.5 }}>·</span>
+                          <span className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{formatDate(m.created_at)}</span>
                         </div>
-                        {m.description && <p className="text-xs text-[#666] truncate mt-1">{m.description}</p>}
+                        {m.description && <p className="text-xs truncate mt-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{m.description}</p>}
                       </div>
                       <span className={`text-[10px] font-semibold px-3 py-1.5 rounded-xl shrink-0 hidden sm:inline-flex items-center gap-1.5 ${
                         m.source === "propio"
-                          ? "bg-white/10 text-[#a1a1aa]"
+                          ? ""
                           : "bg-blue-500/20 text-blue-400"
-                      }`}>
+                      }`} style={m.source === "propio" ? { background: "var(--note-fill-strong)", color: "var(--note-muted)" } : {}}>
                         <Library className="h-3 w-3" /> {m.source === "propio" ? "Propio" : "Biblioteca"}
                       </span>
                       {m.file_url && (
                         <a href={m.file_url} target="_blank" rel="noreferrer" download
-                          className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all shrink-0 group/btn">
-                          <Download className="h-4 w-4 text-[#a1a1aa] group-hover/btn:text-white transition-colors" />
+                          className="h-10 w-10 rounded-xl flex items-center justify-center transition-all shrink-0 group/btn"
+                          style={{ background: "var(--note-fill-strong)" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-text)" }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                        >
+                          <Download className="h-4 w-4 transition-colors" style={{ color: "var(--note-muted)" }} />
                         </a>
                       )}
                       {m.source === "propio" && (
                         <button onClick={() => handleDelete(m)}
-                          className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-red-500/20 transition-all shrink-0 group/btn">
-                          <Trash2 className="h-4 w-4 text-[#666] group-hover/btn:text-red-400 transition-colors" />
+                          className="h-10 w-10 rounded-xl flex items-center justify-center transition-all shrink-0 group/btn"
+                          style={{ background: "var(--note-fill-strong)" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.15)" }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                        >
+                          <Trash2 className="h-4 w-4 transition-colors" style={{ color: "var(--note-muted)" }} />
                         </button>
                       )}
                     </div>
@@ -310,12 +326,12 @@ function MaterialesInner() {
               })}
             </AnimatePresence>
             {!loading && filtered.length === 0 && (
-              <div className="py-20 text-center rounded-2xl bg-white/5 border border-white/10">
-                <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-[#666]" />
+              <div className="py-20 text-center rounded-xl" style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
+                <div className="h-16 w-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "var(--note-fill-strong)" }}>
+                  <FileText className="h-8 w-8" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
                 </div>
-                <p className="text-sm font-medium text-[#a1a1aa] mb-1">Sin materiales</p>
-                <p className="text-xs text-[#666]">Sube tu primer material para comenzar</p>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--note-text)", fontFamily: FONT }}>Sin materiales</p>
+                <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sube tu primer material para comenzar</p>
               </div>
             )}
           </div>
@@ -327,41 +343,44 @@ function MaterialesInner() {
           <SbModalBody>
             <div className="space-y-4">
               <div>
-                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Curso</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider mb-2 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</label>
                 <select
                   value={upCourseId}
                   onChange={e => setUpCourseId(e.target.value)}
-                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer"
+                  className="h-11 w-full px-4 text-sm font-medium rounded-xl transition-all cursor-pointer"
+                  style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
                 >
-                  <option value="" className="bg-[#1a1a1c] text-[#666]">Seleccionar curso...</option>
+                  <option value="">Seleccionar curso...</option>
                   {courses.map(c => (
-                    <option key={c.id} value={c.id} className="bg-[#1a1a1c] text-white">
+                    <option key={c.id} value={c.id}>
                       {c.name} · {c.grade} &quot;{c.section}&quot;
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Nombre</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider mb-2 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Nombre</label>
                 <input
                   value={upName}
                   onChange={e => setUpName(e.target.value)}
                   placeholder="Guía de álgebra - Cap. 3"
-                  className="h-11 w-full px-4 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                  className="h-11 w-full px-4 text-sm font-medium rounded-xl transition-all"
+                  style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
                 />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Descripción (opcional)</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider mb-2 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Descripción (opcional)</label>
                 <textarea
                   value={upDescription}
                   onChange={e => setUpDescription(e.target.value)}
                   rows={2}
                   placeholder="Breve descripción del material"
-                  className="w-full px-4 py-3 text-sm font-medium rounded-2xl bg-white/5 border border-white/10 text-white placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-white/20 transition-all resize-none"
+                  className="w-full px-4 py-3 text-sm font-medium rounded-xl transition-all resize-none"
+                  style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
                 />
               </div>
               <div>
-                <label className="text-[11px] font-bold text-[#a1a1aa] uppercase tracking-wider mb-2 block">Archivo</label>
+                <label className="text-[11px] font-bold uppercase tracking-wider mb-2 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Archivo</label>
                 <div className="relative">
                   <input
                     ref={fileInputRef}
@@ -369,15 +388,19 @@ function MaterialesInner() {
                     onChange={e => setUpFile(e.target.files?.[0] || null)}
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
-                  <div className="h-20 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-2 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer">
-                    <Upload className="h-5 w-5 text-[#666]" />
-                    <p className="text-xs text-[#666]">
+                  <div className="h-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all cursor-pointer"
+                    style={{ borderColor: "var(--note-hairline)", background: "var(--note-fill)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--note-muted)"; e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--note-hairline)"; e.currentTarget.style.background = "var(--note-fill)" }}
+                  >
+                    <Upload className="h-5 w-5" style={{ color: "var(--note-muted)" }} />
+                    <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                       {upFile ? upFile.name : "Click para seleccionar archivo"}
                     </p>
                   </div>
                 </div>
                 {upFile && (
-                  <p className="text-xs text-[#a1a1aa] mt-2 flex items-center gap-1">
+                  <p className="text-xs mt-2 flex items-center gap-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
                     {formatSize(upFile.size)}
                   </p>
@@ -388,18 +411,20 @@ function MaterialesInner() {
           <SbModalFooter>
             <button
               onClick={() => setUploadOpen(false)}
-              className="h-10 px-5 text-sm font-semibold rounded-2xl bg-white/5 text-[#a1a1aa] hover:bg-white/10 transition-all"
+              className="h-10 px-5 text-sm font-semibold rounded-xl transition-all"
+              style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}
             >
               Cancelar
             </button>
             <button
               disabled={!upName || !upCourseId || !upFile || uploading}
               onClick={handleUpload}
-              className="h-10 px-6 text-sm font-bold rounded-2xl bg-white text-black hover:bg-white/90 transition-all disabled:opacity-30 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
+              className="h-10 px-6 text-sm font-bold rounded-xl transition-all disabled:opacity-30 flex items-center gap-2"
+              style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}
             >
               {uploading ? (
                 <>
-                  <span className="animate-spin h-4 w-4 border-2 border-black/30 border-t-black rounded-full" />
+                  <span className="animate-spin h-4 w-4 border-2 rounded-full" style={{ borderColor: "color-mix(in srgb, var(--note-surface) 30%, transparent)", borderTopColor: "var(--note-surface)" }} />
                   Subiendo...
                 </>
               ) : (

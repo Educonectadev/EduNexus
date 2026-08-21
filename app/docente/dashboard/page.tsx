@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
-import { Calendar, Clock, BookOpen, GraduationCap, Users, ChevronDown, Sun, Moon } from "@/components/ui/proicons"
+import { Calendar, Clock, BookOpen, GraduationCap, Users, Sun, Moon } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { useTheme } from "next-themes"
 
@@ -25,6 +25,8 @@ interface TeacherCourse {
   section: string
   students: number
 }
+
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 function toMin(t: string) {
   const [h, m] = t.split(":").map(Number)
@@ -107,82 +109,57 @@ export default function DocenteDashboard() {
     : 0
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
 
         {/* ═══════════════ HEADER ═══════════════ */}
-        <div className="flex items-start justify-between mb-8">
+        <header className="flex items-start justify-between mb-6 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Inicio</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Inicio</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               {greeting},<br />{teacherName}
             </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">{dateFormatted}</p>
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{dateFormatted}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Cambiar tema"
-              title="Cambiar tema"
-              className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative"
-            >
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
           </div>
-        </div>
+        </header>
 
         {/* ═══════════════ 4 STAT CARDS ═══════════════ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
-            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
-              <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+          {[
+            { icon: BookOpen, label: "Mis cursos", value: loading ? "—" : courses.length },
+            { icon: Users, label: "Total alumnos", value: loading ? "—" : totalStudents.toLocaleString() },
+            { icon: Calendar, label: "Clases hoy", value: loading ? "—" : todaySchedule.length },
+            { icon: Clock, label: "Horas hoy", value: loading ? "—" : `${hoursToday}h` },
+          ].map((stat) => (
+            <div key={stat.label} className="p-4" style={{ borderRadius: "16px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+              <div className="h-9 w-9 flex items-center justify-center mb-3" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
+                <stat.icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+              </div>
+              <p className="text-[11px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{stat.label}</p>
+              <p className="text-[28px] font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                {stat.value}
+              </p>
             </div>
-            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Mis cursos</p>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
-              {loading ? "—" : courses.length}
-            </p>
-          </div>
-          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
-            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
-              <Users className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
-            </div>
-            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Total alumnos</p>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
-              {loading ? "—" : totalStudents.toLocaleString()}
-            </p>
-          </div>
-          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
-            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
-              <Calendar className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
-            </div>
-            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Clases hoy</p>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
-              {loading ? "—" : todaySchedule.length}
-            </p>
-          </div>
-          <div className="p-4 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-lg transition-shadow">
-            <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
-              <Clock className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
-            </div>
-            <p className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa] mb-1">Horas hoy</p>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5] leading-none">
-              {loading ? "—" : `${hoursToday}h`}
-            </p>
-          </div>
+          ))}
         </div>
 
         {/* ═══════════════ BOTTOM GRID ═══════════════ */}
@@ -192,34 +169,34 @@ export default function DocenteDashboard() {
           <div className="flex flex-col gap-4">
 
             {/* Horario de hoy */}
-            <div className="p-5 rounded-[20px] flex-1 bg-white dark:bg-[#17171a]">
+            <div className="p-5" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Horario de hoy</p>
-                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                <p className="text-[15px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Horario de hoy</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                   {todaySchedule.length} clases
                 </span>
               </div>
               {todaySchedule.length === 0 ? (
                 <div className="py-8 text-center">
-                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
-                    <Clock className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <div className="h-12 w-12 flex items-center justify-center mx-auto mb-3" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                    <Clock className="h-5 w-5" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
                   </div>
-                  <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin clases hoy</p>
+                  <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin clases hoy</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
                   {todaySchedule.map((cls) => (
-                    <div key={cls.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
-                        <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+                    <div key={cls.id} className="flex items-center gap-3 p-3 transition-colors cursor-pointer group" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                      <div className="h-10 w-10 flex items-center justify-center group-hover:scale-110 transition-transform" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+                        <BookOpen className="h-4 w-4" style={{ color: "var(--note-text)" }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{cls.course_name}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
+                        <p className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{cls.course_name}</p>
+                        <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{cls.grade} {cls.section}{cls.classroom ? ` · ${cls.classroom}` : ""}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[13px] font-semibold text-[#000] dark:text-[#f4f4f5]">{cls.start_time?.slice(0, 5)}</p>
-                        <p className="text-[10px] text-[#666] dark:text-[#a1a1aa]">{cls.end_time?.slice(0, 5)}</p>
+                        <p className="text-[13px] font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{cls.start_time?.slice(0, 5)}</p>
+                        <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{cls.end_time?.slice(0, 5)}</p>
                       </div>
                     </div>
                   ))}
@@ -228,32 +205,32 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Mis Cursos */}
-            <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+            <div className="p-5" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
               <div className="flex items-center justify-between mb-4">
-                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Mis Cursos</p>
-                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+                <p className="text-[15px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Mis Cursos</p>
+                <span className="text-[10px] font-semibold px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                   {courses.length} cursos
                 </span>
               </div>
               {courses.length === 0 ? (
                 <div className="py-8 text-center">
-                  <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
-                    <GraduationCap className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                  <div className="h-12 w-12 flex items-center justify-center mx-auto mb-3" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                    <GraduationCap className="h-5 w-5" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
                   </div>
-                  <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos registrados</p>
+                  <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin cursos registrados</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
                   {courses.map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
-                      <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
-                        <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+                    <div key={c.id} className="flex items-center gap-3 p-3 transition-colors cursor-pointer group" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                      <div className="h-10 w-10 flex items-center justify-center group-hover:scale-110 transition-transform" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+                        <GraduationCap className="h-4 w-4" style={{ color: "var(--note-text)" }} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
-                        <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
+                        <p className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{c.name}</p>
+                        <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{c.grade} {c.section}</p>
                       </div>
-                      <span className="text-[11px] font-semibold text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
+                      <span className="text-[11px] font-semibold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{c.students} alumnos</span>
                     </div>
                   ))}
                 </div>
@@ -262,10 +239,10 @@ export default function DocenteDashboard() {
           </div>
 
           {/* ──── RIGHT COLUMN: Asistencia de hoy ──── */}
-          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a]">
+          <div className="p-5" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
             <div className="flex items-center justify-between mb-5">
-              <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">Asistencia de hoy</p>
-              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">
+              <p className="text-[15px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Asistencia de hoy</p>
+              <span className="text-[10px] font-semibold px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                 Resumen
               </span>
             </div>
@@ -273,11 +250,11 @@ export default function DocenteDashboard() {
             {/* Attendance summary */}
             <div className="mb-5">
               <div className="flex items-end gap-1 mb-1">
-                <span className="text-[56px] font-bold leading-none tracking-tight text-[#000] dark:text-[#f4f4f5]">
+                <span className="text-[56px] font-bold leading-none tracking-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {loading ? "—" : `${attendancePct}%`}
                 </span>
               </div>
-              <p className="text-[13px] text-[#666] dark:text-[#a1a1aa]">
+              <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                 {studentSummary
                   ? `${studentSummary.present} presentes de ${studentSummary.total} alumnos`
                   : "Sin datos de asistencia"}
@@ -285,34 +262,34 @@ export default function DocenteDashboard() {
             </div>
 
             {/* Progress bar */}
-            <div className="w-full h-2.5 rounded-full mb-6 bg-black/5 dark:bg-white/10">
+            <div className="w-full h-2.5 rounded-full mb-6" style={{ background: "var(--note-fill)" }}>
               <div
-                className="h-full rounded-full transition-all duration-700 bg-gradient-to-r from-[#000] to-[#333] dark:from-[#f4f4f5] dark:to-[#a1a1aa]"
-                style={{ width: `${attendancePct}%` }}
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${attendancePct}%`, background: "var(--note-text)", opacity: 0.8 }}
               />
             </div>
 
             {/* Course breakdown */}
-            <p className="text-[13px] font-bold mb-3 text-[#000] dark:text-[#f4f4f5]">Resumen por curso</p>
+            <p className="text-[13px] font-bold mb-3" style={{ color: "var(--note-text)", fontFamily: FONT }}>Resumen por curso</p>
             {courses.length === 0 ? (
               <div className="py-8 text-center">
-                <div className="h-12 w-12 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
-                  <Users className="h-5 w-5 text-[#D9D9D9] dark:text-[#3f3f46]" />
+                <div className="h-12 w-12 flex items-center justify-center mx-auto mb-3" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                  <Users className="h-5 w-5" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
                 </div>
-                <p className="text-[13px] text-[#999] dark:text-[#71717a]">Sin cursos</p>
+                <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin cursos</p>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
                 {courses.map((c) => (
-                  <div key={c.id} className="flex items-center gap-3 p-3 rounded-[16px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer group">
-                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/10 dark:bg-white/10 group-hover:scale-110 transition-transform">
-                      <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa]" />
+                  <div key={c.id} className="flex items-center gap-3 p-3 transition-colors cursor-pointer group" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+                    <div className="h-10 w-10 flex items-center justify-center group-hover:scale-110 transition-transform" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+                      <GraduationCap className="h-4 w-4" style={{ color: "var(--note-text)" }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold truncate text-[#000] dark:text-[#f4f4f5]">{c.name}</p>
-                      <p className="text-[11px] text-[#666] dark:text-[#a1a1aa]">{c.grade} {c.section}</p>
+                      <p className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{c.name}</p>
+                      <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{c.grade} {c.section}</p>
                     </div>
-                    <span className="text-[11px] font-semibold text-[#666] dark:text-[#a1a1aa]">{c.students} alumnos</span>
+                    <span className="text-[11px] font-semibold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{c.students} alumnos</span>
                   </div>
                 ))}
               </div>

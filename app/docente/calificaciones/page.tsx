@@ -42,6 +42,7 @@ interface Course {
 
 const PERIODS = ["Bimestre 1", "Bimestre 2", "Bimestre 3", "Bimestre 4"]
 const MAX_SCORE = 20
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
 
@@ -221,49 +222,50 @@ function CalificacionesInner() {
   const registerStudents = registerCourseId === courseId ? students : []
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
         {/* Header */}
         <header className="mb-4">
           <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Calificaciones
             </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
               Gestiona las notas de tus alumnos
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-xl flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
           </div>
           </div>
 
           {/* Controls - Mobile responsive */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4">
-            <div className="nb-select-wrap flex-1">
+            <div className="flex-1">
               <select
                 value={courseId}
                 onChange={e => setCourseId(e.target.value)}
                 disabled={loading}
-                className={cn("nb-select w-full", courseId && "has-value")}
+                className="w-full h-10 px-3 text-[13px] font-medium rounded-xl transition-all"
+                style={{ border: `1.5px solid ${courseId ? "var(--note-text)" : "var(--note-hairline)"}`, background: courseId ? "var(--note-fill)" : "transparent", color: courseId ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}
               >
                 {courses.length === 0 && <option value="">Sin cursos asignados</option>}
                 {courses.map(c => (
@@ -273,19 +275,24 @@ function CalificacionesInner() {
             </div>
             <div className="flex items-center gap-2">
               {students.length > 0 && (
-                <div className="nb-rail flex-1 sm:flex-none">
+                <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "var(--note-fill)" }}>
                   {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
                     <button key={key} onClick={() => setViewMode(key)}
-                      className={cn("nb-chip", viewMode === key && "active")}>
-                      <Check className="nb-chip-check" />
+                      className="flex-1 h-9 text-[13px] font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200"
+                      style={{
+                        background: viewMode === key ? "var(--note-text)" : "transparent",
+                        color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)",
+                        fontFamily: FONT
+                      }}>
+                      <Check className="h-4 w-4" />
                       {label}
                     </button>
                   ))}
                 </div>
               )}
-              <SbBtn variant="filled" rounded className="flex items-center justify-center gap-2 h-10 px-4" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+              <button className="h-10 px-4 text-sm font-bold flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-30" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
                 <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
-              </SbBtn>
+              </button>
             </div>
           </div>
         </header>
@@ -300,44 +307,25 @@ function CalificacionesInner() {
           <div className="animate-pulse space-y-6">
             <div className="grid grid-cols-3 gap-2">
               {[1, 2, 3].map(i => (
-                <div
-                  key={i}
-                  className="h-28"
-                  style={{
-                    background: "var(--sb-surface-container)",
-                    borderRadius: "16px"
-                  }}
-                />
+                <div key={i} className="h-28" style={{ background: "var(--note-fill)", borderRadius: "16px" }} />
               ))}
             </div>
-            <div
-              className="h-64 animate-pulse"
-              style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "16px"
-              }}
-            />
+            <div className="h-64 animate-pulse" style={{ background: "var(--note-fill)", borderRadius: "16px" }} />
           </div>
         ) : students.length === 0 ? (
           <div
             className="py-16 text-center"
             style={{
-              background: "var(--sb-surface-container)",
-              borderRadius: "20px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+              background: "var(--note-surface)",
+              borderRadius: "24px",
+              border: "1px solid var(--note-hairline)"
             }}
           >
             <BookMarked
               className="h-10 w-10 mx-auto mb-3"
-              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
+              style={{ color: "var(--note-muted)", opacity: 0.3 }}
             />
-            <p
-              className="text-xs font-medium"
-              style={{
-                color: "var(--sb-on-surface-variant)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
+            <p className="text-xs font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
               {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
             </p>
           </div>
@@ -363,31 +351,18 @@ function CalificacionesInner() {
                 <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                   className="p-3 sm:p-4"
                   style={{
-                    background: "var(--sb-surface-container)",
+                    background: "var(--note-surface)",
                     borderRadius: "16px",
-                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                    border: "1px solid var(--note-hairline)"
                   }}
                 >
-                  <div className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center mb-2 bg-black/5 dark:bg-white/10 rounded-xl">
-                    <s.icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                  <div className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center mb-2" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
+                    <s.icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                   </div>
-                  <p
-                    className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.8px]"
-                    style={{
-                      color: "var(--sb-on-surface-variant)",
-                      opacity: 0.45,
-                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                    }}
-                  >
+                  <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                     {s.label}
                   </p>
-                  <p
-                    className="mt-1 text-base sm:text-lg font-bold leading-none"
-                    style={{
-                      color: "var(--sb-on-surface)",
-                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                    }}
-                  >
+                  <p className="mt-1 text-base sm:text-lg font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                     {s.value}
                   </p>
                 </motion.div>
@@ -398,9 +373,9 @@ function CalificacionesInner() {
             <div
               className="overflow-hidden"
               style={{
-                background: "var(--sb-surface-container)",
-                borderRadius: "20px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                background: "var(--note-surface)",
+                borderRadius: "24px",
+                border: "1px solid var(--note-hairline)"
               }}
             >
               <AnimatePresence>
@@ -411,25 +386,29 @@ function CalificacionesInner() {
                     <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25, delay: i * 0.03 }}
                       onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-3 sm:px-4 py-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
+                      className="flex items-center justify-between px-3 sm:px-4 py-3 transition-colors cursor-pointer group"
+                      style={{ borderBottom: i < students.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                    >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
-                          <span className="text-[9px] sm:text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
+                        <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+                          <span className="text-[9px] sm:text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{studentName(s)}</p>
+                          <p className="text-sm font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
                           <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">{s.grades.length} notas</span>
+                            <span className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.grades.length} notas</span>
                             {s.grades.slice(-3).map((g, j) => (
                               <span key={j} className={`text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded-xl ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
                             ))}
-                            {s.grades.length > 3 && <span className="text-[9px] sm:text-[10px] text-muted-foreground">+{s.grades.length - 3}</span>}
+                            {s.grades.length > 3 && <span className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>+{s.grades.length - 3}</span>}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
-                        <span className={`text-base sm:text-lg font-bold ${avg === 0 ? "text-muted-foreground/40" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
+                        <span className={`text-base sm:text-lg font-bold ${avg === 0 ? "opacity-40" : getGradeColor(avg)}`} style={{ color: "var(--note-text)" }}>{avg === 0 ? "—" : avg}</span>
                       </div>
                     </motion.div>
                   )
@@ -447,80 +426,95 @@ function CalificacionesInner() {
               <SbModalBody>
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                   <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
-                      <span className="text-sm sm:text-base font-bold text-white">{getInitials(studentName(selected))}</span>
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                      <span className="text-sm sm:text-base font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(selected))}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-base sm:text-lg font-semibold text-foreground truncate">{studentName(selected)}</p>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{courseLabel} · {selected.grades.length} calificaciones</p>
+                      <p className="text-base sm:text-lg font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(selected)}</p>
+                      <p className="text-[10px] sm:text-xs mt-0.5 truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{courseLabel} · {selected.grades.length} calificaciones</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={`text-xl sm:text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-muted-foreground/40"}`}>
+                      <p className={`text-xl sm:text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "opacity-40"}`} style={{ color: "var(--note-text)" }}>
                         {selected.grades.length ? calcAverage(selected.grades) : "—"}
                       </p>
-                      <p className="text-[9px] sm:text-[10px] text-muted-foreground">Promedio</p>
+                      <p className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</p>
                     </div>
                   </div>
 
                   {selected.grades.length > 0 && (
-                    <div className="rounded-xl bg-black/5 dark:bg-white/5 p-3 mb-4">
+                    <div className="rounded-xl p-3 mb-4" style={{ background: "var(--note-fill)" }}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider">Rendimiento</span>
+                          <BarChart3 className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                          <span className="text-[15px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Rendimiento</span>
                         </div>
-                        <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
+                        <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`} style={{ fontFamily: FONT }}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
                       </div>
-                      <div className="h-3 rounded-full bg-foreground/10 overflow-hidden">
+                      <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--note-fill-strong)" }}>
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%` }}
                           transition={{ duration: 0.8, delay: 0.2 }}
-                          className={`h-full rounded-full ${getGradeBarColor(calcAverage(selected.grades))}`}
+                          className="h-full rounded-full"
+                          style={{ background: "var(--note-text)" }}
                         />
                       </div>
                     </div>
                   )}
 
                   <div className="mb-4">
-                    <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Historial de Notas</p>
+                    <p className="text-[15px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial de Notas</p>
                     <div className="space-y-2">
                       {selected.grades.map((g) => (
-                        <div key={g.id} className="flex items-center gap-2 sm:gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-3 sm:px-4 py-2.5 sm:py-3 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                        <div key={g.id} className="flex items-center gap-2 sm:gap-3 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 group transition-colors"
+                          style={{ background: "var(--note-fill)" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
+                        >
                           {editGradeId === g.id ? (
                             <>
                               <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
                                 className="sb-input rounded-xl text-sm h-8 w-14 sm:w-16 text-center" autoFocus />
                               <div className="flex items-center gap-1">
                                 <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
-                                  className="h-8 px-2 sm:px-3 rounded-xl bg-foreground text-background text-xs font-medium hover:opacity-90 transition-all">
+                                  className="h-8 px-2 sm:px-3 rounded-xl text-xs font-medium transition-all"
+                                  style={{ background: "var(--note-text)", color: "var(--note-surface)" }}>
                                   Guardar
                                 </button>
                                 <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                                  className="h-8 px-2 sm:px-3 rounded-xl bg-foreground/10 text-muted-foreground text-xs font-medium hover:opacity-90 transition-all">
+                                  className="h-8 px-2 sm:px-3 rounded-xl text-xs font-medium transition-all"
+                                  style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)" }}>
                                   Cancelar
                                 </button>
                               </div>
                             </>
                           ) : (
                             <>
-                              <div className={`h-8 w-8 sm:h-9 sm:w-9 rounded-xl flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
+                              <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
                                 <span className={`text-xs sm:text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs sm:text-sm font-medium text-foreground">{g.period}</p>
-                                <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
+                                <p className="text-xs sm:text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{g.period}</p>
+                                <p className="text-[9px] sm:text-[10px] truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                                   {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
                                   {g.notes ? ` · ${g.notes}` : ""}
                                 </p>
                               </div>
                               <div className="flex items-center gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
-                                  className="h-7 w-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors">
+                                  className="h-7 w-7 rounded-xl flex items-center justify-center transition-colors"
+                                  style={{ color: "var(--note-muted)" }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.color = "var(--note-text)"; e.currentTarget.style.background = "var(--note-fill)" }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.color = "var(--note-muted)"; e.currentTarget.style.background = "transparent" }}
+                                >
                                   <Pencil className="h-3.5 w-3.5" />
                                 </button>
                                 <button onClick={() => handleDeleteGrade(g.id)}
-                                  className="h-7 w-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors">
+                                  className="h-7 w-7 rounded-xl flex items-center justify-center transition-colors"
+                                  style={{ color: "var(--note-muted)" }}
+                                  onMouseEnter={(e) => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.1)" }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.color = "var(--note-muted)"; e.currentTarget.style.background = "transparent" }}
+                                >
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </button>
                               </div>
@@ -529,29 +523,31 @@ function CalificacionesInner() {
                         </div>
                       ))}
                       {selected.grades.length === 0 && (
-                        <div className="text-center py-20 rounded-xl border border-dashed border-foreground/10">
-                          <BookMarked className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                          <p className="text-sm text-muted-foreground">Sin calificaciones</p>
+                        <div className="text-center py-20 rounded-xl" style={{ border: "1px dashed var(--note-hairline)" }}>
+                          <BookMarked className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+                          <p className="text-sm" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin calificaciones</p>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-black/5 dark:bg-white/5 p-3 sm:p-4">
-                    <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Agregar Nota</p>
+                  <div className="rounded-xl p-3 sm:p-4" style={{ background: "var(--note-fill)" }}>
+                    <p className="text-[15px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Agregar Nota</p>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
-                        className="sbf-native-select text-sm">
+                        className="text-sm rounded-xl h-9 px-3"
+                        style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
                         <option value="">Bimestre</option>
                         {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
                       </select>
                       <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
-                        className="sb-input rounded-xl text-sm h-9" />
+                        className="rounded-xl text-sm h-9 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
                       <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)}
-                        className="sb-input rounded-xl text-sm h-9" />
+                        className="rounded-xl text-sm h-9 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
                     </div>
                     <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
-                      className="w-full mt-2 h-9 rounded-xl bg-foreground text-background text-xs font-medium disabled:opacity-30 hover:opacity-90 transition-all">
+                      className="w-full mt-2 h-9 rounded-xl text-xs font-medium disabled:opacity-30 transition-all"
+                      style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
                       Agregar
                     </button>
                   </div>
@@ -567,40 +563,40 @@ function CalificacionesInner() {
           <SbModalBody>
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div>
-                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Curso</label>
+                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</label>
                 <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }}
-                  className="sbf-native-select w-full">
+                  className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
                   {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Alumno</label>
+                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</label>
                 <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} disabled={registerCourseId !== courseId}
-                  className="sbf-native-select w-full disabled:opacity-50">
+                  className="w-full h-10 px-3 text-sm rounded-xl disabled:opacity-50" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
                   <option value="">{registerCourseId === courseId ? "Seleccionar alumno..." : "Selecciona primero el curso en la vista"}</option>
                   {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bimestre</label>
-                <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="sbf-native-select w-full">
+                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Bimestre</label>
+                <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
                   <option value="">Seleccionar bimestre...</option>
                   {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nota (0-{MAX_SCORE})</label>
+                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Nota (0-{MAX_SCORE})</label>
                 <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
-                  className="sb-input rounded-xl text-sm h-10 w-full" />
+                  className="rounded-xl text-sm h-10 w-full px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
               </div>
             </motion.div>
           </SbModalBody>
           <SbModalFooter>
             <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <SbBtn rounded className="w-full sm:w-auto" onClick={() => setRegisterOpen(false)}>Cancelar</SbBtn>
-              <SbBtn variant="filled" rounded className="w-full sm:w-auto" disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+              <button className="h-10 px-5 text-sm font-semibold rounded-xl transition-all" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
+              <button className="h-10 px-5 text-sm font-bold rounded-xl transition-all disabled:opacity-30" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
                 {saving ? "Guardando..." : "Guardar"}
-              </SbBtn>
+              </button>
             </div>
           </SbModalFooter>
         </SbModal>
@@ -638,25 +634,25 @@ function TablaNotas({
     onSaveCell(studentId, period, value)
   }
 
-  const avgClass = (avg: number) => avg === 0 ? "text-muted-foreground/40" : avg >= 11 ? "text-emerald-600" : "text-red-500"
+  const avgClass = (avg: number) => avg === 0 ? "text-[var(--note-muted)] opacity-40" : avg >= 11 ? "text-[var(--note-text)]" : "text-[var(--note-muted)]"
 
   return (
-    <div className="rounded-xl border border-foreground/10 bg-foreground/5 overflow-hidden">
+    <div className="rounded-xl overflow-hidden" style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
       {saveError && (
         <div className="px-5 pt-4">
           <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div>
         </div>
       )}
-      <div className="px-5 pt-5 pb-4 border-b border-foreground/10">
+      <div className="px-5 pt-5 pb-4" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">Libro de notas</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Libro de notas</p>
+            <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
           </div>
-          <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-3 text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Aprobado (11+)</span>
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400" /> Desaprobado</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-foreground/10" /> Sin nota</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-fill-strong)" }} /> Sin nota</span>
           </div>
         </div>
       </div>
@@ -664,29 +660,33 @@ function TablaNotas({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr className="bg-foreground/5 text-left">
-              <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Alumno</th>
+            <tr style={{ background: "var(--note-fill-strong)" }}>
+              <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</th>
               {PERIODS.map(p => (
-                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                   B{p.split(" ")[1]}
                 </th>
               ))}
-              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Promedio</th>
+              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-foreground/10">
-            {students.map(s => {
+          <tbody>
+            {students.map((s, i) => {
               const avg = calcAverage(s.grades)
+              const isLast = i === students.length - 1
               return (
-                <tr key={s.id} className="hover:bg-foreground/5 transition-colors">
+                <tr key={s.id} className="transition-colors" style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                >
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`h-8 w-8 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
-                        <span className="text-[9px] font-bold text-white">{getInitials(studentName(s))}</span>
+                      <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+                        <span className="text-[9px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-foreground truncate max-w-[160px]">{studentName(s)}</p>
-                        <p className="text-[9px] text-muted-foreground">{s.code}</p>
+                        <p className="text-xs font-medium truncate max-w-[160px]" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
+                        <p className="text-[9px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.code}</p>
                       </div>
                     </div>
                   </td>
@@ -695,7 +695,7 @@ function TablaNotas({
                     const key = cellKey(s.id, p)
                     const value = drafts[key] !== undefined ? drafts[key] : g ? String(g.score) : ""
                     const isSaving = savingCell === key
-                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-muted-foreground/50"
+                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-[var(--note-muted)] opacity-50"
                     return (
                       <td key={p} className="px-3 py-2 text-center">
                         <div className="relative inline-block">
@@ -709,12 +709,13 @@ function TablaNotas({
                             onChange={e => setDrafts(prev => ({ ...prev, [key]: e.target.value }))}
                             onBlur={() => commit(s.id, p)}
                             onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
-                            className={`w-14 h-9 rounded-xl text-center text-sm font-semibold bg-foreground/5 focus:outline-none focus:ring-2 focus:ring-muted-foreground/40 transition-all ${color}`}
+                            className={`w-14 h-9 rounded-xl text-center text-sm font-semibold focus:outline-none focus:ring-2 transition-all ${color}`}
+                            style={{ background: "var(--note-fill-strong)", "--tw-ring-color": "var(--note-muted)" } as any}
                           />
                           {isSaving && (
                             <span className="absolute -top-1 -right-1 h-2.5 w-2.5">
-                              <span className="absolute inset-0 rounded-full bg-muted-foreground/30 animate-ping" />
-                              <span className="absolute inset-0 rounded-full bg-foreground" />
+                              <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "var(--note-muted)", opacity: 0.3 }} />
+                              <span className="absolute inset-0 rounded-full" style={{ background: "var(--note-text)" }} />
                             </span>
                           )}
                         </div>

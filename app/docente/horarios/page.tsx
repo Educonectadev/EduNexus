@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Sun, Moon, ChevronDown } from "@/components/ui/proicons"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Sun, Moon } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
@@ -14,6 +14,7 @@ interface Horario {
 }
 
 const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
 const isRecess = (gap: number) => gap >= 5 && gap <= 30
@@ -49,46 +50,30 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
             <div
               className="w-full max-w-md overflow-hidden"
               style={{
-                background: "var(--sb-surface)",
-                borderRadius: "20px",
-                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                background: "var(--note-surface)",
+                borderRadius: "24px",
+                border: "1px solid var(--note-hairline)"
               }}
               onClick={e => e.stopPropagation()}
             >
               {/* Header */}
               <div
                 className="px-5 py-4 flex items-center justify-between"
-                style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
+                style={{ borderBottom: "1px solid var(--note-hairline)" }}
               >
                 <div>
-                  <p
-                    className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                    style={{
-                      color: "var(--sb-on-surface-variant)",
-                      opacity: 0.45,
-                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                    }}
-                  >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                     {DAYS[horario.day_of_week - 1]}
                   </p>
-                  <h2
-                    className="text-base font-semibold mt-1"
-                    style={{
-                      color: "var(--sb-on-surface)",
-                      fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                    }}
-                  >
+                  <h2 className="text-base font-semibold mt-1" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                     {horario.course_name}
                   </h2>
                 </div>
                 <button
                   onClick={onClose}
                   className="h-8 w-8 flex items-center justify-center transition-colors"
-                  style={{
-                    borderRadius: "10px",
-                    color: "var(--sb-on-surface-variant)"
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
+                  style={{ borderRadius: "10px", color: "var(--note-muted)" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
                 >
                   <X className="h-4 w-4" />
@@ -99,32 +84,14 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
               <div className="px-5 py-4 space-y-4">
                 {/* Time Block */}
                 <div className="flex items-center gap-3">
-                  <div
-                    className="h-10 w-10 flex items-center justify-center"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "12px"
-                    }}
-                  >
-                    <Clock className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                  <div className="h-10 w-10 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
+                    <Clock className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                   </div>
                   <div>
-                    <p
-                      className="text-lg font-semibold"
-                      style={{
-                        color: "var(--sb-on-surface)",
-                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                      }}
-                    >
+                    <p className="text-lg font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                       {horario.start_time.slice(0, 5)} — {horario.end_time.slice(0, 5)}
                     </p>
-                    <p
-                      className="text-xs"
-                      style={{
-                        color: "var(--sb-on-surface-variant)",
-                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                      }}
-                    >
+                    <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                       {durationStr} de duración
                     </p>
                   </div>
@@ -132,103 +99,41 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
 
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-2">
-                  <div
-                    className="p-3"
-                    style={{
-                      background: "var(--sb-surface-container)",
-                      borderRadius: "12px"
-                    }}
-                  >
+                  <div className="p-3" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <GraduationCap className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
-                      <span
-                        className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                        style={{
-                          color: "var(--sb-on-surface-variant)",
-                          opacity: 0.45,
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <GraduationCap className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+                      <span className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                         Grado
                       </span>
                     </div>
-                    <p
-                      className="text-sm font-medium"
-                      style={{
-                        color: "var(--sb-on-surface)",
-                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                      }}
-                    >
+                    <p className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                       {horario.grade} &quot;{horario.section}&quot;
                     </p>
                   </div>
-                  <div
-                    className="p-3"
-                    style={{
-                      background: "var(--sb-surface-container)",
-                      borderRadius: "12px"
-                    }}
-                  >
+                  <div className="p-3" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <MapPin className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
-                      <span
-                        className="text-[10px] font-bold uppercase tracking-[0.8px]"
-                        style={{
-                          color: "var(--sb-on-surface-variant)",
-                          opacity: 0.45,
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <MapPin className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+                      <span className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                         Aula
                       </span>
                     </div>
-                    <p
-                      className="text-sm font-medium"
-                      style={{
-                        color: "var(--sb-on-surface)",
-                        fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                      }}
-                    >
+                    <p className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                       {horario.classroom || "Sin asignar"}
                     </p>
                   </div>
                 </div>
 
                 {/* Course Info */}
-                <div
-                  className="p-3"
-                  style={{
-                    borderRadius: "12px",
-                    border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-                  }}
-                >
+                <div className="p-3" style={{ borderRadius: "12px", border: "1px solid var(--note-hairline)" }}>
                   <div className="flex items-center gap-2.5">
-                    <div
-                      className="h-8 w-8 flex items-center justify-center"
-                      style={{
-                        background: "var(--sb-surface-container)",
-                        borderRadius: "10px"
-                      }}
-                    >
-                      <BookOpen className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                    <div className="h-8 w-8 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "10px" }}>
+                      <BookOpen className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                     </div>
                     <div>
-                      <p
-                        className="text-xs font-medium"
-                        style={{
-                          color: "var(--sb-on-surface)",
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <p className="text-xs font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                         {horario.course_name}
                       </p>
-                      <p
-                        className="text-[10px]"
-                        style={{
-                          color: "var(--sb-on-surface-variant)",
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                         {horario.course_code}
                       </p>
                     </div>
@@ -237,21 +142,8 @@ function ScheduleDetailModal({ horario, open, onClose }: { horario: Horario | nu
               </div>
 
               {/* Footer */}
-              <div
-                className="px-5 py-3"
-                style={{
-                  borderTop: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)",
-                  background: "var(--sb-surface-container)"
-                }}
-              >
-                <p
-                  className="text-[10px] text-center"
-                  style={{
-                    color: "var(--sb-on-surface-variant)",
-                    opacity: 0.5,
-                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                  }}
-                >
+              <div className="px-5 py-3" style={{ borderTop: "1px solid var(--note-hairline)", background: "var(--note-fill)" }}>
+                <p className="text-[10px] text-center" style={{ color: "var(--note-muted)", opacity: 0.5, fontFamily: FONT }}>
                   Horario recurrente cada {DAYS[horario.day_of_week - 1]}
                 </p>
               </div>
@@ -302,78 +194,58 @@ export default function DocenteHorariosPage() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
       <div className="p-5 md:p-8 pb-24 md:pb-8">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8 gap-4">
+        <header className="flex items-start justify-between mb-6 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Horarios
             </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
               Tu horario semanal de clases
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-xl flex items-center justify-center bg-black/10 dark:bg-white/10">
-                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5]" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5]" />
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
           </div>
-        </div>
+        </header>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Jornada</p>
-              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                <Sun className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
+          {[
+            { label: "Jornada", value: "Lun – Vie" },
+            { label: "Clases", value: totalClasses },
+            { label: "Horas/sem", value: `${totalHours}h` },
+            { label: "Cursos", value: new Set(horarios.map(h => h.course_id)).size },
+          ].map((stat) => (
+            <div key={stat.label} className="p-5 group" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[12px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{stat.label}</p>
+                <div className="h-9 w-9 flex items-center justify-center" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
+                  <Calendar className="h-4 w-4 group-hover:scale-110 transition-transform" style={{ color: "var(--note-muted)" }} />
+                </div>
               </div>
+              <p className="text-[28px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{stat.value}</p>
             </div>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">Lun – Vie</p>
-          </div>
-          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Clases</p>
-              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                <BookOpen className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
-              </div>
-            </div>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalClasses}</p>
-          </div>
-          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Horas/sem</p>
-              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
-              </div>
-            </div>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{totalHours}h</p>
-          </div>
-          <div className="p-5 rounded-[20px] bg-white dark:bg-[#17171a] group">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Cursos</p>
-              <div className="h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                <GraduationCap className="h-4 w-4 text-[#666] dark:text-[#a1a1aa] group-hover:scale-110 transition-transform" />
-              </div>
-            </div>
-            <p className="text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{new Set(horarios.map(h => h.course_id)).size}</p>
-          </div>
+          ))}
         </div>
 
         {/* Day Filters */}
@@ -385,14 +257,14 @@ export default function DocenteHorariosPage() {
         >
           <button
             onClick={() => setActiveDay(null)}
-            className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 hover:bg-black/10 dark:hover:bg-white/10"
+            className="px-3 py-1.5 text-xs font-medium transition-all shrink-0"
             style={{
               borderRadius: "10px",
               border: "1.5px solid",
-              borderColor: activeDay === null ? "transparent" : "var(--sb-outline-variant)",
-              background: activeDay === null ? "var(--sb-on-surface)" : "transparent",
-              color: activeDay === null ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
-              fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+              borderColor: activeDay === null ? "transparent" : "var(--note-hairline)",
+              background: activeDay === null ? "var(--note-text)" : "transparent",
+              color: activeDay === null ? "var(--note-surface)" : "var(--note-muted)",
+              fontFamily: FONT
             }}
           >
             Todos
@@ -401,22 +273,22 @@ export default function DocenteHorariosPage() {
             <button
               key={day}
               onClick={() => setActiveDay(activeDay === day ? null : day)}
-              className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 flex items-center gap-1.5 hover:bg-black/10 dark:hover:bg-white/10"
+              className="px-3 py-1.5 text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"
               style={{
                 borderRadius: "10px",
                 border: "1.5px solid",
-                borderColor: activeDay === day ? "transparent" : "var(--sb-outline-variant)",
+                borderColor: activeDay === day ? "transparent" : "var(--note-hairline)",
                 background: activeDay === day
-                  ? "var(--sb-on-surface)"
+                  ? "var(--note-text)"
                   : todayDay === day
-                    ? "var(--sb-surface-container-high)"
+                    ? "var(--note-fill-strong)"
                     : "transparent",
                 color: activeDay === day
-                  ? "var(--sb-surface)"
+                  ? "var(--note-surface)"
                   : todayDay === day
-                    ? "var(--sb-on-surface)"
-                    : "var(--sb-on-surface-variant)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
+                    ? "var(--note-text)"
+                    : "var(--note-muted)",
+                fontFamily: FONT
               }}
             >
               {label}
@@ -429,36 +301,11 @@ export default function DocenteHorariosPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {[1, 2, 3, 4, 5].map(i => (
-              <div
-                key={i}
-                className="p-4 animate-pulse"
-                style={{
-                  background: "var(--sb-surface-container)",
-                  borderRadius: "16px"
-                }}
-              >
-                <div
-                  className="h-4 w-20 mb-4"
-                  style={{
-                    background: "var(--sb-surface-container-high)",
-                    borderRadius: "8px"
-                  }}
-                />
+              <div key={i} className="p-4 animate-pulse" style={{ background: "var(--note-fill)", borderRadius: "16px" }}>
+                <div className="h-4 w-20 mb-4" style={{ background: "var(--note-fill-strong)", borderRadius: "8px" }} />
                 <div className="space-y-2">
-                  <div
-                    className="h-14"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "10px"
-                    }}
-                  />
-                  <div
-                    className="h-14"
-                    style={{
-                      background: "var(--sb-surface-container-high)",
-                      borderRadius: "10px"
-                    }}
-                  />
+                  <div className="h-14" style={{ background: "var(--note-fill-strong)", borderRadius: "10px" }} />
+                  <div className="h-14" style={{ background: "var(--note-fill-strong)", borderRadius: "10px" }} />
                 </div>
               </div>
             ))}
@@ -472,40 +319,23 @@ export default function DocenteHorariosPage() {
                 <div
                   key={day}
                   style={{
-                    background: isToday ? "var(--sb-surface-container-high)" : "var(--sb-surface-container)",
+                    background: isToday ? "var(--note-fill-strong)" : "var(--note-fill)",
                     borderRadius: "16px",
                     border: isToday
-                      ? "1px solid color-mix(in srgb, var(--sb-primary) 30%, transparent)"
-                      : "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
+                      ? "1px solid var(--note-text)"
+                      : "1px solid var(--note-hairline)"
                   }}
                 >
                   {/* Day Header */}
-                  <div
-                    className="px-4 py-3 flex items-center justify-between"
-                    style={{ borderBottom: "1px solid color-mix(in srgb, var(--sb-outline-variant) 25%, transparent)" }}
-                  >
+                  <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-3.5 w-3.5" style={{ color: "var(--sb-on-surface-variant)" }} />
-                      <span
-                        className="text-xs font-medium"
-                        style={{
-                          color: "var(--sb-on-surface)",
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <Calendar className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+                      <span className="text-xs font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                         {label}
                       </span>
                     </div>
                     {isToday && (
-                      <span
-                        className="text-[10px] font-bold px-2 py-0.5"
-                        style={{
-                          borderRadius: "8px",
-                          background: "var(--sb-on-surface)",
-                          color: "var(--sb-surface)",
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <span className="text-[10px] font-bold px-2 py-0.5" style={{ borderRadius: "8px", background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
                         HOY
                       </span>
                     )}
@@ -514,14 +344,7 @@ export default function DocenteHorariosPage() {
                   {/* Classes */}
                   {items.length === 0 ? (
                     <div className="px-4 py-8 text-center">
-                      <p
-                        className="text-xs"
-                        style={{
-                          color: "var(--sb-on-surface-variant)",
-                          opacity: 0.4,
-                          fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                        }}
-                      >
+                      <p className="text-xs" style={{ color: "var(--note-muted)", opacity: 0.4, fontFamily: FONT }}>
                         Sin clases
                       </p>
                     </div>
@@ -535,47 +358,20 @@ export default function DocenteHorariosPage() {
                           <React.Fragment key={h.id}>
                             <button
                               onClick={() => handleHorarioClick(h)}
-                              className="w-full text-left p-3 transition-all hover:bg-black/5 dark:hover:bg-white/5"
-                              style={{
-                                borderRadius: "12px",
-                                border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.background = "var(--sb-surface-container-high)"
-                                e.currentTarget.style.borderColor = "color-mix(in srgb, var(--sb-outline-variant) 50%, transparent)"
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.background = "transparent"
-                                e.currentTarget.style.borderColor = "color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-                              }}
+                              className="w-full text-left p-3 transition-all"
+                              style={{ borderRadius: "12px", border: "1px solid var(--note-hairline)" }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
                             >
                               <div className="flex items-start justify-between gap-2 mb-1.5">
-                                <h3
-                                  className="text-xs font-medium"
-                                  style={{
-                                    color: "var(--sb-on-surface)",
-                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                                  }}
-                                >
+                                <h3 className="text-xs font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                                   {h.course_name}
                                 </h3>
-                                <span
-                                  className="text-[10px] shrink-0"
-                                  style={{
-                                    color: "var(--sb-on-surface-variant)",
-                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                                  }}
-                                >
+                                <span className="text-[10px] shrink-0" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                                   {h.grade} {h.section}
                                 </span>
                               </div>
-                              <div
-                                className="flex items-center gap-2.5 text-[11px]"
-                                style={{
-                                  color: "var(--sb-on-surface-variant)",
-                                  fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                                }}
-                              >
+                              <div className="flex items-center gap-2.5 text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                                 <span className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
                                   <span>{h.start_time.slice(0, 5)} — {h.end_time.slice(0, 5)}</span>
@@ -590,18 +386,11 @@ export default function DocenteHorariosPage() {
                             </button>
                             {showRecess && (
                               <div className="flex items-center gap-1.5 px-2 py-0.5">
-                                <div className="flex-1 h-px" style={{ background: "var(--sb-outline-variant)", opacity: 0.3 }} />
-                                <span
-                                  className="flex items-center gap-1 text-[9px] uppercase tracking-wider"
-                                  style={{
-                                    color: "var(--sb-on-surface-variant)",
-                                    opacity: 0.3,
-                                    fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-                                  }}
-                                >
+                                <div className="flex-1 h-px" style={{ background: "var(--note-muted)", opacity: 0.2 }} />
+                                <span className="flex items-center gap-1 text-[9px] uppercase tracking-wider" style={{ color: "var(--note-muted)", opacity: 0.3, fontFamily: FONT }}>
                                   <Coffee className="h-2.5 w-2.5" /> Receso {gap}m
                                 </span>
-                                <div className="flex-1 h-px" style={{ background: "var(--sb-outline-variant)", opacity: 0.3 }} />
+                                <div className="flex-1 h-px" style={{ background: "var(--note-muted)", opacity: 0.2 }} />
                               </div>
                             )}
                           </React.Fragment>
@@ -617,35 +406,12 @@ export default function DocenteHorariosPage() {
 
         {/* Empty State */}
         {!loading && horarios.length === 0 && (
-          <div
-            className="py-16 text-center"
-            style={{
-              background: "var(--sb-surface-container)",
-              borderRadius: "20px",
-              border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
-            }}
-          >
-            <Calendar
-              className="h-10 w-10 mx-auto mb-3"
-              style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }}
-            />
-            <p
-              className="text-sm font-medium"
-              style={{
-                color: "var(--sb-on-surface)",
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
+          <div className="py-16 text-center" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+            <Calendar className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+            <p className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Aún no tienes horarios asignados
             </p>
-            <p
-              className="text-xs mt-1"
-              style={{
-                color: "var(--sb-on-surface-variant)",
-                opacity: 0.5,
-                fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
-              }}
-            >
+            <p className="text-xs mt-1" style={{ color: "var(--note-muted)", opacity: 0.5, fontFamily: FONT }}>
               El secretario asignará tus cursos y horarios
             </p>
           </div>
