@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { MoreHorizontal, X, User, Sparkles } from "@/components/ui/proicons"
+import { MoreHorizontal, X, User, Sparkles, LogOut } from "@/components/ui/proicons"
 
 interface NavItem {
   title: string
@@ -20,6 +20,7 @@ interface MobileNavbarProps {
   className?: string
   onAiClick?: () => void
   maxVisible?: number
+  onLogout?: () => void
 }
 
 function NavButton({
@@ -81,6 +82,7 @@ export function MobileNavbar({
   className,
   onAiClick,
   maxVisible = 4,
+  onLogout,
 }: MobileNavbarProps) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = React.useState(false)
@@ -210,6 +212,22 @@ export function MobileNavbar({
                       {item.title}
                     </button>
                   ))}
+
+                  {onLogout && (
+                    <>
+                      <div className="h-px bg-white/10 my-1" />
+                      <button
+                        type="button"
+                        onClick={() => { setMenuOpen(false); onLogout() }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300"
+                      >
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
+                          <LogOut className="h-4 w-4" />
+                        </span>
+                        Cerrar sesión
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

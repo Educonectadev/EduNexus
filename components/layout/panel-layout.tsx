@@ -705,6 +705,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             role={role}
             onAiClick={role === 'secretario' && can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
             maxVisible={4}
+            onLogout={handleLogout}
           />
         )}
 
