@@ -58,7 +58,7 @@ export default function DocenteDashboard() {
           fetch("/api/docente/horarios").then(r => r.json()),
         ])
         if (cancelled) return
-        setCourses(Array.isArray(c) ? c : [])
+        setCourses(Array.isArray(c) ? c.map((course: any) => ({ ...course, students: course.student_count ?? course.students ?? 0 })) : [])
         setHorarios(Array.isArray(h) ? h : [])
 
         try {
