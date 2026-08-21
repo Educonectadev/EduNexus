@@ -84,15 +84,7 @@ export function MobileNavbar({
 }: MobileNavbarProps) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = React.useState(false)
-  const [openSize, setOpenSize] = React.useState({ width: 0, height: 0 })
   const contentRef = React.useRef<HTMLDivElement>(null)
-
-  React.useLayoutEffect(() => {
-    if (menuOpen && contentRef.current) {
-      const el = contentRef.current
-      setOpenSize({ width: el.offsetWidth, height: el.offsetHeight })
-    }
-  }, [menuOpen])
 
   const visibleItems = items.slice(0, maxVisible)
   const optionsItems = items.slice(maxVisible)
@@ -136,56 +128,85 @@ export function MobileNavbar({
             ))}
           </div>
 
-          {/* More Options Button - Floating Circle */}
+          {/* More Options Button - Morph Animation */}
           <div className="mobile-nav-more absolute right-4 bottom-0">
             <div className="relative flex flex-col items-end">
+              {/* Backdrop */}
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    className="fixed inset-0 -z-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setMenuOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Morph Container */}
               <motion.div
-                className="relative z-50 overflow-hidden"
+                layout
+                className="relative z-50"
                 style={{
-                  transformOrigin: "bottom right",
-                  backgroundColor: "var(--sb-on-surface)",
+                  backgroundColor: menuOpen ? "var(--sb-on-surface)" : "var(--sb-on-surface)",
                   boxShadow: "0 8px 32px -8px rgba(0,0,0,0.35)",
                 }}
                 animate={{
-                  width: menuOpen ? Math.max(openSize.width, 56) : 56,
-                  height: menuOpen ? Math.max(openSize.height, 56) : 56,
+                  width: menuOpen ? 224 : 56,
+                  height: menuOpen ? openSize.height || 'auto' : 56,
                   borderRadius: menuOpen ? 28 : 999,
                 }}
-                transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
+                initial={false}
+                transition={{
+                  layout: { type: "spring", stiffness: 400, damping: 30 },
+                  width: { type: "spring", stiffness: 400, damping: 30 },
+                  height: { type: "spring", stiffness: 400, damping: 30 },
+                  borderRadius: { type: "spring", stiffness: 400, damping: 30 },
+                }}
               >
+                {/* Button Icon - stays in corner when menu open */}
                 <motion.button
                   type="button"
-                  className="absolute flex items-center justify-center w-14 h-14 z-10 rounded-full"
+                  className="absolute flex items-center justify-center w-14 h-14 z-10"
                   onClick={() => setMenuOpen(v => !v)}
                   aria-label="Más opciones"
                   aria-expanded={menuOpen}
                   whileTap={{ scale: 0.9 }}
                   animate={{
-                    left: menuOpen ? Math.max(openSize.width - 56, 0) : 0,
-                    top: menuOpen ? Math.max(openSize.height - 56, 0) : 0,
+                    x: menuOpen ? 168 : 0,
+                    y: menuOpen ? 0 : 0,
                   }}
-                  transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 >
                   <motion.div
                     animate={{
-                      rotate: menuOpen ? 90 : 0,
-                      color: menuOpen ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
+                      rotate: menuOpen ? 135 : 0,
+                      color: "var(--sb-surface)",
                     }}
-                    transition={{ type: "spring", stiffness: 500, damping: 18, mass: 0.8 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
                   >
-                    <MoreHorizontal className="h-5 w-5" />
+                    {menuOpen ? (
+                      <X className="h-5 w-5" strokeWidth={2.5} />
+                    ) : (
+                      <MoreHorizontal className="h-5 w-5" />
+                    )}
                   </motion.div>
                 </motion.button>
+
+                {/* Menu Content */}
                 <AnimatePresence>
                   {menuOpen && (
                     <motion.div
+                      ref={contentRef}
+                      className="absolute inset-0 overflow-hidden"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.15 }}
+                      transition={{ delay: 0.1, duration: 0.15 }}
                     >
-                      <div ref={contentRef} className="w-56">
-                        <div className="p-2 pb-3">
+                      <div className="w-56 h-full">
+                        <div className="p-2 pb-3 pl-3 pr-14">
                           {onAiClick && (
                             <button
                               type="button"
