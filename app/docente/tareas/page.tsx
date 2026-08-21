@@ -4,7 +4,7 @@ import * as React from "react"
 import { useSearchParams } from "next/navigation"
 import {
   ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle,
-  BookOpen, Users, X, Eye, Search, GraduationCap, Sun, Moon, Check,
+  BookOpen, Users, X, Eye, Search, GraduationCap, Sun, Moon, Check, ChevronDown,
 } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { motion, AnimatePresence } from "framer-motion"
@@ -295,22 +295,46 @@ function TareasInner() {
         {/* Search + Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
-            <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              className="sb-input w-full h-11 pl-11 pr-4 text-sm rounded-xl" />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-lg flex items-center justify-center transition-colors" style={{ background: "var(--note-fill)" }}>
-                <X className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
-              </button>
-            )}
+            <div
+              className="flex items-center h-11 gap-2.5 px-3 transition-all"
+              style={{
+                borderRadius: "14px",
+                background: "var(--note-fill)",
+                border: "1px solid var(--note-hairline)",
+              }}
+            >
+              <Search className="h-4 w-4 shrink-0" style={{ color: "var(--note-muted)", opacity: 0.6 }} />
+              <input
+                placeholder="Buscar tarea..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent border-none outline-none text-sm font-medium placeholder:opacity-50"
+                style={{ color: "var(--note-text)", fontFamily: FONT }}
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")} className="h-6 w-6 rounded-lg flex items-center justify-center shrink-0 transition-colors" style={{ background: "var(--note-fill-strong)" }}>
+                  <X className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+                </button>
+              )}
+            </div>
           </div>
-          <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
-            className="sbf-native-select h-11 px-4 text-sm rounded-xl sm:w-56">
-            <option value="">Todos los cursos</option>
-            {courses.map(c => (
-              <option key={c.id} value={c.id}>{c.name} - {c.grade} {c.section}</option>
-            ))}
-          </select>
+          <div className="relative sm:w-56">
+            <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
+              className="h-11 w-full px-4 pr-10 text-sm font-medium appearance-none cursor-pointer transition-all"
+              style={{
+                borderRadius: "14px",
+                background: courseFilter ? "var(--note-fill)" : "transparent",
+                border: `1.5px solid ${courseFilter ? "var(--note-fill-strong)" : "var(--note-hairline)"}`,
+                color: courseFilter ? "var(--note-text)" : "var(--note-muted)",
+                fontFamily: FONT,
+              }}>
+              <option value="">Todos los cursos</option>
+              {courses.map(c => (
+                <option key={c.id} value={c.id}>{c.name} - {c.grade} {c.section}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
+          </div>
         </div>
 
         {/* Filter tabs */}
