@@ -255,13 +255,15 @@ function CalificacionesInner() {
             </button>
           </div>
           </div>
-          <div className="flex items-center gap-3 mt-4">
-            <div className="nb-select-wrap">
+
+          {/* Controls - Mobile responsive */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4">
+            <div className="nb-select-wrap flex-1">
               <select
                 value={courseId}
                 onChange={e => setCourseId(e.target.value)}
                 disabled={loading}
-                className={cn("nb-select min-w-[220px]", courseId && "has-value")}
+                className={cn("nb-select w-full", courseId && "has-value")}
               >
                 {courses.length === 0 && <option value="">Sin cursos asignados</option>}
                 {courses.map(c => (
@@ -269,20 +271,22 @@ function CalificacionesInner() {
                 ))}
               </select>
             </div>
-            {students.length > 0 && (
-              <div className="nb-rail">
-                {([["lista", "Lista"], ["tabla", "Libro de notas"]] as const).map(([key, label]) => (
-                  <button key={key} onClick={() => setViewMode(key)}
-                    className={cn("nb-chip", viewMode === key && "active")}>
-                    <Check className="nb-chip-check" />
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-            <SbBtn variant="filled" rounded className="flex items-center gap-2 ml-auto" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
-              <Plus className="h-4 w-4" /> Registrar
-            </SbBtn>
+            <div className="flex items-center gap-2">
+              {students.length > 0 && (
+                <div className="nb-rail flex-1 sm:flex-none">
+                  {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
+                    <button key={key} onClick={() => setViewMode(key)}
+                      className={cn("nb-chip", viewMode === key && "active")}>
+                      <Check className="nb-chip-check" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <SbBtn variant="filled" rounded className="flex items-center justify-center gap-2 h-10 px-4" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+                <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
+              </SbBtn>
+            </div>
           </div>
         </header>
 
@@ -350,25 +354,25 @@ function CalificacionesInner() {
         ) : (
           <>
             {/* Stats */}
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-2">
+            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
-                { label: "Promedio General", value: avgGeneral.toFixed(1), icon: BarChart3 },
+                { label: "Promedio", value: avgGeneral.toFixed(1), icon: BarChart3 },
                 { label: "Mejor Nota", value: bestScore, icon: TrendingUp },
-                { label: "Total Alumnos", value: students.length, icon: BookMarked },
+                { label: "Alumnos", value: students.length, icon: BookMarked },
               ].map(s => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  className="p-4"
+                  className="p-3 sm:p-4"
                   style={{
                     background: "var(--sb-surface-container)",
                     borderRadius: "16px",
                     border: "1px solid color-mix(in srgb, var(--sb-outline-variant) 30%, transparent)"
                   }}
                 >
-                  <div className="h-9 w-9 flex items-center justify-center mb-2 bg-black/5 dark:bg-white/10 rounded-xl">
+                  <div className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center mb-2 bg-black/5 dark:bg-white/10 rounded-xl">
                     <s.icon className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
                   </div>
                   <p
-                    className="text-[10px] font-bold uppercase tracking-[0.8px]"
+                    className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.8px]"
                     style={{
                       color: "var(--sb-on-surface-variant)",
                       opacity: 0.45,
@@ -378,7 +382,7 @@ function CalificacionesInner() {
                     {s.label}
                   </p>
                   <p
-                    className="mt-1.5 text-lg font-bold leading-none"
+                    className="mt-1 text-base sm:text-lg font-bold leading-none"
                     style={{
                       color: "var(--sb-on-surface)",
                       fontFamily: "var(--app-main-font, 'DM Sans'), sans-serif"
@@ -407,25 +411,25 @@ function CalificacionesInner() {
                     <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25, delay: i * 0.03 }}
                       onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`h-10 w-10 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
-                          <span className="text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
+                      className="flex items-center justify-between px-3 sm:px-4 py-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-b border-foreground/10 last:border-0 cursor-pointer group">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-xl ${getAvatarColor(studentName(s))} flex items-center justify-center shrink-0`}>
+                          <span className="text-[9px] sm:text-[10px] font-bold text-white">{getInitials(studentName(s))}</span>
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">{studentName(s)}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] text-muted-foreground">{s.grades.length} notas</span>
-                            {s.grades.slice(-4).map((g, j) => (
-                              <span key={j} className={`text-[10px] font-mono px-1.5 py-0.5 rounded-xl ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
+                          <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">{s.grades.length} notas</span>
+                            {s.grades.slice(-3).map((g, j) => (
+                              <span key={j} className={`text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded-xl ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
                             ))}
-                            {s.grades.length > 4 && <span className="text-[10px] text-muted-foreground">+{s.grades.length - 4}</span>}
+                            {s.grades.length > 3 && <span className="text-[9px] sm:text-[10px] text-muted-foreground">+{s.grades.length - 3}</span>}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
-                        <span className={`text-lg font-bold ${avg === 0 ? "text-muted-foreground/40" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
+                        <span className={`text-base sm:text-lg font-bold ${avg === 0 ? "text-muted-foreground/40" : getGradeColor(avg)}`}>{avg === 0 ? "—" : avg}</span>
                       </div>
                     </motion.div>
                   )
@@ -442,19 +446,19 @@ function CalificacionesInner() {
               <SbModalHeader title="" onClose={() => setDetailOpen(false)} />
               <SbModalBody>
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`h-12 w-12 rounded-xl ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
-                      <span className="text-base font-bold text-white">{getInitials(studentName(selected))}</span>
+                  <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
+                    <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl ${getAvatarColor(studentName(selected))} flex items-center justify-center`}>
+                      <span className="text-sm sm:text-base font-bold text-white">{getInitials(studentName(selected))}</span>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-lg font-semibold text-foreground">{studentName(selected)}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{courseLabel} · {selected.grades.length} calificaciones</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base sm:text-lg font-semibold text-foreground truncate">{studentName(selected)}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{courseLabel} · {selected.grades.length} calificaciones</p>
                     </div>
-                    <div className="text-right">
-                      <p className={`text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-muted-foreground/40"}`}>
+                    <div className="text-right shrink-0">
+                      <p className={`text-xl sm:text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "text-muted-foreground/40"}`}>
                         {selected.grades.length ? calcAverage(selected.grades) : "—"}
                       </p>
-                      <p className="text-[10px] text-muted-foreground">Promedio</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground">Promedio</p>
                     </div>
                   </div>
 
@@ -482,33 +486,35 @@ function CalificacionesInner() {
                     <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Historial de Notas</p>
                     <div className="space-y-2">
                       {selected.grades.map((g) => (
-                        <div key={g.id} className="flex items-center gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-4 py-3 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
+                        <div key={g.id} className="flex items-center gap-2 sm:gap-3 rounded-xl bg-black/5 dark:bg-white/5 px-3 sm:px-4 py-2.5 sm:py-3 group hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
                           {editGradeId === g.id ? (
                             <>
                               <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
-                                className="sb-input rounded-xl text-sm h-8 w-16 text-center" autoFocus />
-                              <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
-                                className="h-8 px-3 rounded-xl bg-foreground text-background text-xs font-medium hover:opacity-90 transition-all">
-                                Guardar
-                              </button>
-                              <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                                className="h-8 px-3 rounded-xl bg-foreground/10 text-muted-foreground text-xs font-medium hover:opacity-90 transition-all">
-                                Cancelar
-                              </button>
+                                className="sb-input rounded-xl text-sm h-8 w-14 sm:w-16 text-center" autoFocus />
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
+                                  className="h-8 px-2 sm:px-3 rounded-xl bg-foreground text-background text-xs font-medium hover:opacity-90 transition-all">
+                                  Guardar
+                                </button>
+                                <button onClick={() => { setEditGradeId(null); setEditScore("") }}
+                                  className="h-8 px-2 sm:px-3 rounded-xl bg-foreground/10 text-muted-foreground text-xs font-medium hover:opacity-90 transition-all">
+                                  Cancelar
+                                </button>
+                              </div>
                             </>
                           ) : (
                             <>
-                              <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
-                                <span className={`text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
+                              <div className={`h-8 w-8 sm:h-9 sm:w-9 rounded-xl flex items-center justify-center shrink-0 ${getGradeBg(g.score)}`}>
+                                <span className={`text-xs sm:text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground">{g.period}</p>
-                                <p className="text-[10px] text-muted-foreground">
+                                <p className="text-xs sm:text-sm font-medium text-foreground">{g.period}</p>
+                                <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
                                   {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
                                   {g.notes ? ` · ${g.notes}` : ""}
                                 </p>
                               </div>
-                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex items-center gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                 <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
                                   className="h-7 w-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 transition-colors">
                                   <Pencil className="h-3.5 w-3.5" />
@@ -531,9 +537,9 @@ function CalificacionesInner() {
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4">
+                  <div className="rounded-xl bg-black/5 dark:bg-white/5 p-3 sm:p-4">
                     <p className="text-[15px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Agregar Nota</p>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
                         className="sbf-native-select text-sm">
                         <option value="">Bimestre</option>
@@ -590,10 +596,12 @@ function CalificacionesInner() {
             </motion.div>
           </SbModalBody>
           <SbModalFooter>
-            <SbBtn rounded onClick={() => setRegisterOpen(false)}>Cancelar</SbBtn>
-            <SbBtn variant="filled" rounded disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
-              {saving ? "Guardando..." : "Guardar"}
-            </SbBtn>
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <SbBtn rounded className="w-full sm:w-auto" onClick={() => setRegisterOpen(false)}>Cancelar</SbBtn>
+              <SbBtn variant="filled" rounded className="w-full sm:w-auto" disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+                {saving ? "Guardando..." : "Guardar"}
+              </SbBtn>
+            </div>
           </SbModalFooter>
         </SbModal>
       </div>
