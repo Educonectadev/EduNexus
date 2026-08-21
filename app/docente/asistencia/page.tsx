@@ -191,7 +191,7 @@ function AsistenciaInner() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   MI ASISTENCIA
+   MI ASISTENCIA — stepbro note design
    ═══════════════════════════════════════════════════════ */
 function MiAsistencia() {
   const [attendance, setAttendance] = React.useState<any>(null)
@@ -241,13 +241,9 @@ function MiAsistencia() {
 
   if (loading) {
     return (
-      <div className="space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-32 animate-pulse" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
-          ))}
-        </div>
-        <div className="h-28 animate-pulse" style={{ borderRadius: "16px", background: "var(--sb-surface-container)" }} />
+      <div className="space-y-4">
+        <div className="h-40 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
+        <div className="h-24 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
       </div>
     )
   }
@@ -259,252 +255,232 @@ function MiAsistencia() {
   const hasPending = !!pendingCheckout
 
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-3">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
 
-      {/* ═══ Jornada + Status ═══ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Jornada card */}
-        <Card className="sm:col-span-2">
-          <div className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className="h-10 w-10 flex items-center justify-center"
-                  style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
-                >
-                  <Clock className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
-                    {new Date().toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long" })}
-                  </p>
-                  <p className="text-[11px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                    {!checkedIn
-                      ? schedule
-                        ? `Horario: ${schedule.start_time} — ${schedule.end_time}`
-                        : "Sin clases programadas"
-                      : checkedOut
-                        ? `Completada · ${checkedIn.slice(0, 5)} — ${checkedOut.slice(0, 5)}`
-                        : `Entrada ${checkedIn.slice(0, 5)} · salida ${schedule?.end_time || "—"}`
-                    }
-                  </p>
-                </div>
-              </div>
-              {s && <StatusBadge label={s.label} dot={s.dot} />}
+      {/* ═══ Jornada de hoy ═══ */}
+      <div style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+        <div className="p-5">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                {new Date().toLocaleDateString("es-PE", { weekday: "long" })}
+              </p>
+              <p className="text-lg font-bold mt-0.5 capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "long" })}
+              </p>
             </div>
+            {s && (
+              <span
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium"
+                style={{ borderRadius: "12px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}
+              >
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--note-text)" }} />
+                {s.label}
+              </span>
+            )}
+          </div>
 
-            {/* Entrada / Salida */}
-            <div className="grid grid-cols-2 gap-3">
-              <div
-                className="p-3"
-                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <LogIn className="h-3.5 w-3.5" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.3 }} />
-                  <SectionLabel>Entrada</SectionLabel>
-                </div>
-                <p className="text-2xl font-bold" style={{ color: checkedIn ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedIn ? 1 : 0.3, fontFamily: FONT }}>
-                  {checkedIn?.slice(0, 5) || "—:——"}
-                </p>
-                {schedule && (
-                  <p className="text-[10px] mt-1" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
-                    Prog. {schedule.start_time}
-                  </p>
-                )}
+          {/* Entrada / Salida */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <div style={{ borderRadius: "16px", background: "var(--note-fill)", padding: "16px" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <LogIn className="h-3.5 w-3.5" style={{ color: checkedIn ? "var(--note-text)" : "var(--note-muted)", opacity: checkedIn ? 1 : 0.4 }} />
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                  Entrada
+                </span>
               </div>
-              <div
-                className="p-3"
-                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <LogOut className="h-3.5 w-3.5" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.3 }} />
-                  <SectionLabel>Salida</SectionLabel>
-                </div>
-                <p className="text-2xl font-bold" style={{ color: checkedOut ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: checkedOut ? 1 : 0.3, fontFamily: FONT }}>
-                  {checkedOut?.slice(0, 5) || "—:——"}
+              <p className="text-3xl font-bold" style={{ color: checkedIn ? "var(--note-text)" : "var(--note-muted)", opacity: checkedIn ? 1 : 0.3, fontFamily: FONT }}>
+                {checkedIn?.slice(0, 5) || "—:——"}
+              </p>
+              {schedule && (
+                <p className="text-[10px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                  Programado {schedule.start_time}
                 </p>
-                {schedule && (
-                  <p className="text-[10px] mt-1" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
-                    Prog. {schedule.end_time}
-                  </p>
-                )}
-              </div>
+              )}
             </div>
+            <div style={{ borderRadius: "16px", background: "var(--note-fill)", padding: "16px" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <LogOut className="h-3.5 w-3.5" style={{ color: checkedOut ? "var(--note-text)" : "var(--note-muted)", opacity: checkedOut ? 1 : 0.4 }} />
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                  Salida
+                </span>
+              </div>
+              <p className="text-3xl font-bold" style={{ color: checkedOut ? "var(--note-text)" : "var(--note-muted)", opacity: checkedOut ? 1 : 0.3, fontFamily: FONT }}>
+                {checkedOut?.slice(0, 5) || "—:——"}
+              </p>
+              {schedule && (
+                <p className="text-[10px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                  Programado {schedule.end_time}
+                </p>
+              )}
+            </div>
+          </div>
 
-            {/* Action */}
-            <div className="mt-4">
-              {hasPending && (
-                <div className="space-y-2">
-                  <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                    Salida pendiente del {safeFormatDate(pendingCheckout.date)}
-                  </p>
-                  <button
-                    onClick={() => handleCheck("check-out", pendingCheckout.date)}
-                    disabled={actionLoading}
-                    className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
-                    style={{ borderRadius: "14px", background: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}
+          {/* Botón de acción */}
+          {hasPending && (
+            <div className="space-y-2">
+              <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                Salida pendiente del {safeFormatDate(pendingCheckout.date)}
+              </p>
+              <button
+                onClick={() => handleCheck("check-out", pendingCheckout.date)}
+                disabled={actionLoading}
+                className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
+              >
+                {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
+                Marcar Salida Pendiente
+              </button>
+            </div>
+          )}
+          {!hasPending && !checkedIn && (
+            <button
+              onClick={() => handleCheck("check-in")}
+              disabled={actionLoading}
+              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+              style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
+            >
+              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogIn className="h-4 w-4" />}
+              Marcar Entrada
+            </button>
+          )}
+          {!hasPending && checkedIn && !checkedOut && (
+            <button
+              onClick={() => handleCheck("check-out")}
+              disabled={actionLoading}
+              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+              style={{ borderRadius: "14px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}
+            >
+              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
+              Marcar Salida
+            </button>
+          )}
+          {!hasPending && checkedIn && checkedOut && (
+            <div
+              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2"
+              style={{ borderRadius: "14px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}
+            >
+              <Check className="h-4 w-4" />
+              Jornada completada
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ═══ Semana ═══ */}
+      <div style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+              Semana
+            </span>
+            <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+              {history.length} registros
+            </span>
+          </div>
+          <div className="flex items-end justify-between gap-2">
+            {weekDays.map((d) => {
+              const isToday = getLocalDateStr() === d.iso
+              const hasData = !!d.status
+              return (
+                <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
+                  <div
+                    className="w-full aspect-square max-w-[40px] flex items-center justify-center"
+                    style={{
+                      borderRadius: "12px",
+                      background: hasData ? "var(--note-fill-strong)" : "var(--note-fill)",
+                      border: isToday ? "1.5px solid var(--note-text)" : "1px solid var(--note-hairline)",
+                    }}
                   >
-                    {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
-                    Marcar Salida Pendiente
-                  </button>
-                </div>
-              )}
-              {!hasPending && !checkedIn && (
-                <button
-                  onClick={() => handleCheck("check-in")}
-                  disabled={actionLoading}
-                  className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ borderRadius: "14px", background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 4px 12px rgba(34,197,94,0.3)" }}
-                >
-                  {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogIn className="h-4 w-4" />}
-                  Marcar Entrada
-                </button>
-              )}
-              {!hasPending && checkedIn && !checkedOut && (
-                <button
-                  onClick={() => handleCheck("check-out")}
-                  disabled={actionLoading}
-                  className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ borderRadius: "14px", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)", color: "#fff", fontFamily: FONT, boxShadow: "0 4px 12px rgba(239,68,68,0.3)" }}
-                >
-                  {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" /> : <LogOut className="h-4 w-4" />}
-                  Marcar Salida
-                </button>
-              )}
-              {!hasPending && checkedIn && checkedOut && (
-                <div
-                  className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2.5"
-                  style={{ borderRadius: "14px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-                >
-                  <Check className="h-4 w-4" />
-                  Jornada completada
-                </div>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        {/* Weekly mini chart */}
-        <Card>
-          <div className="p-5 h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className="h-10 w-10 flex items-center justify-center"
-                style={{ background: "var(--sb-surface-container-high)", borderRadius: "12px" }}
-              >
-                <Flame className="h-5 w-5" style={{ color: "var(--sb-on-surface-variant)" }} />
-              </div>
-              <div>
-                <SectionLabel>Semana</SectionLabel>
-                <p className="text-[10px] mt-0.5" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.6, fontFamily: FONT }}>
-                  {history.length} registros
-                </p>
-              </div>
-            </div>
-            <div className="flex-1 flex items-end justify-between gap-1.5">
-              {weekDays.map((d) => {
-                const isToday = getLocalDateStr() === d.iso
-                const hasData = !!d.status
-                return (
-                  <div key={d.iso} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div
-                      className="w-full aspect-square max-w-[36px] flex items-center justify-center transition-all"
-                      style={{
-                        borderRadius: "10px",
-                        background: hasData ? getBarColor(d.status) : "var(--sb-surface-container-high)",
-                        opacity: hasData ? getBarOpacity(d.status) : 0.3,
-                      }}
-                    >
-                      {hasData && (
-                        <span className="text-[9px] font-bold" style={{ color: "var(--sb-surface)", fontFamily: FONT }}>
-                          {d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span
-                        className="text-[8px] font-semibold uppercase"
-                        style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", opacity: isToday ? 1 : 0.4, fontFamily: FONT }}
-                      >
-                        {d.label}
+                    {hasData && (
+                      <span className="text-[10px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                        {d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}
                       </span>
-                      <span
-                        className="text-[10px] font-medium"
-                        style={{ color: isToday ? "var(--sb-on-surface)" : "var(--sb-on-surface-variant)", fontFamily: FONT }}
-                      >
-                        {d.day}
-                      </span>
-                    </div>
+                    )}
                   </div>
-                )
-              })}
-            </div>
+                  <div className="flex flex-col items-center">
+                    <span
+                      className="text-[9px] font-semibold uppercase"
+                      style={{ color: isToday ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}
+                    >
+                      {d.label}
+                    </span>
+                    <span
+                      className="text-[11px] font-bold"
+                      style={{ color: isToday ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}
+                    >
+                      {d.day}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* ═══ Historial ═══ */}
-      <Card>
-        <div className="px-5 pt-4 pb-3 flex items-center justify-between">
-          <SectionLabel>Historial reciente</SectionLabel>
-          <span
-            className="text-[10px] font-medium px-2 py-1"
-            style={{ borderRadius: "8px", background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface-variant)", fontFamily: FONT }}
-          >
+      <div style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+        <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
+          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+            Historial reciente
+          </span>
+          <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
             {history.length} registros
           </span>
         </div>
         {history.length === 0 ? (
           <div className="py-16 text-center">
-            <Calendar className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--sb-on-surface-variant)", opacity: 0.3 }} />
-            <p className="text-xs" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-              Aún no tienes registros de asistencia
+            <Calendar className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+            <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+              Sin registros aún
             </p>
           </div>
         ) : (
           <div>
-            {history.slice(0, 10).map((h: any, i: number) => {
-              const sc = STATUS_CONFIG[h.status] || STATUS_CONFIG.present
-              const isLast = i === Math.min(history.length, 10) - 1
+            {history.slice(0, 7).map((h: any, i: number) => {
+              const isLast = i === Math.min(history.length, 7) - 1
               return (
                 <div
                   key={h.id || i}
-                  className="flex items-center justify-between px-5 py-3.5 transition-colors"
-                  style={{ borderBottom: isLast ? "none" : "1px solid color-mix(in srgb, var(--sb-outline-variant) 20%, transparent)" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sb-surface-container-high)" }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
+                  className="flex items-center justify-between px-5 py-3.5"
+                  style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className="h-9 w-9 flex items-center justify-center shrink-0"
-                      style={{ background: "var(--sb-surface-container-high)", borderRadius: "10px" }}
+                      style={{ borderRadius: "10px", background: "var(--note-fill)" }}
                     >
-                      <Calendar className="h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
+                      <Calendar className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                     </div>
                     <div>
-                      <p className="text-sm capitalize" style={{ color: "var(--sb-on-surface)", fontFamily: FONT }}>
+                      <p className="text-[13px] font-medium capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                         {safeFormatDate(h.date)}
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                          Ent: {h.check_in ? h.check_in.slice(0, 5) : '—'}
+                        <span className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                          Ent: {h.check_in ? h.check_in.slice(0, 5) : '—:——'}
                         </span>
-                        <span className="text-[11px]" style={{ color: "var(--sb-on-surface-variant)", fontFamily: FONT }}>
-                          Sal: {h.check_out ? h.check_out.slice(0, 5) : '—'}
+                        <span className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                          Sal: {h.check_out ? h.check_out.slice(0, 5) : '—:——'}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg ${sc.color}`}>
-                    <span className={`h-1 w-1 rounded-full ${sc.dot}`} />
-                    {sc.label}
+                  <span
+                    className="inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1"
+                    style={{ borderRadius: "8px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}
+                  >
+                    <span className="h-1 w-1 rounded-full" style={{ background: "var(--note-text)" }} />
+                    {STATUS_CONFIG[h.status]?.label || "A tiempo"}
                   </span>
                 </div>
               )
             })}
           </div>
         )}
-      </Card>
+      </div>
     </motion.div>
   )
 }
