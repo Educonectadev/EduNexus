@@ -85,6 +85,8 @@ export function MobileNavbar({
   const router = useRouter()
   const [menuOpen, setMenuOpen] = React.useState(false)
   const morphRef = React.useRef<HTMLDivElement>(null)
+  const menuRef = React.useRef<HTMLDivElement>(null)
+  const [menuHeight, setMenuHeight] = React.useState<number>(56)
 
   const visibleItems = items.slice(0, maxVisible)
   const optionsItems = items.slice(maxVisible)
@@ -95,6 +97,14 @@ export function MobileNavbar({
     }
     return activeHref === item.href || activeHref.startsWith(item.href + "/")
   }
+
+  // Measure content height
+  React.useLayoutEffect(() => {
+    if (menuOpen && menuRef.current) {
+      const height = menuRef.current.scrollHeight
+      setMenuHeight(Math.max(height, 56))
+    }
+  }, [menuOpen, onAiClick, optionsItems.length])
 
   // Close on outside click
   React.useEffect(() => {
@@ -142,10 +152,11 @@ export function MobileNavbar({
               ref={morphRef}
               className="t-morph"
               data-open={menuOpen ? "true" : "false"}
+              style={menuOpen ? { height: `${menuHeight}px` } : undefined}
             >
               {/* Menu Content */}
-              <div className="t-morph-menu" role="menu">
-                <div className="p-2 pb-3 pl-3 pr-14 h-full">
+              <div ref={menuRef} className="t-morph-menu" role="menu">
+                <div className="p-2 pb-3 pl-3 pr-14">
                   {onAiClick && (
                     <button
                       type="button"

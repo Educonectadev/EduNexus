@@ -1702,8 +1702,6 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 }
 .t-morph[data-open="true"] {
   width: 224px;
-  height: auto;
-  min-height: 160px;
   border-radius: var(--morph-r-open);
   transition:
     width var(--morph-open-dur) var(--morph-ease),
