@@ -1671,11 +1671,12 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 /* minimal: solo iconos, sin etiquetas ni cápsula */
 .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
   gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0;
   margin-right: 4rem;
   background: color-mix(in srgb, var(--sb-surface-container) 62%, transparent);
   border: 1px solid var(--sb-outline-variant);
-  border-radius: 20px;
+  border-radius: 999px;
+  height: 56px;
   box-shadow: 0 8px 32px -12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
