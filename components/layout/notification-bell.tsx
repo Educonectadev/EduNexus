@@ -74,8 +74,10 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 rounded-full bg-sb-primary text-sb-on-primary text-[9px] font-bold flex items-center justify-center border-2 border-sb-surface">
-            {unreadCount > 9 ? "9+" : unreadCount}
+          <span className="t-badge" data-open={unreadCount > 0 ? "true" : "false"}>
+            <span className="t-badge-dot">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
           </span>
         )}
       </button>
