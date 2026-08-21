@@ -1663,6 +1663,15 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   }
 }
 
+/* ===== Scrollbar invisible pero funcional ===== */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 /* ===== Barra de navegación móvil: estilos ===== */
 .mobile-navbar {
   bottom: 1rem;
