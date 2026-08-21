@@ -259,7 +259,7 @@ function TareasInner() {
             </button>
             <button
               onClick={() => setDialogOpen(true)}
-              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-xl transition-all"
+              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
               style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
             >
               <Plus className="h-4 w-4" /> Nueva tarea
@@ -277,7 +277,7 @@ function TareasInner() {
           ].map(s => {
             const Icon = s.icon
             return (
-              <div key={s.label} className="p-4" style={{
+              <div key={s.label} className="p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02]" style={{
                 background: "var(--note-surface)",
                 borderRadius: "16px",
                 border: "1px solid var(--note-hairline)",
@@ -294,9 +294,9 @@ function TareasInner() {
 
         {/* Search + Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
-          <div className="relative flex-1">
+          <div className="relative flex-1 group">
             <div
-              className="flex items-center h-11 gap-2.5 px-3 transition-all"
+              className="flex items-center h-11 gap-2.5 px-3 transition-all duration-200 group-hover:shadow-sm"
               style={{
                 borderRadius: "14px",
                 background: "var(--note-fill)",
@@ -308,19 +308,21 @@ function TareasInner() {
                 placeholder="Buscar tarea..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none text-sm font-medium placeholder:opacity-50"
+                className="flex-1 bg-transparent border-none outline-none text-sm font-medium placeholder:opacity-50 focus:outline-none"
                 style={{ color: "var(--note-text)", fontFamily: FONT }}
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")} className="h-6 w-6 rounded-lg flex items-center justify-center shrink-0 transition-colors" style={{ background: "var(--note-fill-strong)" }}>
+                <button onClick={() => setSearchQuery("")}
+                  className="h-6 w-6 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 hover:scale-110 active:scale-95"
+                  style={{ background: "var(--note-fill-strong)" }}>
                   <X className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
                 </button>
               )}
             </div>
           </div>
-          <div className="relative sm:w-56">
+          <div className="relative sm:w-56 group">
             <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
-              className="h-11 w-full px-4 pr-10 text-sm font-medium appearance-none cursor-pointer transition-all"
+              className="h-11 w-full px-4 pr-10 text-sm font-medium appearance-none cursor-pointer transition-all duration-200 hover:shadow-sm"
               style={{
                 borderRadius: "14px",
                 background: courseFilter ? "var(--note-fill)" : "transparent",
@@ -346,7 +348,7 @@ function TareasInner() {
             { key: 'graded', label: 'Calificadas' },
           ]).map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              className="h-9 px-4 text-[12px] font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0"
+              className="h-9 px-4 text-[12px] font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 shrink-0 hover:scale-[1.03] active:scale-[0.97]"
               style={{
                 borderRadius: "10px",
                 background: filter === f.key ? "var(--note-fill-strong)" : "var(--note-fill)",
@@ -374,7 +376,7 @@ function TareasInner() {
                 <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
-                  className="group overflow-hidden cursor-pointer transition-all duration-200"
+                  className="group overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
                   style={{
                     borderRadius: "16px",
                     background: "var(--note-surface)",
@@ -402,7 +404,7 @@ function TareasInner() {
                           <p className="text-[12px] mt-1 line-clamp-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{t.description}</p>
                         )}
                       </div>
-                      <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill)" }}>
+                      <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-110" style={{ background: "var(--note-fill)" }}>
                         <Eye className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                       </div>
                     </div>
@@ -556,11 +558,14 @@ function TareasInner() {
                 </div>
                 {/* Modal Footer */}
                 <div className="flex items-center justify-end gap-3 p-5 pt-0">
-                  <button onClick={() => setDialogOpen(false)} className="h-10 px-5 text-sm font-semibold rounded-xl transition-all" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
+                  <button onClick={() => setDialogOpen(false)}
+                    className="h-10 px-5 text-sm font-semibold rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                     Cancelar
                   </button>
                   <button disabled={!formData.title || !formData.course_id} onClick={handleCreate}
-                    className="h-10 px-6 text-sm font-bold rounded-xl transition-all disabled:opacity-30" style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
+                    className="h-10 px-6 text-sm font-bold rounded-xl transition-all duration-200 disabled:opacity-30 hover:scale-[1.02] active:scale-[0.97]"
+                    style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
                     Crear tarea
                   </button>
                 </div>
@@ -679,7 +684,8 @@ function TareasInner() {
                                         </span>
                                         {student.submission_status === 'pending' && (
                                           <button onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(selectedTask.id, student.student_id, student.submission_id) }}
-                                            className="text-[10px] font-semibold px-2.5 py-1 rounded-xl transition-colors" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
+                                            className="text-[10px] font-semibold px-2.5 py-1 rounded-xl transition-all duration-200 hover:scale-[1.05] active:scale-[0.95]"
+                                            style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
                                             Marcar entrega
                                           </button>
                                         )}
@@ -693,7 +699,7 @@ function TareasInner() {
                                               feedback: student.feedback || "",
                                             })
                                           }}
-                                            className="text-[10px] font-semibold px-2.5 py-1 rounded-xl transition-colors"
+                                            className="text-[10px] font-semibold px-2.5 py-1 rounded-xl transition-all duration-200 hover:scale-[1.05] active:scale-[0.95]"
                                             style={{
                                               background: isEditing ? "var(--note-fill)" : "var(--note-fill-strong)",
                                               color: "var(--note-text)",
@@ -722,7 +728,8 @@ function TareasInner() {
                                             className="sb-input h-9 w-full px-3 text-sm rounded-xl" />
                                         </div>
                                         <button onClick={() => handleGradeSubmission(selectedTask.id, student)} disabled={gradingTaskId === student.student_id}
-                                          className="h-9 px-4 rounded-xl text-xs font-bold transition-colors disabled:opacity-50 mt-5 shrink-0" style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
+                                          className="h-9 px-4 rounded-xl text-xs font-bold transition-all duration-200 disabled:opacity-50 mt-5 shrink-0 hover:scale-[1.03] active:scale-[0.97]"
+                                          style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
                                           {gradingTaskId === student.student_id ? "Guardando..." : "Guardar"}
                                         </button>
                                       </div>
