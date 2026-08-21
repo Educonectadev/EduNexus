@@ -298,6 +298,11 @@ function TareasInner() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
             <input placeholder="Buscar tarea..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
               className="sb-input w-full h-11 pl-11 pr-4 text-sm rounded-xl" />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-lg flex items-center justify-center transition-colors" style={{ background: "var(--note-fill)" }}>
+                <X className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+              </button>
+            )}
           </div>
           <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
             className="sbf-native-select h-11 px-4 text-sm rounded-xl sm:w-56">
@@ -309,7 +314,7 @@ function TareasInner() {
         </div>
 
         {/* Filter tabs */}
-        <div className="nb-rail mb-5">
+        <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
           {([
             { key: 'all', label: 'Todas' },
             { key: 'pending', label: 'Pendientes' },
@@ -317,8 +322,13 @@ function TareasInner() {
             { key: 'graded', label: 'Calificadas' },
           ]).map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              className={cn("nb-chip", filter === f.key && "active")}>
-              <Check className="nb-chip-check" />
+              className="h-9 px-4 text-[12px] font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0"
+              style={{
+                borderRadius: "10px",
+                background: filter === f.key ? "var(--note-fill-strong)" : "var(--note-fill)",
+                color: filter === f.key ? "var(--note-text)" : "var(--note-muted)",
+                fontFamily: FONT,
+              }}>
               {f.label}
               <span className="text-[10px] opacity-60">{counts[f.key as keyof typeof counts]}</span>
             </button>
