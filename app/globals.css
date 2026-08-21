@@ -1675,6 +1675,28 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 /* ===== Barra de navegación móvil: estilos ===== */
 .mobile-navbar {
   bottom: 1rem;
-  left: 0;
-  right: 0;
+}
+
+/* minimal: solo iconos, sin etiquetas ni cápsula */
+.mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
+  gap: 2px;
+  padding: 0 4px;
+  margin-right: 4rem;
+  background: color-mix(in srgb, var(--sb-surface-container) 62%, transparent);
+  border: 1px solid var(--sb-outline-variant);
+  border-radius: 50px;
+  height: 56px;
+  box-shadow: 0 8px 32px -12px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+@media (max-width: 380px) {
+  .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
+    margin-right: 3.25rem;
+  }
+}
+@media (min-width: 480px) {
+  .mobile-navbar[data-style="minimal"] .mobile-nav-buttons {
+    margin-right: 5rem;
+  }
 }

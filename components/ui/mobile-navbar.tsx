@@ -35,15 +35,16 @@ function NavButton({
     <motion.button
       type="button"
       onClick={() => router.push(item.href)}
-      className="relative flex items-center justify-center w-11 h-11"
+      className="relative flex items-center justify-center w-12 h-12"
       aria-label={item.title}
       aria-current={isActive ? "page" : undefined}
       whileTap={{ scale: 0.9 }}
     >
       <motion.div
-        className="absolute inset-0 rounded-[18px]"
+        className="absolute inset-0"
         initial={false}
         animate={{
+          borderRadius: 999,
           backgroundColor: isActive ? "var(--sb-on-surface)" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -51,17 +52,17 @@ function NavButton({
       <motion.div
         className="relative z-10 flex items-center justify-center"
         animate={{
-          scale: isActive ? 1.05 : 1,
+          scale: isActive ? 1.1 : 1,
           color: isActive ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
           opacity: isActive ? 1 : 0.6,
         }}
         transition={{ duration: 0.2 }}
       >
-        <item.icon className="h-[22px] w-[22px]" strokeWidth={isActive ? 2.5 : 2} />
+        <item.icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
       </motion.div>
       {typeof item.badge === "number" && item.badge > 0 && (
         <span className={cn(
-          "absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 z-20",
+          "absolute top-0 right-0 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 z-20",
           isActive
             ? "border-sb-surface bg-sb-surface text-sb-on-surface"
             : "border-sb-surface bg-sb-primary text-sb-on-primary"
@@ -83,7 +84,15 @@ export function MobileNavbar({
 }: MobileNavbarProps) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = React.useState(false)
+  const [openSize, setOpenSize] = React.useState({ width: 0, height: 0 })
   const contentRef = React.useRef<HTMLDivElement>(null)
+
+  React.useLayoutEffect(() => {
+    if (menuOpen && contentRef.current) {
+      const el = contentRef.current
+      setOpenSize({ width: el.offsetWidth, height: el.offsetHeight })
+    }
+  }, [menuOpen])
 
   const visibleItems = items.slice(0, maxVisible)
   const optionsItems = items.slice(maxVisible)
@@ -97,38 +106,26 @@ export function MobileNavbar({
 
   return (
     <div className="md:hidden">
-      {/* Overlay */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            className="fixed inset-0 z-[59] bg-black/30 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
       <motion.nav
-        className={cn("fixed bottom-4 left-0 right-0 z-[60] px-4", className)}
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.1 }}
+        className={cn("mobile-navbar fixed left-0 right-0 z-[60]", className)}
+        initial={{ y: 100, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
-        <div className="flex items-end justify-center gap-3">
-          {/* Main Nav Container */}
-          <motion.div
-            className="flex items-center gap-1 px-2 py-2"
-            style={{
-              backgroundColor: "var(--sb-surface)",
-              boxShadow: "0 8px 32px -8px rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.15)",
-            }}
-            animate={{
-              borderRadius: 50,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 26 }}
-          >
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              className="fixed inset-0 -z-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+        <div className="mobile-nav-inner relative flex items-end justify-center w-full">
+          {/* Main Nav Container - border-radius 50px */}
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
             {visibleItems.map((item) => (
               <NavButton
                 key={item.href}
@@ -137,124 +134,123 @@ export function MobileNavbar({
                 router={router}
               />
             ))}
-          </motion.div>
+          </div>
 
-          {/* More Options Button - Separated */}
-          <div className="relative">
-            <motion.button
-              type="button"
-              onClick={() => setMenuOpen(v => !v)}
-              className="relative flex items-center justify-center w-11 h-11"
-              style={{
-                backgroundColor: menuOpen ? "var(--sb-on-surface)" : "var(--sb-surface)",
-                boxShadow: "0 8px 32px -8px rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.15)",
-              }}
-              animate={{
-                borderRadius: 50,
-              }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Más opciones"
-              aria-expanded={menuOpen}
-            >
+          {/* More Options Button - Floating Circle */}
+          <div className="mobile-nav-more absolute right-4 bottom-0">
+            <div className="relative flex flex-col items-end">
               <motion.div
-                animate={{
-                  rotate: menuOpen ? 45 : 0,
-                  color: menuOpen ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
+                className="relative z-50 overflow-hidden"
+                style={{
+                  transformOrigin: "bottom right",
+                  backgroundColor: "var(--sb-on-surface)",
+                  boxShadow: "0 8px 32px -8px rgba(0,0,0,0.35)",
                 }}
-                transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                animate={{
+                  width: menuOpen ? Math.max(openSize.width, 56) : 56,
+                  height: menuOpen ? Math.max(openSize.height, 56) : 56,
+                  borderRadius: menuOpen ? 28 : 999,
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
               >
-                {menuOpen ? (
-                  <X className="h-5 w-5" strokeWidth={2.5} />
-                ) : (
-                  <MoreHorizontal className="h-5 w-5" strokeWidth={2} />
-                )}
-              </motion.div>
-            </motion.button>
-
-            {/* Expanded Menu */}
-            <AnimatePresence>
-              {menuOpen && (
-                <motion.div
-                  ref={contentRef}
-                  className="absolute bottom-full right-0 mb-3 w-56 overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--sb-surface)",
-                    boxShadow: "0 -4px 32px -8px rgba(0,0,0,0.25), 0 2px 8px -2px rgba(0,0,0,0.1)",
+                <motion.button
+                  type="button"
+                  className="absolute flex items-center justify-center w-14 h-14 z-10 rounded-full"
+                  onClick={() => setMenuOpen(v => !v)}
+                  aria-label="Más opciones"
+                  aria-expanded={menuOpen}
+                  whileTap={{ scale: 0.9 }}
+                  animate={{
+                    left: menuOpen ? Math.max(openSize.width - 56, 0) : 0,
+                    top: menuOpen ? Math.max(openSize.height - 56, 0) : 0,
                   }}
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.9 }}
                 >
-                  <div className="p-2">
-                    {onAiClick && (
-                      <button
-                        type="button"
-                        onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium rounded-2xl transition-colors hover:opacity-80"
-                        style={{ color: "var(--sb-on-surface)" }}
-                      >
-                        <span
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                          style={{ backgroundColor: "var(--sb-primary)", color: "var(--sb-on-primary)" }}
-                        >
-                          <Sparkles className="h-4 w-4" />
-                        </span>
-                        Asistente IA
-                      </button>
-                    )}
-
-                    {optionsItems.map((item) => (
-                      <button
-                        key={item.href}
-                        type="button"
-                        onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                          isActive(item) ? "font-medium" : ""
-                        )}
-                        style={{
-                          backgroundColor: isActive(item) ? "var(--sb-on-surface)" : "transparent",
-                          color: isActive(item) ? "var(--sb-surface)" : "var(--sb-on-surface)",
-                        }}
-                      >
-                        <span
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                          style={{
-                            backgroundColor: isActive(item) ? "rgba(255,255,255,0.2)" : "var(--sb-surface-container)",
-                            color: isActive(item) ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
-                          }}
-                        >
-                          <item.icon className="h-4 w-4" />
-                        </span>
-                        {item.title}
-                      </button>
-                    ))}
-
-                    <button
-                      type="button"
-                      onClick={() => { setMenuOpen(false); router.push("/perfil") }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors"
-                      style={{
-                        backgroundColor: activeHref === "/perfil" ? "var(--sb-on-surface)" : "transparent",
-                        color: activeHref === "/perfil" ? "var(--sb-surface)" : "var(--sb-on-surface)",
-                      }}
+                  <motion.div
+                    animate={{
+                      rotate: menuOpen ? 90 : 0,
+                      color: menuOpen ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 18, mass: 0.8 }}
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                  </motion.div>
+                </motion.button>
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
                     >
-                      <span
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                        style={{
-                          backgroundColor: activeHref === "/perfil" ? "rgba(255,255,255,0.2)" : "var(--sb-surface-container)",
-                          color: activeHref === "/perfil" ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
-                        }}
-                      >
-                        <User className="h-4 w-4" />
-                      </span>
-                      Mi perfil
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      <div ref={contentRef} className="w-64">
+                        <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sb-surface/45">
+                            Opciones
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setMenuOpen(false)}
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-sb-surface/10 text-sb-surface/60 transition-colors hover:bg-sb-surface/20 hover:text-sb-surface"
+                            aria-label="Cerrar opciones"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <div className="space-y-1 p-2 pt-1 pb-14">
+                          {onAiClick && (
+                            <button
+                              type="button"
+                              onClick={() => { setMenuOpen(false); onAiClick() }}
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm font-medium text-sb-surface hover:bg-sb-surface/10 rounded-full transition-colors"
+                            >
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                                <Sparkles className="h-4 w-4" />
+                              </span>
+                              Asistente IA
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => { setMenuOpen(false); router.push("/perfil") }}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                              activeHref === "/perfil"
+                                ? "bg-sb-surface text-sb-on-surface font-medium"
+                                : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
+                            )}
+                          >
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                              <User className="h-4 w-4" />
+                            </span>
+                            Mi perfil
+                          </button>
+                          {optionsItems.map((item) => (
+                            <button
+                              key={item.href}
+                              type="button"
+                              onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                              className={cn(
+                                "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-full transition-colors",
+                                isActive(item)
+                                  ? "bg-sb-surface text-sb-on-surface font-medium"
+                                  : "text-sb-surface/70 hover:bg-sb-surface/10 hover:text-sb-surface"
+                              )}
+                            >
+                              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sb-surface/15 text-sb-surface">
+                                <item.icon className="h-4 w-4" />
+                              </span>
+                              {item.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.nav>
@@ -264,20 +260,14 @@ export function MobileNavbar({
 
 export function MobileNavbarSkeleton() {
   return (
-    <div className="fixed bottom-4 left-0 right-0 z-30 px-4">
-      <div className="flex items-end justify-center gap-3">
-        <div
-          className="flex items-center gap-1 px-2 py-2"
-          style={{ backgroundColor: "var(--sb-surface)", boxShadow: "0 8px 32px -8px rgba(0,0,0,0.3)" }}
-        >
+    <div className="fixed bottom-4 left-0 right-0 z-30">
+      <div className="relative flex items-center justify-center w-full">
+        <div className="flex items-center gap-1">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-11 h-11 rounded-[18px] animate-pulse" style={{ backgroundColor: "var(--sb-surface-container)" }} />
+            <div key={i} className="w-12 h-12 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
           ))}
         </div>
-        <div
-          className="w-11 h-11 rounded-full animate-pulse"
-          style={{ backgroundColor: "var(--sb-surface)", boxShadow: "0 8px 32px -8px rgba(0,0,0,0.3)" }}
-        />
+        <div className="absolute right-4 bottom-0 w-14 h-14 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
       </div>
     </div>
   )
