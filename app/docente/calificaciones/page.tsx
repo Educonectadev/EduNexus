@@ -98,6 +98,7 @@ function CalificacionesInner() {
   const [viewMode, setViewMode] = React.useState<"lista" | "tabla">("lista")
   const [savingCell, setSavingCell] = React.useState<string | null>(null)
   const [saveError, setSaveError] = React.useState<string | null>(null)
+  const [registerStudents, setRegisterStudents] = React.useState<Student[]>([])
 
   const loadCourses = React.useCallback(async () => {
     try {
@@ -136,6 +137,18 @@ function CalificacionesInner() {
 
   React.useEffect(() => { ;(async () => { await loadCourses() })() }, [loadCourses])
   React.useEffect(() => { if (courseId) { ;(async () => { await loadCourseData(courseId) })() } }, [courseId, loadCourseData])
+
+  React.useEffect(() => {
+    if (!registerCourseId || !registerOpen) { setRegisterStudents([]); return }
+    if (registerCourseId === courseId) { setRegisterStudents(students); return }
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/docente/calificaciones?course_id=${registerCourseId}`)
+        const data = await res.json()
+        setRegisterStudents(Array.isArray(data.students) ? data.students : [])
+      } catch { setRegisterStudents([]) }
+    })()
+  }, [registerCourseId, registerOpen, courseId, students])
 
   const handleSaveGrade = async (studentId: string, gradeId: string, newScore: number) => {
     try {
@@ -229,7 +242,7 @@ function CalificacionesInner() {
   const avgGeneral = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length) : 0
   const bestScore = students.length ? Math.max(...students.map(s => s.grades.length ? Math.max(...s.grades.map(g => g.score)) : 0)) : 0
 
-  const registerStudents = registerCourseId === courseId ? students : []
+
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
@@ -580,9 +593,9 @@ function CalificacionesInner() {
               </div>
               <div>
                 <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</label>
-                <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} disabled={registerCourseId !== courseId}
-                  className="w-full h-10 px-3 text-sm rounded-xl disabled:opacity-50" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                  <option value="">{registerCourseId === courseId ? "Seleccionar alumno..." : "Selecciona primero el curso en la vista"}</option>
+                <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)}
+                  className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
+                  <option value="">{registerStudents.length > 0 ? "Seleccionar alumno..." : "Cargando alumnos..."}</option>
                   {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
                 </select>
               </div>
