@@ -188,7 +188,7 @@ function MaterialesInner() {
             <button
               onClick={() => setUploadOpen(true)}
               disabled={!courses.length}
-              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-xl transition-all disabled:opacity-30"
+              className="h-10 px-5 text-sm font-bold flex items-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]"
               style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}
             >
               <Upload className="h-4 w-4" /> Subir material
@@ -411,7 +411,7 @@ function MaterialesInner() {
           <SbModalFooter>
             <button
               onClick={() => setUploadOpen(false)}
-              className="h-10 px-5 text-sm font-semibold rounded-xl transition-all"
+              className="h-10 px-5 text-sm font-semibold rounded-lg transition-all hover:opacity-80"
               style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}
             >
               Cancelar
@@ -419,7 +419,7 @@ function MaterialesInner() {
             <button
               disabled={!upName || !upCourseId || !upFile || uploading}
               onClick={handleUpload}
-              className="h-10 px-6 text-sm font-bold rounded-xl transition-all disabled:opacity-30 flex items-center gap-2"
+              className="h-10 px-6 text-sm font-bold rounded-lg transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97] flex items-center gap-2"
               style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}
             >
               {uploading ? (

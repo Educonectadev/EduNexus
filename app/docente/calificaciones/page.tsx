@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Check, Pencil, Trash2, BarChart3, Sun, Moon } from "@/components/ui/proicons"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -278,19 +278,18 @@ function CalificacionesInner() {
                 <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "var(--note-fill)" }}>
                   {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
                     <button key={key} onClick={() => setViewMode(key)}
-                      className="flex-1 h-9 text-[13px] font-semibold flex items-center justify-center gap-2 rounded-lg transition-all duration-200"
+                      className="flex-1 h-9 text-[13px] font-semibold flex items-center justify-center rounded-lg transition-all duration-200"
                       style={{
                         background: viewMode === key ? "var(--note-text)" : "transparent",
                         color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)",
                         fontFamily: FONT
                       }}>
-                      <Check className="h-4 w-4" />
                       {label}
                     </button>
                   ))}
                 </div>
               )}
-              <button className="h-10 px-4 text-sm font-bold flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-30" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+              <button className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
                 <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
               </button>
             </div>
@@ -477,13 +476,13 @@ function CalificacionesInner() {
                                 className="sb-input rounded-xl text-sm h-8 w-14 sm:w-16 text-center" autoFocus />
                               <div className="flex items-center gap-1">
                                 <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
-                                  className="h-8 px-2 sm:px-3 rounded-xl text-xs font-medium transition-all"
-                                  style={{ background: "var(--note-text)", color: "var(--note-surface)" }}>
+                                  className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
+                                  style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
                                   Guardar
                                 </button>
                                 <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                                  className="h-8 px-2 sm:px-3 rounded-xl text-xs font-medium transition-all"
-                                  style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)" }}>
+                                  className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
+                                  style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)", fontFamily: FONT }}>
                                   Cancelar
                                 </button>
                               </div>
@@ -546,7 +545,7 @@ function CalificacionesInner() {
                         className="rounded-xl text-sm h-9 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
                     </div>
                     <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
-                      className="w-full mt-2 h-9 rounded-xl text-xs font-medium disabled:opacity-30 transition-all"
+                      className="w-full mt-2 h-9 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all hover:opacity-90 active:scale-[0.98]"
                       style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
                       Agregar
                     </button>
@@ -593,8 +592,8 @@ function CalificacionesInner() {
           </SbModalBody>
           <SbModalFooter>
             <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <button className="h-10 px-5 text-sm font-semibold rounded-xl transition-all" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
-              <button className="h-10 px-5 text-sm font-bold rounded-xl transition-all disabled:opacity-30" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+              <button className="h-10 px-5 text-sm font-semibold rounded-lg transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
+              <button className="h-10 px-5 text-sm font-bold rounded-lg transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
                 {saving ? "Guardando..." : "Guardar"}
               </button>
             </div>

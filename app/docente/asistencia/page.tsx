@@ -171,12 +171,11 @@ function AsistenciaInner() {
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             className={cn(
-              "flex-1 h-11 text-[13px] font-semibold flex items-center justify-center gap-2 rounded-xl transition-all duration-200",
+              "flex-1 h-11 text-[13px] font-semibold flex items-center justify-center rounded-xl transition-all duration-200",
               tab === t.key
                 ? "bg-white text-black shadow-md"
                 : "text-[#a1a1aa] hover:text-white hover:bg-white/10"
             )}>
-            <Check className="h-4 w-4" />
             {t.label}
           </button>
         ))}
@@ -326,7 +325,7 @@ function MiAsistencia() {
               <button
                 onClick={() => handleCheck("check-out", pendingCheckout.date)}
                 disabled={actionLoading}
-                className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+                className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
                 style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
               >
                 {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
@@ -338,7 +337,7 @@ function MiAsistencia() {
             <button
               onClick={() => handleCheck("check-in")}
               disabled={actionLoading}
-              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
               style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
             >
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogIn className="h-4 w-4" />}
@@ -349,7 +348,7 @@ function MiAsistencia() {
             <button
               onClick={() => handleCheck("check-out")}
               disabled={actionLoading}
-              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
+              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
               style={{ borderRadius: "14px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}
             >
               {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
@@ -881,7 +880,6 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => { setAlumnoView(key); if (key === "estadisticas") loadStats() }}
               className={cn("nb-chip", alumnoView === key && "active")}>
-              <Check className="nb-chip-check" />
               {label}
             </button>
           ))}
@@ -1012,12 +1010,12 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={handleMarkAllPresent}
-                    className="h-9 px-4 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    className="h-9 px-4 text-xs font-bold flex items-center gap-1.5 transition-all hover:opacity-90 active:scale-[0.97]"
                     style={{ borderRadius: "10px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos
                   </button>
                   <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
-                    className="h-9 px-4 text-xs font-semibold transition-all disabled:opacity-40"
+                    className="h-9 px-4 text-xs font-semibold transition-all disabled:opacity-40 hover:opacity-80"
                     style={{ borderRadius: "10px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
                     Limpiar
                   </button>
@@ -1097,9 +1095,9 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </div>
             </div>
             <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-8 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+              className="h-12 px-8 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 hover:opacity-90 active:scale-[0.98]"
               style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
-              {saving ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Check className="h-4 w-4" />}
+              {saving ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : null}
               Guardar
             </button>
           </div>
