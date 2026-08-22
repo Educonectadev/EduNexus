@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
       }
 
       const [students] = await pool.query(
-        `SELECT s.id, s.code, s.first_name, s.last_name, s.document_number, s.grade, s.section
+        `SELECT s.id, s.code, s.first_name, s.last_name, s.document_number, e.grade, e.section
          FROM students s
          JOIN enrollments e ON e.student_id = s.id
-         WHERE s.institution_id = ? AND s.grade = ? AND s.section = ? AND e.status = 'active'
+         WHERE e.course_id = ? AND e.status = 'active'
          ORDER BY s.last_name, s.first_name`,
-        [instId, course.grade, course.section]
+        [courseId]
       ) as any[]
 
       const [grades] = await pool.query(
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     const [courseRows] = await pool.query(
-      `SELECT c.id, c.grade, c.section
+      `SELECT c.id
        FROM courses c
        JOIN teachers t ON c.teacher_id = t.id
        WHERE c.id = ? AND t.user_id = ? AND c.status = 'active'`,
@@ -115,8 +115,8 @@ export async function POST(request: NextRequest) {
       `SELECT s.id
        FROM students s
        JOIN enrollments e ON e.student_id = s.id
-       WHERE s.id = ? AND s.institution_id = ? AND s.grade = ? AND s.section = ? AND e.status = 'active'`,
-      [student_id, instId, course.grade, course.section]
+       WHERE s.id = ? AND e.course_id = ? AND e.status = 'active'`,
+      [student_id, course_id]
     ) as any[]
     if (!studentRows[0]) {
       return NextResponse.json({ error: 'Alumno no pertenece al curso' }, { status: 403 })
