@@ -123,15 +123,23 @@ export async function POST(request: NextRequest) {
     }
 
     const id = crypto.randomUUID()
-    await pool.query(
-      `INSERT INTO grades (id, institution_id, student_id, course_id, period, score, max_score, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT (student_id, course_id, period) DO UPDATE SET
-         score = EXCLUDED.score,
-         max_score = EXCLUDED.max_score,
-         notes = EXCLUDED.notes`,
-      [id, instId, student_id, course_id, period, Number(score), Number(max_score || 20), notes || null]
-    )
+    const [existing] = await pool.query(
+      `SELECT id FROM grades WHERE student_id = ? AND course_id = ? AND period = ?`,
+      [student_id, course_id, period]
+    ) as any[]
+
+    if (existing && existing.length > 0) {
+      await pool.query(
+        `UPDATE grades SET score = ?, max_score = ?, notes = ? WHERE id = ?`,
+        [Number(score), Number(max_score || 20), notes || null, existing[0].id]
+      )
+    } else {
+      await pool.query(
+        `INSERT INTO grades (id, institution_id, student_id, course_id, period, score, max_score, notes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, instId, student_id, course_id, period, Number(score), Number(max_score || 20), notes || null]
+      )
+    }
 
     try {
       const [info] = await pool.query(
@@ -150,7 +158,7 @@ export async function POST(request: NextRequest) {
       )
     } catch { /* el aviso es opcional */ }
 
-    return NextResponse.json({ success: true, id })
+    return NextResponse.json({ success: true, id: existing && existing.length > 0 ? existing[0].id : id })
   } catch (error: any) {
     console.error('Error saving calificacion:', error)
     return NextResponse.json({ error: 'Error saving calificacion' }, { status: 500 })
