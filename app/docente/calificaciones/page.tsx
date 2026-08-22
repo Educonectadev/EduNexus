@@ -56,7 +56,8 @@ function getGradeBarColor(g: number) { return g >= 18 ? "bg-foreground" : g >= 1
 
 function calcAverage(grades: Grade[]) {
   if (grades.length === 0) return 0
-  return Number((grades.reduce((a, g) => a + g.score, 0) / grades.length).toFixed(1))
+  const sum = grades.reduce((a, g) => a + Number(g.score), 0)
+  return Number((sum / grades.length).toFixed(1))
 }
 
 function studentName(s: Student) { return `${s.first_name} ${s.last_name}` }
