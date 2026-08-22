@@ -146,6 +146,8 @@ function CalificacionesInner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, course_id: target.course_id, period: target.period, score: newScore, max_score: MAX_SCORE }),
       })
+      setStudents(prev => prev.map(s => s.id !== studentId ? s : { ...s, grades: s.grades.map(g => g.id !== gradeId ? g : { ...g, score: newScore }) }))
+      setSelected(prev => prev ? { ...prev, grades: prev.grades.map(g => g.id !== gradeId ? g : { ...g, score: newScore }) } : null)
       if (courseId) loadCourseData(courseId)
     } catch {}
     setEditGradeId(null); setEditScore("")
@@ -154,17 +156,25 @@ function CalificacionesInner() {
   const handleDeleteGrade = async (gradeId: string) => {
     try {
       await fetch(`/api/docente/calificaciones?id=${gradeId}`, { method: "DELETE" })
+      setStudents(prev => prev.map(s => ({ ...s, grades: s.grades.filter(g => g.id !== gradeId) })))
+      setSelected(prev => prev ? { ...prev, grades: prev.grades.filter(g => g.id !== gradeId) } : null)
       if (courseId) loadCourseData(courseId)
     } catch {}
   }
 
   const handleAddGrade = async (studentId: string) => {
     if (!newPeriod || !newScore) return
-    await fetch("/api/docente/calificaciones", {
+    const res = await fetch("/api/docente/calificaciones", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null }),
     })
+    const data = await res.json()
+    if (data.success && data.id) {
+      const newGrade = { id: data.id, student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null, created_at: new Date().toISOString() }
+      setStudents(prev => prev.map(s => s.id !== studentId ? s : { ...s, grades: [...s.grades, newGrade] }))
+      setSelected(prev => prev ? { ...prev, grades: [...prev.grades, newGrade] } : null)
+    }
     setNewPeriod(""); setNewScore(""); setNewNotes("")
     if (courseId) loadCourseData(courseId)
   }
@@ -259,7 +269,7 @@ function CalificacionesInner() {
 
           {/* Controls - Mobile responsive */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4">
-            <div className="flex-1">
+            <div className="sm:w-56">
               <select
                 value={courseId}
                 onChange={e => setCourseId(e.target.value)}
@@ -278,7 +288,7 @@ function CalificacionesInner() {
                 <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "var(--note-fill)" }}>
                   {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
                     <button key={key} onClick={() => setViewMode(key)}
-                      className="flex-1 h-9 text-[13px] font-semibold flex items-center justify-center rounded-lg transition-all duration-200"
+                      className="h-9 px-4 text-[13px] font-semibold flex items-center justify-center rounded-lg transition-all duration-200"
                       style={{
                         background: viewMode === key ? "var(--note-text)" : "transparent",
                         color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)",
@@ -622,6 +632,16 @@ function TablaNotas({
 }) {
   const [drafts, setDrafts] = React.useState<Record<string, string>>({})
 
+  const approvedCount = students.filter(s => {
+    const avg = calcAverage(s.grades)
+    return avg >= 11
+  }).length
+  const disapprovedCount = students.filter(s => {
+    const avg = calcAverage(s.grades)
+    return avg > 0 && avg < 11
+  }).length
+  const noGradeCount = students.filter(s => s.grades.length === 0).length
+
   const gradeFor = (s: Student, period: string) => s.grades.find(g => g.period === period)
 
   const cellKey = (studentId: string, period: string) => `${studentId}:${period}`
@@ -649,9 +669,9 @@ function TablaNotas({
             <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
           </div>
           <div className="flex items-center gap-3 text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Aprobado (11+)</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400" /> Desaprobado</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-fill-strong)" }} /> Sin nota</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> {approvedCount} Aprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400" /> {disapprovedCount} Desaprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-fill-strong)" }} /> {noGradeCount} Sin nota</span>
           </div>
         </div>
       </div>
