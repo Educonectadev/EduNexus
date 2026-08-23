@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { jwtVerify } from 'jose'
+import { getAuthPayload } from '@/lib/resolveInstId'
 import pool from '@/lib/db'
-
-async function getAuthUser(request: NextRequest) {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-  if (!token) return null
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
-    return payload
-  } catch {
-    return null
-  }
-}
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthUser(request)
-    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    const user = await getAuthPayload(request)
+    if (!user || user.role !== 'director') return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    const instId = user.institutionId as string
 
     const { id } = await params
     const body = await request.json()
@@ -25,7 +14,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     await pool.query(
       `UPDATE notifications SET title = ?, message = ?, agenda = ?, meeting_date = ?, meeting_time = ?, location = ?, virtual_link = ?, target_role = ?, priority = ? WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
-      [title, message || '', agenda || '', meeting_date, meeting_time || null, location || null, virtual_link || null, target_role || 'all', priority || 'media', id, user.institutionId]
+      [title, message || '', agenda || '', meeting_date, meeting_time || null, location || null, virtual_link || null, target_role || 'all', priority || 'media', id, instId]
     )
 
     return NextResponse.json({ success: true })
@@ -36,8 +25,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthUser(request)
-    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    const user = await getAuthPayload(request)
+    if (!user || user.role !== 'director') return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    const instId = user.institutionId as string
 
     const { id } = await params
     const body = await request.json()
@@ -45,7 +35,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (body.pinned !== undefined) {
       await pool.query(
         `UPDATE notifications SET pinned = ? WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
-        [body.pinned ? 1 : 0, id, user.institutionId]
+        [body.pinned ? 1 : 0, id, instId]
       )
     }
 
@@ -57,13 +47,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await getAuthUser(request)
-    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    const user = await getAuthPayload(request)
+    if (!user || user.role !== 'director') return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    const instId = user.institutionId as string
 
     const { id } = await params
     await pool.query(
       `DELETE FROM notifications WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
-      [id, user.institutionId]
+      [id, instId]
     )
     return NextResponse.json({ success: true })
   } catch (error: any) {
