@@ -55,26 +55,29 @@ export function Navbar({ title }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 glass border-b border-border/50 px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b px-6"
+      style={{ background: "var(--sb-surface)", borderColor: "var(--sb-outline-variant)" }}>
       <Button
         variant="ghost"
         size="icon"
         className="md:hidden rounded-xl"
+        style={{ color: "var(--sb-on-surface-variant)" }}
         onClick={toggle}
       >
         <Menu className="h-5 w-5" />
       </Button>
 
       <div className="flex-1">
-        <h1 className="text-lg font-semibold tracking-tight">{getPageTitle()}</h1>
+        <h1 className="text-lg font-semibold tracking-tight" style={{ color: "var(--sb-on-surface)" }}>{getPageTitle()}</h1>
       </div>
 
       <div className="flex items-center gap-2">
         <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--sb-on-surface-variant)" }} />
           <Input
             placeholder="Buscar..."
-            className="w-64 pl-9 rounded-xl bg-muted/50 border-border/50"
+            className="w-64 pl-9 rounded-xl"
+            style={{ background: "var(--sb-surface-container-high)", color: "var(--sb-on-surface)", border: "1px solid var(--sb-outline-variant)" }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 // TODO: Implement search
@@ -87,6 +90,7 @@ export function Navbar({ title }: NavbarProps) {
           variant="ghost"
           size="icon"
           className="rounded-xl"
+          style={{ color: "var(--sb-on-surface-variant)" }}
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -94,7 +98,7 @@ export function Navbar({ title }: NavbarProps) {
           <span className="sr-only">Cambiar tema</span>
         </Button>
 
-        <Button variant="ghost" size="icon" className="relative rounded-xl">
+        <Button variant="ghost" size="icon" className="relative rounded-xl" style={{ color: "var(--sb-on-surface-variant)" }}>
           <Bell className="h-5 w-5" />
           <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full bg-primary text-white border-0">
             3
@@ -103,9 +107,9 @@ export function Navbar({ title }: NavbarProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                <span className="text-primary font-medium text-sm">
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full" style={{ color: "var(--sb-on-surface)" }}>
+              <div className="h-9 w-9 rounded-full flex items-center justify-center" style={{ background: "var(--sb-surface-container-high)" }}>
+                <span className="font-medium text-sm" style={{ color: "var(--sb-on-surface)" }}>
                   {user?.full_name
                     ?.split(" ")
                     .map((n) => n[0])
@@ -116,28 +120,29 @@ export function Navbar({ title }: NavbarProps) {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 rounded-xl" align="end" forceMount>
+          <DropdownMenuContent className="w-56 rounded-xl" align="end" forceMount
+            style={{ background: "var(--sb-surface)", border: "1px solid var(--sb-outline-variant)" }}>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm font-medium leading-none" style={{ color: "var(--sb-on-surface)" }}>
                   {user?.full_name || "Usuario"}
                 </p>
-                <p className="text-xs leading-none text-muted-foreground">
+                <p className="text-xs leading-none" style={{ color: "var(--sb-on-surface-variant)" }}>
                   {user?.email || "usuario@ejemplo.com"}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="rounded-lg cursor-pointer">
+            <DropdownMenuItem className="rounded-lg cursor-pointer" style={{ color: "var(--sb-on-surface)" }}>
               <User className="mr-2 h-4 w-4" />
               <span>Mi perfil</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-lg cursor-pointer">
+            <DropdownMenuItem className="rounded-lg cursor-pointer" style={{ color: "var(--sb-on-surface)" }}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Configuración</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive rounded-lg cursor-pointer" onClick={handleLogout}>
+            <DropdownMenuItem className="rounded-lg cursor-pointer" style={{ color: "#f87171" }} onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Cerrar sesión</span>
             </DropdownMenuItem>
