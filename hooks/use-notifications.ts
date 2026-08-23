@@ -80,6 +80,7 @@ export function useNotifications() {
     let socket: any
     try {
       socket = connectSocket()
+      if (!socket) return
       socket.on('notify:new', (n: any) => {
         if (!n || !n.id || n.id === lastId.current) return
         lastId.current = n.id
