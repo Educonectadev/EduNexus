@@ -151,7 +151,7 @@ function MaterialesInner() {
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
-      <div className="p-6 md:p-8 pb-24 md:pb-8">
+      <div className="p-4 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: 12 }}
@@ -188,10 +188,10 @@ function MaterialesInner() {
             <button
               onClick={() => setUploadOpen(true)}
               disabled={!courses.length}
-              className="h-10 px-5 text-sm font-bold flex items-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]"
+              className="h-10 px-3 sm:px-5 text-sm font-bold flex items-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]"
               style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}
             >
-              <Upload className="h-4 w-4" /> Subir material
+              <Upload className="h-4 w-4" /> <span className="hidden sm:inline">Subir material</span>
             </button>
           </div>
         </motion.header>
