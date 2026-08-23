@@ -227,7 +227,7 @@ function MaterialesInner() {
           <select
             value={courseFilter}
             onChange={e => setCourseFilter(e.target.value)}
-            className="h-11 px-4 text-sm font-medium rounded-xl transition-all cursor-pointer sm:w-64"
+            className="h-11 px-4 text-sm font-medium rounded-xl transition-all cursor-pointer w-full sm:w-64"
             style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
           >
             <option value="all">Todos los cursos</option>
@@ -269,7 +269,7 @@ function MaterialesInner() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 12 }}
                     transition={{ delay: i * 0.03 }}
-                    className="group rounded-xl px-5 py-4 transition-all duration-200"
+                    className="group rounded-xl px-3 sm:px-5 py-4 transition-all duration-200"
                     style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
