@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
     const instId = user.institutionId as string
+    if (!instId) return NextResponse.json([])
 
     const [rows] = await pool.query(
       `SELECT *, COALESCE(priority, 'media') as priority,
@@ -24,8 +25,8 @@ export async function GET(request: NextRequest) {
     )
     return NextResponse.json(rows)
   } catch (error: any) {
-    if (error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json([])
-    console.error('Error fetching reuniones:', error)
+    if (error?.code === '42P01' || error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json([])
+    console.error('Error fetching reuniones:', error?.message || error)
     return NextResponse.json({ error: 'Error fetching reuniones' }, { status: 500 })
   }
 }
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
     }
     const instId = user.institutionId as string
     const userId = user.id as string
+    if (!instId) return NextResponse.json({ error: 'Sin institución' }, { status: 400 })
 
     const body = await request.json()
     const { title, message, agenda, meeting_date, meeting_time, location, virtual_link, target_role, priority } = body
@@ -55,8 +57,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
-    if (error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json({ error: 'Tabla notifications no existe. Ejecuta la migración.' }, { status: 500 })
-    console.error('Error creating reunión:', error)
-    return NextResponse.json({ error: 'Error creating reunión' }, { status: 500 })
+    console.error('Error creating reunión:', error?.message || error)
+    return NextResponse.json({ error: error?.message || 'Error creating reunión' }, { status: 500 })
   }
 }
