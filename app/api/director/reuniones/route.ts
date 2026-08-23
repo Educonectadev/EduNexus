@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     await pool.query(
       `INSERT INTO notifications (id, title, message, agenda, type, target_role, priority, status, meeting_date, meeting_time, location, virtual_link, institution_id, created_by)
        VALUES (?, ?, ?, ?, 'meeting', ?, ?, 'active', ?, ?, ?, ?, ?, ?)`,
-      [id, title, message || '', agenda || '', target_role || 'all', priority || 'media', meeting_date, meeting_time || null, location || null, virtual_link || null, user.institutionId, user.sub]
+      [id, title, message || '', agenda || '', target_role || 'all', priority || 'media', meeting_date, meeting_time || null, location || null, virtual_link || null, user.institutionId, user.id]
     )
 
     return NextResponse.json({ success: true, id })
