@@ -33,9 +33,9 @@ export async function GET(request: NextRequest) {
              m.file_size, m.created_at, c.name AS course_name, c.grade, c.section, 'propio' AS source
       FROM course_materials m
       JOIN courses c ON c.id = m.course_id
-      WHERE m.institution_id = ? AND ${myCoursesClause}
+      WHERE m.institution_id = ? AND m.uploaded_by = ? AND ${myCoursesClause}
     `
-    const params: any[] = [instId, userId]
+    const params: any[] = [instId, userId, userId]
 
     if (courseId) {
       query += ` AND m.course_id = ?`
