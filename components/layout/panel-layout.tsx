@@ -624,7 +624,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Minimal Header - hidden for docente dashboard (has its own header) */}
         {!pathname.startsWith("/docente/") && (
-        <header className="flex items-center justify-between h-14 px-6 shrink-0 bg-sb-surface">
+        <header className="flex items-center justify-between h-14 px-6 shrink-0" style={{ background: "var(--sb-background)" }}>
           <h1 className="text-sm font-medium text-sb-on-surface-variant">{pageName}</h1>
           <div className="flex items-center gap-2">
             {user && (
