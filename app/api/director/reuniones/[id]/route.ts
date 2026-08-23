@@ -10,37 +10,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params
     const body = await request.json()
-    const { title, message, agenda, meeting_date, meeting_time, location, virtual_link, target_role, priority } = body
+    const { title, message, meeting_date, meeting_time, target_role, priority } = body
 
     await pool.query(
-      `UPDATE notifications SET title = ?, message = ?, agenda = ?, meeting_date = ?, meeting_time = ?, location = ?, virtual_link = ?, target_role = ?, priority = ? WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
-      [title, message || '', agenda || '', meeting_date, meeting_time || null, location || null, virtual_link || null, target_role || 'all', priority || 'media', id, instId]
+      `UPDATE notifications SET title = ?, message = ?, meeting_date = ?, meeting_time = ?, target_role = ?, priority = ? WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
+      [title, message || '', meeting_date, meeting_time || null, target_role || 'all', priority || 'media', id, instId]
     )
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    return NextResponse.json({ error: 'Error updating reunión' }, { status: 500 })
-  }
-}
-
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const user = await getAuthPayload(request)
-    if (!user || user.role !== 'director') return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-    const instId = user.institutionId as string
-
-    const { id } = await params
-    const body = await request.json()
-
-    if (body.pinned !== undefined) {
-      await pool.query(
-        `UPDATE notifications SET pinned = ? WHERE id = ? AND institution_id = ? AND type = 'meeting'`,
-        [body.pinned ? 1 : 0, id, instId]
-      )
-    }
-
-    return NextResponse.json({ success: true })
-  } catch (error: any) {
+    console.error('Error updating reunión:', error?.message || error)
     return NextResponse.json({ error: 'Error updating reunión' }, { status: 500 })
   }
 }
@@ -58,7 +37,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     )
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    if (error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json([])
+    console.error('Error deleting reunión:', error?.message || error)
     return NextResponse.json({ error: 'Error deleting reunión' }, { status: 500 })
   }
 }

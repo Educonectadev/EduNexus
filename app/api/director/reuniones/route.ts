@@ -13,21 +13,17 @@ export async function GET(request: NextRequest) {
     if (!instId) return NextResponse.json([])
 
     const [rows] = await pool.query(
-      `SELECT *, COALESCE(priority, 'media') as priority,
-              COALESCE(pinned, 0) as pinned,
-              COALESCE(location, '') as location,
-              COALESCE(virtual_link, '') as virtual_link,
-              COALESCE(agenda, '') as agenda
+      `SELECT id, title, COALESCE(message, '') as message, type, target_role, priority, status,
+              meeting_date, meeting_time, institution_id, created_at
        FROM notifications
        WHERE type = 'meeting' AND institution_id = ?
-       ORDER BY pinned DESC, meeting_date ASC, meeting_time ASC`,
+       ORDER BY meeting_date ASC, meeting_time ASC`,
       [instId]
     )
     return NextResponse.json(rows)
   } catch (error: any) {
-    if (error?.code === '42P01' || error?.code === 'ER_NO_SUCH_TABLE') return NextResponse.json([])
     console.error('Error fetching reuniones:', error?.message || error)
-    return NextResponse.json({ error: 'Error fetching reuniones' }, { status: 500 })
+    return NextResponse.json([])
   }
 }
 
@@ -38,11 +34,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     }
     const instId = user.institutionId as string
-    const userId = user.id as string
     if (!instId) return NextResponse.json({ error: 'Sin institución' }, { status: 400 })
 
     const body = await request.json()
-    const { title, message, agenda, meeting_date, meeting_time, location, virtual_link, target_role, priority } = body
+    const { title, message, meeting_date, meeting_time, target_role, priority } = body
 
     if (!title || !meeting_date) {
       return NextResponse.json({ error: 'Título y fecha son requeridos' }, { status: 400 })
@@ -50,9 +45,9 @@ export async function POST(request: NextRequest) {
 
     const id = crypto.randomUUID()
     await pool.query(
-      `INSERT INTO notifications (id, title, message, agenda, type, target_role, priority, status, meeting_date, meeting_time, location, virtual_link, institution_id, created_by)
-       VALUES (?, ?, ?, ?, 'meeting', ?, ?, 'active', ?, ?, ?, ?, ?, ?)`,
-      [id, title, message || '', agenda || '', target_role || 'all', priority || 'media', meeting_date, meeting_time || null, location || null, virtual_link || null, instId, userId]
+      `INSERT INTO notifications (id, title, message, type, target_role, priority, status, meeting_date, meeting_time, institution_id)
+       VALUES (?, ?, ?, 'meeting', ?, ?, 'active', ?, ?, ?)`,
+      [id, title, message || '', target_role || 'all', priority || 'media', meeting_date, meeting_time || null, instId]
     )
 
     return NextResponse.json({ success: true, id })
