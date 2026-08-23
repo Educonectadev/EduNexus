@@ -51,6 +51,7 @@ export default function MessagesPage() {
 
   const initSocket = () => {
     const socket = connectSocket()
+    if (!socket) return
     socketRef.current = socket
 
     socket.on('connect', () => {
@@ -134,6 +135,7 @@ export default function MessagesPage() {
     if (!newMessage.trim() || !selectedContact) return
 
     const socket = getSocket()
+    if (!socket) return
     socket.emit('message:send', {
       receiverId: selectedContact.id,
       message: newMessage,

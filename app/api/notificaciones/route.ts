@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
-import { getAuthPayload, resolveInstId } from '@/lib/resolveInstId'
+import { getAuthPayload } from '@/lib/resolveInstId'
 
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthPayload(request)
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    const instId = await resolveInstId(request)
+    const instId = user.institutionId as string | null
 
-    // Roles sin institución (dev/super_admin): reciben avisos dirigidos a su rol
-    const globalRole = instId ? null : (user.role === 'dev' || user.role === 'super_admin' ? user.role : null)
-    if (!instId && !globalRole) {
-      return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
+    if (!instId && user.role !== 'dev' && user.role !== 'super_admin') {
+      return NextResponse.json({ notifications: [], unread: 0 })
     }
+
+    const globalRole = !instId ? user.role : null
 
     const [rows] = globalRole
       ? (await pool.query(
@@ -65,6 +65,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ notifications, unread })
   } catch (error) {
     console.error('Error fetching notifications:', error)
-    return NextResponse.json({ error: 'Error al cargar notificaciones' }, { status: 500 })
+    return NextResponse.json({ notifications: [], unread: 0 })
   }
 }

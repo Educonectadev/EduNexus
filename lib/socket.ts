@@ -6,7 +6,9 @@ let socket: any = null
 
 export function getSocket(): any {
   if (!socket) {
-    socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
+    const url = process.env.NEXT_PUBLIC_SOCKET_URL
+    if (!url) return null
+    socket = io(url, {
       autoConnect: false,
       reconnection: false,
       timeout: 5000,
@@ -17,6 +19,7 @@ export function getSocket(): any {
 
 export function connectSocket() {
   const s = getSocket()
+  if (!s) return null
   if (!s.connected) {
     s.connect()
   }
