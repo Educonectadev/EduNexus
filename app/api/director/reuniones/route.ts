@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     if (!instId) return NextResponse.json([])
 
     const [rows] = await pool.query(
-      `SELECT id, title, COALESCE(message, '') as message, type, target_role, priority, status,
+      `SELECT id, title, COALESCE(message, '') as message, type, target_role, status,
               meeting_date, meeting_time, institution_id, created_at
        FROM notifications
        WHERE type = 'meeting' AND institution_id = ?
@@ -45,9 +45,9 @@ export async function POST(request: NextRequest) {
 
     const id = crypto.randomUUID()
     await pool.query(
-      `INSERT INTO notifications (id, title, message, type, target_role, priority, status, meeting_date, meeting_time, institution_id)
-       VALUES (?, ?, ?, 'meeting', ?, ?, 'active', ?, ?, ?)`,
-      [id, title, message || '', target_role || 'all', priority || 'media', meeting_date, meeting_time || null, instId]
+      `INSERT INTO notifications (id, title, message, type, target_role, status, meeting_date, meeting_time, institution_id)
+       VALUES (?, ?, ?, 'meeting', ?, 'active', ?, ?, ?)`,
+      [id, title, message || '', target_role || 'all', meeting_date, meeting_time || null, instId]
     )
 
     return NextResponse.json({ success: true, id })
