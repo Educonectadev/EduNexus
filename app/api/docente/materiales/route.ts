@@ -44,13 +44,13 @@ export async function GET(request: NextRequest) {
 
     query += `
       UNION ALL
-      SELECT m.id, NULL AS course_id, NULL AS uploaded_by, m.name, m.description, m.file_url, m.file_type,
+      SELECT m.id, NULL AS course_id, m.uploaded_by, m.name, m.description, m.file_url, m.file_type,
              m.file_size, m.created_at, NULL AS course_name, NULL AS grade, NULL AS section, 'biblioteca' AS source
       FROM document_library m
-      WHERE m.institution_id = ?
+      WHERE m.institution_id = ? AND m.uploaded_by = ?
       ORDER BY created_at DESC
     `
-    params.push(instId)
+    params.push(instId, userId)
 
     const [rows] = await pool.query(query, params)
     return NextResponse.json(rows)
