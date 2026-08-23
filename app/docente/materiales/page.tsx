@@ -227,12 +227,12 @@ function MaterialesInner() {
           <select
             value={courseFilter}
             onChange={e => setCourseFilter(e.target.value)}
-            className="h-11 px-4 text-sm font-medium rounded-xl transition-all cursor-pointer w-full sm:w-64"
-            style={{ background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
+            className="h-11 px-4 text-sm font-medium rounded-xl transition-all cursor-pointer w-full sm:w-64 appearance-none bg-[var(--note-fill)] text-[var(--note-text)] border border-[var(--note-hairline)]"
+            style={{ fontFamily: FONT, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', paddingRight: '36px' }}
           >
-            <option value="all">Todos los cursos</option>
+            <option value="all" className="bg-[var(--note-fill)] text-[var(--note-text)]">Todos los cursos</option>
             {courses.map(c => (
-              <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
+              <option key={c.id} value={c.id} className="bg-[var(--note-fill)] text-[var(--note-text)]">{c.name} · {c.grade} &quot;{c.section}&quot;</option>
             ))}
           </select>
         </motion.div>
