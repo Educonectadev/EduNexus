@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { MobileNavbar } from "@/components/ui/mobile-navbar"
-import { LayoutDashboard, BookOpen, UserCheck, GraduationCap, CreditCard, Calendar, Settings, Terminal, Shield } from "@/components/ui/proicons"
+import { LayoutDashboard, BookOpen, UserCheck, GraduationCap, CreditCard, Calendar, Settings } from "@/components/ui/proicons"
 
 export default function NavbarTestPage() {
   return (
@@ -13,42 +13,21 @@ export default function NavbarTestPage() {
             Test navbar móvil
           </h2>
           <p className="text-[13px] text-sb-on-surface/70 mt-1">
-            Abre DevTools en modo móvil (&lt;768px) y pulsa un botón de sección.
+            Abre DevTools en modo móvil (&lt;768px) y pulsa el botón ⋯ de la derecha.
           </p>
         </div>
       </div>
       <MobileNavbar
         role="docente"
         activeHref="/docente/dashboard"
-        groups={[
-          {
-            title: "Académico",
-            icon: GraduationCap,
-            items: [
-              { title: "Dashboard", href: "/docente/dashboard", icon: LayoutDashboard },
-              { title: "Cursos", href: "/docente/cursos", icon: BookOpen },
-              { title: "Asistencia", href: "/docente/asistencia", icon: UserCheck },
-              { title: "Notas", href: "/docente/calificaciones", icon: GraduationCap },
-            ],
-          },
-          {
-            title: "Herramientas",
-            icon: Terminal,
-            items: [
-              { title: "Tareas", href: "/docente/tareas", icon: CreditCard },
-              { title: "Materiales", href: "/docente/materiales", icon: Calendar },
-              { title: "Calendario", href: "/docente/calendario", icon: Settings },
-            ],
-          },
-          {
-            title: "Sistema",
-            icon: Shield,
-            items: [
-              { title: "Mensajes", href: "/docente/mensajes", icon: Calendar },
-              { title: "Horarios", href: "/docente/horarios", icon: Calendar },
-              { title: "Reuniones", href: "/docente/reuniones", icon: Calendar },
-            ],
-          },
+        items={[
+          { title: "Dashboard", href: "/docente/dashboard", icon: LayoutDashboard },
+          { title: "Cursos", href: "/docente/cursos", icon: BookOpen },
+          { title: "Asistencia", href: "/docente/asistencia", icon: UserCheck },
+          { title: "Notas", href: "/docente/calificaciones", icon: GraduationCap },
+          { title: "Tareas", href: "/docente/tareas", icon: CreditCard },
+          { title: "Materiales", href: "/docente/materiales", icon: Calendar },
+          { title: "Calendario", href: "/docente/calendario", icon: Settings },
         ]}
       />
     </div>

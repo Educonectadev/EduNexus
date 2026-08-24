@@ -701,10 +701,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* ===== MOBILE BOTTOM NAV ===== */}
         {role && (
           <MobileNavbar
-            groups={visibleNavSections.map(s => ({ title: s.title, icon: s.items[0]?.icon || LayoutDashboard, items: s.items }))}
+            items={visibleNavItems}
             activeHref={pathname}
             role={role}
             onAiClick={role === 'secretario' && can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
+            maxVisible={4}
             onLogout={handleLogout}
           />
         )}

@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { X, User, Sparkles, LogOut, ChevronRight } from "@/components/ui/proicons"
+import { MoreHorizontal, X, User, Sparkles, LogOut, ChevronRight } from "@/components/ui/proicons"
 
 interface NavItem {
   title: string
@@ -20,22 +20,84 @@ interface NavGroup {
 }
 
 interface MobileNavbarProps {
-  groups: NavGroup[]
+  items?: NavItem[]
+  groups?: NavGroup[]
   activeHref: string
   role?: string
   className?: string
   onAiClick?: () => void
+  maxVisible?: number
   onLogout?: () => void
 }
 
-export function MobileNavbar({
+function NavButton({
+  item,
+  isActive,
+  router,
+}: {
+  item: NavItem
+  isActive: boolean
+  router: ReturnType<typeof useRouter>
+}) {
+  return (
+    <motion.button
+      type="button"
+      onClick={() => router.push(item.href)}
+      className="relative flex items-center justify-center w-12 h-12"
+      aria-label={item.title}
+      aria-current={isActive ? "page" : undefined}
+      whileTap={{ scale: 0.9 }}
+    >
+      <motion.div
+        className="absolute inset-0"
+        initial={false}
+        animate={{
+          borderRadius: 999,
+          backgroundColor: isActive ? "var(--sb-on-surface)" : "transparent",
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+      />
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
+        animate={{
+          scale: isActive ? 1.1 : 1,
+          color: isActive ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
+          opacity: isActive ? 1 : 0.6,
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        <item.icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
+      </motion.div>
+      {typeof item.badge === "number" && item.badge > 0 && (
+        <span className={cn(
+          "absolute top-0 right-0 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 z-20",
+          isActive
+            ? "border-sb-surface bg-sb-surface text-sb-on-surface"
+            : "border-sb-surface bg-sb-primary text-sb-on-primary"
+        )}>
+          {item.badge > 9 ? "9+" : item.badge}
+        </span>
+      )}
+    </motion.button>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODO GROUPS — botones agrupados + bottom-sheet modal
+   ═══════════════════════════════════════════════════════ */
+function GroupedNavbar({
   groups,
   activeHref,
   role,
-  className,
   onAiClick,
   onLogout,
-}: MobileNavbarProps) {
+}: {
+  groups: NavGroup[]
+  activeHref: string
+  role?: string
+  onAiClick?: () => void
+  onLogout?: () => void
+}) {
   const router = useRouter()
   const [openGroup, setOpenGroup] = React.useState<number | null>(null)
 
@@ -48,18 +110,16 @@ export function MobileNavbar({
 
   const currentGroup = openGroup !== null ? groups[openGroup] : null
 
-  if (!groups || groups.length === 0) return null
-
   return (
-    <div className="md:hidden">
-      {/* ===== BOTTOM BAR ===== */}
+    <>
+      {/* Bottom bar */}
       <motion.nav
-        className={cn("mobile-navbar fixed left-0 right-0 z-[60]", className)}
-        initial={{ y: 100, opacity: 0, scale: 0.95 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
+        className="mobile-navbar fixed left-0 right-0 bottom-0 z-[60] md:hidden"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 32, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-center justify-center w-full gap-2 px-4 py-2">
+        <div className="flex items-center justify-center w-full gap-2 px-4 py-2">
           {groups.map((group, idx) => {
             const hasActive = group.items.some(i => isActive(i))
             const Icon = group.icon
@@ -87,26 +147,19 @@ export function MobileNavbar({
         </div>
       </motion.nav>
 
-      {/* ===== MODAL ===== */}
+      {/* Bottom-sheet modal */}
       <AnimatePresence>
         {currentGroup && (
           <motion.div
-            className="fixed inset-0 z-[70] flex items-end justify-center"
+            className="fixed inset-0 z-[70] flex items-end justify-center md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
           >
-            {/* Backdrop */}
             <motion.div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={() => setOpenGroup(null)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
             />
-
-            {/* Sheet */}
             <motion.div
               className="relative w-full max-w-md bg-sb-surface rounded-t-3xl overflow-hidden"
               initial={{ y: "100%" }}
@@ -114,24 +167,16 @@ export function MobileNavbar({
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 400, damping: 35 }}
             >
-              {/* Handle */}
               <div className="flex justify-center pt-3 pb-2">
                 <div className="w-10 h-1 rounded-full bg-sb-on-surface/20" />
               </div>
-
-              {/* Header */}
               <div className="flex items-center justify-between px-5 pb-3">
                 <h3 className="text-[15px] font-semibold text-sb-on-surface">{currentGroup.title}</h3>
-                <button
-                  onClick={() => setOpenGroup(null)}
-                  className="p-1.5 rounded-xl hover:bg-sb-surface-container-high transition-colors text-sb-on-surface/60"
-                >
+                <button onClick={() => setOpenGroup(null)} className="p-1.5 rounded-xl hover:bg-sb-surface-container-high transition-colors text-sb-on-surface/60">
                   <X className="h-4 w-4" />
                 </button>
               </div>
-
-              {/* Items */}
-              <div className="px-4 pb-8 space-y-1 max-h-[60vh] overflow-auto">
+              <div className="px-4 pb-6 space-y-1 max-h-[55vh] overflow-auto">
                 {currentGroup.items.map((item) => {
                   const active = isActive(item)
                   return (
@@ -141,9 +186,7 @@ export function MobileNavbar({
                       onClick={() => { setOpenGroup(null); router.push(item.href) }}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-colors text-left",
-                        active
-                          ? "bg-sb-on-surface/10 text-sb-on-surface"
-                          : "hover:bg-sb-surface-container-high/50 text-sb-on-surface-variant"
+                        active ? "bg-sb-on-surface/10 text-sb-on-surface" : "hover:bg-sb-surface-container-high/50 text-sb-on-surface-variant"
                       )}
                     >
                       <div className={cn(
@@ -152,43 +195,32 @@ export function MobileNavbar({
                       )}>
                         <item.icon className="h-4 w-4" />
                       </div>
-                      <span className={cn("text-sm flex-1", active ? "font-medium" : "")}>{item.title}</span>
+                      <span className={cn("text-sm flex-1", active && "font-medium")}>{item.title}</span>
                       <ChevronRight className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
                     </button>
                   )
                 })}
               </div>
-
-              {/* Footer actions */}
-              <div className="px-4 pb-8 pt-2 border-t border-sb-outline-variant/10 space-y-1">
+              <div className="px-4 pb-6 pt-2 border-t border-sb-outline-variant/10 space-y-1">
                 {onAiClick && (
-                  <button
-                    type="button"
-                    onClick={() => { setOpenGroup(null); onAiClick() }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors"
-                  >
+                  <button type="button" onClick={() => { setOpenGroup(null); onAiClick() }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors">
                     <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
                       <Sparkles className="h-4 w-4 text-sb-primary" />
                     </div>
                     Asistente IA
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => { setOpenGroup(null); router.push("/dev/perfil") }}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors"
-                >
+                <button type="button" onClick={() => { setOpenGroup(null); router.push("/perfil") }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors">
                   <div className="h-9 w-9 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
                     <User className="h-4 w-4 text-sb-on-surface-variant/70" />
                   </div>
                   Mi perfil
                 </button>
                 {onLogout && (
-                  <button
-                    type="button"
-                    onClick={() => { setOpenGroup(null); onLogout() }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition-colors"
-                  >
+                  <button type="button" onClick={() => { setOpenGroup(null); onLogout() }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition-colors">
                     <div className="h-9 w-9 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
                       <LogOut className="h-4 w-4 text-red-500" />
                     </div>
@@ -200,19 +232,169 @@ export function MobileNavbar({
           </motion.div>
         )}
       </AnimatePresence>
+    </>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════
+   MODO ITEMS — botones + dropdown "more" (original)
+   ═══════════════════════════════════════════════════════ */
+function FlatNavbar({
+  items,
+  activeHref,
+  role,
+  onAiClick,
+  maxVisible = 4,
+  onLogout,
+}: {
+  items: NavItem[]
+  activeHref: string
+  role?: string
+  onAiClick?: () => void
+  maxVisible?: number
+  onLogout?: () => void
+}) {
+  const router = useRouter()
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const morphRef = React.useRef<HTMLDivElement>(null)
+  const menuRef = React.useRef<HTMLDivElement>(null)
+  const [menuHeight, setMenuHeight] = React.useState<number>(56)
+
+  const visibleItems = items.slice(0, maxVisible)
+  const optionsItems = items.slice(maxVisible)
+
+  const isActive = (item: NavItem) => {
+    if (item.href === `/${role}`) {
+      return activeHref === `/${role}` || activeHref === `/${role}/dashboard`
+    }
+    return activeHref === item.href || activeHref.startsWith(item.href + "/")
+  }
+
+  React.useLayoutEffect(() => {
+    if (menuOpen && menuRef.current) {
+      const height = menuRef.current.scrollHeight
+      setMenuHeight(Math.max(height, 56))
+    }
+  }, [menuOpen, onAiClick, optionsItems.length])
+
+  React.useEffect(() => {
+    if (!menuOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (morphRef.current && !morphRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false) }
+    document.addEventListener("mousedown", onDown)
+    document.addEventListener("keydown", onKey)
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey) }
+  }, [menuOpen])
+
+  return (
+    <div className="md:hidden">
+      <motion.nav
+        className={cn("mobile-navbar fixed left-0 right-0 z-[60]", className)}
+        initial={{ y: 100, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
+      >
+        <div className="mobile-nav-inner relative flex items-end justify-center w-full">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
+            {visibleItems.map((item) => (
+              <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
+            ))}
+          </div>
+
+          {optionsItems.length > 0 && (
+            <div className="mobile-nav-more absolute right-4 bottom-0">
+              <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
+                <div ref={menuRef} className="t-morph-menu" role="menu">
+                  <div className="p-2 pb-3 pl-3 pr-14">
+                    {onAiClick && (
+                      <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-white/10">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sb-surface">
+                          <Sparkles className="h-4 w-4" />
+                        </span>
+                        Asistente IA
+                      </button>
+                    )}
+
+                    <button type="button" onClick={() => { setMenuOpen(false); router.push("/perfil") }}
+                      className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
+                        activeHref === "/perfil" ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                      )}>
+                      <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                        activeHref === "/perfil" ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                      )}>
+                        <User className="h-4 w-4" />
+                      </span>
+                      Mi perfil
+                    </button>
+
+                    {optionsItems.map((item) => (
+                      <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                        className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
+                          isActive(item) ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                        )}>
+                        <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                          isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                        )}>
+                          <item.icon className="h-4 w-4" />
+                        </span>
+                        {item.title}
+                      </button>
+                    ))}
+
+                    {onLogout && (
+                      <>
+                        <div className="h-px bg-white/10 my-1" />
+                        <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
+                            <LogOut className="h-4 w-4" />
+                          </span>
+                          Cerrar sesión
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <button type="button" className="t-morph-plus" aria-expanded={menuOpen ? "true" : "false"} aria-label="Más opciones"
+                  onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}>
+                  <MoreHorizontal className="h-5 w-5 text-sb-surface" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.nav>
     </div>
   )
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXPORT — detecta si usa groups o items
+   ═══════════════════════════════════════════════════════ */
+export function MobileNavbar(props: MobileNavbarProps) {
+  if (props.groups && props.groups.length > 0) {
+    return <GroupedNavbar groups={props.groups} activeHref={props.activeHref} role={props.role} onAiClick={props.onAiClick} onLogout={props.onLogout} />
+  }
+  if (props.items && props.items.length > 0) {
+    return <FlatNavbar items={props.items} activeHref={props.activeHref} role={props.role} onAiClick={props.onAiClick} maxVisible={props.maxVisible} onLogout={props.onLogout} />
+  }
+  return null
 }
 
 export function MobileNavbarSkeleton() {
   return (
     <div className="fixed bottom-4 left-0 right-0 z-30">
       <div className="relative flex items-center justify-center w-full">
-        <div className="flex items-center gap-2">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-11 w-28 rounded-2xl bg-sb-surface-container-highest/50 animate-pulse" />
+        <div className="flex items-center gap-1">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="w-12 h-12 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
           ))}
         </div>
+        <div className="absolute right-4 bottom-0 w-14 h-14 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
       </div>
     </div>
   )
