@@ -72,6 +72,18 @@ const navSections: { title: string; items: NavItem[] }[] = [
   },
 ]
 
+const mobileNavItems = [
+  { title: "Overview", href: "/dev", icon: LayoutDashboard },
+  { title: "Solicitudes", href: "/dev/demo", icon: Inbox },
+  { title: "Instituciones", href: "/dev/instituciones", icon: Building2 },
+  { title: "Más", href: "#more", icon: Settings },
+]
+
+const mobileNavGroups = navSections.map(s => ({
+  title: s.title,
+  items: s.items.filter(i => !mobileNavItems.some(mi => mi.href === i.href)),
+}))
+
 const allNav = navSections.flatMap(s => s.items)
 
 export default function DevLayout({
@@ -335,10 +347,11 @@ export default function DevLayout({
 
         {/* ===== MOBILE BOTTOM NAV ===== */}
         <MobileNavbar
-          items={allNav.map(({ badge, ...item }) => item)}
+          items={mobileNavItems}
+          groups={mobileNavGroups}
           activeHref={pathname}
           role="dev"
-          maxVisible={4}
+          maxVisible={3}
         />
 
       </div>

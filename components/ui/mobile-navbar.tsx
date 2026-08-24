@@ -13,8 +13,14 @@ interface NavItem {
   badge?: number
 }
 
+interface NavGroup {
+  title: string
+  items: NavItem[]
+}
+
 interface MobileNavbarProps {
   items: NavItem[]
+  groups?: NavGroup[]
   activeHref: string
   role?: string
   className?: string
@@ -77,6 +83,7 @@ function NavButton({
 
 export function MobileNavbar({
   items,
+  groups,
   activeHref,
   role,
   className,
@@ -91,7 +98,7 @@ export function MobileNavbar({
   const [menuHeight, setMenuHeight] = React.useState<number>(56)
 
   const visibleItems = items.slice(0, maxVisible)
-  const optionsItems = items.slice(maxVisible)
+  const optionsItems = groups ? [] : items.slice(maxVisible)
 
   const isActive = (item: NavItem) => {
     if (item.href === `/${role}`) {
@@ -172,46 +179,56 @@ export function MobileNavbar({
                     </button>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => { setMenuOpen(false); router.push("/perfil") }}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                      activeHref === "/perfil"
-                        ? "bg-white/20 text-sb-surface font-medium"
-                        : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
-                    )}
-                  >
-                    <span className={cn(
-                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                      activeHref === "/perfil" ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
-                    )}>
-                      <User className="h-4 w-4" />
-                    </span>
-                    Mi perfil
-                  </button>
-
-                  {optionsItems.map((item) => (
-                    <button
-                      key={item.href}
-                      type="button"
-                      onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                        isActive(item)
-                          ? "bg-white/20 text-sb-surface font-medium"
-                          : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
-                      )}
-                    >
-                      <span className={cn(
-                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                        isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
-                      )}>
-                        <item.icon className="h-4 w-4" />
-                      </span>
-                      {item.title}
-                    </button>
-                  ))}
+                  {groups ? (
+                    groups.map((group) => (
+                      <div key={group.title} className="mt-2">
+                        <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/40">{group.title}</p>
+                        {group.items.map((item) => (
+                          <button
+                            key={item.href}
+                            type="button"
+                            onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
+                              isActive(item)
+                                ? "bg-white/20 text-sb-surface font-medium"
+                                : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                            )}
+                          >
+                            <span className={cn(
+                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                              isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                            )}>
+                              <item.icon className="h-3.5 w-3.5" />
+                            </span>
+                            {item.title}
+                          </button>
+                        ))}
+                      </div>
+                    ))
+                  ) : (
+                    optionsItems.map((item) => (
+                      <button
+                        key={item.href}
+                        type="button"
+                        onClick={() => { setMenuOpen(false); router.push(item.href) }}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
+                          isActive(item)
+                            ? "bg-white/20 text-sb-surface font-medium"
+                            : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                        )}
+                      >
+                        <span className={cn(
+                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                          isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                        )}>
+                          <item.icon className="h-4 w-4" />
+                        </span>
+                        {item.title}
+                      </button>
+                    ))
+                  )}
 
                   {onLogout && (
                     <>
