@@ -47,16 +47,47 @@ export default function DevDashboard() {
     { label: "Tablas", value: stats.tables, icon: Database, color: "text-amber-500" },
   ]
 
-  const actions = [
-    { label: "Instituciones", desc: "Crear y gestionar colegios", href: "/dev/instituciones", icon: Building2 },
-    { label: "Usuarios", desc: "Administrar cuentas y roles", href: "/dev/usuarios", icon: Users },
-    { label: "Planes", desc: "Planes de suscripción", href: "/dev/planes", icon: CreditCard },
-    { label: "Anomalías", desc: "Constitución, cruces y errores", href: "/dev/anomalias", icon: AlertTriangle },
-    { label: "Base de Datos", desc: "Conexión real y tablas", href: "/dev/basedatos", icon: Database },
-    { label: "Esquema BD", desc: "Diagrama ER de tablas", href: "/dev/esquema", icon: Database },
-    { label: "Database SQL", desc: "Ejecutar SQL directo", href: "/dev/database", icon: Terminal },
-    { label: "Seguimiento", desc: "Monitoreo y actividad", href: "/dev/seguimiento", icon: Activity },
-    { label: "Configuración", desc: "Ajustes del sistema", href: "/dev/config", icon: Settings },
+  const actionGroups = [
+    {
+      title: "Gestión",
+      icon: Building2,
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+      items: [
+        { label: "Instituciones", desc: "Crear y gestionar colegios", href: "/dev/instituciones", icon: Building2 },
+        { label: "Usuarios", desc: "Cuentas y roles", href: "/dev/usuarios", icon: Users },
+        { label: "Planes", desc: "Suscripciones", href: "/dev/planes", icon: CreditCard },
+        { label: "Facturación", desc: "Pagos y cobros", href: "/dev/facturacion", icon: CreditCard },
+        { label: "Reportes", desc: "Estadísticas", href: "/dev/reportes", icon: BarChart3 },
+        { label: "Solicitudes", desc: "Demo y contratación", href: "/dev/demo", icon: Inbox },
+      ],
+    },
+    {
+      title: "Base de Datos",
+      icon: Database,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+      items: [
+        { label: "Anomalías", desc: "Constitución y errores", href: "/dev/anomalias", icon: AlertTriangle },
+        { label: "Base de Datos", desc: "Conexión y tablas", href: "/dev/basedatos", icon: Database },
+        { label: "Esquema BD", desc: "Diagrama ER", href: "/dev/esquema", icon: Database },
+        { label: "SQL Console", desc: "Ejecutar SQL", href: "/dev/database", icon: Terminal },
+        { label: "Seed", desc: "Datos de prueba", href: "/dev/seed", icon: Terminal },
+      ],
+    },
+    {
+      title: "Monitoreo",
+      icon: Activity,
+      color: "text-purple-500",
+      bg: "bg-purple-500/10",
+      items: [
+        { label: "Seguimiento", desc: "Actividad del sistema", href: "/dev/seguimiento", icon: Activity },
+        { label: "Contraseñas", desc: "Gestión de accesos", href: "/dev/contrasenas", icon: Key },
+        { label: "Audit", desc: "Logs de auditoría", href: "/dev/audit", icon: Shield },
+        { label: "Backups", desc: "Copias de seguridad", href: "/dev/backups", icon: Database },
+        { label: "Configuración", desc: "Ajustes del sistema", href: "/dev/config", icon: Settings },
+      ],
+    },
   ]
 
   return (
@@ -83,30 +114,36 @@ export default function DevDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Acciones</p>
-          <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 divide-y divide-sb-outline-variant/8 overflow-hidden">
-            {actions.map((action) => (
-              <Link
-                key={action.href}
-                href={action.href}
-                className="flex items-center gap-3 p-4 hover:bg-sb-surface-container-low/50 transition-colors group"
-              >
-                <div className="h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0 group-hover:bg-sb-surface-container-high transition-colors">
-                  <action.icon className="h-4 w-4 text-sb-on-surface/70 group-hover:text-sb-on-surface transition-colors" />
+      <div>
+        <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-3">Acciones</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {actionGroups.map((group) => (
+            <div key={group.title} className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 overflow-hidden">
+              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-sb-outline-variant/8">
+                <div className={`h-8 w-8 rounded-lg ${group.bg} flex items-center justify-center`}>
+                  <group.icon className={`h-4 w-4 ${group.color}`} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-sb-on-surface">{action.label}</p>
-                  <p className="text-[12px] text-sb-on-surface/70 truncate">{action.desc}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-sb-on-surface/40 shrink-0 group-hover:translate-x-0.5 group-hover:text-sb-on-surface/70 transition-all" />
-              </Link>
-            ))}
-          </div>
+                <span className="text-[13px] font-semibold text-sb-on-surface">{group.title}</span>
+                <span className="ml-auto text-[10px] text-sb-on-surface/40 bg-sb-surface-container px-1.5 py-0.5 rounded-full">{group.items.length}</span>
+              </div>
+              <div className="divide-y divide-sb-outline-variant/6">
+                {group.items.map((action) => (
+                  <Link key={action.href} href={action.href}
+                    className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-sb-surface-container-low/50 transition-colors group">
+                    <action.icon className="h-3.5 w-3.5 text-sb-on-surface/40 group-hover:text-sb-on-surface/70 transition-colors shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-medium text-sb-on-surface truncate">{action.label}</p>
+                    </div>
+                    <ChevronRight className="h-3 w-3 text-sb-on-surface/30 shrink-0 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div>
           <p className="text-[11px] font-semibold text-sb-on-surface/60 uppercase tracking-wider mb-2">Solicitudes de contratación</p>
           <div className="bg-sb-surface rounded-2xl border border-sb-outline-variant/10 p-4 space-y-3">
