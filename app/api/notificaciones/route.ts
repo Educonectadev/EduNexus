@@ -20,31 +20,31 @@ export async function GET(request: NextRequest) {
           `SELECT n.id, n.title, n.message, n.type, n.target_role,
                   COALESCE(n.priority, 'media') AS priority,
                   COALESCE(n.category, 'general') AS category,
-                  COALESCE(n.pinned, 0) AS pinned,
+                  n.pinned,
                   n.institution_id, n.status, n.created_at,
                   CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read
            FROM notifications n
-           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
+           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = $1
            WHERE n.status = 'active'
-             AND (n.target_role = ? OR n.user_id = ?)
-           ORDER BY n.pinned DESC, n.created_at DESC
+             AND (n.target_role = $2 OR n.user_id = $1)
+           ORDER BY n.created_at DESC
            LIMIT 60`,
-          [user.id, globalRole, user.id]
+          [user.id, globalRole]
         )) as any[]
       : (await pool.query(
           `SELECT n.id, n.title, n.message, n.type, n.target_role,
                   COALESCE(n.priority, 'media') AS priority,
                   COALESCE(n.category, 'general') AS category,
-                  COALESCE(n.pinned, 0) AS pinned,
+                  n.pinned,
                   n.institution_id, n.status, n.created_at,
                   CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read
            FROM notifications n
-           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
-           WHERE n.institution_id = ? AND n.status = 'active'
-             AND (n.target_role = 'all' OR n.target_role = ? OR n.user_id = ?)
-           ORDER BY n.pinned DESC, n.created_at DESC
+           LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = $1
+           WHERE n.institution_id = $2 AND n.status = 'active'
+             AND (n.target_role = 'all' OR n.target_role = $3 OR n.user_id = $1)
+           ORDER BY n.created_at DESC
            LIMIT 60`,
-          [user.id, instId, user.role || 'all', user.id]
+          [user.id, instId, user.role || 'all']
         )) as any[]
 
     const notifications = (rows as any[]).map(n => ({
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       target_role: n.target_role,
       priority: n.priority,
       category: n.category,
-      pinned: Number(n.pinned) || 0,
+      pinned: n.pinned === true || n.pinned === 1 || n.pinned === '1',
       institution_id: n.institution_id,
       created_at: n.created_at,
       read: !!n.read,
