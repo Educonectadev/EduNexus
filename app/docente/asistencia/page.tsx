@@ -128,7 +128,6 @@ function AsistenciaInner() {
   const prefilterCourse = searchParams.get("curso") || ""
   const [tab, setTab] = React.useState<Tab>(prefilterCourse ? "alumnos" : "personal")
   const [prefillCourse, setPrefillCourse] = React.useState(prefilterCourse)
-  const [scheduleError, setScheduleError] = React.useState<string | null>(null)
   const tabs: { key: Tab; label: string }[] = [
     { key: "personal", label: "Mi Asistencia" },
     { key: "alumnos", label: "Asistencia de Alumnos" },
@@ -200,6 +199,7 @@ function MiAsistencia() {
   const [actionLoading, setActionLoading] = React.useState(false)
   const [history, setHistory] = React.useState<any[]>([])
   const [pendingCheckout, setPendingCheckout] = React.useState<any>(null)
+  const [scheduleError, setScheduleError] = React.useState<string | null>(null)
   const today = getLocalDateStr()
 
   React.useEffect(() => {
