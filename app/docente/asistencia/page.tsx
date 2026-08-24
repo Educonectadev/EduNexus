@@ -222,10 +222,13 @@ function MiAsistencia() {
   const handleCheck = async (action: "check-in" | "check-out", targetDate?: string) => {
     setActionLoading(true)
     try {
+      const now = new Date()
+      const localTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+      const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
       const res = await fetch("/api/docente/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, ...(targetDate ? { date: targetDate } : {}) }),
+        body: JSON.stringify({ action, date: targetDate || localDate, time: localTime }),
       })
       const data = await res.json()
       if (data.success) {

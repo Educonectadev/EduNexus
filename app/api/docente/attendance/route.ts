@@ -86,10 +86,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { action, date, notes } = body
+    const { action, date, notes, time } = body
     const today = date || new Date().toISOString().slice(0, 10)
-    const now = new Date()
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+    const currentTime = time || `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}:${String(new Date().getSeconds()).padStart(2, '0')}`
 
     const dayOfWeek = new Date(today + 'T00:00:00').getDay()
     const scheduleDay = dayOfWeek >= 1 && dayOfWeek <= 5 ? dayOfWeek : null
