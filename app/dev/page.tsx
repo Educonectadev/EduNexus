@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Building2, Users, Database, Terminal, ChevronRight, Server, CreditCard, GraduationCap, Shield, Settings, Handshake, AlertTriangle, Activity } from "@/components/ui/proicons"
+import { Building2, Users, Database, Terminal, ChevronRight, Server, CreditCard, GraduationCap, Shield, Settings, Handshake, AlertTriangle, Activity, BarChart3, Inbox, Key } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 
 interface Stats {
