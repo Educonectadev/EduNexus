@@ -22,19 +22,20 @@ export async function GET(request: NextRequest) {
     )
     return NextResponse.json(rows)
   } catch (error: any) {
-    console.error('Error fetching reuniones:', error?.message || error)
-    return NextResponse.json([])
+    console.error('Error fetching reuniones:', error)
+    return NextResponse.json({ error: error?.message || String(error), code: error?.code || null }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getAuthPayload(request)
-    if (!user || (user.role !== 'director' && user.role !== 'dev' && user.role !== 'super_admin')) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    if (!user) return NextResponse.json({ error: 'No autenticado', detail: 'getAuthPayload returned null' }, { status: 401 })
+    if (user.role !== 'director' && user.role !== 'dev' && user.role !== 'super_admin') {
+      return NextResponse.json({ error: 'No autorizado', detail: `role=${user.role}` }, { status: 401 })
     }
     const instId = user.institutionId as string
-    if (!instId) return NextResponse.json({ error: 'Sin institución' }, { status: 400 })
+    if (!instId) return NextResponse.json({ error: 'Sin institución', detail: 'institutionId is null', userId: user.id }, { status: 400 })
 
     const body = await request.json()
     const { title, message, meeting_date, meeting_time, target_role, priority } = body
@@ -44,15 +45,20 @@ export async function POST(request: NextRequest) {
     }
 
     const id = crypto.randomUUID()
-    await pool.query(
+    const [result] = await pool.query(
       `INSERT INTO notifications (id, title, message, type, target_role, status, meeting_date, meeting_time, institution_id)
-       VALUES (?, ?, ?, 'meeting', ?, 'active', ?, ?, ?)`,
+       VALUES (?, ?, ?, 'meeting', ?, 'active', ?, ?, ?)
+       RETURNING id`,
       [id, title, message || '', target_role || 'all', meeting_date, meeting_time || null, instId]
     )
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
-    console.error('Error creating reunión:', error?.message || error)
-    return NextResponse.json({ error: error?.message || 'Error creating reunión' }, { status: 500 })
+    console.error('Error creating reunión:', error)
+    return NextResponse.json({
+      error: error?.message || String(error),
+      code: error?.code || null,
+      detail: error?.detail || null,
+    }, { status: 500 })
   }
 }
