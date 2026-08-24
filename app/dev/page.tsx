@@ -220,7 +220,6 @@ export default function DevDashboard() {
           </div>
         </div>
       </div>
-      </div>
 
       {/* ===== Accesos a Anomalías y Base de Datos ===== */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
