@@ -3,6 +3,43 @@ import { getAuthPayload } from '@/lib/resolveInstId'
 import pool from '@/lib/db'
 import crypto from 'crypto'
 
+const CREATE_TABLE = `
+CREATE TABLE IF NOT EXISTS notifications (
+  id VARCHAR(36) NOT NULL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  message TEXT DEFAULT NULL,
+  type VARCHAR(50) NOT NULL DEFAULT 'info',
+  target_role VARCHAR(50) DEFAULT 'all',
+  status VARCHAR(20) DEFAULT 'active',
+  meeting_date DATE DEFAULT NULL,
+  meeting_time TIME DEFAULT NULL,
+  institution_id VARCHAR(36) DEFAULT NULL,
+  created_by VARCHAR(36) DEFAULT NULL,
+  user_id VARCHAR(36) DEFAULT NULL,
+  is_read BOOLEAN DEFAULT false,
+  priority VARCHAR(20) DEFAULT 'media',
+  category VARCHAR(50) DEFAULT 'general',
+  pinned BOOLEAN DEFAULT false,
+  location VARCHAR(255) DEFAULT NULL,
+  virtual_link VARCHAR(500) DEFAULT NULL,
+  agenda TEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`
+
+let tableReady = false
+
+async function ensureTable() {
+  if (tableReady) return
+  try {
+    await pool.query(CREATE_TABLE)
+    tableReady = true
+  } catch {
+    // tabla ya existe o error
+    tableReady = true
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthPayload(request)
@@ -12,6 +49,7 @@ export async function GET(request: NextRequest) {
     const instId = user.institutionId as string
     if (!instId) return NextResponse.json([])
 
+    await ensureTable()
     const [rows] = await pool.query(
       `SELECT id, title, COALESCE(message, '') as message, type, target_role, status,
               meeting_date, meeting_time, institution_id, created_at
@@ -43,6 +81,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Título y fecha son requeridos' }, { status: 400 })
     }
 
+    await ensureTable()
     const id = crypto.randomUUID()
     await pool.query(
       `INSERT INTO notifications (id, title, message, type, target_role, status, meeting_date, meeting_time, institution_id)
