@@ -243,33 +243,31 @@ function ComunicadoDetail({ c }: { c: Comunicado }) {
 /* ═══ REUNION CARD ═══ */
 function ReunionCard({ r, onCopyLink, copiedLink, onClick, past }: { r: Reunion; onCopyLink: (l: string) => void; copiedLink: string | null; onClick: () => void; past?: boolean }) {
   return (
-    <motion.div layout className={cn("bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer", past && "opacity-50")} onClick={onClick}>
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center shrink-0", past ? "bg-black/5 dark:bg-white/5" : "bg-emerald-500/10")}>
-            <Handshake className={cn("h-5 w-5", past ? "text-black/20 dark:text-white/20" : "text-emerald-500/70")} />
+    <motion.div layout className={cn("bg-white dark:bg-[#1a1a1c] sb-note rounded-2xl p-3 space-y-2 transition-all cursor-pointer", past && "opacity-50")} onClick={onClick}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={cn("h-9 w-9 rounded-xl flex items-center justify-center shrink-0", past ? "bg-black/5 dark:bg-white/5" : "bg-emerald-500/10")}>
+            <Handshake className={cn("h-4 w-4", past ? "text-black/20 dark:text-white/20" : "text-emerald-500/70")} />
           </div>
           <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-black dark:text-white truncate">{r.title}</h3>
-            {r.location && <p className="text-xs text-black/50 dark:text-white/50 flex items-center gap-1 mt-0.5"><MapPin className="h-3 w-3" /> {r.location}</p>}
+            <h3 className="text-[13px] font-semibold text-black dark:text-white truncate">{r.title}</h3>
+            {r.location && <p className="text-[11px] text-black/40 dark:text-white/40 flex items-center gap-1 mt-0.5"><MapPin className="h-2.5 w-2.5" /> {r.location}</p>}
           </div>
         </div>
-        {r.virtual_link && (
-          <button onClick={e => { e.stopPropagation(); onCopyLink(r.virtual_link!) }} className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sb-primary/60 hover:text-sb-primary">
-            {copiedLink === r.virtual_link ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-          </button>
-        )}
+        <div className="flex items-center gap-1 shrink-0">
+          {r.virtual_link && (
+            <button onClick={e => { e.stopPropagation(); onCopyLink(r.virtual_link!) }} className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sb-primary/60 hover:text-sb-primary">
+              {copiedLink === r.virtual_link ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+            </button>
+          )}
+        </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2">
         <SbBadge color={past ? "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40" : "bg-emerald-400/10 text-emerald-400/80"}>{past ? "Finalizada" : "Próxima"}</SbBadge>
         <SbBadge color="bg-black/5 dark:bg-white/5 text-black/50 dark:text-white/50">{targetLabels[r.target_role] || "Todos"}</SbBadge>
         {r.priority && r.priority !== "media" && <SbBadge color={priorityLabels[r.priority]?.color || ""}>{priorityLabels[r.priority]?.label || r.priority}</SbBadge>}
+        <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{new Date(r.meeting_date).toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}{r.meeting_time && <>{formatTime(r.meeting_time)}</>}</span>
       </div>
-      <div className="flex items-center gap-3 text-[10px] text-black/40 dark:text-white/40">
-        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(r.meeting_date).toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}</span>
-        {r.meeting_time && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(r.meeting_time)}</span>}
-      </div>
-      {r.agenda && <p className="text-[11px] text-black/40 dark:text-white/40 line-clamp-2">{r.agenda}</p>}
     </motion.div>
   )
 }
@@ -277,21 +275,21 @@ function ReunionCard({ r, onCopyLink, copiedLink, onClick, past }: { r: Reunion;
 /* ═══ COMUNICADO CARD ═══ */
 function ComunicadoCard({ c, onClick }: { c: Comunicado; onClick: () => void }) {
   return (
-    <motion.div layout className="bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer" onClick={onClick}>
-      <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
-          <Megaphone className="h-5 w-5 text-sb-primary/70" />
+    <motion.div layout className="bg-white dark:bg-[#1a1a1c] sb-note rounded-2xl p-3 space-y-2 transition-all cursor-pointer" onClick={onClick}>
+      <div className="flex items-center gap-2.5">
+        <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
+          <Megaphone className="h-4 w-4 text-sb-primary/70" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-black dark:text-white truncate">{c.title}</h3>
-          <p className="text-xs text-black/50 dark:text-white/50 line-clamp-2 mt-0.5">{c.message}</p>
+          <h3 className="text-[13px] font-semibold text-black dark:text-white truncate">{c.title}</h3>
+          <p className="text-[11px] text-black/40 dark:text-white/40 line-clamp-1 mt-0.5">{c.message}</p>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2">
         <SbBadge color="bg-sb-primary/10 text-sb-primary">{targetLabels[c.target_role] || "Todos"}</SbBadge>
         {c.priority && c.priority !== "media" && <SbBadge color={priorityLabels[c.priority]?.color || ""}>{priorityLabels[c.priority]?.label || c.priority}</SbBadge>}
+        <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{timeAgo(c.created_at)}</span>
       </div>
-      <div className="flex items-center gap-2 text-[10px] text-black/40 dark:text-white/40"><Clock className="h-3 w-3" /><span>{timeAgo(c.created_at)}</span></div>
     </motion.div>
   )
 }
