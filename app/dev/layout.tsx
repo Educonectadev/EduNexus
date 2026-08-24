@@ -77,7 +77,6 @@ const mobileNavGroups = [
     title: "Principal",
     icon: LayoutDashboard,
     items: [
-      { title: "Overview", href: "/dev", icon: LayoutDashboard },
       { title: "Solicitudes", href: "/dev/demo", icon: Inbox },
       { title: "Instituciones", href: "/dev/instituciones", icon: Building2 },
       { title: "Usuarios", href: "/dev/usuarios", icon: Users },
@@ -108,6 +107,13 @@ const mobileNavGroups = [
       { title: "Settings", href: "/dev/config", icon: Settings },
     ],
   },
+]
+
+const mobileNavItems = [
+  { title: "Overview", href: "/dev", icon: LayoutDashboard },
+  { title: "Solicitudes", href: "/dev/demo", icon: Inbox },
+  { title: "Instituciones", href: "/dev/instituciones", icon: Building2 },
+  { title: "Usuarios", href: "/dev/usuarios", icon: Users },
 ]
 
 const allNav = navSections.flatMap(s => s.items)
@@ -373,9 +379,11 @@ export default function DevLayout({
 
         {/* ===== MOBILE BOTTOM NAV ===== */}
         <MobileNavbar
+          items={mobileNavItems}
           groups={mobileNavGroups}
           activeHref={pathname}
           role="dev"
+          maxVisible={4}
         />
 
       </div>
