@@ -45,7 +45,7 @@ async function dispatchWebPush(data: any) {
         `SELECT s.endpoint, s.p256dh, s.auth, u.role AS "role"
          FROM push_subscriptions s
          JOIN users u ON u.id = s.user_id
-         WHERE s.user_id = ? AND u.status = 'active'`,
+         WHERE s.user_id = $1 AND u.status = 'active'`,
         [user_id]
       )
     } else if (target_role === 'dev') {
@@ -56,7 +56,7 @@ async function dispatchWebPush(data: any) {
          WHERE u.role = 'dev' AND u.status = 'active'`
       )
     } else if (institution_id) {
-      const roleClause = target_role && target_role !== 'all' ? ' AND u.role = ?' : ''
+      const roleClause = target_role && target_role !== 'all' ? ' AND u.role = $2' : ''
       const params = target_role && target_role !== 'all'
         ? [institution_id, target_role]
         : [institution_id]
@@ -64,7 +64,7 @@ async function dispatchWebPush(data: any) {
         `SELECT s.endpoint, s.p256dh, s.auth, u.role AS "role"
          FROM push_subscriptions s
          JOIN users u ON u.id = s.user_id
-         WHERE u.institution_id = ? AND u.status = 'active'${roleClause}`,
+         WHERE u.institution_id = $1 AND u.status = 'active'${roleClause}`,
         params
       )
     }
@@ -84,7 +84,7 @@ async function dispatchWebPush(data: any) {
         .catch((err: any) => {
           // Suscripción obsoleta: limpiar
           if (err && (err.statusCode === 404 || err.statusCode === 410)) {
-            pool.query('DELETE FROM push_subscriptions WHERE endpoint = ?', [r.endpoint]).catch(() => {})
+            pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [r.endpoint]).catch(() => {})
           } else if (err && err.statusCode) {
             console.error('Push error', err.statusCode, r.endpoint)
           }
@@ -154,7 +154,7 @@ io.on('connection', (socket) => {
       const id = crypto.randomUUID()
       await pool.query(
         `INSERT INTO chat_messages (id, institution_id, sender_id, receiver_id, course_id, message, message_type)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [id, institutionId, userId, receiverId || null, courseId || null, message, messageType || 'text']
       )
 
@@ -176,11 +176,11 @@ io.on('connection', (socket) => {
 
         // Aviso en campana si el destinatario es un padre
         try {
-          const [rRows] = await pool.query(`SELECT role FROM users WHERE id = ?`, [receiverId])
+          const [rRows] = await pool.query(`SELECT role FROM users WHERE id = $1`, [receiverId])
           if (rRows[0]?.role === 'padre') {
             await pool.query(
               `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status, user_id)
-               VALUES (?, ?, 'Nuevo mensaje', ?, 'message', 'padre', 'mensajes', 'media', 'active', ?)`,
+               VALUES ($1, $2, 'Nuevo mensaje', $3, 'message', 'padre', 'mensajes', 'media', 'active', $4)`,
               [crypto.randomUUID(), institutionId, `${fullName} te escribió: "${String(message).slice(0, 120)}"`, receiverId]
             )
           }
@@ -200,7 +200,7 @@ io.on('connection', (socket) => {
     try {
       const { messageId } = data
       await pool.query(
-        'UPDATE chat_messages SET is_read = true WHERE id = ? AND receiver_id = ?',
+        'UPDATE chat_messages SET is_read = true WHERE id = $1 AND receiver_id = $2',
         [messageId, userId]
       )
       socket.emit('message:read:confirm', { messageId })
@@ -321,7 +321,7 @@ async function runScheduledAudit() {
       try {
         await pool.query(
           `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status)
-           VALUES (?, NULL, ?, ?, 'anomalia', 'dev', 'errores', ?, 'active')`,
+           VALUES ($1, NULL, $2, $3, 'anomalia', 'dev', 'errores', $4, 'active')`,
           [crypto.randomUUID(), `Anomalía (${f.severity}): ${f.title}`, f.detail, f.severity === 'alta' ? 'alta' : 'media']
         )
       } catch (error) {
