@@ -237,6 +237,8 @@ function MiAsistencia() {
         setPendingCheckout(null)
       } else if (res.status === 409 && data.pendingCheckout) {
         setPendingCheckout(data.pendingCheckout)
+      } else if (res.status === 400 && data.message) {
+        alert(data.message)
       }
     } catch {} finally { setActionLoading(false) }
   }

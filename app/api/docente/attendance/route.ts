@@ -110,6 +110,8 @@ export async function POST(request: NextRequest) {
     const applyGrace = (t: string) => toMin(t) + graceMinutes
     const fmt = (mins: number) => `${String(Math.floor(mins / 60) % 24).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}:00`
 
+    const currentMin = toMin(currentTime.slice(0, 5))
+
     const [existing] = await pool.query(
       `SELECT id, check_in, check_out, status FROM teacher_attendance WHERE teacher_id = ? AND date = ?`,
       [userId, today]
@@ -117,6 +119,18 @@ export async function POST(request: NextRequest) {
     const record = (existing as any[])[0]
 
     if (action === 'check-in') {
+      if (!scheduleStart) {
+        return NextResponse.json({ error: 'No tienes horario programado para hoy' }, { status: 400 })
+      }
+      const checkInWindowStart = toMin(scheduleStart) - 30
+      const checkInWindowEnd = applyGrace(scheduleStart)
+      if (currentMin < checkInWindowStart || currentMin > checkInWindowEnd) {
+        return NextResponse.json({
+          error: 'OUTSIDE_SCHEDULE',
+          message: `Solo puedes marcar entrada entre ${fmt(checkInWindowStart).slice(0,5)} y ${fmt(checkInWindowEnd).slice(0,5)}`,
+          window: { start: fmt(checkInWindowStart).slice(0,5), end: fmt(checkInWindowEnd).slice(0,5) },
+        }, { status: 400 })
+      }
       const [pendingRows] = await pool.query(
         `SELECT id, teacher_id, date, check_in, check_out, status, notes
          FROM teacher_attendance
@@ -153,6 +167,23 @@ export async function POST(request: NextRequest) {
     } else if (action === 'check-out') {
       if (!record) {
         return NextResponse.json({ error: 'No check-in found for today' }, { status: 400 })
+      }
+      if (!record.check_in) {
+        return NextResponse.json({ error: 'Debes marcar entrada primero' }, { status: 400 })
+      }
+      if (record.check_out) {
+        return NextResponse.json({ error: 'Ya marcaste salida hoy' }, { status: 400 })
+      }
+      if (scheduleEnd) {
+        const checkOutWindowStart = toMin(scheduleEnd) - 15
+        const checkOutWindowEnd = toMin(scheduleEnd) + 60
+        if (currentMin < checkOutWindowStart || currentMin > checkOutWindowEnd) {
+          return NextResponse.json({
+            error: 'OUTSIDE_SCHEDULE',
+            message: `Solo puedes marcar salida entre ${fmt(checkOutWindowStart).slice(0,5)} y ${fmt(checkOutWindowEnd).slice(0,5)}`,
+            window: { start: fmt(checkOutWindowStart).slice(0,5), end: fmt(checkOutWindowEnd).slice(0,5) },
+          }, { status: 400 })
+        }
       }
       const checkOutStatus = scheduleEnd && currentTime < fmt(applyGrace(scheduleEnd))
         ? 'early_leave'
