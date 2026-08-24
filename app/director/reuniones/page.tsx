@@ -594,7 +594,7 @@ function ReunionCard({
   return (
     <motion.div layout
       className={cn(
-        "bg-black dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer",
+        "bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer",
         r.pinned ? "ring-1 ring-sb-outline/10" : "",
         past ? "opacity-50" : ""
       )}
@@ -607,11 +607,11 @@ function ReunionCard({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h3 className="text-sm font-semibold text-sb-on-surface truncate">{r.title}</h3>
+              <h3 className="text-sm font-semibold text-black dark:text-white truncate">{r.title}</h3>
               {r.pinned && <span className="text-[10px] text-amber-400/60">📌</span>}
             </div>
             {r.location && (
-              <p className="text-xs text-sb-on-surface-variant/40 flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-black/60 dark:text-white/60 flex items-center gap-1 mt-0.5">
                 <MapPin className="h-3 w-3" /> {r.location}
               </p>
             )}
@@ -619,32 +619,31 @@ function ReunionCard({
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={e => { e.stopPropagation(); onPin(r) }}
-            className="p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 transition-colors"
-            style={{ color: r.pinned ? "#fbbf24" : "var(--sb-on-surface-variant)" }}
+            className={cn("p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 transition-colors", r.pinned ? "text-amber-400" : "text-black/40 dark:text-white/40 hover:text-black/60 dark:hover:text-white/60")}
             title={r.pinned ? "Desfijar" : "Fijar"}>
             <Pin className="h-3.5 w-3.5" />
           </button>
           <button onClick={e => { e.stopPropagation(); onEdit(r) }}
-            className="p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 text-sb-on-surface-variant/30 hover:text-sb-on-surface/60 transition-colors" title="Editar">
+            className="p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 text-black/30 dark:text-white/30 hover:text-black/60 dark:hover:text-white/60 transition-colors" title="Editar">
             <Edit3 className="h-3.5 w-3.5" />
           </button>
           <button onClick={e => { e.stopPropagation(); onDelete(r) }}
-            className="p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 text-sb-on-surface-variant/30 hover:text-red-400/60 transition-colors" title="Eliminar">
+            className="p-1.5 rounded-lg hover:bg-sb-surface-container-high/80 text-black/30 dark:text-white/30 hover:text-red-400/60 transition-colors" title="Eliminar">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <SbBadge color={past ? "bg-sb-surface-container-high text-sb-on-surface-variant/30" : "bg-emerald-400/10 text-emerald-400/80"}>
+        <SbBadge color={past ? "bg-black/10 dark:bg-white/10 text-black/40 dark:text-white/40" : "bg-emerald-400/10 text-emerald-400/80"}>
           {past ? "Finalizada" : "Próxima"}
         </SbBadge>
-        <SbBadge color="bg-sb-surface-container-high text-sb-on-surface-variant/50">
+        <SbBadge color="bg-black/10 dark:bg-white/10 text-black/50 dark:text-white/50">
           {targetLabels[r.target_role] || "Todos"}
         </SbBadge>
       </div>
 
-      <div className="flex items-center gap-3 text-[10px] text-sb-on-surface-variant/40">
+      <div className="flex items-center gap-3 text-[10px] text-black/40 dark:text-white/40">
         <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(r.meeting_date).toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}</span>
         {r.meeting_time && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(r.meeting_time)}</span>}
       </div>
