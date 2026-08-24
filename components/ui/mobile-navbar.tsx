@@ -152,8 +152,8 @@ function GroupedNavbar({
           {/* Botón "más" con menú agrupado */}
           {hasMore && (
             <div className="mobile-nav-more absolute right-4 bottom-0">
-              <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
-                <div ref={menuRef} className="t-morph-menu" role="menu">
+              <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
+                <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
@@ -167,17 +167,17 @@ function GroupedNavbar({
 
                     {/* Secciones agrupadas */}
                     {groups.map((group) => (
-                      <div key={group.title} className="mt-2">
-                        <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/40">{group.title}</p>
+                      <div key={group.title} className="mt-1.5">
+                        <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/40">{group.title}</p>
                         {group.items.map((item) => (
                           <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                            className={cn("w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
+                            className={cn("w-full flex items-center gap-3 px-3 py-1.5 text-left text-sm rounded-xl transition-colors",
                               isActive(item) ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
                             )}>
-                            <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                            <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg",
                               isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
                             )}>
-                              <item.icon className="h-3.5 w-3.5" />
+                              <item.icon className="h-3 w-3" />
                             </span>
                             {item.title}
                           </button>
@@ -327,9 +327,9 @@ function FlatNavbar({
                       <>
                         <div className="h-px bg-white/10 my-1" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
-                            <LogOut className="h-4 w-4" />
+                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
+                            <LogOut className="h-3.5 w-3.5" />
                           </span>
                           Cerrar sesión
                         </button>
