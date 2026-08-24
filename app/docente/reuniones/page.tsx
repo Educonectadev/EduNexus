@@ -1,19 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { Handshake, Calendar, Clock, MapPin, Video, Users, ListChecks, Copy, Check, X, Megaphone } from "@/components/ui/proicons"
+import { Handshake, Calendar, Clock, MapPin, Video, Copy, Check, Megaphone } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbBadge } from "@/components/ui/sb"
 
 interface Reunion {
   id: string; title: string; message: string; agenda: string; meeting_date: string; meeting_time: string
-  location: string; virtual_link: string; target_role: string; status: string; priority: string; created_at: string; type: string
+  location: string; virtual_link: string; target_role: string; status: string; priority: string; created_at: string
 }
 
 interface Comunicado {
   id: string; title: string; message: string; target_role: string; status: string; priority: string
-  category: string; created_at: string; type: string
+  category: string; created_at: string
 }
 
 const targetLabels: Record<string, string> = { all: "Todos", docente: "Docentes", padre: "Apoderados", secretario: "Secretaría" }
@@ -38,6 +38,7 @@ export default function DocenteReunionesPage() {
   const [reuniones, setReuniones] = React.useState<Reunion[]>([])
   const [comunicados, setComunicados] = React.useState<Comunicado[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [tab, setTab] = React.useState<"reuniones" | "comunicados">("reuniones")
   const [showDetails, setShowDetails] = React.useState<Reunion | Comunicado | null>(null)
   const [detailType, setDetailType] = React.useState<"reunion" | "comunicado">("reunion")
   const [copiedLink, setCopiedLink] = React.useState<string | null>(null)
@@ -58,74 +59,91 @@ export default function DocenteReunionesPage() {
   const past = reuniones.filter(r => !isTodayOrFuture(r.meeting_date))
 
   return (
-    <div className="space-y-8">
-      <SbSectionHeader title="Reuniones y Comunicados" description="Reuniones y comunicados de la dirección" />
+    <div className="space-y-5">
+      <SbSectionHeader title="Reuniones y Comunicados" description="Reuniones y avisos de la dirección" />
 
-      {/* ═══ SECCIÓN REUNIONES ═══ */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-8 w-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-            <Handshake className="h-4 w-4 text-emerald-500/70" />
-          </div>
-          <h2 className="text-base font-bold text-black dark:text-white">Reuniones</h2>
+      {/* ═══ TOGGLE REUNIONES / COMUNICADOS ═══ */}
+      <div className="flex bg-black/5 dark:bg-white/5 rounded-2xl p-1">
+        <button
+          onClick={() => setTab("reuniones")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
+            tab === "reuniones"
+              ? "bg-white dark:bg-[#1a1a1c] text-black dark:text-white shadow-sm"
+              : "text-black/40 dark:text-white/40 hover:text-black/60 dark:hover:text-white/60"
+          )}
+        >
+          <Handshake className="h-4 w-4" />
+          Reuniones
+          {upcoming.length > 0 && (
+            <span className="h-5 min-w-[20px] px-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-center">
+              {upcoming.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setTab("comunicados")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
+            tab === "comunicados"
+              ? "bg-white dark:bg-[#1a1a1c] text-black dark:text-white shadow-sm"
+              : "text-black/40 dark:text-white/40 hover:text-black/60 dark:hover:text-white/60"
+          )}
+        >
+          <Megaphone className="h-4 w-4" />
+          Comunicados
+          {comunicados.length > 0 && (
+            <span className="h-5 min-w-[20px] px-1 rounded-full bg-sb-primary/15 text-sb-primary text-[10px] font-bold flex items-center justify-center">
+              {comunicados.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* ═══ CONTENIDO REUNIONES ═══ */}
+      {tab === "reuniones" && (
+        <div className="space-y-4">
+          {!loading && reuniones.length === 0 && (
+            <EmptyState icon={Handshake} title="Sin reuniones" desc="La dirección no ha programado reuniones" />
+          )}
+
+          {upcoming.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Check className="h-3.5 w-3.5 text-emerald-400/70" />
+                <h3 className="text-xs font-semibold text-black/60 dark:text-white/60">Próximas</h3>
+                <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{upcoming.length}</span>
+              </div>
+              <div className="space-y-2">
+                {upcoming.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} />)}
+              </div>
+            </div>
+          )}
+
+          {past.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-3.5 w-3.5 text-black/20 dark:text-white/20" />
+                <h3 className="text-xs font-semibold text-black/40 dark:text-white/40">Pasadas</h3>
+                <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{past.length}</span>
+              </div>
+              <div className="space-y-2">
+                {past.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} past />)}
+              </div>
+            </div>
+          )}
         </div>
+      )}
 
-        {!loading && reuniones.length === 0 && (
-          <div className="text-center py-8 bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px]">
-            <Handshake className="h-8 w-8 text-black/20 dark:text-white/20 mx-auto mb-2" />
-            <p className="text-sm text-black/40 dark:text-white/40">Sin reuniones programadas</p>
-          </div>
-        )}
-
-        {upcoming.length > 0 && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Check className="h-3.5 w-3.5 text-emerald-400/70" />
-              <h3 className="text-xs font-semibold text-black/60 dark:text-white/60">Próximas</h3>
-              <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{upcoming.length}</span>
-            </div>
-            <div className="space-y-2">
-              {upcoming.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} />)}
-            </div>
-          </div>
-        )}
-
-        {past.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-3.5 w-3.5 text-black/20 dark:text-white/20" />
-              <h3 className="text-xs font-semibold text-black/40 dark:text-white/40">Pasadas</h3>
-              <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{past.length}</span>
-            </div>
-            <div className="space-y-2">
-              {past.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} past />)}
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* ═══ SECCIÓN COMUNICADOS ═══ */}
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-8 w-8 rounded-xl bg-sb-primary/10 flex items-center justify-center">
-            <Megaphone className="h-4 w-4 text-sb-primary/70" />
-          </div>
-          <h2 className="text-base font-bold text-black dark:text-white">Comunicados del Director</h2>
+      {/* ═══ CONTENIDO COMUNICADOS ═══ */}
+      {tab === "comunicados" && (
+        <div className="space-y-2">
+          {!loading && comunicados.length === 0 && (
+            <EmptyState icon={Megaphone} title="Sin comunicados" desc="No hay avisos de la dirección" />
+          )}
+          {comunicados.map(c => <ComunicadoCard key={c.id} c={c} onClick={() => { setShowDetails(c); setDetailType("comunicado") }} />)}
         </div>
-
-        {!loading && comunicados.length === 0 && (
-          <div className="text-center py-8 bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px]">
-            <Megaphone className="h-8 w-8 text-black/20 dark:text-white/20 mx-auto mb-2" />
-            <p className="text-sm text-black/40 dark:text-white/40">Sin comunicados</p>
-          </div>
-        )}
-
-        {comunicados.length > 0 && (
-          <div className="space-y-2">
-            {comunicados.map(c => <ComunicadoCard key={c.id} c={c} onClick={() => { setShowDetails(c); setDetailType("comunicado") }} />)}
-          </div>
-        )}
-      </section>
+      )}
 
       {/* ═══ MODAL ═══ */}
       <SbModal open={!!showDetails} onClose={() => setShowDetails(null)} maxWidth="480px">
@@ -148,6 +166,20 @@ export default function DocenteReunionesPage() {
   )
 }
 
+/* ═══ EMPTY STATE ═══ */
+function EmptyState({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
+  return (
+    <div className="text-center py-12 bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px]">
+      <div className="w-16 h-16 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
+        <Icon className="h-7 w-7 text-black/15 dark:text-white/15" />
+      </div>
+      <p className="text-sm font-medium text-black/50 dark:text-white/50">{title}</p>
+      <p className="text-xs text-black/30 dark:text-white/30 mt-0.5">{desc}</p>
+    </div>
+  )
+}
+
+/* ═══ REUNION DETAIL ═══ */
 function ReunionDetail({ r, copiedLink, onCopyLink }: { r: Reunion; copiedLink: string | null; onCopyLink: (l: string) => void }) {
   return (
     <div className="space-y-4">
@@ -191,6 +223,7 @@ function ReunionDetail({ r, copiedLink, onCopyLink }: { r: Reunion; copiedLink: 
   )
 }
 
+/* ═══ COMUNICADO DETAIL ═══ */
 function ComunicadoDetail({ c }: { c: Comunicado }) {
   return (
     <div className="space-y-4">
@@ -207,6 +240,7 @@ function ComunicadoDetail({ c }: { c: Comunicado }) {
   )
 }
 
+/* ═══ REUNION CARD ═══ */
 function ReunionCard({ r, onCopyLink, copiedLink, onClick, past }: { r: Reunion; onCopyLink: (l: string) => void; copiedLink: string | null; onClick: () => void; past?: boolean }) {
   return (
     <motion.div layout className={cn("bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer", past && "opacity-50")} onClick={onClick}>
@@ -240,6 +274,7 @@ function ReunionCard({ r, onCopyLink, copiedLink, onClick, past }: { r: Reunion;
   )
 }
 
+/* ═══ COMUNICADO CARD ═══ */
 function ComunicadoCard({ c, onClick }: { c: Comunicado; onClick: () => void }) {
   return (
     <motion.div layout className="bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer" onClick={onClick}>
