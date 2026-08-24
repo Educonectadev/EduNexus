@@ -1,13 +1,23 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import fs from 'fs'
 import path from 'path'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+let _supabase: SupabaseClient | null = null
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    if (!url || !key) throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
+    _supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
+  }
+  return _supabase
+}
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false, autoRefreshToken: false },
-})
+function supabaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (!url) throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
+  return url
+}
 
 export const BUCKET = 'uploads'
 
@@ -23,7 +33,7 @@ export function ensureUploadDir<T>(_category?: string): T | undefined {
 /** Saves a buffer into Supabase Storage and returns its public URL. */
 export async function saveUpload(category: string, institutionId: string, filename: string, buffer: Buffer): Promise<string> {
   const objectPath = `${category}/${institutionId}/${filename}`
-  const { data, error } = await supabase.storage.from(BUCKET).upload(objectPath, buffer, {
+  const { data, error } = await getSupabase().storage.from(BUCKET).upload(objectPath, buffer, {
     contentType: guessMime(filename),
     cacheControl: '3600',
     upsert: false,
@@ -40,7 +50,7 @@ export async function saveUpload(category: string, institutionId: string, filena
 
 /** Returns a public object URL without requesting it. */
 export function publicUrl(category: string, institutionId: string, filename: string): string {
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${category}/${institutionId}/${filename}`
+  return `${supabaseUrl()}/storage/v1/object/public/${BUCKET}/${category}/${institutionId}/${filename}`
 }
 
 /** Returns public URL for a legacy (pre-Supabase) path if it only exists locally. */
@@ -82,7 +92,7 @@ export async function deleteUpload(fileUrl: string | null | undefined): Promise<
       const objPath = fileUrl.slice(idx + marker.length).split('?')[0]
       if (objPath && !objPath.includes('..')) {
         try {
-          await supabase.storage.from(BUCKET).remove([objPath])
+          await getSupabase().storage.from(BUCKET).remove([objPath])
           return
         } catch {
           // ignore, also attempt local
