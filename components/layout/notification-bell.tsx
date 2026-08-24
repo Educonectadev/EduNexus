@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Bell, BellRing, X, CheckIcon, Clock, Inbox, Megaphone, Handshake, Users,
@@ -35,6 +36,7 @@ function notifMeta(type: string): { icon: React.ComponentType<{ className?: stri
 export default function NotificationBell() {
   const { notifications, loading, unread, live, closeLive, markOneRead, markAllRead } = useNotifications()
   const push = usePushSettings()
+  const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [pushBusy, setPushBusy] = React.useState(false)
   const unreadCount = Math.min(unread, 99)
@@ -167,10 +169,21 @@ export default function NotificationBell() {
                 ) : (
                   notifications.map(n => {
                     const meta = notifMeta(n.type)
+                    const handleClick = () => {
+                      markOneRead(n.id)
+                      setOpen(false)
+                      if (n.type === 'meeting') {
+                        const path = window.location.pathname
+                        if (path.startsWith('/docente')) router.push('/docente/reuniones')
+                        else if (path.startsWith('/director')) router.push('/director/reuniones')
+                        else if (path.startsWith('/padre')) router.push('/padre/comunicados')
+                        else router.push('/docente/reuniones')
+                      }
+                    }
                     return (
                       <button
                         key={n.id}
-                        onClick={() => markOneRead(n.id)}
+                        onClick={handleClick}
                         className={cn(
                           "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-sb-surface-container-highest/50",
                           !n.read && "bg-sb-primary/5"
