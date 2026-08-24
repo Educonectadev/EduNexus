@@ -53,7 +53,7 @@ BEGIN
     'message', left(COALESCE(NEW.message, ''), 180),
     'category', COALESCE(NEW.category, 'general'),
     'priority', COALESCE(NEW.priority, 'media'),
-    'pinned', COALESCE(NEW.pinned, 0),
+    'pinned', COALESCE(NEW.pinned, false),
     'created_at', NEW.created_at
   )::text INTO payload;
   PERFORM pg_notify('edu_notifications', payload);

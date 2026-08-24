@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../app/register/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation'\n\nexport default function RegisterPage() {\n  redirect('/demo')\n}"],"names":[],"mappings":"8UAAA,EAAA,CAAA,CAAA,QAAA,IAAA,EAAA,EAAA,CAAA,CAAA,QAEe,SAAS,IACtB,CAAA,EAAA,EAAA,QAAA,AAAQ,EAAC,QACX"}

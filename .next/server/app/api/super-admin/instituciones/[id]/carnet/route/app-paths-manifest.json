@@ -1,0 +1,3 @@
+{
+  "/api/super-admin/instituciones/[id]/carnet/route": "app/api/super-admin/instituciones/[id]/carnet/route.js"
+}
