@@ -109,7 +109,7 @@ function GroupedNavbar({
   const [menuHeight, setMenuHeight] = React.useState<number>(56)
 
   const visibleItems = items.slice(0, maxVisible)
-  const hasMore = items.length > maxVisible
+  const hasMore = groups.length > 0 || items.length > maxVisible
 
   const isActive = (item: NavItem) => {
     if (item.href === `/${role}`) {
