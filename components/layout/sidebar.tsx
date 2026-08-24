@@ -79,6 +79,7 @@ const docenteNav: NavItem[] = [
   { title: "Dashboard", href: "/docente", icon: LayoutDashboard },
   { title: "Mis Cursos", href: "/docente/cursos", icon: BookOpen },
   { title: "Horarios", href: "/docente/horarios", icon: Calendar },
+  { title: "Reuniones", href: "/docente/reuniones", icon: Calendar },
   { title: "Asistencia", href: "/docente/asistencia", icon: UserCheck },
   { title: "Calificaciones", href: "/docente/calificaciones", icon: BookMarked },
   { title: "Tareas", href: "/docente/tareas", icon: ClipboardList },
