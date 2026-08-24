@@ -594,7 +594,7 @@ function ReunionCard({
   return (
     <motion.div layout
       className={cn(
-        "bg-sb-surface rounded-xl p-4 space-y-2.5 transition-all hover:bg-sb-surface-container-high/50 cursor-pointer",
+        "bg-black dark:bg-[#1a1a1c] sb-note rounded-[25px] p-4 space-y-2.5 transition-all cursor-pointer",
         r.pinned ? "ring-1 ring-sb-outline/10" : "",
         past ? "opacity-50" : ""
       )}
