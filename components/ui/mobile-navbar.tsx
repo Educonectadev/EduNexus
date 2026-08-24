@@ -48,6 +48,8 @@ export function MobileNavbar({
 
   const currentGroup = openGroup !== null ? groups[openGroup] : null
 
+  if (!groups || groups.length === 0) return null
+
   return (
     <div className="md:hidden">
       {/* ===== BOTTOM BAR ===== */}
