@@ -51,17 +51,18 @@ export async function GET(request: NextRequest) {
       `SELECT id, title, COALESCE(message, '') as message, type, target_role, status,
               meeting_date, meeting_time, institution_id, created_at,
               COALESCE(priority, 'media') as priority,
-              CAST(COALESCE(pinned, 0) AS BOOLEAN) as pinned,
+              pinned,
               COALESCE(location, '') as location,
               COALESCE(virtual_link, '') as virtual_link,
               COALESCE(agenda, '') as agenda
        FROM notifications
        WHERE type = 'meeting' AND institution_id = $1
-       ORDER BY meeting_date ASC, meeting_time ASC`,
+       ORDER BY meeting_date DESC, meeting_time DESC`,
       [instId]
     )
     return NextResponse.json(rows)
-  } catch {
+  } catch (e: any) {
+    console.error('GET reuniones error:', e?.message || e)
     return NextResponse.json([])
   }
 }

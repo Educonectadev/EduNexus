@@ -108,8 +108,12 @@ export default function ReunionesPage() {
           agenda: r.agenda || "",
         }))
         setReuniones(enriched)
+      } else {
+        console.error("GET reuniones failed:", res.status, await res.text())
       }
-    } catch {}
+    } catch (e) {
+      console.error("GET reuniones error:", e)
+    }
     finally { setLoading(false) }
   }
 
