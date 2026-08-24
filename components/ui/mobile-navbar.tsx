@@ -243,6 +243,7 @@ function FlatNavbar({
   items,
   activeHref,
   role,
+  className,
   onAiClick,
   maxVisible = 4,
   onLogout,
@@ -250,6 +251,7 @@ function FlatNavbar({
   items: NavItem[]
   activeHref: string
   role?: string
+  className?: string
   onAiClick?: () => void
   maxVisible?: number
   onLogout?: () => void
@@ -380,7 +382,7 @@ export function MobileNavbar(props: MobileNavbarProps) {
     return <GroupedNavbar groups={props.groups} activeHref={props.activeHref} role={props.role} onAiClick={props.onAiClick} onLogout={props.onLogout} />
   }
   if (props.items && props.items.length > 0) {
-    return <FlatNavbar items={props.items} activeHref={props.activeHref} role={props.role} onAiClick={props.onAiClick} maxVisible={props.maxVisible} onLogout={props.onLogout} />
+    return <FlatNavbar items={props.items} activeHref={props.activeHref} role={props.role} className={props.className} onAiClick={props.onAiClick} maxVisible={props.maxVisible} onLogout={props.onLogout} />
   }
   return null
 }
