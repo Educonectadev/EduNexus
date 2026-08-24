@@ -140,8 +140,17 @@ export default function ReunionesPage() {
       const res = await fetch(url, {
         method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData),
       })
-      if (res.ok) { setDialogOpen(false); setEditing(null); fetchData() }
-    } catch {}
+      const data = await res.json().catch(() => null)
+      if (res.ok) {
+        setDialogOpen(false)
+        setEditing(null)
+        fetchData()
+      } else {
+        alert(data?.error || `Error ${res.status}`)
+      }
+    } catch (e: any) {
+      alert(e?.message || "Error de red")
+    }
     finally { setSaving(false) }
   }
 
