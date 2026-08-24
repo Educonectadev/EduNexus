@@ -259,10 +259,10 @@ function TareasInner() {
             </button>
             <button
               onClick={() => setDialogOpen(true)}
-              className="h-10 px-4 text-sm font-bold flex items-center gap-2 rounded-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
+              className="h-10 px-3 sm:px-4 text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 rounded-xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
               style={{ background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
             >
-              <Plus className="h-4 w-4" /> Nueva tarea
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nueva tarea</span><span className="sm:hidden">Nueva</span>
             </button>
           </div>
         </header>
