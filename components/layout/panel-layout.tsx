@@ -82,6 +82,7 @@ const navByRole: Record<string, NavItem[]> = {
     { title: "Dashboard", href: "/docente/dashboard", icon: LayoutDashboard },
     { title: "Cursos", href: "/docente/cursos", icon: BookOpen },
     { title: "Horarios", href: "/docente/horarios", icon: Calendar },
+    { title: "Reuniones", href: "/docente/reuniones", icon: Handshake },
     { title: "Asistencia", href: "/docente/asistencia", icon: UserCheck },
     { title: "Notas", href: "/docente/calificaciones", icon: BookMarked },
     { title: "Tareas", href: "/docente/tareas", icon: ClipboardList },
