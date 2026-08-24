@@ -4,7 +4,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { MoreHorizontal, X, User, Sparkles, LogOut } from "@/components/ui/proicons"
+import { X, User, Sparkles, LogOut, ChevronRight } from "@/components/ui/proicons"
 
 interface NavItem {
   title: string
@@ -15,90 +15,29 @@ interface NavItem {
 
 interface NavGroup {
   title: string
+  icon: React.ComponentType<{ className?: string }>
   items: NavItem[]
 }
 
 interface MobileNavbarProps {
-  items: NavItem[]
-  groups?: NavGroup[]
+  groups: NavGroup[]
   activeHref: string
   role?: string
   className?: string
   onAiClick?: () => void
-  maxVisible?: number
   onLogout?: () => void
 }
 
-function NavButton({
-  item,
-  isActive,
-  router,
-}: {
-  item: NavItem
-  isActive: boolean
-  router: ReturnType<typeof useRouter>
-}) {
-  return (
-    <motion.button
-      type="button"
-      onClick={() => router.push(item.href)}
-      className="relative flex items-center justify-center w-12 h-12"
-      aria-label={item.title}
-      aria-current={isActive ? "page" : undefined}
-      whileTap={{ scale: 0.9 }}
-    >
-      <motion.div
-        className="absolute inset-0"
-        initial={false}
-        animate={{
-          borderRadius: 999,
-          backgroundColor: isActive ? "var(--sb-on-surface)" : "transparent",
-        }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      />
-      <motion.div
-        className="relative z-10 flex items-center justify-center"
-        animate={{
-          scale: isActive ? 1.1 : 1,
-          color: isActive ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
-          opacity: isActive ? 1 : 0.6,
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        <item.icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
-      </motion.div>
-      {typeof item.badge === "number" && item.badge > 0 && (
-        <span className={cn(
-          "absolute top-0 right-0 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 z-20",
-          isActive
-            ? "border-sb-surface bg-sb-surface text-sb-on-surface"
-            : "border-sb-surface bg-sb-primary text-sb-on-primary"
-        )}>
-          {item.badge > 9 ? "9+" : item.badge}
-        </span>
-      )}
-    </motion.button>
-  )
-}
-
 export function MobileNavbar({
-  items,
   groups,
   activeHref,
   role,
   className,
   onAiClick,
-  maxVisible = 4,
   onLogout,
 }: MobileNavbarProps) {
   const router = useRouter()
-  const [menuOpen, setMenuOpen] = React.useState(false)
-  const morphRef = React.useRef<HTMLDivElement>(null)
-  const menuRef = React.useRef<HTMLDivElement>(null)
-  const [menuHeight, setMenuHeight] = React.useState<number>(56)
-
-  const visibleItems = items.slice(0, maxVisible)
-  const optionsItems = groups ? [] : items.slice(maxVisible)
+  const [openGroup, setOpenGroup] = React.useState<number | null>(null)
 
   const isActive = (item: NavItem) => {
     if (item.href === `/${role}`) {
@@ -107,161 +46,158 @@ export function MobileNavbar({
     return activeHref === item.href || activeHref.startsWith(item.href + "/")
   }
 
-  // Measure content height
-  React.useLayoutEffect(() => {
-    if (menuOpen && menuRef.current) {
-      const height = menuRef.current.scrollHeight
-      setMenuHeight(Math.max(height, 56))
-    }
-  }, [menuOpen, onAiClick, optionsItems.length])
-
-  // Close on outside click
-  React.useEffect(() => {
-    if (!menuOpen) return
-    const onDown = (e: MouseEvent) => {
-      if (morphRef.current && !morphRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false)
-    }
-    document.addEventListener("mousedown", onDown)
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.removeEventListener("mousedown", onDown)
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [menuOpen])
+  const currentGroup = openGroup !== null ? groups[openGroup] : null
 
   return (
     <div className="md:hidden">
+      {/* ===== BOTTOM BAR ===== */}
       <motion.nav
         className={cn("mobile-navbar fixed left-0 right-0 z-[60]", className)}
         initial={{ y: 100, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          {/* Main Nav Container */}
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
-            {visibleItems.map((item) => (
-              <NavButton
-                key={item.href}
-                item={item}
-                isActive={isActive(item)}
-                router={router}
-              />
-            ))}
-          </div>
-
-          {/* More Options Button - Morph Animation */}
-          <div className="mobile-nav-more absolute right-4 bottom-0">
-            <div
-              ref={morphRef}
-              className="t-morph"
-              data-open={menuOpen ? "true" : "false"}
-              style={menuOpen ? { height: `${menuHeight}px` } : undefined}
-            >
-              {/* Menu Content */}
-              <div ref={menuRef} className="t-morph-menu" role="menu">
-                <div className="p-2 pb-3 pl-3 pr-14">
-                  {onAiClick && (
-                    <button
-                      type="button"
-                      onClick={() => { setMenuOpen(false); onAiClick() }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-white/10"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sb-surface">
-                        <Sparkles className="h-4 w-4" />
-                      </span>
-                      Asistente IA
-                    </button>
-                  )}
-
-                  {groups ? (
-                    groups.map((group) => (
-                      <div key={group.title} className="mt-2">
-                        <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/40">{group.title}</p>
-                        {group.items.map((item) => (
-                          <button
-                            key={item.href}
-                            type="button"
-                            onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                            className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
-                              isActive(item)
-                                ? "bg-white/20 text-sb-surface font-medium"
-                                : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
-                            )}
-                          >
-                            <span className={cn(
-                              "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
-                              isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
-                            )}>
-                              <item.icon className="h-3.5 w-3.5" />
-                            </span>
-                            {item.title}
-                          </button>
-                        ))}
-                      </div>
-                    ))
-                  ) : (
-                    optionsItems.map((item) => (
-                      <button
-                        key={item.href}
-                        type="button"
-                        onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                          isActive(item)
-                            ? "bg-white/20 text-sb-surface font-medium"
-                            : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
-                        )}
-                      >
-                        <span className={cn(
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                          isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
-                        )}>
-                          <item.icon className="h-4 w-4" />
-                        </span>
-                        {item.title}
-                      </button>
-                    ))
-                  )}
-
-                  {onLogout && (
-                    <>
-                      <div className="h-px bg-white/10 my-1" />
-                      <button
-                        type="button"
-                        onClick={() => { setMenuOpen(false); onLogout() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
-                          <LogOut className="h-4 w-4" />
-                        </span>
-                        Cerrar sesión
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Plus Button */}
-              <button
+        <div className="mobile-nav-inner relative flex items-center justify-center w-full gap-2 px-4 py-2">
+          {groups.map((group, idx) => {
+            const hasActive = group.items.some(i => isActive(i))
+            const Icon = group.icon
+            return (
+              <motion.button
+                key={group.title}
                 type="button"
-                className="t-morph-plus"
-                aria-expanded={menuOpen ? "true" : "false"}
-                aria-label="Más opciones"
-                onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
+                onClick={() => setOpenGroup(idx)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all",
+                  hasActive
+                    ? "bg-sb-on-surface text-sb-surface"
+                    : "bg-sb-surface-container-highest text-sb-on-surface-variant"
+                )}
+                whileTap={{ scale: 0.95 }}
               >
-                <MoreHorizontal className="h-5 w-5 text-sb-surface" />
-              </button>
-            </div>
-          </div>
+                <Icon className="h-4 w-4" />
+                <span className="hidden min-[360px]:inline">{group.title}</span>
+                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-white/15 text-[10px] font-bold flex items-center justify-center">
+                  {group.items.length}
+                </span>
+              </motion.button>
+            )
+          })}
         </div>
       </motion.nav>
+
+      {/* ===== MODAL ===== */}
+      <AnimatePresence>
+        {currentGroup && (
+          <motion.div
+            className="fixed inset-0 z-[70] flex items-end justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setOpenGroup(null)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+
+            {/* Sheet */}
+            <motion.div
+              className="relative w-full max-w-md bg-sb-surface rounded-t-3xl overflow-hidden"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            >
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-10 h-1 rounded-full bg-sb-on-surface/20" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pb-3">
+                <h3 className="text-[15px] font-semibold text-sb-on-surface">{currentGroup.title}</h3>
+                <button
+                  onClick={() => setOpenGroup(null)}
+                  className="p-1.5 rounded-xl hover:bg-sb-surface-container-high transition-colors text-sb-on-surface/60"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Items */}
+              <div className="px-4 pb-8 space-y-1 max-h-[60vh] overflow-auto">
+                {currentGroup.items.map((item) => {
+                  const active = isActive(item)
+                  return (
+                    <button
+                      key={item.href}
+                      type="button"
+                      onClick={() => { setOpenGroup(null); router.push(item.href) }}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-colors text-left",
+                        active
+                          ? "bg-sb-on-surface/10 text-sb-on-surface"
+                          : "hover:bg-sb-surface-container-high/50 text-sb-on-surface-variant"
+                      )}
+                    >
+                      <div className={cn(
+                        "h-9 w-9 rounded-xl flex items-center justify-center shrink-0",
+                        active ? "bg-sb-on-surface/15 text-sb-on-surface" : "bg-sb-surface-container-high text-sb-on-surface-variant/70"
+                      )}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
+                      <span className={cn("text-sm flex-1", active ? "font-medium" : "")}>{item.title}</span>
+                      <ChevronRight className="h-4 w-4 text-sb-on-surface/30 shrink-0" />
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Footer actions */}
+              <div className="px-4 pb-8 pt-2 border-t border-sb-outline-variant/10 space-y-1">
+                {onAiClick && (
+                  <button
+                    type="button"
+                    onClick={() => { setOpenGroup(null); onAiClick() }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors"
+                  >
+                    <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
+                      <Sparkles className="h-4 w-4 text-sb-primary" />
+                    </div>
+                    Asistente IA
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => { setOpenGroup(null); router.push("/dev/perfil") }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-sb-on-surface-variant hover:bg-sb-surface-container-high/50 transition-colors"
+                >
+                  <div className="h-9 w-9 rounded-xl bg-sb-surface-container-high flex items-center justify-center shrink-0">
+                    <User className="h-4 w-4 text-sb-on-surface-variant/70" />
+                  </div>
+                  Mi perfil
+                </button>
+                {onLogout && (
+                  <button
+                    type="button"
+                    onClick={() => { setOpenGroup(null); onLogout() }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                  >
+                    <div className="h-9 w-9 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                      <LogOut className="h-4 w-4 text-red-500" />
+                    </div>
+                    Cerrar sesión
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
@@ -270,12 +206,11 @@ export function MobileNavbarSkeleton() {
   return (
     <div className="fixed bottom-4 left-0 right-0 z-30">
       <div className="relative flex items-center justify-center w-full">
-        <div className="flex items-center gap-1">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="w-12 h-12 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
+        <div className="flex items-center gap-2">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-11 w-28 rounded-2xl bg-sb-surface-container-highest/50 animate-pulse" />
           ))}
         </div>
-        <div className="absolute right-4 bottom-0 w-14 h-14 rounded-full bg-sb-surface-container-highest/50 animate-pulse" />
       </div>
     </div>
   )
