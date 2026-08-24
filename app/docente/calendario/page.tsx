@@ -91,11 +91,11 @@ export default function CalendarioPage() {
         {/* Header */}
         <header className="flex items-start justify-between pt-2 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
+            <p className="text-[14px] font-medium mb-1 text-sb-on-surface-variant">Panel Docente</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-sb-on-surface">
               Calendario
             </h1>
-            <p className="text-[13px] mt-2 text-[#a1a1aa]">
+            <p className="text-[13px] mt-2 text-sb-on-surface-variant">
               Tu horario semanal y eventos de la institución
             </p>
           </div>
@@ -103,19 +103,19 @@ export default function CalendarioPage() {
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
                 <div className="h-6 w-6 rounded-xl bg-black/10 dark:bg-white/10 flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#f4f4f5]">
+                  <span className="text-[9px] font-semibold text-sb-on-surface">
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-sm md:text-base font-medium text-sb-on-surface whitespace-nowrap">
                   {user.full_name}
                 </span>
               </div>
             )}
             <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition-colors relative group">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#f4f4f5] group-hover:scale-110" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#f4f4f5] group-hover:scale-110" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-sb-on-surface group-hover:scale-110" />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-sb-on-surface group-hover:scale-110" />
             </button>
           </div>
         </header>
