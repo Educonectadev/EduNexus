@@ -128,6 +128,7 @@ function AsistenciaInner() {
   const prefilterCourse = searchParams.get("curso") || ""
   const [tab, setTab] = React.useState<Tab>(prefilterCourse ? "alumnos" : "personal")
   const [prefillCourse, setPrefillCourse] = React.useState(prefilterCourse)
+  const [scheduleError, setScheduleError] = React.useState<string | null>(null)
   const tabs: { key: Tab; label: string }[] = [
     { key: "personal", label: "Mi Asistencia" },
     { key: "alumnos", label: "Asistencia de Alumnos" },
@@ -238,7 +239,8 @@ function MiAsistencia() {
       } else if (res.status === 409 && data.pendingCheckout) {
         setPendingCheckout(data.pendingCheckout)
       } else if (res.status === 400 && data.message) {
-        alert(data.message)
+        setScheduleError(data.message)
+        setTimeout(() => setScheduleError(null), 5000)
       }
     } catch {} finally { setActionLoading(false) }
   }
@@ -370,6 +372,15 @@ function MiAsistencia() {
             </div>
           )}
         </div>
+
+        {scheduleError && (
+          <div className="mx-5 mb-4 p-3 flex items-center gap-3" style={{ borderRadius: "14px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
+            <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+              <Clock className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+            </div>
+            <p className="text-[13px] font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{scheduleError}</p>
+          </div>
+        )}
       </div>
 
       {/* ═══ Semana ═══ */}
