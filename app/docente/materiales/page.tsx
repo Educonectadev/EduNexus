@@ -150,7 +150,7 @@ function MaterialesInner() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c] sb-note">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
       <div className="p-4 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <motion.header

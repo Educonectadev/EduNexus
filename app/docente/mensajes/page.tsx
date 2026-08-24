@@ -178,7 +178,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-black dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c]">
       <div className="h-full flex">
         <div className={`w-80 bg-white dark:bg-[#17171a] flex flex-col ${
           selectedContact ? 'hidden md:flex' : 'flex'
