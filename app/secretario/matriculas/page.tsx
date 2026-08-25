@@ -1018,13 +1018,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
             </SbBtn>
             <SbBtn variant="tonal" rounded className="flex items-center gap-2"
               onClick={() => {
-                const headers = ["Código del Alumno", "Nombre del Alumno", "DNI", "Fecha Nacimiento (DD/MM/AAAA)", "Género (M/F)", "Nombre del Padre/Apoderado", "DNI del Padre", "Teléfono del Padre", "Email del Padre", "Grado", "Sección"]
-                const example = ["ALU-20260001", "María García López", "12345678", "15/03/2015", "F", "Juan García", "87654321", "987654321", "juan@email.com", "1ro", "A"]
-                const csvContent = [headers.join(","), example.join(",")].join("\n")
-                const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
                 const link = document.createElement("a")
-                link.href = URL.createObjectURL(blob)
-                link.download = `plantilla_matricula_${new Date().getFullYear()}.csv`
+                link.href = "/plantillas/2026v2/matricula_completa_2026v2.csv"
+                link.download = `plantilla_matricula_2026v2.csv`
                 link.click()
               }}>
               <Download className="h-4 w-4" /> Descargar Plantilla
