@@ -5,6 +5,7 @@ import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Ch
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbIconBtn, SbDropdown, SbDropdownItem, SbBadge } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfClearFilters, SbfResultsCount } from "@/components/ui/search-filter-bar"
+import { toast } from "@/hooks/use-toast"
 import "@/frontend.css"
 
 interface Enrollment {
@@ -177,12 +178,44 @@ export default function SecretarioMatriculasPage() {
       const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       if (!rowData.student_name) rowData.errors.push("Nombre del alumno requerido")
       if (!rowData.student_dni || rowData.student_dni.length < 8) rowData.errors.push("DNI inválido")
-      if (rowData.grade && !grades.some(g => norm(g) === norm(rowData.grade))) rowData.errors.push(`Grado "${rowData.grade}" no existe en Gestión Académica`)
-      if (rowData.section && !sections.some(s => norm(s) === norm(rowData.section))) rowData.errors.push(`Sección "${rowData.section}" no existe en Gestión Académica`)
       if (rowData.student_gender && !["M", "F", "MASCULINO", "FEMENINO"].includes(rowData.student_gender)) rowData.errors.push("Género inválido")
       if (rowData.student_birth_date) {
         const converted = convertDate(rowData.student_birth_date)
         if (!converted) rowData.errors.push("Formato de fecha inválido (use AAAA-MM-DD)")
+      }
+      
+      // Grade: fuzzy match — "1ro" matches "1° de Primaria", "4to" matches "4° de Primaria"
+      if (rowData.grade) {
+        const gradeNorm = norm(rowData.grade)
+        const exactMatch = grades.some(g => norm(g) === gradeNorm)
+        if (!exactMatch) {
+          // Try fuzzy: extract number from input, find grade starting with that number
+          const numMatch = gradeNorm.match(/^(\d+)/)
+          if (numMatch) {
+            const num = numMatch[1]
+            const fuzzyMatch = grades.find(g => norm(g).startsWith(num + "°") || norm(g).startsWith(num + " "))
+            if (fuzzyMatch) {
+              rowData.grade = fuzzyMatch // auto-correct
+            } else {
+              rowData.errors.push(`Grado "${rowData.grade}" no existe en Gestión Académica`)
+            }
+          } else {
+            rowData.errors.push(`Grado "${rowData.grade}" no existe en Gestión Académica`)
+          }
+        }
+      }
+      // Section: fuzzy match — "a" matches "A", "b" matches "B"
+      if (rowData.section) {
+        const secNorm = norm(rowData.section)
+        const exactSec = sections.some(s => norm(s) === secNorm)
+        if (!exactSec) {
+          const fuzzySec = sections.find(s => norm(s).startsWith(secNorm) || secNorm.startsWith(norm(s)))
+          if (fuzzySec) {
+            rowData.section = fuzzySec // auto-correct
+          } else {
+            rowData.errors.push(`Sección "${rowData.section}" no existe en Gestión Académica`)
+          }
+        }
       }
       
       rowData.valid = rowData.errors.length === 0
@@ -370,8 +403,8 @@ export default function SecretarioMatriculasPage() {
 
   const handleCreate = async () => {
     const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    if (form.grade && !grades.some(g => norm(g) === norm(form.grade))) { toast('El grado no existe en Gestión Académica', "error"); return }
-    if (form.section && !sections.some(s => norm(s) === norm(form.section))) { toast('La sección no existe en Gestión Académica', "error"); return }
+    if (form.grade && !grades.some(g => norm(g) === norm(form.grade))) { toast({ title: 'El grado no existe en Gestión Académica', variant: 'destructive' }); return }
+    if (form.section && !sections.some(s => norm(s) === norm(form.section))) { toast({ title: 'La sección no existe en Gestión Académica', variant: 'destructive' }); return }
     setSaving(true)
     try {
       const res = await fetch("/api/secretario/enrollments", {
@@ -540,6 +573,8 @@ export default function SecretarioMatriculasPage() {
           onImport={handleBulkImport}
           onReset={resetBulkImport}
           fileInputRef={fileInputRef}
+          grades={grades}
+          sections={sections}
         />
       ) : (
         <>
@@ -968,7 +1003,7 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
   )
 }
 
-function BulkImportView({ step, setStep, file, rows, setRows, progress, results, onFileSelect, onImport, onReset, fileInputRef }: {
+function BulkImportView({ step, setStep, file, rows, setRows, progress, results, onFileSelect, onImport, onReset, fileInputRef, grades, sections }: {
   step: "upload" | "preview" | "importing" | "done"
   setStep: (s: "upload" | "preview" | "importing" | "done") => void
   file: File | null
@@ -980,6 +1015,8 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   onImport: () => void
   onReset: () => void
   fileInputRef: React.RefObject<HTMLInputElement | null>
+  grades: string[]
+  sections: string[]
 }) {
   const validCount = rows.filter(r => r.valid && !r.skipped).length
   const errorCount = rows.filter(r => !r.valid).length
@@ -1126,13 +1163,79 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                       </div>
                     )}
                   </td>
-                  <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/60">{row.student_dni || "—"}</td>
-                  <td className="py-2 px-3 text-sb-on-surface/70">{row.grade || "—"}</td>
+                  <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/60">
+                    {!row.valid ? (
+                      <input
+                        type="text"
+                        value={row.student_dni}
+                        onChange={(e) => {
+                          const updated = rows.map((r, j) => j === i ? { ...r, student_dni: e.target.value } : r)
+                          setRows(updated)
+                        }}
+                        className="w-20 text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 font-mono text-sb-on-surface focus:border-red-400 focus:outline-none"
+                        placeholder="DNI"
+                        maxLength={8}
+                      />
+                    ) : (
+                      row.student_dni || "—"
+                    )}</td>
+                  <td className="py-2 px-3 text-sb-on-surface/70">
+                    {!row.valid ? (
+                      <div className="flex gap-1">
+                        <select
+                          value={row.grade}
+                          onChange={(e) => {
+                            const updated = rows.map((r, j) => j === i ? { ...r, grade: e.target.value } : r)
+                            setRows(updated)
+                          }}
+                          className="text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 text-sb-on-surface focus:border-red-400 focus:outline-none flex-1 min-w-0"
+                        >
+                          <option value="">Grado</option>
+                          {grades.map(g => <option key={g} value={g}>{g}</option>)}
+                        </select>
+                        <select
+                          value={row.section}
+                          onChange={(e) => {
+                            const updated = rows.map((r, j) => j === i ? { ...r, section: e.target.value } : r)
+                            setRows(updated)
+                          }}
+                          className="text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 text-sb-on-surface focus:border-red-400 focus:outline-none w-12"
+                        >
+                          <option value="">Sec</option>
+                          {sections.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                    ) : (
+                      row.grade || "—"
+                    )}
+                  </td>
                   <td className="py-2 px-3">
                     {!row.valid ? (
-                      <div className="flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4 text-red-400" />
-                        <span className="text-[10px] text-red-400">{row.errors[0]}</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3 text-red-400 shrink-0" />
+                          <span className="text-[10px] text-red-400 line-clamp-2">{row.errors[0]}</span>
+                        </div>
+                        {row.errors.length > 1 && (
+                          <span className="text-[9px] text-red-400/60">+{row.errors.length -1} errores</span>
+                        )}
+                        <button
+                          onClick={() => {
+                            // Re-validate after edit
+                            const updated = rows.map((r, j) => {
+                              if (j !== i) return r
+                              const newErrors: string[] = []
+                              if (!r.student_name) newErrors.push("Nombre del alumno requerido")
+                              if (!r.student_dni || r.student_dni.length < 8) newErrors.push("DNI inválido")
+                              if (r.student_gender && !["M", "F", "MASCULINO", "FEMENINO"].includes(r.student_gender)) newErrors.push("Género inválido")
+                              return { ...r, errors: newErrors, valid: newErrors.length === 0 }
+                            })
+                            setRows(updated)
+                          }}
+                          className="text-[10px] text-sb-primary hover:underline mt-0.5"
+                        >
+                          Re-validar
+                        </button>
                       </div>
                     ) : row.duplicate ? (
                       <label className="flex items-center gap-2 cursor-pointer">
