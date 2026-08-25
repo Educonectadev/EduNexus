@@ -143,7 +143,7 @@ function GroupedNavbar({
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
           {/* Botones visibles */}
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -151,7 +151,7 @@ function GroupedNavbar({
 
           {/* Botón "más" con menú agrupado */}
           {hasMore && (
-            <div className="mobile-nav-more absolute right-4 bottom-0">
+            <div className="mobile-nav-more absolute right-3 bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
@@ -276,14 +276,14 @@ function FlatNavbar({
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
           </div>
 
           {optionsItems.length > 0 && (
-            <div className="mobile-nav-more absolute right-4 bottom-0">
+            <div className="mobile-nav-more absolute right-3 bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
