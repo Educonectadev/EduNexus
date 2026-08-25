@@ -702,6 +702,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {role && (
           <MobileNavbar
             items={visibleNavItems}
+            groups={visibleNavSections.map(s => ({
+              title: s.title,
+              icon: s.items[0]?.icon || LayoutDashboard,
+              items: s.items,
+            }))}
             activeHref={pathname}
             role={role}
             onAiClick={role === 'secretario' && can("can_ai_assistant") ? () => setAiOpen(true) : undefined}
