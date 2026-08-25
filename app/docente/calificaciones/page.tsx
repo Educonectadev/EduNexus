@@ -299,10 +299,10 @@ function CalificacionesInner() {
             </div>
             <div className="flex items-center gap-2">
               {students.length > 0 && (
-                <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "var(--note-fill)" }}>
+                <div className="flex items-center gap-1 p-1 rounded-full" style={{ background: "var(--note-fill)" }}>
                   {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
                     <button key={key} onClick={() => setViewMode(key)}
-                      className="h-9 px-4 text-[13px] font-semibold flex items-center justify-center rounded-lg transition-all duration-200"
+                      className="h-9 px-4 text-[13px] font-semibold flex items-center justify-center rounded-full transition-all duration-200"
                       style={{
                         background: viewMode === key ? "var(--note-text)" : "transparent",
                         color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)",
