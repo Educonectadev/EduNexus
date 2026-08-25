@@ -53,7 +53,7 @@ function NavButton({
         initial={false}
         animate={{
           borderRadius: 999,
-          backgroundColor: isActive ? "var(--sb-on-surface)" : "transparent",
+          backgroundColor: isActive ? "white" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
       />
@@ -61,8 +61,8 @@ function NavButton({
         className="relative z-10 flex items-center justify-center"
         animate={{
           scale: isActive ? 1.1 : 1,
-          color: isActive ? "var(--sb-surface)" : "var(--sb-on-surface-variant)",
-          opacity: isActive ? 1 : 0.6,
+          color: isActive ? "black" : "white",
+          opacity: isActive ? 1 : 0.8,
         }}
         transition={{ duration: 0.2 }}
       >
