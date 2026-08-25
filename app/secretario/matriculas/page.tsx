@@ -178,7 +178,7 @@ export default function SecretarioMatriculasPage() {
       const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       if (!rowData.student_name) rowData.errors.push("Nombre del alumno requerido")
       if (!rowData.student_dni || rowData.student_dni.length < 8) rowData.errors.push("DNI inválido")
-      if (rowData.student_gender && !["M", "F", "MASCULINO", "FEMENINO"].includes(rowData.student_gender)) rowData.errors.push("Género inválido")
+      if (rowData.student_gender && !["M", "F", "MASCULINO", "FEMENINO", "Masculino", "Femenino"].includes(rowData.student_gender)) rowData.errors.push("Género inválido")
       if (rowData.student_birth_date) {
         const converted = convertDate(rowData.student_birth_date)
         if (!converted) rowData.errors.push("Formato de fecha inválido (use AAAA-MM-DD)")
