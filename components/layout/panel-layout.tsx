@@ -640,10 +640,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             )}
 
             <div className="flex md:hidden items-center gap-1 mr-1">
-              <button onClick={() => setSearchOpen(true)}
+              <Link href="/perfil"
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
-                <Search className="h-[18px] w-[18px]" />
-              </button>
+                <User className="h-[18px] w-[18px]" />
+              </Link>
               <NotificationBell />
               <button onClick={handleLogout}
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
