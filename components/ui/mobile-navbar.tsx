@@ -142,8 +142,7 @@ function GroupedNavbar({
         transition={{ type: "spring", stiffness: 400, damping: 32, delay: 0.1 }}
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          {/* Botones visibles */}
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-sb-on-surface/80 backdrop-blur-xl rounded-[50px] px-2 py-1.5">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -276,7 +275,7 @@ function FlatNavbar({
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-sb-on-surface/80 backdrop-blur-xl rounded-[50px] px-2 py-1.5">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
