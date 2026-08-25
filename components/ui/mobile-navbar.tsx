@@ -157,8 +157,8 @@ function GroupedNavbar({
                   <div className="p-2 pb-3 pl-3 pr-14">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-white/10">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sb-surface">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -168,14 +168,14 @@ function GroupedNavbar({
                     {/* Secciones agrupadas */}
                     {groups.map((group) => (
                       <div key={group.title} className="mt-1.5">
-                        <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/40">{group.title}</p>
+                        <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-surface/50">{group.title}</p>
                         {group.items.map((item) => (
                           <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
                             className={cn("w-full flex items-center gap-3 px-3 py-1.5 text-left text-sm rounded-xl transition-colors",
-                              isActive(item) ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                              isActive(item) ? "bg-sb-surface-container-high text-sb-surface font-medium" : "text-sb-surface/90 hover:bg-sb-surface-container-high hover:text-sb-surface"
                             )}>
                             <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg",
-                              isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                              isActive(item) ? "bg-sb-surface-container text-sb-surface" : "bg-sb-surface-container text-sb-surface/80"
                             )}>
                               <item.icon className="h-3 w-3" />
                             </span>
@@ -187,7 +187,7 @@ function GroupedNavbar({
 
                     {onLogout && (
                       <>
-                        <div className="h-px bg-white/10 my-2" />
+                        <div className="h-px bg-sb-surface-container-high my-2" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
                           className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
@@ -289,8 +289,8 @@ function FlatNavbar({
                   <div className="p-2 pb-3 pl-3 pr-14">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-white/10">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-sb-surface">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -299,10 +299,10 @@ function FlatNavbar({
 
                     <button type="button" onClick={() => { setMenuOpen(false); router.push("/perfil") }}
                       className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                        activeHref === "/perfil" ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                        activeHref === "/perfil" ? "bg-sb-surface-container-high text-sb-surface font-medium" : "text-sb-surface/90 hover:bg-sb-surface-container-high hover:text-sb-surface"
                       )}>
                       <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                        activeHref === "/perfil" ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                        activeHref === "/perfil" ? "bg-sb-surface-container text-sb-surface" : "bg-sb-surface-container text-sb-surface/80"
                       )}>
                         <User className="h-4 w-4" />
                       </span>
@@ -312,10 +312,10 @@ function FlatNavbar({
                     {optionsItems.map((item) => (
                       <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
                         className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                          isActive(item) ? "bg-white/20 text-sb-surface font-medium" : "text-sb-surface/80 hover:bg-white/10 hover:text-sb-surface"
+                          isActive(item) ? "bg-sb-surface-container-high text-sb-surface font-medium" : "text-sb-surface/90 hover:bg-sb-surface-container-high hover:text-sb-surface"
                         )}>
                         <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                          isActive(item) ? "bg-white/25 text-sb-surface" : "bg-white/15 text-sb-surface/80"
+                          isActive(item) ? "bg-sb-surface-container text-sb-surface" : "bg-sb-surface-container text-sb-surface/80"
                         )}>
                           <item.icon className="h-4 w-4" />
                         </span>
@@ -325,7 +325,7 @@ function FlatNavbar({
 
                     {onLogout && (
                       <>
-                        <div className="h-px bg-white/10 my-1" />
+                        <div className="h-px bg-sb-surface-container-high my-1" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
                           className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
                           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
