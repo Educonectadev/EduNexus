@@ -72,16 +72,20 @@ export async function POST(request: NextRequest) {
       grade, section, year,
     } = body
 
-    if (!student_name || !student_dni || !grade) {
-      return NextResponse.json({ error: 'Nombre, DNI y grado son requeridos' }, { status: 400 })
+    if (!student_name || !student_dni) {
+      return NextResponse.json({ error: 'Nombre y DNI son requeridos' }, { status: 400 })
     }
 
-    const [gradeRows] = await pool.query(
-      `SELECT id FROM academic_grades WHERE institution_id = ? AND LOWER(name) = LOWER(?)`,
-      [instId, grade]
-    ) as any[]
-    if ((gradeRows as any[]).length === 0) {
-      return NextResponse.json({ error: `El grado "${grade}" no existe en Gestión Académica` }, { status: 400 })
+    let gradeId = null
+    if (grade) {
+      const [gradeRows] = await pool.query(
+        `SELECT id FROM academic_grades WHERE institution_id = ? AND LOWER(name) = LOWER(?)`,
+        [instId, grade]
+      ) as any[]
+      if ((gradeRows as any[]).length === 0) {
+        return NextResponse.json({ error: `El grado "${grade}" no existe en Gestión Académica` }, { status: 400 })
+      }
+      gradeId = (gradeRows as any[])[0].id
     }
     if (section) {
       const [secRows] = await pool.query(
@@ -115,13 +119,15 @@ export async function POST(request: NextRequest) {
 
     if (existingStudent.rows.length > 0) {
       studentId = existingStudent.rows[0].id
-      const existingEnrollment = await conn.query(
-        `SELECT id FROM enrollments WHERE student_id = $1 AND grade = $2 AND section = $3 AND year = $4`,
-        [studentId, grade, section || 'A', year || new Date().getFullYear()]
-      )
-      if (existingEnrollment.rows.length > 0) {
-        await conn.query('ROLLBACK')
-        return NextResponse.json({ error: 'DUPLICATE_ENROLLMENT', details: `El alumno ya está matriculado en ${grade} ${section || 'A'} ${year || new Date().getFullYear()}` }, { status: 409 })
+      if (grade) {
+        const existingEnrollment = await conn.query(
+          `SELECT id FROM enrollments WHERE student_id = $1 AND grade = $2 AND section = $3 AND year = $4`,
+          [studentId, grade, section || 'A', year || new Date().getFullYear()]
+        )
+        if (existingEnrollment.rows.length > 0) {
+          await conn.query('ROLLBACK')
+          return NextResponse.json({ error: 'DUPLICATE_ENROLLMENT', details: `El alumno ya está matriculado en ${grade} ${section || 'A'} ${year || new Date().getFullYear()}` }, { status: 409 })
+        }
       }
 
       await conn.query(
@@ -136,21 +142,24 @@ export async function POST(request: NextRequest) {
       await conn.query(
         `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status)
          VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, 'active')`,
-        [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade, section || 'A']
+        [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '']
       )
     }
 
     // Find the course that matches this grade/section
-    const [courseRows] = await conn.query(
-      `SELECT id FROM courses WHERE institution_id = $1 AND grade = $2 AND section = $3 AND status = 'active' LIMIT 1`,
-      [instId, grade, section || 'A']
-    )
-    const courseId = (courseRows as any).rows[0]?.id || null
+    let courseId = null
+    if (grade) {
+      const [courseRows] = await conn.query(
+        `SELECT id FROM courses WHERE institution_id = $1 AND grade = $2 AND section = $3 AND status = 'active' LIMIT 1`,
+        [instId, grade, section || 'A']
+      )
+      courseId = (courseRows as any).rows[0]?.id || null
+    }
 
     const result = await conn.query(
       `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, year, status)
        VALUES ($1, $2, $3, $4, $5, $6, 'active')`,
-      [instId, studentId, courseId, grade, section || 'A', year || new Date().getFullYear()]
+      [instId, studentId, courseId, grade || '', section || '', year || new Date().getFullYear()]
     )
 
     if (parent_dni) {
