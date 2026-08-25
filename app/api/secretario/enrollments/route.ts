@@ -149,11 +149,11 @@ export async function POST(request: NextRequest) {
     // Find the course that matches this grade/section
     let courseId = null
     if (grade) {
-      const [courseRows] = await conn.query(
+      const courseResult = await conn.query(
         `SELECT id FROM courses WHERE institution_id = $1 AND grade = $2 AND section = $3 AND status = 'active' LIMIT 1`,
         [instId, grade, section || 'A']
       )
-      courseId = (courseRows as any).rows[0]?.id || null
+      courseId = courseResult.rows[0]?.id || null
     }
 
     const result = await conn.query(
