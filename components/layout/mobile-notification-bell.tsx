@@ -2,13 +2,12 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
 import {
-  Bell, BellRing, X, CheckIcon, Clock, Inbox, Megaphone, Handshake, Users,
-  Loader2, CheckCircle, Zap, Power, Download, Smartphone, Info,
+  Bell, BellRing, CheckIcon, Clock, Inbox, Megaphone, Handshake, Users,
+  Loader2, Zap,
 } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
-import { useNotifications, type LiveNotification } from "@/hooks/use-notifications"
+import { useNotifications } from "@/hooks/use-notifications"
 import { usePushSettings } from "@/hooks/use-push"
 
 function timeAgo(iso: string) {
@@ -59,18 +58,12 @@ export default function MobileNotificationBell() {
     return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey) }
   }, [menuOpen])
 
-  let pushStatus = "Recibe avisos aunque la app esté cerrada"
-  let pushLabel = "Activar"
+  let pushStatus = "Activar"
   let pushDisabled = false
   if (push.permission === "granted" && push.subscribed) {
-    pushStatus = "Activadas en este dispositivo"
-    pushLabel = "Desactivar"
-  } else if (push.permission === "granted") {
-    pushStatus = "Listas, falta suscribirse"
-    pushLabel = "Activar"
+    pushStatus = "Desactivar"
   } else if (push.permission === "denied") {
-    pushStatus = "Bloqueadas por el navegador"
-    pushLabel = "Bloqueada"
+    pushStatus = "Bloqueada"
     pushDisabled = true
   }
 
@@ -80,142 +73,128 @@ export default function MobileNotificationBell() {
   }
 
   return (
-    <div className="relative bottom-0">
-      <div
-        ref={morphRef}
-        className="t-morph"
-        data-open={menuOpen ? "true" : "false"}
-        style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}
-      >
-        <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
-          <div className="p-2">
-            <div className="flex items-center justify-between px-3 py-2 mb-1">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-sb-on-surface">Notificaciones</p>
-                {unreadCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-sb-primary text-sb-on-primary text-[9px] font-bold">{unreadCount}</span>
-                )}
-              </div>
+    <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
+      <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
+        <div className="p-2">
+          <div className="flex items-center justify-between px-3 py-1.5 mb-1">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-medium text-sb-on-surface">Notificaciones</p>
               {unreadCount > 0 && (
-                <button onClick={markAllRead}
-                  className="flex items-center gap-1 h-6 px-2 rounded-lg text-[10px] font-medium text-sb-on-surface-variant hover:bg-sb-surface-container-high transition-colors">
-                  <CheckIcon className="h-3 w-3" />
-                  Leer todo
-                </button>
+                <span className="px-1.5 py-0.5 rounded-full bg-sb-primary text-sb-on-primary text-[8px] font-bold">{unreadCount}</span>
               )}
             </div>
+            {unreadCount > 0 && (
+              <button onClick={markAllRead}
+                className="flex items-center gap-1 h-5 px-1.5 rounded-md text-[9px] font-medium text-sb-on-surface-variant hover:bg-sb-surface-container-high transition-colors">
+                <CheckIcon className="h-2.5 w-2.5" />
+                Leer todo
+              </button>
+            )}
+          </div>
 
-            <div className="max-h-[50vh] overflow-y-auto">
-              {loading ? (
-                <div className="p-3 space-y-2">
-                  {[0, 1, 2].map(i => (
-                    <div key={i} className="flex items-start gap-2.5 animate-pulse">
-                      <div className="h-7 w-7 rounded-lg bg-sb-surface-container-highest shrink-0" />
-                      <div className="flex-1 space-y-1.5 py-1">
-                        <div className="h-2.5 w-3/4 rounded bg-sb-surface-container-highest" />
-                        <div className="h-2 w-1/2 rounded bg-sb-surface-container-highest" />
-                      </div>
+          <div className="max-h-[50vh] overflow-y-auto">
+            {loading ? (
+              <div className="p-2 space-y-2">
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="flex items-start gap-2 animate-pulse">
+                    <div className="h-6 w-6 rounded-lg bg-sb-surface-container-highest shrink-0" />
+                    <div className="flex-1 space-y-1 py-0.5">
+                      <div className="h-2 w-3/4 rounded bg-sb-surface-container-highest" />
+                      <div className="h-1.5 w-1/2 rounded bg-sb-surface-container-highest" />
                     </div>
-                  ))}
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="py-10 flex flex-col items-center gap-2 text-center px-4">
-                  <div className="h-10 w-10 rounded-xl bg-sb-surface-container-highest flex items-center justify-center">
-                    <Inbox className="h-5 w-5 text-sb-on-surface-variant/50" />
                   </div>
-                  <p className="text-xs font-medium text-sb-on-surface/80">Sin notificaciones</p>
-                  <p className="text-[10px] text-sb-on-surface-variant/60">Los avisos aparecerán aquí</p>
+                ))}
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="py-8 flex flex-col items-center gap-2 text-center px-4">
+                <div className="h-8 w-8 rounded-lg bg-sb-surface-container-highest flex items-center justify-center">
+                  <Inbox className="h-4 w-4 text-sb-on-surface-variant/50" />
                 </div>
-              ) : (
-                notifications.slice(0, 10).map(n => {
-                  const meta = notifMeta(n.type)
-                  const handleClick = () => {
-                    markOneRead(n.id)
-                    setMenuOpen(false)
-                    if (n.type === 'meeting') {
-                      const path = window.location.pathname
-                      if (path.startsWith('/docente')) router.push('/docente/reuniones')
-                      else if (path.startsWith('/director')) router.push('/director/reuniones')
-                      else if (path.startsWith('/padre')) router.push('/padre/comunicados')
-                      else router.push('/docente/reuniones')
-                    }
+                <p className="text-[11px] font-medium text-sb-on-surface/80">Sin notificaciones</p>
+              </div>
+            ) : (
+              notifications.slice(0, 8).map(n => {
+                const meta = notifMeta(n.type)
+                const handleClick = () => {
+                  markOneRead(n.id)
+                  setMenuOpen(false)
+                  if (n.type === 'meeting') {
+                    const path = window.location.pathname
+                    if (path.startsWith('/docente')) router.push('/docente/reuniones')
+                    else if (path.startsWith('/director')) router.push('/director/reuniones')
+                    else if (path.startsWith('/padre')) router.push('/padre/comunicados')
+                    else router.push('/docente/reuniones')
                   }
-                  return (
-                    <button
-                      key={n.id}
-                      onClick={handleClick}
-                      className={cn(
-                        "w-full flex items-start gap-2.5 px-3 py-2 text-left rounded-xl transition-colors hover:bg-sb-surface-container-high",
-                        !n.read && "bg-sb-primary/5"
-                      )}
-                    >
-                      <div className={cn("h-7 w-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5", !n.read ? meta.cls : "bg-sb-surface-container-highest text-sb-on-surface-variant/60")}>
-                        <meta.icon className="h-3.5 w-3.5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={cn("text-[11px] truncate", !n.read ? "text-sb-on-surface font-medium" : "text-sb-on-surface/75")}>{n.title}</p>
-                        {n.message && <p className="text-[10px] text-sb-on-surface-variant mt-0.5 line-clamp-2">{n.message}</p>}
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Clock className="h-2.5 w-2.5 text-sb-on-surface-variant/60" />
-                          <span className="text-[9px] text-sb-on-surface-variant/60">{timeAgo(n.created_at)}</span>
-                        </div>
-                      </div>
-                      {!n.read && <div className="h-1.5 w-1.5 rounded-full bg-sb-primary shrink-0 mt-1.5" />}
-                    </button>
-                  )
-                })
-              )}
-            </div>
-
-            {push.supported && (
-              <div className="border-t border-sb-outline-variant/10 mt-1 pt-1">
-                <div className="flex items-center justify-between gap-2 px-3 py-1.5">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="h-6 w-6 rounded-lg bg-sb-primary/10 flex items-center justify-center shrink-0">
-                      <BellRing className="h-3 w-3 text-sb-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-medium text-sb-on-surface">Push</p>
-                      <p className="text-[9px] text-sb-on-surface-variant truncate">{pushStatus}</p>
-                    </div>
-                  </div>
+                }
+                return (
                   <button
-                    onClick={handlePushToggle}
-                    disabled={pushDisabled || pushBusy}
+                    key={n.id}
+                    onClick={handleClick}
                     className={cn(
-                      "flex items-center gap-1 h-6 px-2 rounded-lg text-[9px] font-medium shrink-0 transition-colors",
-                      push.permission === "granted" && push.subscribed
-                        ? "text-sb-on-surface-variant hover:bg-sb-surface-container-high"
-                        : "bg-sb-primary text-sb-on-primary hover:opacity-90",
-                      pushDisabled && "opacity-50 cursor-not-allowed"
+                      "w-full flex items-start gap-2 px-2.5 py-1.5 text-left rounded-lg transition-colors hover:bg-sb-surface-container-high",
+                      !n.read && "bg-sb-primary/5"
                     )}
                   >
-                    {pushBusy ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Zap className="h-2.5 w-2.5" />}
-                    {pushLabel}
+                    <div className={cn("h-6 w-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5", !n.read ? meta.cls : "bg-sb-surface-container-highest text-sb-on-surface-variant/60")}>
+                      <meta.icon className="h-3 w-3" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-[10px] truncate", !n.read ? "text-sb-on-surface font-medium" : "text-sb-on-surface/75")}>{n.title}</p>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <Clock className="h-2 w-2 text-sb-on-surface-variant/60" />
+                        <span className="text-[8px] text-sb-on-surface-variant/60">{timeAgo(n.created_at)}</span>
+                      </div>
+                    </div>
+                    {!n.read && <div className="h-1.5 w-1.5 rounded-full bg-sb-primary shrink-0 mt-1" />}
                   </button>
-                </div>
-              </div>
+                )
+              })
             )}
           </div>
-        </div>
 
-        <button
-          type="button"
-          className="t-morph-plus"
-          aria-expanded={menuOpen ? "true" : "false"}
-          aria-label="Notificaciones"
-          onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
-        >
-          <div className="relative">
-            <Bell className="h-5 w-5 text-sb-on-surface" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 rounded-full bg-sb-primary text-sb-on-primary text-[8px] font-bold flex items-center justify-center px-0.5">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </div>
-        </button>
+          {push.supported && (
+            <div className="border-t border-sb-outline-variant/10 mt-1 pt-1 px-2.5 py-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <BellRing className="h-2.5 w-2.5 text-sb-primary shrink-0" />
+                  <span className="text-[9px] text-sb-on-surface-variant truncate">Push: {pushStatus}</span>
+                </div>
+                <button
+                  onClick={handlePushToggle}
+                  disabled={pushDisabled || pushBusy}
+                  className={cn(
+                    "flex items-center gap-0.5 h-5 px-1.5 rounded-md text-[8px] font-medium shrink-0 transition-colors",
+                    push.permission === "granted" && push.subscribed
+                      ? "text-sb-on-surface-variant hover:bg-sb-surface-container-high"
+                      : "bg-sb-primary text-sb-on-primary hover:opacity-90",
+                    pushDisabled && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {pushBusy ? <Loader2 className="h-2 w-2 animate-spin" /> : <Zap className="h-2 w-2" />}
+                  {push.permission === "granted" && push.subscribed ? "Off" : "On"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
+      <button
+        type="button"
+        className="t-morph-plus"
+        aria-expanded={menuOpen ? "true" : "false"}
+        aria-label="Notificaciones"
+        onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
+      >
+        <div className="relative">
+          <Bell className="h-5 w-5 text-sb-on-surface" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[12px] h-3 rounded-full bg-sb-primary text-sb-on-primary text-[7px] font-bold flex items-center justify-center px-0.5">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </div>
+      </button>
     </div>
   )
 }
