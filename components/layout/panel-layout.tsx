@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { MobileNavbar } from "@/components/ui/mobile-navbar"
 import NotificationBell from "@/components/layout/notification-bell"
+import MobileNotificationBell from "@/components/layout/mobile-notification-bell"
 import AIAssistant from "@/components/secretario/ai-assistant"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
 import { usePlanPermissions } from "@/hooks/use-plan-permissions"
@@ -644,7 +645,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
                 <User className="h-[18px] w-[18px]" />
               </Link>
-              <NotificationBell />
+              <MobileNotificationBell />
               <button onClick={handleLogout}
                 className="flex items-center justify-center p-2 rounded-xl text-sb-on-surface-variant hover:bg-sb-surface-container-highest/50 hover:text-sb-on-surface/80 transition-all">
                 <LogOut className="h-[18px] w-[18px]" />
