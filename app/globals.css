@@ -1864,6 +1864,10 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   bottom: 1rem;
 }
 
+.mobile-nav-buttons {
+  border-radius: 50px !important;
+}
+
 @media (max-width: 380px) {
   .mobile-nav-inner {
     padding-left: 0.5rem !important;
