@@ -43,7 +43,10 @@ function NavButton({
     <motion.button
       type="button"
       onClick={() => router.push(item.href)}
-      className="relative flex items-center justify-center w-12 h-12"
+      className={cn(
+        "relative flex items-center justify-center w-12 h-12",
+        isActive ? "text-sb-on-primary" : "text-sb-on-surface"
+      )}
       aria-label={item.title}
       aria-current={isActive ? "page" : undefined}
       whileTap={{ scale: 0.9 }}
@@ -53,7 +56,7 @@ function NavButton({
         initial={false}
         animate={{
           borderRadius: 999,
-          backgroundColor: isActive ? "white" : "transparent",
+          backgroundColor: isActive ? "var(--sb-primary)" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
       />
@@ -61,7 +64,6 @@ function NavButton({
         className="relative z-10 flex items-center justify-center"
         animate={{
           scale: isActive ? 1.1 : 1,
-          color: isActive ? "black" : "white",
           opacity: isActive ? 1 : 0.8,
         }}
         transition={{ duration: 0.2 }}
@@ -72,7 +74,7 @@ function NavButton({
         <span className={cn(
           "absolute top-0 right-0 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-1 border-2 z-20",
           isActive
-            ? "border-sb-surface bg-sb-surface text-sb-on-surface"
+            ? "border-sb-primary bg-sb-primary text-sb-on-primary"
             : "border-sb-surface bg-sb-primary text-sb-on-primary"
         )}>
           {item.badge > 9 ? "9+" : item.badge}
@@ -201,7 +203,7 @@ function GroupedNavbar({
 
                 <button type="button" className="t-morph-plus" aria-expanded={menuOpen ? "true" : "false"} aria-label="Más opciones"
                   onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}>
-                  <MoreHorizontal className="h-5 w-5 text-sb-surface" />
+                  <MoreHorizontal className="h-5 w-5 text-sb-on-surface" />
                 </button>
               </div>
             </div>
@@ -339,7 +341,7 @@ function FlatNavbar({
 
                 <button type="button" className="t-morph-plus" aria-expanded={menuOpen ? "true" : "false"} aria-label="Más opciones"
                   onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}>
-                  <MoreHorizontal className="h-5 w-5 text-sb-surface" />
+                  <MoreHorizontal className="h-5 w-5 text-sb-on-surface" />
                 </button>
               </div>
             </div>
