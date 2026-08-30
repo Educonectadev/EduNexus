@@ -119,7 +119,7 @@ export default function NotificationBell() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.98 }}
               transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-              className="fixed top-16 right-3 left-3 sm:left-auto sm:right-4 z-50 bg-sb-surface-container/95 backdrop-blur-3xl rounded-3xl border border-sb-outline-variant/20 shadow-2xl max-h-[75vh] overflow-hidden w-auto sm:w-[380px]"
+              className="fixed top-16 right-3 left-3 sm:left-auto sm:right-4 z-50 bg-sb-surface-container/95 backdrop-blur-3xl rounded-[10px] border border-sb-outline-variant/20 shadow-2xl max-h-[75vh] overflow-hidden w-auto sm:w-[380px]"
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-sb-outline-variant/10">
                 <div className="flex items-center gap-2">
