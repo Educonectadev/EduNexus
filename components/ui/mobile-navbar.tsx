@@ -143,8 +143,8 @@ function GroupedNavbar({
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 32, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
+        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] py-1.5 border border-sb-outline-variant shadow-lg">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -276,8 +276,8 @@ function FlatNavbar({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
+        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] py-1.5 border border-sb-outline-variant shadow-lg">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
