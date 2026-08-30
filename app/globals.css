@@ -1705,6 +1705,8 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   width: 224px;
   border-radius: var(--morph-r-open);
   background-color: var(--sb-surface);
+  position: absolute;
+  right: 0;
   transition:
     width var(--morph-open-dur) var(--morph-ease),
     height var(--morph-open-dur) var(--morph-ease),
