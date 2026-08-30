@@ -143,8 +143,8 @@ function GroupedNavbar({
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 32, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] py-1.5 border border-sb-outline-variant shadow-lg">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
+        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -152,7 +152,7 @@ function GroupedNavbar({
 
           {/* Botón "más" con menú agrupado */}
           {hasMore && (
-            <div className="mobile-nav-more relative bottom-0">
+            <div className="mobile-nav-more relative bottom-0 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] border border-sb-outline-variant shadow-lg">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
@@ -276,15 +276,15 @@ function FlatNavbar({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
-        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] py-1.5 border border-sb-outline-variant shadow-lg">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1">
+        <div className="mobile-nav-inner relative flex items-end justify-between w-full px-3">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
           </div>
 
           {optionsItems.length > 0 && (
-            <div className="mobile-nav-more relative bottom-0">
+            <div className="mobile-nav-more relative bottom-0 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] border border-sb-outline-variant shadow-lg">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
