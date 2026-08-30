@@ -1699,19 +1699,18 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   transition:
     width var(--morph-close-dur) var(--morph-close-ease),
     height var(--morph-close-dur) var(--morph-close-ease),
-    border-radius var(--morph-close-dur) var(--morph-close-ease),
-    transform var(--morph-open-dur) var(--morph-ease);
+    border-radius var(--morph-close-dur) var(--morph-close-ease);
 }
 .t-morph[data-open="true"] {
   width: 224px;
   border-radius: var(--morph-r-open);
   background-color: var(--sb-surface);
-  transform: translateX(calc(-224px + 56px));
+  margin-left: -168px;
   transition:
     width var(--morph-open-dur) var(--morph-ease),
     height var(--morph-open-dur) var(--morph-ease),
     border-radius var(--morph-open-dur) var(--morph-ease),
-    transform var(--morph-open-dur) var(--morph-ease);
+    margin var(--morph-open-dur) var(--morph-ease);
 }
 
 .t-morph-plus {
@@ -1770,7 +1769,7 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 @media (max-width: 380px) {
   .t-morph[data-open="true"] {
     width: 180px;
-    transform: translateX(calc(-180px + 48px));
+    margin-left: -132px;
   }
   .t-morph-plus {
     width: 48px;
