@@ -142,7 +142,7 @@ function GroupedNavbar({
         transition={{ type: "spring", stiffness: 400, damping: 32, delay: 0.1 }}
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-black/80 backdrop-blur-xl rounded-[50px] px-2 py-1.5">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -156,8 +156,8 @@ function GroupedNavbar({
                   <div className="p-2 pb-3 pl-3 pr-14">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-white rounded-2xl transition-colors hover:bg-white/15">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-on-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -167,14 +167,14 @@ function GroupedNavbar({
                     {/* Secciones agrupadas */}
                     {groups.map((group) => (
                       <div key={group.title} className="mt-1.5">
-                        <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/40">{group.title}</p>
+                        <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant">{group.title}</p>
                         {group.items.map((item) => (
                           <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
                             className={cn("w-full flex items-center gap-3 px-3 py-1.5 text-left text-sm rounded-xl transition-colors",
-                              isActive(item) ? "bg-white text-black font-medium" : "text-white hover:bg-white/15 hover:text-white"
+                              isActive(item) ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                             )}>
                             <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg",
-                              isActive(item) ? "bg-black/20 text-black" : "bg-white/15 text-white"
+                              isActive(item) ? "bg-sb-on-primary/20 text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant"
                             )}>
                               <item.icon className="h-3 w-3" />
                             </span>
@@ -186,10 +186,10 @@ function GroupedNavbar({
 
                     {onLogout && (
                       <>
-                        <div className="h-px bg-white/15 my-2" />
+                        <div className="h-px bg-sb-outline-variant my-2" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
+                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
                             <LogOut className="h-4 w-4" />
                           </span>
                           Cerrar sesión
@@ -275,7 +275,7 @@ function FlatNavbar({
         transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.6, delay: 0.1 }}
       >
         <div className="mobile-nav-inner relative flex items-end justify-center w-full">
-          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-black/80 backdrop-blur-xl rounded-[50px] px-2 py-1.5">
+          <div className="mobile-nav-buttons relative flex items-center justify-around gap-1 mr-14 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] px-2 py-1.5 border border-sb-outline-variant shadow-lg">
             {visibleItems.map((item) => (
               <NavButton key={item.href} item={item} isActive={isActive(item)} router={router} />
             ))}
@@ -288,8 +288,8 @@ function FlatNavbar({
                   <div className="p-2 pb-3 pl-3 pr-14">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-white rounded-2xl transition-colors hover:bg-white/15">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-on-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -298,10 +298,10 @@ function FlatNavbar({
 
                     <button type="button" onClick={() => { setMenuOpen(false); router.push("/perfil") }}
                       className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                        activeHref === "/perfil" ? "bg-white text-black font-medium" : "text-white hover:bg-white/15 hover:text-white"
+                        activeHref === "/perfil" ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                       )}>
                       <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                        activeHref === "/perfil" ? "bg-black/20 text-black" : "bg-white/15 text-white"
+                        activeHref === "/perfil" ? "bg-sb-on-primary/20 text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant"
                       )}>
                         <User className="h-4 w-4" />
                       </span>
@@ -311,10 +311,10 @@ function FlatNavbar({
                     {optionsItems.map((item) => (
                       <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
                         className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
-                          isActive(item) ? "bg-white text-black font-medium" : "text-white hover:bg-white/15 hover:text-white"
+                          isActive(item) ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                         )}>
                         <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
-                          isActive(item) ? "bg-black/20 text-black" : "bg-white/15 text-white"
+                          isActive(item) ? "bg-sb-on-primary/20 text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant"
                         )}>
                           <item.icon className="h-4 w-4" />
                         </span>
@@ -324,10 +324,10 @@ function FlatNavbar({
 
                     {onLogout && (
                       <>
-                        <div className="h-px bg-white/15 my-1" />
+                        <div className="h-px bg-sb-outline-variant my-1" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-2xl transition-colors text-red-400 hover:bg-red-500/20 hover:text-red-300">
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-500/20 text-red-400">
+                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-2xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
                             <LogOut className="h-3.5 w-3.5" />
                           </span>
                           Cerrar sesión

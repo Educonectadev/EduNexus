@@ -1693,8 +1693,9 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   height: 56px;
   border-radius: var(--morph-r-closed);
   overflow: hidden;
-  background-color: var(--sb-on-surface);
+  background-color: var(--sb-surface);
   box-shadow: 0 8px 32px -8px rgba(0,0,0,0.35);
+  border: 1px solid var(--sb-outline-variant);
   transition:
     width var(--morph-close-dur) var(--morph-close-ease),
     height var(--morph-close-dur) var(--morph-close-ease),
@@ -1703,7 +1704,7 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 .t-morph[data-open="true"] {
   width: 224px;
   border-radius: var(--morph-r-open);
-  background-color: var(--sb-on-surface);
+  background-color: var(--sb-surface);
   transition:
     width var(--morph-open-dur) var(--morph-ease),
     height var(--morph-open-dur) var(--morph-ease),
