@@ -150,9 +150,9 @@ function GroupedNavbar({
             ))}
           </div>
 
-          {/* Botón "más" con menú agrupado */}
+          {/* Botón "más opciones" - separado del navbar */}
           {hasMore && (
-            <div className="mobile-nav-more relative bottom-0 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] border border-sb-outline-variant shadow-lg">
+            <div className="mobile-nav-more relative bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
@@ -284,7 +284,7 @@ function FlatNavbar({
           </div>
 
           {optionsItems.length > 0 && (
-            <div className="mobile-nav-more relative bottom-0 bg-sb-surface-container-high/90 backdrop-blur-xl rounded-[50px] border border-sb-outline-variant shadow-lg">
+            <div className="mobile-nav-more relative bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu" role="menu">
                   <div className="p-2 pb-3 pl-3 pr-14">
