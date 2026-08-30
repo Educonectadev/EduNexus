@@ -1763,6 +1763,21 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   .t-morph, .t-morph-plus, .t-morph-menu { transition: none !important; }
 }
 
+/* Responsive: modal en pantallas pequeñas */
+@media (max-width: 380px) {
+  .t-morph[data-open="true"] {
+    width: 180px;
+  }
+  .t-morph-plus {
+    width: 48px;
+    height: 48px;
+  }
+  .t-morph {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 /* ===== Notification Badge Animation ===== */
 :root {
   --badge-slide-dur: 260ms;
@@ -1844,6 +1859,13 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
 /* ===== Barra de navegación móvil: estilos ===== */
 .mobile-navbar {
   bottom: 1rem;
+}
+
+@media (max-width: 380px) {
+  .mobile-nav-inner {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
 }
 
 /* minimal: solo iconos, sin etiquetas ni cápsula */
