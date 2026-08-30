@@ -155,11 +155,11 @@ function GroupedNavbar({
             <div className="mobile-nav-more relative bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${Math.min(menuHeight, 420)}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu overflow-y-auto max-h-[70vh]" role="menu">
-                  <div className="p-2 pb-3 pl-3 pr-14">
+                  <div className="p-2">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-on-surface">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sb-surface-container-high text-sb-on-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -168,11 +168,11 @@ function GroupedNavbar({
 
                     {/* Secciones agrupadas */}
                     {groups.map((group) => (
-                      <div key={group.title} className="mt-1.5">
+                      <div key={group.title} className="mt-1">
                         <p className="px-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant">{group.title}</p>
                         {group.items.map((item) => (
                           <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                            className={cn("w-full flex items-center gap-3 px-3 py-1.5 text-left text-sm rounded-xl transition-colors",
+                            className={cn("w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
                               isActive(item) ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                             )}>
                             <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-lg",
@@ -188,11 +188,11 @@ function GroupedNavbar({
 
                     {onLogout && (
                       <>
-                        <div className="h-px bg-sb-outline-variant my-2" />
+                        <div className="h-px bg-sb-outline-variant my-1" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
-                            <LogOut className="h-4 w-4" />
+                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
+                            <LogOut className="h-3.5 w-3.5" />
                           </span>
                           Cerrar sesión
                         </button>
@@ -287,11 +287,11 @@ function FlatNavbar({
             <div className="mobile-nav-more relative bottom-0">
               <div ref={morphRef} className="t-morph" data-open={menuOpen ? "true" : "false"} style={menuOpen ? { height: `${menuHeight}px` } : undefined}>
                 <div ref={menuRef} className="t-morph-menu" role="menu">
-                  <div className="p-2 pb-3 pl-3 pr-14">
+                  <div className="p-2">
                     {onAiClick && (
                       <button type="button" onClick={() => { setMenuOpen(false); onAiClick() }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-2xl transition-colors hover:bg-sb-surface-container-high">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high text-sb-on-surface">
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm text-sb-on-surface rounded-xl transition-colors hover:bg-sb-surface-container-high">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sb-surface-container-high text-sb-on-surface">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         Asistente IA
@@ -299,10 +299,10 @@ function FlatNavbar({
                     )}
 
                     <button type="button" onClick={() => { setMenuOpen(false); router.push("/perfil") }}
-                      className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
+                      className={cn("w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
                         activeHref === "/perfil" ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                       )}>
-                      <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                      <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
                         activeHref === "/perfil" ? "bg-sb-on-primary/20 text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant"
                       )}>
                         <User className="h-4 w-4" />
@@ -312,10 +312,10 @@ function FlatNavbar({
 
                     {optionsItems.map((item) => (
                       <button key={item.href} type="button" onClick={() => { setMenuOpen(false); router.push(item.href) }}
-                        className={cn("w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-2xl transition-colors",
+                        className={cn("w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors",
                           isActive(item) ? "bg-sb-primary text-sb-on-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high hover:text-sb-on-surface"
                         )}>
-                        <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl",
+                        <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
                           isActive(item) ? "bg-sb-on-primary/20 text-sb-on-primary" : "bg-sb-surface-container-high text-sb-on-surface-variant"
                         )}>
                           <item.icon className="h-4 w-4" />
@@ -328,8 +328,8 @@ function FlatNavbar({
                       <>
                         <div className="h-px bg-sb-outline-variant my-1" />
                         <button type="button" onClick={() => { setMenuOpen(false); onLogout() }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-2xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm rounded-xl transition-colors text-red-500 hover:bg-red-500/10 hover:text-red-600">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-500/10 text-red-500">
                             <LogOut className="h-3.5 w-3.5" />
                           </span>
                           Cerrar sesión
