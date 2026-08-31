@@ -40,30 +40,28 @@ async function sendToSubscriptions(subscriptions: any[], payload: PushPayload) {
     message: payload.message,
     url: payload.url || '/',
     type: payload.type || 'info',
-    icon: payload.icon || '/icon.svg',
-    badge: payload.badge || '/icon.svg',
+    icon: payload.icon || '/icons/icon-192x192.png',
+    badge: payload.badge || '/icons/icon-192x192.png',
     senderName: payload.senderName || '',
     institutionName: payload.institutionName || '',
   })
 
-  let sent = 0
-  let errors = 0
   const expiredEndpoints: string[] = []
 
-  for (const sub of subscriptions) {
-    try {
-      await webpush.sendNotification(
+  // Send all push notifications in parallel (much faster)
+  const results = await Promise.allSettled(
+    subscriptions.map((sub) =>
+      webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         jsonPayload
-      )
-      sent++
-    } catch (error: any) {
-      errors++
-      if (error.statusCode === 404 || error.statusCode === 410 || error.statusCode === 403) {
-        expiredEndpoints.push(sub.endpoint)
-      }
-    }
-  }
+      ).catch((error: any) => {
+        if (error.statusCode === 404 || error.statusCode === 410 || error.statusCode === 403) {
+          expiredEndpoints.push(sub.endpoint)
+        }
+        throw error
+      })
+    )
+  )
 
   if (expiredEndpoints.length > 0) {
     try {
@@ -73,6 +71,9 @@ async function sendToSubscriptions(subscriptions: any[], payload: PushPayload) {
       )
     } catch { /* noop */ }
   }
+
+  const sent = results.filter((r) => r.status === 'fulfilled').length
+  const errors = results.filter((r) => r.status === 'rejected').length
 
   return { sent, errors }
 }
