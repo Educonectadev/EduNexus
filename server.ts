@@ -7,7 +7,6 @@ import crypto from 'crypto'
 import pool from './lib/db'
 import webpush from 'web-push'
 import { runAnomalyScan } from './lib/anomalies'
-import pgConnectionString from 'pg-connection-string'
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3001')
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
@@ -246,22 +245,7 @@ function buildListenerConfig() {
     ? { rejectUnauthorized: false }
     : false
   console.log('[listener] DATABASE_URL:', conn ? `${conn.substring(0, 30)}...` : 'NOT SET')
-  if (conn) {
-    try {
-      const parsed = pgConnectionString.parse(conn)
-      return {
-        host: parsed.host || undefined,
-        port: parseInt(parsed.port || '5432'),
-        user: parsed.user || undefined,
-        password: parsed.password || undefined,
-        database: parsed.database || 'postgres',
-        ssl: parsed.ssl || ssl,
-      }
-    } catch (e: any) {
-      console.error('[listener] URL parse error:', e.message)
-      return { connectionString: conn, ssl }
-    }
-  }
+  if (conn) return { connectionString: conn, ssl }
   return {
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432'),
