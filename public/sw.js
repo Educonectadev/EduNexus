@@ -31,13 +31,22 @@ self.addEventListener('fetch', (event) => {
 
 // ===== Notificaciones push =====
 self.addEventListener('push', (event) => {
-  let payload = { title: 'EduNexus', message: '', url: '/', icon: '/icon.svg', badge: '/icon.svg' }
+  let payload = { title: 'EduNexus', message: '', url: '/', icon: '/icon.svg', badge: '/icon.svg', senderName: '', institutionName: '' }
   try {
     if (event.data) payload = Object.assign(payload, event.data.json())
   } catch (e) { /* payload vacío */ }
 
+  // Build detailed body with sender and institution
+  let body = payload.message || ''
+  const details = []
+  if (payload.senderName) details.push(payload.senderName)
+  if (payload.institutionName) details.push(payload.institutionName)
+  if (details.length > 0) {
+    body = body ? `${body}\n\n${details.join(' • ')}` : details.join(' • ')
+  }
+
   const options = {
-    body: payload.message || '',
+    body,
     icon: payload.icon || '/icon.svg',
     badge: payload.badge || '/icon.svg',
     data: { url: payload.url || '/', type: payload.type || 'info' },

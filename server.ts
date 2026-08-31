@@ -71,11 +71,33 @@ async function dispatchWebPush(data: any) {
 
     if (!rows.length) return
 
+    // Get institution name and creator name for detailed notification
+    let institutionName = ''
+    let senderName = ''
+    try {
+      if (data.institution_id) {
+        const [instRows] = await pool.query(
+          `SELECT name FROM institutions WHERE id = $1`,
+          [data.institution_id]
+        )
+        institutionName = (instRows as any[])[0]?.name || ''
+      }
+      if (data.created_by) {
+        const [userRows] = await pool.query(
+          `SELECT full_name FROM users WHERE id = $1`,
+          [data.created_by]
+        )
+        senderName = (userRows as any[])[0]?.full_name || ''
+      }
+    } catch { /* noop */ }
+
     const payload = JSON.stringify({
       title: data.title || 'Nueva notificación',
       message: data.message || '',
       url: BASE_URL + pushTargetPath(data.target_role || rows[0]?.role, data.type),
       type: data.type || 'info',
+      senderName,
+      institutionName,
     })
 
     await Promise.allSettled(rows.map((r) =>

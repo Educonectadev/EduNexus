@@ -62,7 +62,9 @@ export async function POST(request: NextRequest) {
             BEGIN
               SELECT json_build_object(
                 'id', NEW.id, 'user_id', COALESCE(NEW.user_id, ''),
-                'institution_id', NEW.institution_id, 'target_role', NEW.target_role,
+                'institution_id', NEW.institution_id,
+                'created_by', COALESCE(NEW.created_by, ''),
+                'target_role', NEW.target_role,
                 'type', NEW.type, 'title', NEW.title,
                 'message', left(COALESCE(NEW.message, ''), 180),
                 'category', COALESCE(NEW.category, 'general'),
@@ -109,10 +111,29 @@ export async function POST(request: NextRequest) {
     }
 
     // Send push notifications in background (don't block response)
+    // Get director name and institution name for detailed notification
+    let senderName = ''
+    let institutionName = ''
+    try {
+      const [[directorRow]] = await pool.query(
+        `SELECT full_name FROM users WHERE id = $1`,
+        [user.id]
+      ) as any[]
+      senderName = directorRow?.full_name || ''
+      
+      const [[instRow]] = await pool.query(
+        `SELECT name FROM institutions WHERE id = $1`,
+        [instId]
+      ) as any[]
+      institutionName = instRow?.name || ''
+    } catch { /* noop */ }
+
     sendPushToRole(instId, target_role || 'all', {
       title: `Nuevo comunicado: ${title}`,
       message: message.substring(0, 200),
       type: 'communication',
+      senderName,
+      institutionName,
     }).catch(() => {})
 
     return NextResponse.json({ success: true, id })

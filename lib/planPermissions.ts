@@ -10,7 +10,7 @@ export const ALL_PERMISSIONS = [
   { key: 'can_chat', label: 'Chat en tiempo real docente-padre', default: false },
   { key: 'can_carnets', label: 'Carnets PDF descargables', default: false },
   { key: 'can_bulk_import', label: 'Importación masiva', default: true },
-  { key: 'can_export_reports', label: 'Exportar reportes', default: false },
+  { key: 'can_export_reports', label: 'Exportar reportes', default: true },
   { key: 'can_api_access', label: 'API de acceso', default: false },
   { key: 'can_white_label', label: 'White label', default: false },
   { key: 'can_priority_support', label: 'Soporte prioritario', default: false },

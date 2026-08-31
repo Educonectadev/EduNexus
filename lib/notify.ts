@@ -17,17 +17,28 @@ interface NotifyOptions {
   priority?: string
   targetRole?: string
   userIds?: string[]
+  senderName?: string
 }
 
 export async function createNotify(opts: NotifyOptions) {
   const {
     institutionId, title, message,
     type = 'info', category = 'general', priority = 'media',
-    targetRole = 'all', userIds,
+    targetRole = 'all', userIds, senderName,
   } = opts
 
   if (!title) return
   try {
+    // Get institution name for detailed push notification
+    let institutionName = ''
+    try {
+      const [[instRow]] = await pool.query(
+        `SELECT name FROM institutions WHERE id = $1`,
+        [institutionId]
+      ) as any[]
+      institutionName = instRow?.name || ''
+    } catch { /* noop */ }
+
     if (userIds && userIds.length > 0) {
       await pool.query(
         `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status, user_id)
@@ -41,6 +52,8 @@ export async function createNotify(opts: NotifyOptions) {
         title,
         message: message.substring(0, 200),
         type,
+        senderName: senderName || '',
+        institutionName,
       }).catch(() => {})
       return
     }
@@ -54,6 +67,8 @@ export async function createNotify(opts: NotifyOptions) {
       title,
       message: message.substring(0, 200),
       type,
+      senderName: senderName || '',
+      institutionName,
     }).catch(() => {})
   } catch (error) {
     console.error('[notify] error:', error)
@@ -82,6 +97,16 @@ export async function notifyParentsOfStudents(
 ) {
   if (!studentIds?.length) return
   try {
+    // Get institution name for detailed push notification
+    let institutionName = ''
+    try {
+      const [[instRow]] = await pool.query(
+        `SELECT name FROM institutions WHERE id = $1`,
+        [institutionId]
+      ) as any[]
+      institutionName = instRow?.name || ''
+    } catch { /* noop */ }
+
     // First get the parent user IDs
     const [parentRows] = await pool.query(
       `SELECT DISTINCT u.id
@@ -110,6 +135,7 @@ export async function notifyParentsOfStudents(
         title,
         message: message.substring(0, 200),
         type,
+        institutionName,
       }).catch(() => {})
     }
   } catch (error) {

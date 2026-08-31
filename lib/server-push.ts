@@ -18,6 +18,8 @@ interface PushPayload {
   type?: string
   icon?: string
   badge?: string
+  senderName?: string
+  institutionName?: string
 }
 
 function targetPath(role?: string, type?: string): string {
@@ -40,6 +42,8 @@ async function sendToSubscriptions(subscriptions: any[], payload: PushPayload) {
     type: payload.type || 'info',
     icon: payload.icon || '/icon.svg',
     badge: payload.badge || '/icon.svg',
+    senderName: payload.senderName || '',
+    institutionName: payload.institutionName || '',
   })
 
   let sent = 0
