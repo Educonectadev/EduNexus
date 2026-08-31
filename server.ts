@@ -245,7 +245,7 @@ function buildListenerConfig() {
     ? { rejectUnauthorized: false }
     : false
   console.log('[listener] DATABASE_URL:', conn ? `${conn.substring(0, 30)}...` : 'NOT SET')
-  if (conn) return { connectionString: conn, ssl }
+  if (conn) return { connectionString: conn, ssl, family: 4 }
   return {
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432'),
@@ -253,6 +253,7 @@ function buildListenerConfig() {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'postgres',
     ssl,
+    family: 4,
   }
 }
 

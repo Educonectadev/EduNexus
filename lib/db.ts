@@ -8,6 +8,7 @@ const poolConfig: any = process.env.DATABASE_URL || process.env.POSTGRES_URL
       ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
         ? { rejectUnauthorized: false }
         : false,
+      family: 4,
     }
   : {
       host: process.env.DB_HOST,
@@ -18,6 +19,7 @@ const poolConfig: any = process.env.DATABASE_URL || process.env.POSTGRES_URL
       ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
         ? { rejectUnauthorized: false }
         : false,
+      family: 4,
     }
 
 poolConfig.max = parseInt(process.env.DB_POOL_LIMIT || '50')
