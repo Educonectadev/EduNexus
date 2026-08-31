@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import pool from '@/lib/db'
+import { sendPushToRole, sendPushToUsers } from '@/lib/server-push'
 
 // Creación centralizada de notificaciones en la tabla `notifications`.
 // El trigger trg_notify_new_notification emite pg_notify('edu_notifications')
@@ -35,6 +36,12 @@ export async function createNotify(opts: NotifyOptions) {
          WHERE EXISTS (SELECT 1 FROM users u WHERE u.id = uid AND u.status = 'active')`,
         [institutionId, title, message, type, targetRole, category, priority, userIds]
       )
+      // Send push to specific users
+      sendPushToUsers(userIds, {
+        title,
+        message: message.substring(0, 200),
+        type,
+      }).catch(() => {})
       return
     }
     await pool.query(
@@ -42,6 +49,12 @@ export async function createNotify(opts: NotifyOptions) {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
       [crypto.randomUUID(), institutionId, title, message, type, targetRole, category, priority]
     )
+    // Send push to role
+    sendPushToRole(institutionId, targetRole, {
+      title,
+      message: message.substring(0, 200),
+      type,
+    }).catch(() => {})
   } catch (error) {
     console.error('[notify] error:', error)
   }
@@ -69,6 +82,18 @@ export async function notifyParentsOfStudents(
 ) {
   if (!studentIds?.length) return
   try {
+    // First get the parent user IDs
+    const [parentRows] = await pool.query(
+      `SELECT DISTINCT u.id
+       FROM parent_student ps
+       JOIN parents p ON p.id = ps.parent_id
+       JOIN users u ON u.email = p.email
+       WHERE ps.student_id = ANY(?::text[]) AND u.role = 'padre' AND u.status = 'active'`,
+      [studentIds]
+    ) as any[]
+    
+    const parentUserIds = (parentRows || []).map((r: any) => r.id)
+    
     await pool.query(
       `INSERT INTO notifications (id, institution_id, title, message, type, target_role, category, priority, status, user_id)
        SELECT CAST(gen_random_uuid() AS VARCHAR(36)), ?, ?, ?, ?, 'padre', ?, ?, 'active', u.id
@@ -78,6 +103,15 @@ export async function notifyParentsOfStudents(
        WHERE ps.student_id = ANY(?::text[]) AND u.role = 'padre' AND u.status = 'active'`,
       [institutionId, title, message, type, category, priority, studentIds]
     )
+    
+    // Send push to parent users
+    if (parentUserIds.length > 0) {
+      sendPushToUsers(parentUserIds, {
+        title,
+        message: message.substring(0, 200),
+        type,
+      }).catch(() => {})
+    }
   } catch (error) {
     console.error('[notify-parents] error:', error)
   }

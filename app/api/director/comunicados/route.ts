@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload } from '@/lib/resolveInstId'
+import { sendPushToRole } from '@/lib/server-push'
 import crypto from 'crypto'
 
 export async function GET(request: NextRequest) {
@@ -106,6 +107,13 @@ export async function POST(request: NextRequest) {
         throw e
       }
     }
+
+    // Send push notifications in background (don't block response)
+    sendPushToRole(instId, target_role || 'all', {
+      title: `Nuevo comunicado: ${title}`,
+      message: message.substring(0, 200),
+      type: 'communication',
+    }).catch(() => {})
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
