@@ -1,39 +1,24 @@
 import { Pool, PoolClient } from 'pg'
-import pgConnectionString from 'pg-connection-string'
 
 // National scale: 34,000+ institutions, ~2M students
 // Pool must handle concurrent requests across all tenants
-const poolConfig: any = (() => {
-  const conn = process.env.DATABASE_URL || process.env.POSTGRES_URL
-  const ssl = process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
-    ? { rejectUnauthorized: false }
-    : false
-  const base = { ssl }
-  if (conn) {
-    try {
-      const parsed = pgConnectionString.parse(conn)
-      return {
-        ...base,
-        host: parsed.host || undefined,
-        port: parseInt(parsed.port || '5432'),
-        user: parsed.user || undefined,
-        password: parsed.password || undefined,
-        database: parsed.database || 'postgres',
-        ssl: parsed.ssl || ssl,
-      }
-    } catch {
-      return { ...base, connectionString: conn }
+const poolConfig: any = process.env.DATABASE_URL || process.env.POSTGRES_URL
+  ? {
+      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+      ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
     }
-  }
-  return {
-    ...base,
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '5432'),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-  }
-})()
+  : {
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT || '5432'),
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      ssl: process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
+    }
 
 poolConfig.max = parseInt(process.env.DB_POOL_LIMIT || '50')
 poolConfig.idleTimeoutMillis = 60000
