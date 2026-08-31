@@ -230,7 +230,7 @@ io.on('connection', (socket) => {
 })
 
 httpServer.listen(PORT, () => {
-  console.log(`Socket.IO server running on port ${PORT} [v2]`)
+  console.log(`Socket.IO server running on port ${PORT}`)
 })
 
 // ===== NOTIFICACIONES EN TIEMPO REAL =====
@@ -244,14 +244,13 @@ function buildListenerConfig() {
   const ssl = process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production'
     ? { rejectUnauthorized: false }
     : false
-  console.log('[listener] DATABASE_URL:', conn ? `${conn.substring(0, 30)}...` : 'NOT SET')
   if (conn) return { connectionString: conn, ssl }
   return {
-    host: process.env.DB_HOST || '127.0.0.1',
+    host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || '5432'),
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'postgres',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     ssl,
   }
 }
@@ -297,13 +296,12 @@ async function listenNotifications() {
     })
 
     client.on('error', (error) => {
-      console.error('Notification listener error:', error.message || error)
-      setTimeout(listenNotifications, 15000)
+      console.error('Notification listener error:', error)
+      setTimeout(listenNotifications, 5000)
     })
-  } catch (error: any) {
-    console.error('Notification listener failed:', error.message || error)
-    console.log('[listener] Will retry in 15s. Check DATABASE_URL env var.')
-    setTimeout(listenNotifications, 15000)
+  } catch (error) {
+    console.error('Notification listener failed, retrying in 5s:', error)
+    setTimeout(listenNotifications, 5000)
   }
 }
 

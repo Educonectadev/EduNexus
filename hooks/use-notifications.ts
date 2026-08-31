@@ -41,22 +41,18 @@ function playNotificationSound() {
     }
     if (ctx.state === 'suspended') ctx.resume().then(play)
     else play()
-  } catch { /* silencio */ }
-}
-
-function getTokenFromCookie(): string | null {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.match(/token=([^;]+)/)
-  return match ? match[1] : null
+  } catch {
+    /* silencio */
+  }
 }
 
 export function useNotifications() {
   const [notifications, setNotifications] = React.useState<LiveNotification[]>([])
   const [loading, setLoading] = React.useState(true)
   const [unread, setUnread] = React.useState(0)
+  // Última notificación recibida en vivo, para el toast
   const [live, setLive] = React.useState<LiveNotification | null>(null)
   const liveTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastId = React.useRef<string>('')
 
   const refresh = React.useCallback(async () => {
     try {
@@ -73,73 +69,45 @@ export function useNotifications() {
   }, [])
 
   React.useEffect(() => {
+    // Carga inicial diferida para evitar setState síncrono en el efecto
     const t = setTimeout(() => { refresh() }, 0)
     return () => clearTimeout(t)
   }, [refresh])
 
-  const handleNewNotification = React.useCallback((n: any) => {
-    if (!n || !n.id || n.id === lastId.current) return
-    lastId.current = n.id
-    const item: LiveNotification = {
-      id: n.id,
-      title: n.title || 'Nueva notificación',
-      message: n.message || '',
-      type: n.type || 'info',
-      target_role: n.target_role || null,
-      institution_id: n.institution_id || null,
-      created_at: n.created_at || new Date().toISOString(),
-      read: false,
-    }
-    setNotifications(prev => [item, ...prev.filter(x => x.id !== item.id)].slice(0, 60))
-    setUnread(u => u + 1)
-    setLive(item)
-    playNotificationSound()
-    if (liveTimer.current) clearTimeout(liveTimer.current)
-    liveTimer.current = setTimeout(() => setLive(null), 4500)
-  }, [])
+  const lastId = React.useRef<string>('')
 
   React.useEffect(() => {
-    const hasSocket = !!process.env.NEXT_PUBLIC_SOCKET_URL
-
-    if (hasSocket) {
-      let socket: any
-      try {
-        socket = connectSocket()
-        if (socket) {
-          socket.on('notify:new', handleNewNotification)
+    let socket: any
+    try {
+      socket = connectSocket()
+      if (!socket) return
+      socket.on('notify:new', (n: any) => {
+        if (!n || !n.id || n.id === lastId.current) return
+        lastId.current = n.id
+        const item: LiveNotification = {
+          id: n.id,
+          title: n.title || 'Nueva notificación',
+          message: n.message || '',
+          type: n.type || 'info',
+          target_role: n.target_role || null,
+          institution_id: n.institution_id || null,
+          created_at: n.created_at || new Date().toISOString(),
+          read: false,
         }
-      } catch (error) {
-        console.error('Error connecting socket:', error)
-      }
-      return () => {
-        if (socket) socket.off('notify:new', handleNewNotification)
-      }
-    }
-
-    const token = getTokenFromCookie()
-    if (!token) return
-
-    let es: EventSource | null = null
-    let reconnectTimer: ReturnType<typeof setTimeout> | null = null
-
-    const connect = () => {
-      es = new EventSource(`/api/notifications/sse?token=${encodeURIComponent(token)}`)
-      es.addEventListener('notification', (e) => {
-        try { handleNewNotification(JSON.parse(e.data)) } catch { /* noop */ }
+        setNotifications(prev => [item, ...prev.filter(x => x.id !== item.id)].slice(0, 60))
+        setUnread(u => u + 1)
+        setLive(item)
+        playNotificationSound()
+        if (liveTimer.current) clearTimeout(liveTimer.current)
+        liveTimer.current = setTimeout(() => setLive(null), 4500)
       })
-      es.onerror = () => {
-        es?.close()
-        reconnectTimer = setTimeout(connect, 5000)
-      }
+    } catch (error) {
+      console.error('Error connecting socket:', error)
     }
-
-    connect()
-
     return () => {
-      es?.close()
-      if (reconnectTimer) clearTimeout(reconnectTimer)
+      if (socket) socket.off('notify:new')
     }
-  }, [handleNewNotification])
+  }, [])
 
   const markOneRead = React.useCallback(async (id: string) => {
     setNotifications(prev => prev.map(n => (n.id === id ? { ...n, read: true } : n)))
