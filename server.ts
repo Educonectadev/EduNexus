@@ -7,9 +7,6 @@ import crypto from 'crypto'
 import pool from './lib/db'
 import webpush from 'web-push'
 import { runAnomalyScan } from './lib/anomalies'
-import dns from 'dns'
-
-dns.setDefaultResultOrder('ipv4first')
 
 const PORT = parseInt(process.env.SOCKET_PORT || '3001')
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
@@ -248,7 +245,21 @@ function buildListenerConfig() {
     ? { rejectUnauthorized: false }
     : false
   console.log('[listener] DATABASE_URL:', conn ? `${conn.substring(0, 30)}...` : 'NOT SET')
-  if (conn) return { connectionString: conn, ssl }
+  if (conn) {
+    try {
+      const url = new URL(conn)
+      return {
+        host: url.hostname,
+        port: parseInt(url.port || '5432'),
+        user: url.username,
+        password: url.password,
+        database: url.pathname.replace('/', ''),
+        ssl,
+      }
+    } catch {
+      return { connectionString: conn, ssl }
+    }
+  }
   return {
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432'),
