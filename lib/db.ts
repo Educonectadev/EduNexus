@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from 'pg'
+import pgConnectionString from 'pg-connection-string'
 
 // National scale: 34,000+ institutions, ~2M students
 // Pool must handle concurrent requests across all tenants
@@ -10,14 +11,15 @@ const poolConfig: any = (() => {
   const base = { ssl }
   if (conn) {
     try {
-      const url = new URL(conn)
+      const parsed = pgConnectionString.parse(conn)
       return {
         ...base,
-        host: url.hostname,
-        port: parseInt(url.port || '5432'),
-        user: url.username,
-        password: url.password,
-        database: url.pathname.replace('/', ''),
+        host: parsed.host || undefined,
+        port: parseInt(parsed.port || '5432'),
+        user: parsed.user || undefined,
+        password: parsed.password || undefined,
+        database: parsed.database || 'postgres',
+        ssl: parsed.ssl || ssl,
       }
     } catch {
       return { ...base, connectionString: conn }
