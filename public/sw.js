@@ -4,7 +4,12 @@ const CACHE = 'edunexus-v1'
 self.addEventListener('install', (event) => {
   self.skipWaiting()
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(['/', '/manifest.json', '/icon.svg']))
+    caches.open(CACHE).then((cache) =>
+      Promise.allSettled([
+        cache.add('/manifest.json').catch(() => {}),
+        cache.add('/icon.svg').catch(() => {}),
+      ])
+    )
   )
 })
 
@@ -16,16 +21,14 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// Pass-through con fallback de caché (la app sigue siendo dinámica)
+// Pass-through: solo caché de archivos estáticos, sin interceptar RSC/API
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+  const url = new URL(event.request.url)
+  // No interceptar requests de RSC, API, ni SSE
+  if (url.searchParams.has('_rsc') || url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) return
   event.respondWith(
-    fetch(event.request).then(response => {
-      if (response.redirected) {
-        return Response.redirect(response.url, response.status)
-      }
-      return response
-    }).catch(() => caches.match(event.request))
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   )
 })
 

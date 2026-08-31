@@ -1,1 +1,5 @@
 node_modules
+
+.next/
+.env*
+DISENO_DASHBOARD_DOCENTES.md

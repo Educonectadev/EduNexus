@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Pagos
     const [payments] = await pool.query(
       `SELECT p.*, CONCAT(s.first_name, ' ', s.last_name) AS student_name,
-              COALESCE(pc.name, p.concept, 'Colegiatura') AS concept_name
+              COALESCE(pc.name, p.concept_id, 'Colegiatura') AS concept_name
        FROM payments p
        JOIN students s ON p.student_id = s.id
        LEFT JOIN payment_concepts pc ON p.concept_id = pc.id
