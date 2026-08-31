@@ -41,7 +41,11 @@ export async function GET(request: NextRequest) {
            FROM notifications n
            LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = $1
            WHERE n.institution_id = $2 AND n.status = 'active'
-             AND (n.target_role = 'all' OR n.target_role = $3 OR n.user_id = $1)
+             AND (
+               (n.user_id IS NOT NULL AND n.user_id = $1)
+               OR
+               (n.user_id IS NULL AND (n.target_role = 'all' OR n.target_role = $3))
+             )
            ORDER BY n.created_at DESC
            LIMIT 60`,
           [user.id, instId, user.role || 'all']
