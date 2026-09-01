@@ -15,13 +15,32 @@ export function isPushSupported(): boolean {
     && 'PushManager' in window
 }
 
+let swRegistrationCache: ServiceWorkerRegistration | null = null
+
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null
+  if (swRegistrationCache) return swRegistrationCache
   try {
     const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    // Wait for the service worker to be active
+    if (reg.installing) {
+      await new Promise<void>((resolve) => {
+        reg.installing!.addEventListener('statechange', (e) => {
+          if ((e.target as ServiceWorker).state === 'activated') resolve()
+        })
+      })
+    } else if (reg.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' })
+      await new Promise<void>((resolve) => {
+        reg.waiting!.addEventListener('statechange', (e) => {
+          if ((e.target as ServiceWorker).state === 'activated') resolve()
+        })
+      })
+    }
+    swRegistrationCache = reg
     return reg
   } catch (error) {
-    console.error('Error registrando service worker:', error)
+    console.error('[push] Error registrando service worker:', error)
     return null
   }
 }
@@ -29,11 +48,18 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 export async function getVapidPublicKey(): Promise<string | null> {
   try {
     const res = await fetch('/api/push/vapid-public-key')
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.error('[push] VAPID key endpoint failed:', res.status)
+      return null
+    }
     const data = await res.json()
-    return data.enabled ? (data.publicKey as string) : null
+    if (!data.enabled) {
+      console.error('[push] VAPID keys not configured on server')
+      return null
+    }
+    return data.publicKey as string
   } catch (error) {
-    console.error('Error obteniendo VAPID key:', error)
+    console.error('[push] Error obteniendo VAPID key:', error)
     return null
   }
 }
@@ -49,29 +75,57 @@ export async function getExistingPushSubscription(): Promise<PushSubscription | 
 }
 
 export async function subscribeToPush(): Promise<boolean> {
-  if (!isPushSupported()) return false
+  if (!isPushSupported()) {
+    console.warn('[push] Push not supported in this browser')
+    return false
+  }
 
   const permission = typeof Notification !== 'undefined' ? Notification.permission : 'denied'
-  if (permission !== 'granted') return false
+  if (permission !== 'granted') {
+    console.warn('[push] Notification permission not granted:', permission)
+    return false
+  }
 
   const publicKey = await getVapidPublicKey()
-  if (!publicKey) return false
+  if (!publicKey) {
+    console.error('[push] No VAPID public key available')
+    return false
+  }
 
   const reg = await registerServiceWorker()
-  if (!reg) return false
+  if (!reg) {
+    console.error('[push] Service worker registration failed')
+    return false
+  }
 
   try {
     let subscription = await reg.pushManager.getSubscription()
+
     if (!subscription) {
-      subscription = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicKey),
-      })
+      // Need to create new subscription
+      try {
+        subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey),
+        })
+      } catch (subError: any) {
+        // If subscription fails, try unsubscribing first and resubscribing
+        console.warn('[push] Initial subscribe failed, trying reset:', subError?.message)
+        const existing = await reg.pushManager.getSubscription()
+        if (existing) await existing.unsubscribe()
+        subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey),
+        })
+      }
     }
 
     const p256dh = subscription.getKey('p256dh')
     const auth = subscription.getKey('auth')
-    if (!p256dh || !auth) return false
+    if (!p256dh || !auth) {
+      console.error('[push] Missing subscription keys')
+      return false
+    }
 
     const toB64 = (buf: ArrayBuffer | null) =>
       btoa(String.fromCharCode(...new Uint8Array(buf as ArrayBuffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -84,16 +138,23 @@ export async function subscribeToPush(): Promise<boolean> {
         keys: { p256dh: toB64(p256dh), auth: toB64(auth) },
       }),
     })
-    return res.ok
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      console.error('[push] Failed to save subscription:', res.status, err)
+      return false
+    }
+
+    console.log('[push] Subscription saved successfully')
+    return true
   } catch (error) {
-    console.error('Error suscribiéndose a push:', error)
+    console.error('[push] Error suscribiéndose a push:', error)
     return false
   }
 }
 
-// ¿Esta CUENTA (usuario logueado) tiene activadas las notificaciones
-// push en este dispositivo/navegador? (el endpoint es por navegador)
-// Si el navegador tiene suscripción pero no está en la DB, la vuelve a guardar.
+// Check if user has active push subscription
+// Auto-heals: if browser has subscription but DB doesn't, re-saves it
 export async function isUserSubscribed(): Promise<boolean> {
   if (!isPushSupported()) return false
   const reg = await registerServiceWorker()
@@ -101,15 +162,16 @@ export async function isUserSubscribed(): Promise<boolean> {
   try {
     const subscription = await reg.pushManager.getSubscription()
     if (!subscription) return false
+
     const res = await fetch(`/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`)
-    
-    // If DB is down (503), assume subscription is still active to avoid toggle flickering
+
+    // If DB is down (503), assume subscription is still active
     if (res.status === 503) return true
-    
+
     if (!res.ok) return false
     const data = await res.json()
-    
-    // If browser has subscription but DB doesn't have it, re-save it
+
+    // If browser has subscription but DB doesn't, re-save it
     if (!data.active) {
       const p256dh = subscription.getKey('p256dh')
       const auth = subscription.getKey('auth')
@@ -124,14 +186,13 @@ export async function isUserSubscribed(): Promise<boolean> {
             keys: { p256dh: toB64(p256dh), auth: toB64(auth) },
           }),
         })
-        // If save succeeded or DB is down, assume active
         return saveRes.ok || saveRes.status === 503
       }
     }
-    
+
     return !!data.active
   } catch (error) {
-    console.error('Error consultando suscripción del usuario:', error)
+    console.error('[push] Error consultando suscripción:', error)
     return false
   }
 }
@@ -145,9 +206,6 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     if (!subscription) return true
     const endpoint = subscription.endpoint
 
-    // Solo desactiva ESTA cuenta (borra su fila). No se elimina la
-    // suscripción del navegador para no afectar a otras cuentas del
-    // mismo dispositivo.
     try {
       const res = await fetch('/api/push/subscribe', {
         method: 'DELETE',
@@ -159,7 +217,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
       return false
     }
   } catch (error) {
-    console.error('Error desuscribiendo push:', error)
+    console.error('[push] Error desuscribiendo push:', error)
     return false
   }
 }

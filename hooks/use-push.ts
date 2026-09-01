@@ -44,7 +44,12 @@ export function usePushSettings(): PushSettings & {
   }, [])
 
   const refreshSubscription = React.useCallback(async () => {
-    setSubscribed(await isUserSubscribed())
+    try {
+      const result = await isUserSubscribed()
+      setSubscribed(result)
+    } catch {
+      // Don't change state on error
+    }
   }, [])
 
   React.useEffect(() => {
@@ -57,7 +62,17 @@ export function usePushSettings(): PushSettings & {
     }
 
     if (typeof Notification !== 'undefined') syncPermission(Notification.permission)
-    registerServiceWorker().then(() => refreshSubscription())
+
+    // Register SW and check subscription with retry
+    const init = async () => {
+      const reg = await registerServiceWorker()
+      if (reg) {
+        // Wait a bit for SW to stabilize
+        await new Promise(r => setTimeout(r, 500))
+        await refreshSubscription()
+      }
+    }
+    init()
 
     const onBeforeInstall = (e: Event) => {
       e.preventDefault()
@@ -85,8 +100,19 @@ export function usePushSettings(): PushSettings & {
     if (!supported || typeof Notification === 'undefined') return
     const result = await Notification.requestPermission()
     syncPermission(result)
-    if (result === 'granted') await subscribeToPush()
-    setSubscribed(await isUserSubscribed())
+    if (result === 'granted') {
+      // Wait a bit for permission to settle
+      await new Promise(r => setTimeout(r, 300))
+      const success = await subscribeToPush()
+      if (success) {
+        setSubscribed(true)
+      } else {
+        // Retry once after a delay
+        await new Promise(r => setTimeout(r, 1000))
+        const retry = await subscribeToPush()
+        setSubscribed(retry)
+      }
+    }
   }, [supported, syncPermission])
 
   const toggle = React.useCallback(async () => {
