@@ -8,8 +8,9 @@ import {
   Loader2, Zap,
 } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
-import { useNotifications } from "@/hooks/use-notifications"
+import { useNotifications, type LiveNotification } from "@/hooks/use-notifications"
 import { usePushSettings } from "@/hooks/use-push"
+import NotificationDetailModal from "./notification-detail-modal"
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime()
@@ -39,6 +40,7 @@ export default function MobileNotificationBell() {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [pushBusy, setPushBusy] = React.useState(false)
+  const [detailNotif, setDetailNotif] = React.useState<LiveNotification | null>(null)
   const ref = React.useRef<HTMLDivElement>(null)
   const unreadCount = Math.min(unread, 99)
 
@@ -139,6 +141,8 @@ export default function MobileNotificationBell() {
                         else if (path.startsWith('/director')) router.push('/director/reuniones')
                         else if (path.startsWith('/padre')) router.push('/padre/comunicados')
                         else router.push('/docente/reuniones')
+                      } else {
+                        setDetailNotif(n)
                       }
                     }
                     return (
@@ -196,6 +200,8 @@ export default function MobileNotificationBell() {
           </>
         )}
       </AnimatePresence>
+
+      <NotificationDetailModal notification={detailNotif} onClose={() => setDetailNotif(null)} />
     </div>
   )
 }

@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useNotifications, type LiveNotification } from "@/hooks/use-notifications"
 import { usePushSettings } from "@/hooks/use-push"
+import NotificationDetailModal from "./notification-detail-modal"
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime()
@@ -39,6 +40,7 @@ export default function NotificationBell() {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [pushBusy, setPushBusy] = React.useState(false)
+  const [detailNotif, setDetailNotif] = React.useState<LiveNotification | null>(null)
   const unreadCount = Math.min(unread, 99)
 
   const toggle = () => setOpen(o => !o)
@@ -93,7 +95,7 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -16, scale: 0.96 }}
             transition={{ duration: 0.25, ease: [0.37, 0.35, 0, 1] }}
-            onClick={() => { markOneRead(live.id); closeLive() }}
+            onClick={() => { markOneRead(live.id); closeLive(); setDetailNotif(live) }}
             className="fixed top-4 left-1/2 z-[70] -translate-x-1/2 w-[calc(100vw-32px)] max-w-[380px] text-left bg-sb-surface-container/[0.96] backdrop-blur-2xl rounded-2xl border border-sb-outline-variant/20 shadow-2xl shadow-black/10 p-3.5 flex items-start gap-3"
           >
             <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
@@ -178,6 +180,8 @@ export default function NotificationBell() {
                         else if (path.startsWith('/director')) router.push('/director/reuniones')
                         else if (path.startsWith('/padre')) router.push('/padre/comunicados')
                         else router.push('/docente/reuniones')
+                      } else {
+                        setDetailNotif(n)
                       }
                     }
                     return (
@@ -278,6 +282,8 @@ export default function NotificationBell() {
           </>
         )}
       </AnimatePresence>
+
+      <NotificationDetailModal notification={detailNotif} onClose={() => setDetailNotif(null)} />
     </>
   )
 }

@@ -12,6 +12,10 @@ export interface LiveNotification {
   institution_id: string | null
   created_at: string
   read: boolean
+  priority: string
+  category: string
+  pinned: boolean
+  sender_name: string
 }
 
 let soundCtx: AudioContext | null = null
@@ -60,7 +64,13 @@ export function useNotifications() {
       const res = await fetch('/api/notificaciones')
       if (!res.ok) return
       const data = await res.json()
-      const newNotifications = data.notifications || []
+      const newNotifications = (data.notifications || []).map((n: any) => ({
+        ...n,
+        priority: n.priority || 'media',
+        category: n.category || 'general',
+        pinned: !!n.pinned,
+        sender_name: n.sender_name || '',
+      }))
       const newUnread = data.unread || 0
 
       // Detect if there are new notifications (for sound/toast)
@@ -114,6 +124,10 @@ export function useNotifications() {
             institution_id: n.institution_id || null,
             created_at: n.created_at || new Date().toISOString(),
             read: false,
+            priority: n.priority || 'media',
+            category: n.category || 'general',
+            pinned: !!n.pinned,
+            sender_name: n.sender_name || '',
           }
           setNotifications(prev => [item, ...prev.filter(x => x.id !== item.id)].slice(0, 60))
           setUnread(u => u + 1)
