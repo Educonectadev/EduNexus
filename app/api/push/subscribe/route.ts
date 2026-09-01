@@ -11,12 +11,18 @@ export async function GET(request: NextRequest) {
     const endpoint = request.nextUrl.searchParams.get('endpoint')
     if (!endpoint) return NextResponse.json({ active: false })
 
-    const [rows] = await pool.query(
-      'SELECT 1 FROM push_subscriptions WHERE endpoint = $1 AND user_id = $2',
-      [endpoint, user.id]
-    ).catch(() => [] as any[]) as any[]
+    try {
+      const [rows] = await pool.query(
+        'SELECT 1 FROM push_subscriptions WHERE endpoint = $1 AND user_id = $2',
+        [endpoint, user.id]
+      ) as any[]
 
-    return NextResponse.json({ active: (rows as any[]).length > 0 })
+      return NextResponse.json({ active: (rows as any[]).length > 0 })
+    } catch (dbError) {
+      console.error('[push] DB error checking subscription:', dbError)
+      // Return error instead of false so client knows it's a DB issue
+      return NextResponse.json({ error: 'Error de base de datos', active: false }, { status: 503 })
+    }
   } catch {
     return NextResponse.json({ active: false })
   }
@@ -73,6 +79,7 @@ export async function POST(request: NextRequest) {
         )
       } else {
         console.error('[push] error guardando suscripción:', e)
+        return NextResponse.json({ error: 'Error guardando suscripción en base de datos' }, { status: 500 })
       }
     }
 

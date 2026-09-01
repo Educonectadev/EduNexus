@@ -23,8 +23,16 @@ const poolConfig: any = process.env.DATABASE_URL || process.env.POSTGRES_URL
 poolConfig.max = parseInt(process.env.DB_POOL_LIMIT || '50')
 poolConfig.idleTimeoutMillis = 60000
 poolConfig.connectionTimeoutMillis = 10000
+// Keep connections alive behind connection poolers (Supabase, PgBouncer)
+poolConfig.keepAlive = true
+poolConfig.keepAliveInitialDelayMillis = 10000
 
 const pool = new Pool(poolConfig)
+
+// Handle idle connection errors (e.g., server terminated connection)
+pool.on('error', (err) => {
+  console.error('[db] Unexpected pool error:', err.message)
+})
 
 // Convert mysql-style ? placeholders to pg-style $1, $2, ...
 function toPgParams(sql: string, params: any[] = []): { text: string; values: any[] } {

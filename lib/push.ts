@@ -102,6 +102,10 @@ export async function isUserSubscribed(): Promise<boolean> {
     const subscription = await reg.pushManager.getSubscription()
     if (!subscription) return false
     const res = await fetch(`/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`)
+    
+    // If DB is down (503), assume subscription is still active to avoid toggle flickering
+    if (res.status === 503) return true
+    
     if (!res.ok) return false
     const data = await res.json()
     
@@ -112,7 +116,7 @@ export async function isUserSubscribed(): Promise<boolean> {
       if (p256dh && auth) {
         const toB64 = (buf: ArrayBuffer | null) =>
           btoa(String.fromCharCode(...new Uint8Array(buf as ArrayBuffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-        await fetch('/api/push/subscribe', {
+        const saveRes = await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -120,7 +124,8 @@ export async function isUserSubscribed(): Promise<boolean> {
             keys: { p256dh: toB64(p256dh), auth: toB64(auth) },
           }),
         })
-        return true
+        // If save succeeded or DB is down, assume active
+        return saveRes.ok || saveRes.status === 503
       }
     }
     
