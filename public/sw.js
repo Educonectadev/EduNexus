@@ -1,5 +1,5 @@
-/* EduNexus Service Worker v5 */
-const CACHE = 'edunexus-v5'
+/* EduNexus Service Worker v6 */
+const CACHE = 'edunexus-v6'
 const OFFLINE_URL = '/offline.html'
 
 const PRECACHE = [
@@ -75,68 +75,69 @@ self.addEventListener('fetch', (event) => {
 })
 
 // ===== Push Notifications =====
-self.addEventListener('push', (event) => {
-  let payload = {
+self.addEventListener('push', function(event) {
+  let data = {
     title: 'EduNexus',
-    message: '',
+    message: 'Tienes una nueva notificación',
     url: '/',
     senderName: '',
     institutionName: '',
   }
+
   try {
-    if (event.data) payload = Object.assign(payload, event.data.json())
-  } catch (e) { /* noop */ }
+    if (event.data) {
+      data = Object.assign(data, event.data.json())
+    }
+  } catch (e) {}
 
-  let body = payload.message || 'Tienes una nueva notificación'
-  const details = []
-  if (payload.senderName) details.push(payload.senderName)
-  if (payload.institutionName) details.push(payload.institutionName)
-  if (details.length > 0) {
-    body = body ? `${body}\n${details.join(' • ')}` : details.join(' • ')
-  }
+  let body = data.message || ''
+  if (data.senderName) body += '\n' + data.senderName
+  if (data.institutionName) body += ' • ' + data.institutionName
+  if (!body) body = 'Tienes una nueva notificación'
 
-  const options = {
-    body,
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-96x96.png',
-    vibrate: [300, 100, 300],
-    tag: 'edunexus-' + (payload.type || 'general'),
-    renotify: true,
-    requireInteraction: true,
-    data: { url: payload.url || '/', type: payload.type || 'info' },
-  }
+  var title = data.title || 'EduNexus'
+  var icon = '/icons/icon-192x192.png'
+  var badge = '/icons/icon-192x192.png'
+  var url = data.url || '/'
 
   event.waitUntil(
-    self.registration.showNotification(payload.title || 'EduNexus', options)
+    self.registration.showNotification(title, {
+      body: body,
+      icon: icon,
+      badge: badge,
+      vibrate: [200, 100, 200],
+      tag: 'edunexus-push',
+      renotify: true,
+      data: { url: url }
+    })
   )
 
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({ type: 'PUSH_RECEIVED', payload })
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clients) {
+      clients.forEach(function(client) {
+        client.postMessage({ type: 'PUSH_RECEIVED', payload: data })
       })
     })
   )
 })
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', function(event) {
   event.notification.close()
-  const url = event.notification.data && event.notification.data.url
+  var url = (event.notification.data && event.notification.data.url) || '/'
 
-  event.waitUntil((async () => {
-    const urlToOpen = url || '/'
-    const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-
-    for (const client of allClients) {
-      if ('focus' in client) {
-        client.focus()
-        client.navigate(urlToOpen)
-        return
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(allClients) {
+      for (var i = 0; i < allClients.length; i++) {
+        var client = allClients[i]
+        if ('focus' in client) {
+          client.focus()
+          client.navigate(url)
+          return
+        }
       }
-    }
-
-    if (self.clients.openWindow) await self.clients.openWindow(urlToOpen)
-  })())
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(url)
+      }
+    })
+  )
 })
-
-self.addEventListener('notificationclose', () => {})
