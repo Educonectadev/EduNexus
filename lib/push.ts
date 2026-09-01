@@ -93,6 +93,7 @@ export async function subscribeToPush(): Promise<boolean> {
 
 // ¿Esta CUENTA (usuario logueado) tiene activadas las notificaciones
 // push en este dispositivo/navegador? (el endpoint es por navegador)
+// Si el navegador tiene suscripción pero no está en la DB, la vuelve a guardar.
 export async function isUserSubscribed(): Promise<boolean> {
   if (!isPushSupported()) return false
   const reg = await registerServiceWorker()
@@ -103,6 +104,26 @@ export async function isUserSubscribed(): Promise<boolean> {
     const res = await fetch(`/api/push/subscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`)
     if (!res.ok) return false
     const data = await res.json()
+    
+    // If browser has subscription but DB doesn't have it, re-save it
+    if (!data.active) {
+      const p256dh = subscription.getKey('p256dh')
+      const auth = subscription.getKey('auth')
+      if (p256dh && auth) {
+        const toB64 = (buf: ArrayBuffer | null) =>
+          btoa(String.fromCharCode(...new Uint8Array(buf as ArrayBuffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+            keys: { p256dh: toB64(p256dh), auth: toB64(auth) },
+          }),
+        })
+        return true
+      }
+    }
+    
     return !!data.active
   } catch (error) {
     console.error('Error consultando suscripción del usuario:', error)
