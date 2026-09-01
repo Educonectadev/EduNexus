@@ -1,5 +1,5 @@
 /* EduNexus Service Worker - PWA Native-like */
-const CACHE = 'edunexus-v2'
+const CACHE = 'edunexus-v3'
 const OFFLINE_URL = '/offline.html'
 
 const PRECACHE = [
@@ -10,7 +10,6 @@ const PRECACHE = [
   '/icons/icon-512x512.png',
 ]
 
-// Install - pre-cache critical assets
 self.addEventListener('install', (event) => {
   self.skipWaiting()
   event.waitUntil(
@@ -18,7 +17,6 @@ self.addEventListener('install', (event) => {
   )
 })
 
-// Activate - clean old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -29,18 +27,13 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-// Fetch - network first, cache fallback for navigation
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
-
   const url = new URL(event.request.url)
-
-  // Skip non-GET, API calls, and RSC
   if (url.searchParams.has('_rsc')) return
   if (url.pathname.startsWith('/api/')) return
   if (url.pathname.startsWith('/_next/static/')) return
 
-  // Navigation requests - network first, offline fallback
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -54,7 +47,6 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Static assets - cache first
   if (url.pathname.startsWith('/_next/') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.png') || url.pathname.endsWith('.svg') || url.pathname.endsWith('.ico')) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
@@ -69,7 +61,6 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Everything else - network with cache fallback
   event.respondWith(
     fetch(event.request)
       .then((response) => {
@@ -107,52 +98,55 @@ self.addEventListener('push', (event) => {
   }
 
   const options = {
-    body,
-    icon: payload.icon || '/icons/icon-192x192.png',
-    badge: payload.badge || '/icons/icon-192x192.png',
-    vibrate: [120, 60, 120],
-    tag: payload.tag || undefined,
-    renotify: !!payload.tag,
-    data: { url: payload.url || '/', type: payload.type || 'info' },
-    actions: [
-      { action: 'open', title: 'Abrir' },
-      { action: 'dismiss', title: 'Cerrar' },
-    ],
+    body: body || 'Tienes una nueva notificación',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-192x192.png',
+    image: '/icons/icon-512x512.png',
+    vibrate: [200, 100, 200],
+    tag: 'edunexus-notification',
+    renotify: true,
     requireInteraction: false,
     silent: false,
+    data: { url: payload.url || '/', type: payload.type || 'info', timestamp: Date.now() },
   }
 
-  event.waitUntil(self.registration.showNotification(payload.title || 'EduNexus', options))
+  event.waitUntil(
+    self.registration.showNotification(payload.title || 'EduNexus', options)
+      .catch((err) => {
+        console.error('[SW] showNotification failed:', err)
+      })
+  )
+
+  // Also notify the client window to play in-app sound
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      clients.forEach((client) => {
+        client.postMessage({
+          type: 'PUSH_RECEIVED',
+          payload,
+        })
+      })
+    })
+  )
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-
-  if (event.action === 'dismiss') return
-
   const url = event.notification.data && event.notification.data.url
 
   event.waitUntil((async () => {
     const urlToOpen = url || '/'
-    const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true })
+    const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
 
     for (const client of allClients) {
-      if (client.url.includes(urlToOpen) && 'focus' in client) {
+      if ('focus' in client) {
         client.focus()
         client.navigate(urlToOpen)
         return
       }
     }
 
-    for (const client of allClients) {
-      if ('focus' in client) {
-        client.focus()
-        if ('navigate' in client) client.navigate(urlToOpen)
-        return
-      }
-    }
-
-    if (clients.openWindow) await clients.openWindow(urlToOpen)
+    if (self.clients.openWindow) await self.clients.openWindow(urlToOpen)
   })())
 })
 
