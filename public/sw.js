@@ -1,5 +1,5 @@
 /* EduNexus Service Worker - PWA Native-like */
-const CACHE = 'edunexus-v3'
+const CACHE = 'edunexus-v4'
 const OFFLINE_URL = '/offline.html'
 
 const PRECACHE = [
@@ -89,7 +89,7 @@ self.addEventListener('push', (event) => {
     if (event.data) payload = Object.assign(payload, event.data.json())
   } catch (e) { /* noop */ }
 
-  let body = payload.message || ''
+  let body = payload.message || 'Tienes una nueva notificación'
   const details = []
   if (payload.senderName) details.push(payload.senderName)
   if (payload.institutionName) details.push(payload.institutionName)
@@ -97,13 +97,14 @@ self.addEventListener('push', (event) => {
     body = body ? `${body}\n\n${details.join(' • ')}` : details.join(' • ')
   }
 
+  const tag = payload.tag || `notif-${Date.now()}`
+
   const options = {
-    body: body || 'Tienes una nueva notificación',
+    body,
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-192x192.png',
-    image: '/icons/icon-512x512.png',
     vibrate: [200, 100, 200],
-    tag: 'edunexus-notification',
+    tag,
     renotify: true,
     requireInteraction: false,
     silent: false,
@@ -112,19 +113,14 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     self.registration.showNotification(payload.title || 'EduNexus', options)
-      .catch((err) => {
-        console.error('[SW] showNotification failed:', err)
-      })
+      .then(() => console.log('[SW] Notification shown successfully'))
+      .catch((err) => console.error('[SW] showNotification failed:', err))
   )
 
-  // Also notify the client window to play in-app sound
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
       clients.forEach((client) => {
-        client.postMessage({
-          type: 'PUSH_RECEIVED',
-          payload,
-        })
+        client.postMessage({ type: 'PUSH_RECEIVED', payload })
       })
     })
   )
@@ -150,6 +146,4 @@ self.addEventListener('notificationclick', (event) => {
   })())
 })
 
-self.addEventListener('notificationclose', (event) => {
-  // noop
-})
+self.addEventListener('notificationclose', () => {})
