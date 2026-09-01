@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
                   COALESCE(n.category, 'general') AS category,
                   n.pinned,
                   n.institution_id, n.status, n.created_at,
-                  COALESCE(u.full_name, u.username, '') AS sender_name,
+                  COALESCE(u.full_name, '') AS sender_name,
                   CASE WHEN r.user_id IS NULL THEN false ELSE true END AS read`
 
     const [rows] = globalRole
