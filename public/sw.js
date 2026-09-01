@@ -1,5 +1,5 @@
-/* EduNexus Service Worker - PWA Native-like */
-const CACHE = 'edunexus-v4'
+/* EduNexus Service Worker v5 */
+const CACHE = 'edunexus-v5'
 const OFFLINE_URL = '/offline.html'
 
 const PRECACHE = [
@@ -80,8 +80,6 @@ self.addEventListener('push', (event) => {
     title: 'EduNexus',
     message: '',
     url: '/',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
     senderName: '',
     institutionName: '',
   }
@@ -94,27 +92,22 @@ self.addEventListener('push', (event) => {
   if (payload.senderName) details.push(payload.senderName)
   if (payload.institutionName) details.push(payload.institutionName)
   if (details.length > 0) {
-    body = body ? `${body}\n\n${details.join(' • ')}` : details.join(' • ')
+    body = body ? `${body}\n${details.join(' • ')}` : details.join(' • ')
   }
-
-  const tag = payload.tag || `notif-${Date.now()}`
 
   const options = {
     body,
     icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
-    vibrate: [200, 100, 200],
-    tag,
+    badge: '/icons/icon-96x96.png',
+    vibrate: [300, 100, 300],
+    tag: 'edunexus-' + (payload.type || 'general'),
     renotify: true,
-    requireInteraction: false,
-    silent: false,
-    data: { url: payload.url || '/', type: payload.type || 'info', timestamp: Date.now() },
+    requireInteraction: true,
+    data: { url: payload.url || '/', type: payload.type || 'info' },
   }
 
   event.waitUntil(
     self.registration.showNotification(payload.title || 'EduNexus', options)
-      .then(() => console.log('[SW] Notification shown successfully'))
-      .catch((err) => console.error('[SW] showNotification failed:', err))
   )
 
   event.waitUntil(
