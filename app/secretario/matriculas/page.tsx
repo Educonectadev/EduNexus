@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Sparkles, Calendar } from "@/components/ui/proicons"
+import { GraduationCap, Plus, User, BookOpen, Search, Eye, Pencil, Trash2, X, Check, ChevronDown, Filter, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2, RefreshCw, Sparkles, Calendar as CalendarIcon } from "@/components/ui/proicons"
+import { Calendar as CalendarComp } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbIconBtn, SbDropdown, SbDropdownItem, SbBadge } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfClearFilters, SbfResultsCount } from "@/components/ui/search-filter-bar"
@@ -969,14 +971,25 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
             </div>
             <div>
               <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Fecha Nac.</label>
-              <div className="relative">
-                <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/40 pointer-events-none" />
-                <input type="date" value={form.student_birth_date}
-                  max={new Date().toISOString().split('T')[0]} min="2000-01-01"
-                  onChange={(e) => setForm({ ...form, student_birth_date: e.target.value })} className="sb-input pl-8 pr-2 text-[13px]" />
-                {form.student_birth_date && (()=>{ const d=new Date(form.student_birth_date); const age=Math.floor((Date.now()-d.getTime())/31557600000); return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary pointer-events-none">{age}a</span> })()}
-              </div>
-              <p className="text-[10px] text-sb-on-surface-variant/30 mt-1">{form.student_birth_date ? new Date(form.student_birth_date).toLocaleDateString('es-PE',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : 'dd/mm/aaaa'}</p>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" className={`sb-input w-full flex items-center justify-between text-left text-[13px] ${!form.student_birth_date ? 'text-sb-on-surface-variant/40' : ''}`}>
+                    <span>{form.student_birth_date ? new Date(form.student_birth_date+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}) : 'dd/mm/aaaa'}</span>
+                    <CalendarIcon className="h-4 w-4 opacity-50" />
+                    {form.student_birth_date && (()=>{ const d=new Date(form.student_birth_date); const age=Math.floor((Date.now()-d.getTime())/31557600000); return <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{age}a</span> })()}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComp
+                    mode="single"
+                    selected={form.student_birth_date ? new Date(form.student_birth_date+'T00:00:00') : undefined}
+                    onSelect={(d: Date | undefined) => setForm({ ...form, student_birth_date: d ? d.toISOString().split('T')[0] : '' })}
+                    captionLayout="dropdown"
+                    className="rounded-lg border"
+                    disabled={(date: Date) => date > new Date() || date < new Date("2000-01-01")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div>
               <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Género</label>
