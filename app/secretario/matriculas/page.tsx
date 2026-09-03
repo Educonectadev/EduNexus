@@ -414,8 +414,9 @@ export default function SecretarioMatriculasPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       })
-      if (res.ok) { setCreateOpen(false); setForm(emptyForm); fetchEnrollments() }
-    } catch (e) { console.error(e) } finally { setSaving(false) }
+      if (res.ok) { setCreateOpen(false); setForm(emptyForm); fetchEnrollments(); toast({ title: 'Matrícula creada', variant: 'default' }) }
+      else { const d = await res.json().catch(()=>({})); toast({ title: d.error || `Error ${res.status}`, description: d.details || d.message || '', variant: 'destructive' }); console.error('[enrollments]', d) }
+    } catch (e:any) { toast({ title: e?.message || 'Error de red', variant: 'destructive' }); console.error(e) } finally { setSaving(false) }
   }
 
   const handleUpdate = async () => {
