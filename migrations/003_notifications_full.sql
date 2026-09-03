@@ -47,6 +47,7 @@ BEGIN
     'id', NEW.id,
     'user_id', COALESCE(NEW.user_id, ''),
     'institution_id', NEW.institution_id,
+    'created_by', COALESCE(NEW.created_by, ''),
     'target_role', NEW.target_role,
     'type', NEW.type,
     'title', NEW.title,

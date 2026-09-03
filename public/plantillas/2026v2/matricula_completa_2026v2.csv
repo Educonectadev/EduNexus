@@ -1,4 +1,4 @@
-﻿Codigo del Alumno,Nombre del Alumno,DNI,Fecha Nacimiento (DD/MM/AAAA),Genero (M/F),Nombre del Padre/Apoderado,DNI del Padre,Telefono del Padre,Email del Padre,Grado,Seccion
+﻿Codigo del Alumno,Nombre del Alumno,DNI,Fecha Nacimiento (DD/MM/AAAA),Genero (M/F),Nombre del Padre/Apoderado,DNI del Padre,Telefono del Padre,Email del Padre,Grado,Seccion,Turno
 ALU-20260001,Mateo Mendoza Silva,78695681,18/10/2012,Masculino,Martin Luna Castillo,39968745,990668968,martin.mendoza@gmail.com,1° de Secundaria,A
 ALU-20260002,Alberto Salazar Medina,83526008,08/08/2012,Masculino,Eduardo Fuentes Pena,75888073,988721495,eduardo.salazar@gmail.com,1° de Secundaria,A
 ALU-20260003,Carlos Moreno Torres,24862807,11/11/2012,Masculino,Tomas Diaz Medina,11542004,975805171,tomas.moreno@gmail.com,1° de Secundaria,A

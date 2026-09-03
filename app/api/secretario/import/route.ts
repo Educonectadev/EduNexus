@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
     const dniIdx = headers.findIndex(h => h.includes('dni') || h.includes('documento'))
     const gradeIdx = headers.findIndex(h => h.includes('grado') || h.includes('grade'))
     const sectionIdx = headers.findIndex(h => h.includes('sección') || h.includes('seccion') || h.includes('section'))
+    const shiftIdx = headers.findIndex(h => h.includes('turno') || h.includes('shift'))
 
     if (nameIdx === -1) return NextResponse.json({ error: 'El archivo debe tener una columna "nombre" o "alumno"' }, { status: 400 })
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     const existingDnis = new Set(existingStudents.map((s: any) => s.document_number))
 
     // Parse all rows
-    const rows: Array<{ name: string; dni: string; grade: string; section: string; lineNum: number }> = []
+    const rows: Array<{ name: string; dni: string; grade: string; section: string; shift: string; lineNum: number }> = []
     for (let i = 1; i < lines.length; i++) {
       const cols = lines[i].split(',').map(c => c.trim())
       const name = cols[nameIdx] || ''
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      rows.push({ name, dni, grade, section, lineNum: i + 1 })
+      rows.push({ name, dni, grade, section: section || '', shift: cols[shiftIdx] || '', lineNum: i + 1 })
     }
 
     // Batch insert
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
         const id = crypto.randomUUID()
         const code = `ALU${String(Date.now()).slice(-6)}${batch + values.length}`
 
-        values.push([id, instId, firstName || row.name, lastName || '', row.dni || '', row.grade || '', row.section || '', code])
+        values.push([id, instId, firstName || row.name, lastName || '', row.dni || '', row.grade || '', row.section || '', row.shift || '', code])
       }
 
       const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ')
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await pool.query(
-          `INSERT INTO students (id, institution_id, first_name, last_name, document_number, grade, section, code, status)
+          `INSERT INTO students (id, institution_id, first_name, last_name, document_number, grade, section, shift, code, status)
            VALUES ${placeholders}`,
           [...flatValues]
         )

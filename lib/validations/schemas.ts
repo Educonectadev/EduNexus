@@ -20,6 +20,7 @@ export const studentSchema = z.object({
   gender: z.enum(['M', 'F']),
   grade: z.string().min(1, "El grado es requerido"),
   section: z.string().min(1, "La sección es requerida"),
+  shift: z.string().min(1, "El turno es requerido"),
 })
 
 export const teacherSchema = z.object({

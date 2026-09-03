@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     if (!instId) return NextResponse.json({ error: 'No se encontró la institución' }, { status: 400 })
 
     const body = await request.json()
-    const { first_name, last_name, document_type, document_number, email, phone, address, occupation, student_id, relationship, create_account, password: customPassword } = body
+    const { first_name, last_name, document_type, document_number, email, phone, address, occupation, student_id, relationship, create_account, shift, password: customPassword } = body
 
     if (!first_name || !last_name || !document_number) {
       return NextResponse.json({ error: 'Nombre, apellido y DNI son requeridos' }, { status: 400 })
@@ -152,9 +152,9 @@ export async function POST(request: NextRequest) {
     await conn.query('BEGIN')
 
     await conn.query(
-      `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-      [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null]
+      `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, email, phone, address, occupation, shift)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [id, instId, first_name, last_name, document_type || 'DNI', document_number, email || null, phone || null, address || null, occupation || null, shift || '']
     )
 
     if (student_id) {
