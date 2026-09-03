@@ -206,8 +206,21 @@ export default function SecretarioPersonalPage() {
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4">
-              <SbBtn variant="filled" rounded className="w-full" onClick={() => setSelected(null)}>Cerrar</SbBtn>
+            <div className="px-6 py-4 flex gap-2">
+              <SbBtn rounded className="flex-1" onClick={() => setSelected(null)}>Cerrar</SbBtn>
+              {selected.status === "active" ? (
+                <SbBtn variant="tonal" rounded className="flex-1 text-amber-600" onClick={async()=>{
+                  if(!confirm(`¿Despedir a ${selected.full_name}? Se marcará como inactivo.`)) return
+                  const r = await fetch(`/api/secretario/personal/${selected.id}`, { method: "PATCH", headers:{ "Content-Type":"application/json"}, body: JSON.stringify({ action:"despedir"}) })
+                  if(r.ok){ setStaff(prev=>prev.map(s=>s.id===selected.id?{...s, status:"inactive"}:s)); setSelected(null) }
+                }}>Despedir</SbBtn>
+              ) : (
+                <SbBtn variant="tonal" rounded className="flex-1 text-red-400" onClick={async()=>{
+                  if(!confirm(`¿Eliminar definitivamente a ${selected.full_name}?`)) return
+                  const r = await fetch(`/api/secretario/personal/${selected.id}`, { method: "DELETE"})
+                  if(r.ok){ setStaff(prev=>prev.filter(s=>s.id!==selected.id)); setSelected(null) }
+                }}>Eliminar</SbBtn>
+              )}
             </div>
           </SbModalBody>
         )}

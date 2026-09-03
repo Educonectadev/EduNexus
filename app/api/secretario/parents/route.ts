@@ -218,3 +218,30 @@ export async function POST(request: NextRequest) {
     }
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  let conn: any = null
+  try {
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    conn = await pool.rawPool.connect()
+    await conn.query('BEGIN')
+    const parentsRes = await conn.query(`SELECT id, email FROM parents WHERE institution_id = $1`, [instId])
+    const ids: string[] = parentsRes.rows.map((r:any)=>r.id)
+    const emails: string[] = parentsRes.rows.map((r:any)=>r.email).filter(Boolean)
+    if (ids.length > 0) {
+      await conn.query(`DELETE FROM parent_student WHERE parent_id = ANY($1)`, [ids])
+      await conn.query(`DELETE FROM parents WHERE id = ANY($1)`, [ids])
+      if (emails.length > 0) {
+        await conn.query(`DELETE FROM users WHERE email = ANY($1) AND role='padre' AND institution_id = $2`, [emails, instId])
+      }
+    }
+    await conn.query('COMMIT')
+    const authUser = await getAuthPayload(request)
+    logAudit({ userId: (authUser?.userId as string)||'', institutionId: instId, action: 'delete', entity: 'parent', entityId: 'all', details: { bulkDelete: true, deleted: ids.length } })
+    return NextResponse.json({ deleted: ids.length })
+  } catch (e:any) {
+    if (conn) try { await conn.query('ROLLBACK') } catch {}
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  } finally { if (conn) try { conn.release() } catch {} }
+}

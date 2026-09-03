@@ -86,6 +86,9 @@ export default function SecretarioPadresPage() {
   const [institutionName, setInstitutionName] = React.useState("")
   const [institutionId, setInstitutionId] = React.useState("")
 
+  const [deleteAllOpen, setDeleteAllOpen] = React.useState(false)
+  const [deletingAll, setDeletingAll] = React.useState(false)
+  React.useEffect(()=>{ (window as any).setPadresDeleteAllOpen = setDeleteAllOpen; return () => { delete (window as any).setPadresDeleteAllOpen } }, [])
   const [form, setForm] = React.useState({
     first_name: "", last_name: "", document_type: "DNI", document_number: "",
     email: "", phone: "", address: "", occupation: "", password: "",
@@ -379,10 +382,15 @@ export default function SecretarioPadresPage() {
             <p className="text-sm text-sb-on-surface-variant/50 mt-1">Gestionar el vínculo familiar de los estudiantes</p>
           </div>
           {activeTab === "individual" ? (
-            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { resetForm(); setCreateOpen(true) }}>
-              <Plus className="h-3.5 w-3.5" />
-              Nuevo padre
-            </SbBtn>
+            <div className="flex items-center gap-2">
+              <SbBtn variant="tonal" rounded className="flex items-center gap-2 text-red-400" onClick={() => setDeleteAllOpen(true)} disabled={parents.length===0}>
+                <Trash2 className="h-4 w-4" /> Eliminar Todo
+              </SbBtn>
+              <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { resetForm(); setCreateOpen(true) }}>
+                <Plus className="h-3.5 w-3.5" />
+                Nuevo padre
+              </SbBtn>
+            </div>
           ) : (
             <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={downloadPadresTemplate}>
               <Download className="h-4 w-4" /> Descargar Plantilla
@@ -762,6 +770,18 @@ export default function SecretarioPadresPage() {
         </div>
           </>
         )}
+      {deleteAllOpen && (
+        <SbModal open={deleteAllOpen} onClose={()=>setDeleteAllOpen(false)} maxWidth="480px">
+          <SbModalBody>
+            <h3 className="text-base font-semibold text-sb-on-surface">Eliminar todos los padres</h3>
+            <p className="text-sm text-sb-on-surface-variant/60 mt-2">Se eliminarán {parents.length} padres/apoderados y sus vínculos y cuentas. Esta acción no se puede deshacer.</p>
+            <div className="flex gap-2 mt-6">
+              <SbBtn rounded className="flex-1" onClick={()=>setDeleteAllOpen(false)}>Cancelar</SbBtn>
+              <SbBtn variant="filled" rounded className="flex-1 bg-red-500 hover:bg-red-600 text-white" disabled={deletingAll} onClick={async()=>{ setDeletingAll(true); try{ const r=await fetch("/api/secretario/parents",{method:"DELETE"}); if(r.ok){ setParents([]); setDeleteAllOpen(false)} } finally{ setDeletingAll(false) } }}>{deletingAll?"Eliminando...":"Eliminar Todo"}</SbBtn>
+            </div>
+          </SbModalBody>
+        </SbModal>
+      )}
       {/* ===== CREATE MODAL ===== */}
       <SbModal open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="520px">
         <SbModalHeader title="Nuevo Padre / Apoderado" onClose={() => setCreateOpen(false)} />
