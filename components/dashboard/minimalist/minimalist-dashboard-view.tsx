@@ -193,18 +193,7 @@ export function MinimalistDashboardView({
             Actividad reciente
           </h2>
           {activities.length === 0 ? (
-            <div className="bg-sb-surface rounded-2xl p-4">
-              <ChartContainer config={{ desktop: { label: "Matrículas", color: "#2563eb" }, mobile: { label: "Pagos", color: "#60a5fa" } } satisfies ChartConfig} className="h-[200px] w-full">
-                <BarChart accessibilityLayer data={[{month:"Ene",desktop:186,mobile:80},{month:"Feb",desktop:305,mobile:200},{month:"Mar",desktop:237,mobile:120},{month:"Abr",desktop:73,mobile:190},{month:"May",desktop:209,mobile:130},{month:"Jun",desktop:214,mobile:140}]}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(v:string)=>v.slice(0,3)} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                  <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-                </BarChart>
-              </ChartContainer>
-              <p className="text-[11px] text-sb-on-surface-variant/40 text-center mt-2">Matrículas vs Pagos — últimos 6 meses</p>
-            </div>
+            <ChartReal />
           ) : (
           <div className="space-y-px rounded-2xl overflow-hidden bg-sb-outline-variant/10">
             {activities.map((act, i) => {
@@ -239,5 +228,30 @@ export function MinimalistDashboardView({
         </motion.section>
       </div>
     </motion.div>
+  )
+}
+
+function ChartReal(){
+  const [data, setData] = React.useState<{month:string, matriculas:number, pagos:number}[] | null>(null)
+  React.useEffect(()=>{ fetch("/api/secretario/stats/monthly").then(r=>r.json()).then(setData).catch(()=>setData([])) },[])
+  if(!data) return <div className="bg-sb-surface rounded-2xl p-8 flex items-center justify-center"><div className="h-6 w-6 border-2 border-sb-primary border-t-transparent rounded-full animate-spin" /></div>
+  const hasData = data.some(d=>d.matriculas||d.pagos)
+  if(!hasData) return <div className="bg-sb-surface rounded-2xl p-8 text-center"><p className="text-sm text-sb-on-surface-variant/50">Sin actividad reciente — el gráfico aparecerá con tus matrículas y pagos</p></div>
+  return (
+    <div className="bg-sb-surface rounded-2xl p-4 border border-sb-outline-variant/10">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Matrículas vs Pagos</p>
+        <span className="text-[10px] text-sb-on-surface-variant/40">Últimos 6 meses</span>
+      </div>
+      <ChartContainer config={{ matriculas: { label: "Matrículas", color: "hsl(var(--sb-primary))" }, pagos: { label: "Pagos", color: "hsl(142 70% 45%)" } } satisfies ChartConfig} className="h-[220px] w-full">
+        <BarChart accessibilityLayer data={data} margin={{left: -10, right: 10}}>
+          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-sb-outline-variant/20" />
+          <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} tick={{fontSize: 11}} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="matriculas" fill="var(--color-matriculas)" radius={[8,8,0,0]} />
+          <Bar dataKey="pagos" fill="var(--color-pagos)" radius={[8,8,0,0]} />
+        </BarChart>
+      </ChartContainer>
+    </div>
   )
 }
