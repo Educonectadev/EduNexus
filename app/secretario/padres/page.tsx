@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Users, Plus, Search, Eye, Pencil, Trash2, X, Link, UserCheck, ChevronRight, Phone, Mail, MapPin, Briefcase, GraduationCap, Heart, Shield, User, Filter, UserPlus, BookOpen, Command } from "@/components/ui/proicons"
+import { Users, Plus, Search, Eye, Pencil, Trash2, X, Link, UserCheck, ChevronRight, Phone, Mail, MapPin, Briefcase, GraduationCap, Heart, Shield, User, Filter, UserPlus, BookOpen, Command, Upload, FileSpreadsheet, Download, AlertCircle, CheckCircle, Loader2 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter, useToast } from "@/components/ui/sb"
 import { peruvianOccupations } from "@/lib/occupations"
+import { toast as sonnerToast } from "@/hooks/use-toast"
 
 interface Parent {
   id: string; first_name: string; last_name: string; document_type: string; document_number: string;
@@ -61,6 +62,14 @@ export default function SecretarioPadresPage() {
   const [isFocused, setIsFocused] = React.useState(false)
   const { toast } = useToast()
   const inputRef = React.useRef<HTMLInputElement>(null)
+
+  const [activeTab, setActiveTab] = React.useState<"individual" | "bulk">("individual")
+  const [bulkFile, setBulkFile] = React.useState<File | null>(null)
+  const [bulkRows, setBulkRows] = React.useState<any[]>([])
+  const [bulkStep, setBulkStep] = React.useState<"upload" | "preview" | "importing" | "done">("upload")
+  const [bulkProgress, setBulkProgress] = React.useState(0)
+  const [bulkResults, setBulkResults] = React.useState<{ imported: number; skipped: number; errors: number } | null>(null)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   const [createOpen, setCreateOpen] = React.useState(false)
   const [detailOpen, setDetailOpen] = React.useState(false)
@@ -287,23 +296,139 @@ export default function SecretarioPadresPage() {
     return p.linked_students.some(s => s.relationship === filterRelationship)
   })
 
+  // Bulk import helpers para padres
+  const parsePadresCSV = (text: string) => {
+    const lines = text.split("\n").filter(l => l.trim())
+    if (lines.length < 2) return []
+    const dataLines = lines.slice(1)
+    return dataLines.map((line, idx) => {
+      const cells: string[] = []
+      let cur = ""; let inQ = false
+      for (const ch of line) { if (ch === '"') inQ = !inQ; else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = "" } else cur += ch }
+      cells.push(cur.trim())
+      const row: any = {
+        row: idx + 2,
+        parent_name: cells[0] || "", parent_dni: cells[1] || "", parent_phone: cells[2] || "", parent_email: cells[3] || "",
+        student_name: cells[4] || "", student_dni: cells[5] || "", relationship: (cells[6] || "apoderado").toLowerCase(),
+        grade: cells[7] || "", section: cells[8] || "",
+        valid: true, errors: [] as string[], skipped: false,
+      }
+      if (!row.parent_name) row.errors.push("Nombre del padre requerido")
+      if (!row.parent_dni || row.parent_dni.length < 8) row.errors.push("DNI padre inválido")
+      if (!["padre","madre","apoderado","tio","abuelo","hermano","otro"].includes(row.relationship)) row.relationship = "apoderado"
+      row.valid = row.errors.length === 0
+      return row
+    })
+  }
+  const handlePadresFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return
+    setBulkFile(file)
+    const text = await file.text()
+    const rows = parsePadresCSV(text)
+    // detectar duplicados dentro del archivo por DNI padre
+    const seen = new Set<string>(); const marked = rows.map((r:any) => {
+      if (!r.valid) return r
+      if (seen.has(r.parent_dni)) return { ...r, skipped: true, errors: [...r.errors, "DNI repetido en archivo"], valid: false }
+      seen.add(r.parent_dni); return r
+    })
+    setBulkRows(marked); setBulkStep("preview")
+  }
+  const handlePadresBulkImport = async () => {
+    setBulkStep("importing"); setBulkProgress(0)
+    const importable = bulkRows.filter((r:any) => r.valid && !r.skipped)
+    let imported = 0, skipped = 0, errors = 0
+    for (let i = 0; i < importable.length; i++) {
+      setBulkProgress(Math.round(((i+1)/importable.length)*100))
+      const r = importable[i]
+      const [first, ...rest] = r.parent_name.trim().split(/\s+/)
+      const last = rest.join(" ") || "-"
+      // buscar student_id por DNI si se proporcionó
+      let student_id: string | undefined
+      if (r.student_dni) {
+        try {
+          const sRes = await fetch(`/api/secretario/busqueda?q=${encodeURIComponent(r.student_dni)}`)
+          if (sRes.ok) { const arr = await sRes.json(); const hit = arr.find((s:any) => (s.document_number||s.dni) === r.student_dni); if (hit) student_id = hit.id }
+        } catch {}
+      }
+      try {
+        const res = await fetch("/api/secretario/parents", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ first_name: first, last_name: last, document_number: r.parent_dni, phone: r.parent_phone, email: r.parent_email || undefined, student_id, relationship: r.relationship }) })
+        if (res.ok) imported++; else { const d = await res.json().catch(()=>({})); if (res.status===409) skipped++; else errors++ }
+      } catch { errors++ }
+      await new Promise(r2 => setTimeout(r2, 40))
+    }
+    setBulkResults({ imported, skipped, errors }); setBulkStep("done"); fetchParents()
+  }
+  const downloadPadresTemplate = () => {
+    const header = "Nombre Padre,DNI Padre,Telefono,Email,Nombre Alumno,DNI Alumno,Parentesco,Grado,Seccion"
+    const sample = "Juan Perez,12345678,999888777,,Maria Perez,87654321,padre,1ro Primaria,A"
+    const blob = new Blob([header+"\n"+sample], { type: "text/csv" })
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "plantilla_padres.csv"; a.click()
+  }
+  const resetPadresBulk = () => { setBulkFile(null); setBulkRows([]); setBulkStep("upload"); setBulkProgress(0); setBulkResults(null); if(fileInputRef.current) fileInputRef.current.value="" }
+
   return (
     <div className="space-y-5">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2"
         >
           <div>
             <h1 className="text-2xl font-bold text-sb-on-surface tracking-tight">Padres y Apoderados</h1>
             <p className="text-sm text-sb-on-surface-variant/50 mt-1">Gestionar el vínculo familiar de los estudiantes</p>
           </div>
-          <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { resetForm(); setCreateOpen(true) }}>
-            <Plus className="h-3.5 w-3.5" />
-            Nuevo padre
-          </SbBtn>
+          {activeTab === "individual" ? (
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => { resetForm(); setCreateOpen(true) }}>
+              <Plus className="h-3.5 w-3.5" />
+              Nuevo padre
+            </SbBtn>
+          ) : (
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={downloadPadresTemplate}>
+              <Download className="h-4 w-4" /> Descargar Plantilla
+            </SbBtn>
+          )}
         </motion.div>
+
+        {/* Tabs como Matrículas */}
+        <div className="flex gap-1 p-1 bg-sb-surface-container rounded-xl mb-2">
+          <button onClick={() => setActiveTab("individual")} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${activeTab==="individual" ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"}`}>
+            <User className="h-4 w-4" /> Carga Individual
+          </button>
+          <button onClick={() => setActiveTab("bulk")} className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${activeTab==="bulk" ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"}`}>
+            <FileSpreadsheet className="h-4 w-4" /> Carga Masiva
+          </button>
+        </div>
+        {activeTab === "bulk" ? (
+          <div className="bg-sb-surface rounded-2xl overflow-hidden">
+            {bulkStep === "upload" && (
+              <div className="p-8 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-sb-surface-container-high flex items-center justify-center mx-auto mb-4"><Upload className="h-8 w-8 text-sb-on-surface-variant/40" /></div>
+                <h3 className="text-lg font-medium text-sb-on-surface mb-2">Importar padres desde Excel</h3>
+                <p className="text-sm text-sb-on-surface-variant/50 mb-6 max-w-md mx-auto">Sube un CSV con columnas: Nombre Padre, DNI Padre, Teléfono, Email, Nombre Alumno, DNI Alumno, Parentesco, Grado, Sección. Si el alumno ya existe se vinculará automáticamente.</p>
+                <input ref={fileInputRef} type="file" accept=".csv" onChange={handlePadresFileSelect} className="hidden" />
+                <div className="flex gap-3 justify-center">
+                  <SbBtn variant="filled" rounded onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4 mr-2" /> Seleccionar Archivo</SbBtn>
+                  <SbBtn variant="tonal" rounded onClick={downloadPadresTemplate}><Download className="h-4 w-4 mr-2" /> Plantilla</SbBtn>
+                </div>
+              </div>
+            )}
+            {bulkStep === "preview" && (
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3"><p className="text-sm font-medium">{bulkFile?.name} — {bulkRows.length} filas</p><button onClick={resetPadresBulk} className="text-xs text-sb-on-surface-variant/50">Cambiar archivo</button></div>
+                <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                  <table className="w-full text-sm"><thead className="sticky top-0 bg-sb-surface"><tr className="border-b"><th className="text-left py-2 px-2 text-[10px] uppercase">Fila</th><th className="text-left py-2 px-2 text-[10px] uppercase">Padre</th><th className="text-left py-2 px-2 text-[10px] uppercase">DNI</th><th className="text-left py-2 px-2 text-[10px] uppercase">Alumno</th><th className="text-left py-2 px-2 text-[10px] uppercase">Estado</th></tr></thead>
+                  <tbody>{bulkRows.map((r:any,i:number)=>(<tr key={i} className={`border-b ${!r.valid? "bg-red-500/5": r.skipped? "opacity-60":""}`}><td className="py-2 px-2 font-mono text-xs">{r.row}</td><td className="py-2 px-2">{r.parent_name}</td><td className="py-2 px-2">{r.parent_dni}</td><td className="py-2 px-2">{r.student_name||"—"} {r.relationship && <span className="text-xs text-sb-on-surface-variant/50">({r.relationship})</span>}</td><td className="py-2 px-2">{!r.valid? <span className="text-red-400 text-xs">{r.errors.join(", ")}</span> : r.skipped? <span className="text-amber-400 text-xs">Omitido</span> : <span className="text-emerald-400 text-xs">Listo</span>}</td></tr>))}</tbody></table>
+                </div>
+                <div className="flex justify-end gap-2 mt-4"><SbBtn rounded onClick={resetPadresBulk}>Cancelar</SbBtn><SbBtn variant="filled" rounded onClick={handlePadresBulkImport} disabled={bulkRows.filter((r:any)=>r.valid&&!r.skipped).length===0}>Importar {bulkRows.filter((r:any)=>r.valid&&!r.skipped).length} padres</SbBtn></div>
+              </div>
+            )}
+            {bulkStep === "importing" && (<div className="p-8 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto mb-3" /><p className="text-sm">Importando... {bulkProgress}%</p><div className="w-full h-2 bg-sb-surface-container rounded-full mt-3"><div className="h-2 bg-sb-primary rounded-full transition-all" style={{width: bulkProgress+"%"}} /></div></div>)}
+            {bulkStep === "done" && bulkResults && (<div className="p-8 text-center"><CheckCircle className="h-10 w-10 text-emerald-400 mx-auto mb-3" /><p className="font-medium">Importación completada</p><p className="text-sm text-sb-on-surface-variant/50 mt-1">{bulkResults.imported} importados · {bulkResults.skipped} omitidos · {bulkResults.errors} errores</p><SbBtn variant="filled" rounded className="mt-4" onClick={resetPadresBulk}>Nueva importación</SbBtn></div>)}
+          </div>
+        ) : (
+          <>
+        
 
         {/* Stats */}
         <motion.div
@@ -635,7 +760,8 @@ export default function SecretarioPadresPage() {
             </AnimatePresence>
           )}
         </div>
-
+          </>
+        )}
       {/* ===== CREATE MODAL ===== */}
       <SbModal open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="520px">
         <SbModalHeader title="Nuevo Padre / Apoderado" onClose={() => setCreateOpen(false)} />
