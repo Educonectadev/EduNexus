@@ -652,7 +652,7 @@ export default function SecretarioMatriculasPage() {
                 <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider">Grado</td>
                 <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider">Sección</td>
                 <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider">Año</td>
-                <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider">Estado</td>
+                <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider">Turno</td>
                 <td className="text-[10px] font-medium text-sb-on-surface-variant/50 uppercase tracking-wider text-right">Acciones</td>
               </tr>
             </thead>
@@ -670,6 +670,7 @@ export default function SecretarioMatriculasPage() {
                     <td className="text-sb-on-surface/70 text-[13px]">{enr.grade}</td>
                     <td className="text-sb-on-surface/70 text-[13px]">{enr.section}</td>
                     <td className="font-mono text-xs text-sb-on-surface-variant/50">{enr.year}</td>
+                    <td>{enr.shift || "—"}</td>
                     <td>
                       <SbBadge color={enr.status === "active" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"}>
                         {enr.status === "active" ? "Activo" : "Pendiente"}
