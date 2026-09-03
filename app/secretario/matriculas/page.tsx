@@ -979,7 +979,7 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
                     {form.student_birth_date && (()=>{ const d=new Date(form.student_birth_date); const age=Math.floor((Date.now()-d.getTime())/31557600000); return <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{age}a</span> })()}
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-[9999]" align="start" sideOffset={8}>
                   <CalendarComp
                     mode="single"
                     selected={form.student_birth_date ? new Date(form.student_birth_date+'T00:00:00') : undefined}
