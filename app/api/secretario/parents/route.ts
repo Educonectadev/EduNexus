@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (create_account !== false) {
-      generatedEmail = email || (await generateEmail(first_name, last_name, document_number, instId))
+      generatedEmail = await generateEmail(first_name, last_name, document_number, instId)
       generatedPassword = (customPassword && customPassword.trim()) || generateParentPassword()
       const hashedPassword = await bcrypt.hash(generatedPassword!, 10)
       const fullName = `${first_name} ${last_name}`.trim()
