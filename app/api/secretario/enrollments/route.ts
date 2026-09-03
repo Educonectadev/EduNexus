@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         await conn.query(
           `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, shift, status)
            VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, $11, 'active')`,
-          [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '', shift || '', 'active']
+          [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '', shift || '']
         )
       } catch (e:any) {
         if (e.code === '42703') {
