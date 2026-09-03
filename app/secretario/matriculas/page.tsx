@@ -23,6 +23,7 @@ interface Enrollment {
   created_at: string
   code?: string
   document_type?: string
+  shift?: string
 }
 
 interface BulkRow {
@@ -95,6 +96,7 @@ export default function SecretarioMatriculasPage() {
     student_name: "", student_dni: "", student_birth_date: "", student_gender: "",
     parent_name: "", parent_dni: "", parent_phone: "", parent_email: "",
     grade: "", section: "", year: new Date().getFullYear().toString(),
+    shift: "",
   }
   const [form, setForm] = React.useState(emptyForm)
 
@@ -470,6 +472,7 @@ export default function SecretarioMatriculasPage() {
       student_gender: enr.gender || "",
       parent_name: "", parent_dni: "", parent_phone: "", parent_email: "",
       grade: enr.grade, section: enr.section, year: enr.year.toString(),
+      shift: enr.shift || "",
     })
     setDetailOpen(false)
     setEditOpen(true)
@@ -995,6 +998,15 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
             <select value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} className="sbf-native-select w-full">
               <option value="">—</option>
               {sections.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Turno</label>
+            <select value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} className="sbf-native-select w-full">
+              <option value="">—</option>
+              <option value="mañana">Mañana</option>
+              <option value="tarde">Tarde</option>
+              <option value="noite">Noite</option>
             </select>
           </div>
         </div>
