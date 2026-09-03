@@ -30,10 +30,8 @@ export function SbfSelect({ value, onChange, options, placeholder, icon: Icon }:
       <motion.button
         onClick={() => setOpen(!open)}
         className={`sbf-select-trigger ${value ? "has-value" : ""}`}
-        animate={open ? { scale: 1.03, y: -1 } : { scale: 1, y: 0 }}
-        whileHover={{ scale: 1.06, y: -2 }}
-        whileTap={{ scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 400, damping: 32, mass: 0.7 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.15 }}
       >
         {Icon && <Icon className="h-3.5 w-3.5 opacity-50" />}
         <span className="sbf-select-label">
