@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const [enrollments] = await pool.query(
       `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
               s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
-              s.code, s.document_type
+              s.code, s.document_type, COALESCE(s.shift, e.shift, '') as shift
        FROM enrollments e
        LEFT JOIN students s ON e.student_id = s.id
        WHERE s.institution_id = ?
