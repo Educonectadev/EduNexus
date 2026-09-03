@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar } from "@/components/ui/proicons"
+import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar, Trash2 } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalBody, SbBtn, SbBadge } from "@/components/ui/sb"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
@@ -22,6 +22,8 @@ export default function SecretarioPersonalPage() {
   const [search, setSearch] = React.useState("")
   const [selected, setSelected] = React.useState<Staff | null>(null)
   const [importOpen, setImportOpen] = React.useState(false)
+  const [deleteAllOpen, setDeleteAllOpen] = React.useState(false)
+  const [deletingAll, setDeletingAll] = React.useState(false)
 
   const fetchStaff = async () => {
     try {
@@ -60,6 +62,9 @@ export default function SecretarioPersonalPage() {
       <SbSectionHeader title="Personal" description="Docentes y secretarios — datos compartidos con el director y los horarios"
         action={
           <div className="flex items-center gap-2">
+            <SbBtn variant="tonal" rounded className="flex items-center gap-2 text-red-400" onClick={() => setDeleteAllOpen(true)} disabled={staff.length === 0}>
+              <Trash2 className="h-4 w-4" /> Eliminar Todo
+            </SbBtn>
             <SbBtn rounded className="flex items-center gap-2" onClick={() => setImportOpen(true)}>
               <Plus className="h-4 w-4" /> Importar personal
             </SbBtn>
@@ -209,6 +214,25 @@ export default function SecretarioPersonalPage() {
       </SbModal>
 
       <ImportarDocentesModal open={importOpen} onClose={() => setImportOpen(false)} onImported={fetchStaff} />
+
+      {deleteAllOpen && (
+        <SbModal open={deleteAllOpen} onClose={() => setDeleteAllOpen(false)} maxWidth="480px">
+          <SbModalBody>
+            <h3 className="text-base font-semibold text-sb-on-surface">Eliminar todo el personal</h3>
+            <p className="text-sm text-sb-on-surface-variant/60 mt-2">Se eliminarán {staff.length} docentes/secretarios de esta institución. Esta acción no se puede deshacer.</p>
+            <div className="flex gap-2 mt-6">
+              <SbBtn rounded className="flex-1" onClick={() => setDeleteAllOpen(false)}>Cancelar</SbBtn>
+              <SbBtn variant="filled" rounded className="flex-1 bg-red-500 hover:bg-red-600 text-white" disabled={deletingAll} onClick={async () => {
+                setDeletingAll(true)
+                try {
+                  const res = await fetch("/api/secretario/personal", { method: "DELETE" })
+                  if (res.ok) { setStaff([]); setDeleteAllOpen(false) }
+                } finally { setDeletingAll(false) }
+              }}>{deletingAll ? "Eliminando..." : "Eliminar Todo"}</SbBtn>
+            </div>
+          </SbModalBody>
+        </SbModal>
+      )}
     </div>
   )
 }

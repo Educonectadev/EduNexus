@@ -26,3 +26,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Error fetching personal' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const user = await getAuthPayload(request)
+    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    const instId = await resolveInstId(request)
+    if (!instId) return NextResponse.json({ error: 'Sin institucion' }, { status: 400 })
+    const conn: any = await (pool as any).rawPool.connect()
+    try {
+      await conn.query('BEGIN')
+      const usersRes = await conn.query(`SELECT id FROM users WHERE institution_id = $1 AND role IN ('docente','secretario')`, [instId])
+      const ids: string[] = usersRes.rows.map((r: any) => r.id)
+      if (ids.length > 0) {
+        await conn.query(`DELETE FROM teachers WHERE user_id = ANY($1)`, [ids])
+        await conn.query(`DELETE FROM users WHERE id = ANY($1)`, [ids])
+      }
+      await conn.query('COMMIT')
+      return NextResponse.json({ deleted: ids.length })
+    } catch (e: any) {
+      await conn.query('ROLLBACK').catch(()=>{})
+      return NextResponse.json({ error: e.message }, { status: 500 })
+    } finally { conn.release() }
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Error deleting personal' }, { status: 500 })
+  }
+}
