@@ -13,7 +13,7 @@ interface Parent {
   linked_students: { name: string; relationship: string; id: string; grade: string; section: string }[]
 }
 
-interface Student { id: string; first_name: string; last_name: string; document_number: string; grade: string; section: string; full_name?: string; dni?: string; grade_level?: string }
+interface Student { id: string; first_name: string; last_name: string; document_number: string; grade: string; section: string; shift: string; full_name?: string; dni?: string; grade_level?: string }
 
 const relationships = [
   { value: "padre", label: "Padre", icon: "👨" }, { value: "madre", label: "Madre", icon: "👩" },
@@ -939,7 +939,7 @@ export default function SecretarioPadresPage() {
                           </div>
                           <div className="flex-1">
                             <p className="text-sm text-sb-on-surface">{s.first_name} {s.last_name}</p>
-                            <p className="text-[11px] text-sb-on-surface-variant/50">DNI: {s.document_number} — {s.grade} {s.section}</p>
+                            <p className="text-[11px] text-sb-on-surface-variant/50">DNI: {s.document_number} — {s.grade} {s.section} — Turno: {s.shift || "—"}</p>
                           </div>
                           {linkForm.student_id === s.id && <span className="text-emerald-600 text-xs font-medium">Seleccionado</span>}
                         </button>

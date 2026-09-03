@@ -18,14 +18,14 @@ export async function GET(request: NextRequest) {
       [instId]
     )
 
-    const [students] = await pool.query(
-      `SELECT s.id, s.code, s.first_name, s.last_name, s.document_number, s.grade, s.section, s.status,
-              s.gender, s.birth_date
-       FROM students s
-       JOIN enrollments e ON e.student_id = s.id
-       WHERE e.institution_id = ?
-       GROUP BY s.id
-       ORDER BY s.grade, s.section, s.first_name`,
+const [students] = await pool.query(
+      `SELECT s.id, s.code, s.first_name, s.last_name, s.document_number, s.grade, s.section, s.shift,
+               s.status, s.gender, s.birth_date
+        FROM students s
+        JOIN enrollments e ON e.student_id = s.id
+        WHERE e.institution_id = ?
+        GROUP BY s.id
+        ORDER BY s.grade, s.section, s.first_name`,
       [instId]
     )
 

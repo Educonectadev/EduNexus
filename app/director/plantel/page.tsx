@@ -11,7 +11,7 @@ interface StaffMember {
 }
 
 interface Student {
-  id: string; code: string; first_name: string; last_name: string; document_number: string; grade: string; section: string; status: string; gender: string; birth_date: string
+  id: string; code: string; first_name: string; last_name: string; document_number: string; grade: string; section: string; shift: string; status: string; gender: string; birth_date: string
 }
 
 const sectionMeta = [
@@ -140,9 +140,10 @@ export default function PlantelPage() {
               <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
               <span className="text-[10px] text-sb-on-surface-variant/30 font-mono">#{s.code?.slice(-6) || "—"}</span>
             </div>
-            <div className="flex items-center gap-3 text-xs text-sb-on-surface-variant/50 mt-0.5">
+<div className="flex items-center gap-3 text-xs text-sb-on-surface-variant/50 mt-0.5">
               <span className="flex items-center gap-1"><BookOpen className="h-3 w-3" />{s.grade} {s.section}</span>
-              <span className="flex items-center gap-1"><Hash className="h-3 w-3" />{s.document_number || "—"}</span>
+              <span className="flex items-center gap-1"><Hash className="h-3 w-3 shrink-0" />{s.document_number || "—"}</span>
+              <span className="flex items-center gap-1 text-[10px] text-sb-on-surface-variant/60">{s.shift || "—"}</span>
             </div>
           </div>
         </div>
