@@ -107,6 +107,10 @@ export async function POST(request: NextRequest) {
     }
 
     conn = await pool.rawPool.connect()
+    // asegurar columnas shift existen (hotfix prod sin migración)
+    await conn.query(`ALTER TABLE students ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
+    await conn.query(`ALTER TABLE parents ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
+    await conn.query(`ALTER TABLE enrollments ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
     await conn.query('BEGIN')
 
     let studentId: string
@@ -132,10 +136,10 @@ export async function POST(request: NextRequest) {
 
 await conn.query(
         `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender),
-          shift = COALESCE('', shift),
+          shift = COALESCE(NULLIF($6, ''), shift),
           code = COALESCE(NULLIF($5, ''), code)
-          WHERE id = $6`,
-        [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId]
+          WHERE id = $7`,
+        [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', shift || '', studentId]
       )
     } else {
       studentId = crypto.randomUUID()
@@ -158,9 +162,9 @@ await conn.query(
     }
 
     const result = await conn.query(
-      `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, year, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'active')`,
-      [instId, studentId, courseId, grade || '', section || '', year || new Date().getFullYear()]
+      `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, shift, year, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
+      [instId, studentId, courseId, grade || '', section || '', shift || '', year || new Date().getFullYear()]
     )
 
     if (parent_dni) {
