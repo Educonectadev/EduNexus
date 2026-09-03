@@ -968,8 +968,14 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
             </div>
             <div>
               <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Fecha Nac.</label>
-              <input type="date" value={form.student_birth_date}
-                onChange={(e) => setForm({ ...form, student_birth_date: e.target.value })} className="sb-input" />
+              <div className="relative">
+                <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/40 pointer-events-none" />
+                <input type="date" value={form.student_birth_date}
+                  max={new Date().toISOString().split('T')[0]} min="2000-01-01"
+                  onChange={(e) => setForm({ ...form, student_birth_date: e.target.value })} className="sb-input pl-8 pr-2 text-[13px]" />
+                {form.student_birth_date && (()=>{ const d=new Date(form.student_birth_date); const age=Math.floor((Date.now()-d.getTime())/31557600000); return <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary pointer-events-none">{age}a</span> })()}
+              </div>
+              <p className="text-[10px] text-sb-on-surface-variant/30 mt-1">{form.student_birth_date ? new Date(form.student_birth_date).toLocaleDateString('es-PE',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : 'dd/mm/aaaa'}</p>
             </div>
             <div>
               <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Género</label>
