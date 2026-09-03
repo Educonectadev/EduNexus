@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import type { LucideIcon } from "@/components/ui/proicons"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 
 interface Metric {
   label: string
@@ -190,6 +192,20 @@ export function MinimalistDashboardView({
           <h2 className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-4">
             Actividad reciente
           </h2>
+          {activities.length === 0 ? (
+            <div className="bg-sb-surface rounded-2xl p-4">
+              <ChartContainer config={{ desktop: { label: "Matrículas", color: "#2563eb" }, mobile: { label: "Pagos", color: "#60a5fa" } } satisfies ChartConfig} className="h-[200px] w-full">
+                <BarChart accessibilityLayer data={[{month:"Ene",desktop:186,mobile:80},{month:"Feb",desktop:305,mobile:200},{month:"Mar",desktop:237,mobile:120},{month:"Abr",desktop:73,mobile:190},{month:"May",desktop:209,mobile:130},{month:"Jun",desktop:214,mobile:140}]}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(v:string)=>v.slice(0,3)} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                  <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                </BarChart>
+              </ChartContainer>
+              <p className="text-[11px] text-sb-on-surface-variant/40 text-center mt-2">Matrículas vs Pagos — últimos 6 meses</p>
+            </div>
+          ) : (
           <div className="space-y-px rounded-2xl overflow-hidden bg-sb-outline-variant/10">
             {activities.map((act, i) => {
               const Icon = act.icon
@@ -219,6 +235,7 @@ export function MinimalistDashboardView({
               )
             })}
           </div>
+          )}
         </motion.section>
       </div>
     </motion.div>
