@@ -107,10 +107,6 @@ export async function POST(request: NextRequest) {
     }
 
     conn = await pool.rawPool.connect()
-    // asegurar columnas shift existen (hotfix prod sin migración)
-    await conn.query(`ALTER TABLE students ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
-    await conn.query(`ALTER TABLE parents ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
-    await conn.query(`ALTER TABLE enrollments ADD COLUMN IF NOT EXISTS shift VARCHAR(20) DEFAULT ''`).catch(()=>{})
     await conn.query('BEGIN')
 
     let studentId: string
@@ -134,21 +130,33 @@ export async function POST(request: NextRequest) {
         }
       }
 
-await conn.query(
-        `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender),
-          shift = COALESCE(NULLIF($6, ''), shift),
-          code = COALESCE(NULLIF($5, ''), code)
-          WHERE id = $7`,
-        [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', shift || '', studentId]
-      )
+      try {
+        await conn.query(
+          `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender),
+            shift = COALESCE(NULLIF($6, ''), shift),
+            code = COALESCE(NULLIF($5, ''), code)
+            WHERE id = $7`,
+          [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', shift || '', studentId]
+        )
+      } catch (e:any) {
+        if (e.code === '42703') {
+          await conn.query(`UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender), code = COALESCE(NULLIF($5, ''), code) WHERE id = $6`, [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', studentId])
+        } else throw e
+      }
     } else {
       studentId = crypto.randomUUID()
       const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
-      await conn.query(
-        `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, shift, status)
-         VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, $11, 'active')`,
-        [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '', shift || '', 'active']
-      )
+      try {
+        await conn.query(
+          `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, shift, status)
+           VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, $11, 'active')`,
+          [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '', shift || '', 'active']
+        )
+      } catch (e:any) {
+        if (e.code === '42703') {
+          await conn.query(`INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status) VALUES ($1,$2,$3,$4,$5,'DNI',$6,NULLIF($7,'')::date,NULLIF($8,''),$9,$10,'active')`, [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || ''])
+        } else throw e
+      }
     }
 
     // Find the course that matches this grade/section
@@ -161,11 +169,17 @@ await conn.query(
       courseId = courseResult.rows[0]?.id || null
     }
 
-    const result = await conn.query(
-      `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, shift, year, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
-      [instId, studentId, courseId, grade || '', section || '', shift || '', year || new Date().getFullYear()]
-    )
+    try {
+      await conn.query(
+        `INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, shift, year, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
+        [instId, studentId, courseId, grade || '', section || '', shift || '', year || new Date().getFullYear()]
+      )
+    } catch (e:any) {
+      if (e.code === '42703') {
+        await conn.query(`INSERT INTO enrollments (institution_id, student_id, course_id, grade, section, year, status) VALUES ($1,$2,$3,$4,$5,$6,'active')`, [instId, studentId, courseId, grade || '', section || '', year || new Date().getFullYear()])
+      } else throw e
+    }
 
     if (parent_dni) {
       const existingParent = await conn.query(
