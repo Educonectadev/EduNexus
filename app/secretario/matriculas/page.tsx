@@ -330,6 +330,22 @@ export default function SecretarioMatriculasPage() {
     // Preview instantáneo sin esperar compare (para 994 filas)
     setBulkRows(marked)
     setBulkStep("preview")
+    // Si no había columna DNI (TMP), intenta autocompletar por nombre desde la BD
+    const tmpRows = marked.filter(r => r.student_dni.startsWith("TMP") && r.student_name)
+    if (tmpRows.length > 0 && tmpRows.length < 30) {
+      tmpRows.slice(0,20).forEach(async (r) => {
+        try {
+          const res = await fetch(`/api/secretario/busqueda?q=${encodeURIComponent(r.student_name)}`)
+          if (!res.ok) return
+          const arr = await res.json()
+          const hit = arr.find((s:any) => `${s.first_name} ${s.last_name}`.toLowerCase().trim() === r.student_name.toLowerCase().trim())
+          const dni = hit?.document_number || hit?.dni
+          if (dni && /^\d{8}$/.test(dni)) {
+            setBulkRows(prev => prev.map(p => p.row===r.row ? {...p, student_dni: dni, valid: true, errors: p.errors.filter(e=>e!=="DNI inválido")} : p))
+          }
+        } catch {}
+      })
+    }
     // Compare en background para detectar nuevos/cambios/sin cambios
     const validRows = marked.filter(r => r.valid && !r.skipped)
     if (validRows.length > 0) {
