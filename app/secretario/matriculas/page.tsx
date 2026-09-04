@@ -153,10 +153,12 @@ export default function SecretarioMatriculasPage() {
       }
     }
     const findIdx = (keys: string[]) => {
+      // prioridad exacto, luego includes (para tus 13 etiquetas exactas)
+      for(let k of keys){ const i=headerCells.findIndex(h=>h===k); if(i!==-1) return i }
       for(let k of keys){ const i=headerCells.findIndex(h=>h.includes(k)); if(i!==-1) return i }
       return -1
     }
-    const idxCode = findIdx(["codigo","code"])
+    const idxCode = findIdx(["codigo alumno","codigo","code"])
     const idxName = (()=>{ const a=findIdx(["nombre alumno","nombre del alumno","nombres y apellidos","nombre completo","alumno"]); return a!==-1?a: Math.max(0,findIdx(["nombre"])) })()
     const idxApellidos = findIdx(["apellidos","apellido"])
     const idxNombresOnly = findIdx(["nombres"])
@@ -165,8 +167,8 @@ export default function SecretarioMatriculasPage() {
     const idxGender = findIdx(["genero","sexo","gender"])
     const idxParentName = findIdx(["nombre padre","nombre del padre","padre/apoderado","padre","apoderado"])
     const idxParentDni = findIdx(["dni padre","dni apoderado"])
-    const idxParentPhone = findIdx(["telefono padre","celular","phone"])
-    const idxParentEmail = findIdx(["email padre","correo"])
+    const idxParentPhone = findIdx(["telefono padre","telefono","celular","phone"])
+    const idxParentEmail = findIdx(["email padre","email","correo"])
     const idxNivel = findIdx(["nivel"])
     const idxGrade = findIdx(["grado","grade"])
     const idxSection = findIdx(["seccion","section"])
