@@ -9,7 +9,7 @@ export async function POST(req: NextRequest){
   const conn:any = await (pool as any).rawPool.connect()
   try{
     await conn.query('BEGIN')
-    let imported=0, skipped=0, errors=0
+    let imported=0, skipped=0, errors=0; let firstError: string | null = null
     // Pre-fetch existing students by DNI for fast lookup
     const dnis = rows.map(r=>r.student_dni).filter(Boolean)
     const existingMap = new Map<string,string>()
@@ -17,10 +17,10 @@ export async function POST(req: NextRequest){
       const res = await conn.query(`SELECT id, document_number FROM students WHERE institution_id=$1 AND document_number = ANY($2)`, [instId, dnis])
       for(const r of res.rows) existingMap.set(r.document_number, r.id)
     }
-    // Ensure grades/sections exist cache
+    // Ensure grades/sections exist cache (usa conn con $)
     const gradeCache = new Set<string>()
-    const [gRows]=await pool.query(`SELECT LOWER(name) as n FROM academic_grades WHERE institution_id=$1`,[instId]) as any
-    for(const g of gRows) gradeCache.add(g.n)
+    const gRes = await conn.query(`SELECT LOWER(name) as n FROM academic_grades WHERE institution_id=$1`,[instId])
+    for(const g of gRes.rows) gradeCache.add(g.n)
     for(const r of rows){
       try{
         const grade = r.grade || ''
@@ -70,10 +70,10 @@ export async function POST(req: NextRequest){
           if(!exL.rows.length) await conn.query(`INSERT INTO parent_student (parent_id,student_id,relationship,is_primary) VALUES ($1,$2,'padre',true)`,[pid, studentId])
         }
         imported++
-      }catch(e){ console.error(e); errors++ }
+      }catch(e:any){ console.error('bulk row',r.student_dni, e); if(!firstError) firstError = e.message || String(e); errors++ }
     }
     await conn.query('COMMIT')
-    return NextResponse.json({ imported, skipped, errors })
+    return NextResponse.json({ imported, skipped, errors, firstError })
   }catch(e:any){ await conn.query('ROLLBACK').catch(()=>{}); return NextResponse.json({error:e.message},{status:500}) }
   finally{ conn.release() }
 }

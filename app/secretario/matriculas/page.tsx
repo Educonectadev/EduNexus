@@ -387,12 +387,13 @@ export default function SecretarioMatriculasPage() {
         body: JSON.stringify({ rows: payloadRows }),
       })
       const data = await res.json().catch(()=>({}))
-      if (res.ok) {
+      if (res.ok && data.imported > 0) {
         setBulkProgress(100)
         const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
         setBulkResults({ imported: data.imported || 0, skipped: (data.skipped||0)+userSkipped, errors: data.errors||0 })
         setBulkStep("done"); fetchEnrollments(); return
       }
+      if (res.ok && data.imported===0) throw new Error(data.firstError || "bulk 0 importados")
       throw new Error(data.error || "bulk failed")
     } catch (e) {
       console.error("bulk fallback a fila por fila", e)
