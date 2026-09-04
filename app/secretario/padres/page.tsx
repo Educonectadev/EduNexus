@@ -326,7 +326,17 @@ export default function SecretarioPadresPage() {
   const handlePadresFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; if (!file) return
     setBulkFile(file)
-    const text = await file.text()
+    let text: string
+    if (file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls")) {
+      const XLSX = await import("xlsx")
+      const buf = await file.arrayBuffer()
+      const wb = XLSX.read(buf, { type: "array" })
+      const sheet = wb.Sheets[wb.SheetNames[0]]
+      const rows2 = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: false }) as unknown as string[][]
+      text = rows2.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n")
+    } else {
+      text = await file.text()
+    }
     const rows = parsePadresCSV(text)
     // detectar duplicados dentro del archivo por DNI padre
     const seen = new Set<string>(); const marked = rows.map((r:any) => {
@@ -414,7 +424,7 @@ export default function SecretarioPadresPage() {
                 <div className="w-16 h-16 rounded-2xl bg-sb-surface-container-high flex items-center justify-center mx-auto mb-4"><Upload className="h-8 w-8 text-sb-on-surface-variant/40" /></div>
                 <h3 className="text-lg font-medium text-sb-on-surface mb-2">Importar padres desde Excel</h3>
                 <p className="text-sm text-sb-on-surface-variant/50 mb-6 max-w-md mx-auto">Sube un CSV con columnas: Nombre Padre, DNI Padre, Teléfono, Email, Nombre Alumno, DNI Alumno, Parentesco, Grado, Sección. Si el alumno ya existe se vinculará automáticamente.</p>
-                <input ref={fileInputRef} type="file" accept=".csv" onChange={handlePadresFileSelect} className="hidden" />
+                <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" onChange={handlePadresFileSelect} className="hidden" />
                 <div className="flex gap-3 justify-center">
                   <SbBtn variant="filled" rounded onClick={() => fileInputRef.current?.click()}><Upload className="h-4 w-4 mr-2" /> Seleccionar Archivo</SbBtn>
                   <SbBtn variant="tonal" rounded onClick={downloadPadresTemplate}><Download className="h-4 w-4 mr-2" /> Plantilla</SbBtn>

@@ -233,18 +233,30 @@ export default function SecretarioMatriculasPage() {
 
   const parseExcel = (file: File): Promise<BulkRow[]> => {
     return new Promise((resolve) => {
+      const isXlsx = file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls")
       const reader = new FileReader()
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
-          const text = e.target?.result as string
-          const rows = parseCSV(text)
-          resolve(rows)
+          if (isXlsx) {
+            const XLSX = await import("xlsx")
+            const data = e.target?.result as ArrayBuffer
+            const wb = XLSX.read(data, { type: "array" })
+            const sheet = wb.Sheets[wb.SheetNames[0]]
+            const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: false }) as unknown as string[][]
+            // Convert rows to CSV text for parseCSV
+            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n")
+            resolve(parseCSV(csv))
+          } else {
+            const text = e.target?.result as string
+            resolve(parseCSV(text))
+          }
         } catch (err) {
           console.error("Error parsing file:", err)
           resolve([])
         }
       }
-      reader.readAsText(file, "UTF-8")
+      if (isXlsx) reader.readAsArrayBuffer(file)
+      else reader.readAsText(file, "UTF-8")
     })
   }
 
@@ -1075,7 +1087,7 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             onChange={onFileSelect}
             className="hidden"
           />
@@ -1097,7 +1109,7 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           </div>
           
           <p className="text-xs text-sb-on-surface-variant/30 mt-4">
-            Formato aceptado: .csv
+            Formato aceptado: .csv, .xlsx
           </p>
         </div>
       </motion.div>
