@@ -137,7 +137,27 @@ export default function SecretarioMatriculasPage() {
   const parseCSV = (text: string): BulkRow[] => {
     const lines = text.split("\n").filter(line => line.trim())
     if (lines.length < 2) return []
-    
+    const headerCells = (() => {
+      const h = lines[0]; const c: string[]=[]; let cur=""; let q=false;
+      for(const ch of h){ if(ch==='"') q=!q; else if(ch===","&&!q){ c.push(cur.trim()); cur="" } else cur+=ch } c.push(cur.trim()); return c.map(s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))
+    })()
+    const findIdx = (keys: string[]) => {
+      for(let k of keys){ const i=headerCells.findIndex(h=>h.includes(k)); if(i!==-1) return i }
+      return -1
+    }
+    const idxCode = findIdx(["codigo","code"])
+    const idxName = (()=>{ const a=findIdx(["nombre del alumno","nombres y apellidos","nombre completo","alumno"]); return a!==-1?a: Math.max(0,findIdx(["nombre"])) })()
+    const idxApellidos = findIdx(["apellidos","apellido"])
+    const idxNombresOnly = findIdx(["nombres"])
+    const idxDni = findIdx(["dni alumno","dni del alumno","documento alumno","dni"])
+    const idxBirth = findIdx(["fecha nac","nacimiento","birth"])
+    const idxGender = findIdx(["genero","sexo","gender"])
+    const idxParentName = findIdx(["nombre del padre","padre","apoderado"])
+    const idxParentDni = findIdx(["dni padre","dni apoderado"])
+    const idxParentPhone = findIdx(["telefono padre","celular","phone"])
+    const idxParentEmail = findIdx(["email padre","correo"])
+    const idxGrade = findIdx(["grado","grade"])
+    const idxSection = findIdx(["seccion","section"])
     // Skip header row
     const dataLines = lines.slice(1)
     
@@ -159,19 +179,21 @@ export default function SecretarioMatriculasPage() {
       }
       cells.push(current.trim())
       
+      const get = (idx:number) => idx>=0 ? (cells[idx] || "") : ""
+      const combinedName = (idxApellidos!==-1 && idxNombresOnly!==-1) ? `${get(idxNombresOnly)} ${get(idxApellidos)}`.trim() : ""
       const rowData: BulkRow = {
         row: index + 2,
-        student_code: cells[0] || "",
-        student_name: cells[1] || "",
-        student_dni: cells[2] || "",
-        student_birth_date: cells[3] || "",
-        student_gender: (cells[4] || "").toUpperCase(),
-        parent_name: cells[5] || "",
-        parent_dni: cells[6] || "",
-        parent_phone: cells[7] || "",
-        parent_email: cells[8] || "",
-        grade: cells[9] || "",
-        section: cells[10] || "",
+        student_code: idxCode>=0 ? get(idxCode) : (cells[0] || ""),
+        student_name: combinedName || get(idxName) || cells[1] || "",
+        student_dni: get(idxDni) || cells[2] || "",
+        student_birth_date: get(idxBirth) || cells[3] || "",
+        student_gender: (get(idxGender) || cells[4] || "").toUpperCase(),
+        parent_name: get(idxParentName) || cells[5] || "",
+        parent_dni: get(idxParentDni) || cells[6] || "",
+        parent_phone: get(idxParentPhone) || cells[7] || "",
+        parent_email: get(idxParentEmail) || cells[8] || "",
+        grade: get(idxGrade) || cells[9] || "",
+        section: get(idxSection) || cells[10] || "",
         valid: true,
         errors: [],
         duplicate: false,
