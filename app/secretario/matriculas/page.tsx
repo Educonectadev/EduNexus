@@ -206,7 +206,10 @@ export default function SecretarioMatriculasPage() {
       // Validate
       const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       if (!rowData.student_name) rowData.errors.push("Nombre del alumno requerido")
-      if (!rowData.student_dni || rowData.student_dni.length < 8) rowData.errors.push("DNI inválido")
+      if (!rowData.student_dni || rowData.student_dni.length < 8) {
+        // modo híbrido: genera DNI temporal para no bloquear importación masiva
+        rowData.student_dni = `TMP${String(rowData.row).padStart(6,"0")}`
+      }
       // Género híbrido: autocorrige en vez de bloquear
       if (rowData.student_gender) {
         const g = rowData.student_gender.toLowerCase()
