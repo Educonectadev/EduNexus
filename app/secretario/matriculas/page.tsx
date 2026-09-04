@@ -323,55 +323,39 @@ export default function SecretarioMatriculasPage() {
       return r
     })
 
-    // Compare against existing students to detect data changes
-    const validRows = marked.filter(r => r.valid && !r.skipped)
-    if (validRows.length > 0) {
-      try {
-        const res = await fetch("/api/secretario/enrollments/compare", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ rows: validRows.map(r => ({
-            student_name: r.student_name,
-            student_dni: r.student_dni,
-            student_birth_date: convertDate(r.student_birth_date),
-            student_gender: r.student_gender === "MASCULINO" ? "M" : r.student_gender === "FEMENINO" ? "F" : r.student_gender,
-            parent_name: r.parent_name,
-            parent_dni: r.parent_dni,
-            parent_phone: r.parent_phone,
-            parent_email: r.parent_email,
-            grade: r.grade,
-            section: r.section,
-          })) }),
-        })
-        if (res.ok) {
-          const data = await res.json()
-          const byDni = new Map<string, CompareResult>((data.results || []).map((r: CompareResult) => [r.dni, r]))
-          const merged: BulkRow[] = marked.map(r => {
-            const cmp = r.student_dni ? byDni.get(r.student_dni) : null
-            if (!cmp || !r.valid || r.skipped) return r
-            if (cmp.status === "unchanged") {
-              return { ...r, compareStatus: "unchanged" as const, changes: [], existingCode: cmp.code || "", skipped: true }
-            }
-            return {
-              ...r,
-              compareStatus: cmp.status,
-              changes: cmp.changes || [],
-              existingCode: cmp.code || "",
-              existingEnrollmentId: cmp.enrollmentId || null,
-              duplicate: false,
-              skipped: false,
-            }
-          })
-          setBulkRows(merged)
-          setBulkStep("preview")
-          return
-        }
-      } catch {}
-    }
-
+    // Preview instantáneo sin esperar compare (para 994 filas)
     setBulkRows(marked)
     setBulkStep("preview")
+    // Compare en background para detectar nuevos/cambios/sin cambios
+    const validRows = marked.filter(r => r.valid && !r.skipped)
+    if (validRows.length > 0) {
+      fetch("/api/secretario/enrollments/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ rows: validRows.map(r => ({
+          student_name: r.student_name,
+          student_dni: r.student_dni,
+          student_birth_date: convertDate(r.student_birth_date),
+          student_gender: r.student_gender === "MASCULINO" ? "M" : r.student_gender === "FEMENINO" ? "F" : r.student_gender,
+          parent_name: r.parent_name,
+          parent_dni: r.parent_dni,
+          parent_phone: r.parent_phone,
+          parent_email: r.parent_email,
+          grade: r.grade,
+          section: r.section,
+        })) }),
+      }).then(r=>r.ok?r.json():null).then(data=>{
+        if(!data) return
+        const byDni = new Map<string, CompareResult>((data.results || []).map((r: CompareResult) => [r.dni, r]))
+        setBulkRows(prev => prev.map(r => {
+          const cmp = r.student_dni ? byDni.get(r.student_dni) : null
+          if (!cmp || !r.valid || r.skipped) return r
+          if (cmp.status === "unchanged") return { ...r, compareStatus: "unchanged" as const, changes: [], existingCode: cmp.code || "", skipped: true }
+          return { ...r, compareStatus: cmp.status, changes: cmp.changes || [], existingCode: cmp.code || "", existingEnrollmentId: cmp.enrollmentId || null, duplicate: false, skipped: false }
+        }))
+      }).catch(()=>{})
+    }
   }
 
   const handleBulkImport = async () => {
@@ -1245,8 +1229,13 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
               {rows.map((row, i) => (
                 <tr key={i} className={`border-b border-sb-outline-variant/10 ${!row.valid ? "bg-red-500/5" : row.duplicate ? "bg-amber-500/5" : row.compareStatus === "changed" ? "bg-amber-500/5" : row.compareStatus === "unchanged" ? "opacity-60" : ""}`}>
                   <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/50">{row.row}</td>
-                  <td className="py-2 px-3 text-sb-on-surface/80">
-                    {row.student_name || "—"}
+                  <td className="py-2 px-3">
+                    <input
+                      value={row.student_name}
+                      onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,student_name:e.target.value}:r))}
+                      className={`w-full text-xs bg-transparent border rounded-lg px-1.5 py-1 text-sb-on-surface focus:outline-none ${!row.valid && !row.student_name ? 'border-red-400/50' : 'border-sb-outline-variant/20 focus:border-sb-primary/30'}`}
+                      placeholder="Alumno"
+                    />
                     {row.compareStatus === "changed" && row.changes && row.changes.length > 0 && (
                       <div className="mt-1.5 space-y-0.5">
                         {row.changes.map((c, ci) => (
@@ -1259,57 +1248,35 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                         ))}
                       </div>
                     )}
-                    {row.compareStatus === "changed" && row.existingCode && (
-                      <div className="mt-1 text-[10px] font-mono text-sb-on-surface-variant/40">
-                        Código actual: {row.existingCode}
-                      </div>
-                    )}
                   </td>
-                  <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/60">
-                    {!row.valid ? (
-                      <input
-                        type="text"
-                        value={row.student_dni}
-                        onChange={(e) => {
-                          const updated = rows.map((r, j) => j === i ? { ...r, student_dni: e.target.value } : r)
-                          setRows(updated)
-                        }}
-                        className="w-20 text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 font-mono text-sb-on-surface focus:border-red-400 focus:outline-none"
-                        placeholder="DNI"
-                        maxLength={8}
-                      />
-                    ) : (
-                      row.student_dni || "—"
-                    )}</td>
-                  <td className="py-2 px-3 text-sb-on-surface/70">
-                    {!row.valid ? (
-                      <div className="flex gap-1">
-                        <select
-                          value={row.grade}
-                          onChange={(e) => {
-                            const updated = rows.map((r, j) => j === i ? { ...r, grade: e.target.value } : r)
-                            setRows(updated)
-                          }}
-                          className="text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 text-sb-on-surface focus:border-red-400 focus:outline-none flex-1 min-w-0"
-                        >
-                          <option value="">Grado</option>
-                          {grades.map(g => <option key={g} value={g}>{g}</option>)}
-                        </select>
-                        <select
-                          value={row.section}
-                          onChange={(e) => {
-                            const updated = rows.map((r, j) => j === i ? { ...r, section: e.target.value } : r)
-                            setRows(updated)
-                          }}
-                          className="text-xs bg-transparent border border-red-400/30 rounded-lg px-1.5 py-0.5 text-sb-on-surface focus:border-red-400 focus:outline-none w-12"
-                        >
-                          <option value="">Sec</option>
-                          {sections.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      </div>
-                    ) : (
-                      row.grade || "—"
-                    )}
+                  <td className="py-2 px-3">
+                    <input
+                      value={row.student_dni}
+                      onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,student_dni:e.target.value}:r))}
+                      className={`w-24 text-xs bg-transparent border rounded-lg px-1.5 py-1 font-mono focus:outline-none ${!row.valid && (!row.student_dni||row.student_dni.length<8) ? 'border-red-400/50 text-red-400' : 'border-sb-outline-variant/20 text-sb-on-surface focus:border-sb-primary/30'}`}
+                      placeholder="DNI"
+                      maxLength={8}
+                    />
+                  </td>
+                  <td className="py-2 px-3">
+                    <div className="flex gap-1">
+                      <select
+                        value={row.grade}
+                        onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,grade:e.target.value}:r))}
+                        className="text-xs bg-transparent border border-sb-outline-variant/20 rounded-lg px-1.5 py-1 text-sb-on-surface focus:border-sb-primary/30 focus:outline-none flex-1 min-w-0"
+                      >
+                        <option value="">Grado</option>
+                        {grades.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+                      <select
+                        value={row.section}
+                        onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,section:e.target.value}:r))}
+                        className="text-xs bg-transparent border border-sb-outline-variant/20 rounded-lg px-1.5 py-1 text-sb-on-surface focus:border-sb-primary/30 focus:outline-none w-12"
+                      >
+                        <option value="">Sec</option>
+                        {sections.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
                   </td>
                   <td className="py-2 px-3">
                     {!row.valid ? (
