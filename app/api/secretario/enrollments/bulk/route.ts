@@ -25,7 +25,7 @@ export async function POST(req: NextRequest){
       try{
         const grade = r.grade || ''
         const section = r.section || 'A'
-        if(grade && !gradeCache.has(grade.toLowerCase())){ skipped++; continue }
+        // no bloquear por grado no configurado — deja importar igual (hybrid)
         let studentId = existingMap.get(r.student_dni)
         if(studentId){
           const exEnr = await conn.query(`SELECT id FROM enrollments WHERE student_id=$1 AND grade=$2 AND section=$3 AND year=$4`,[studentId, grade, section, r.year||new Date().getFullYear()])
