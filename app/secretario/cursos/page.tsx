@@ -547,7 +547,7 @@ export default function CursosSecretarioPage() {
         </div>
         <div className="bg-sb-surface rounded-2xl p-4">
           <Users className="h-4 w-4 mb-2 text-purple-400/60" />
-          <p className="text-xl font-semibold text-sb-on-surface/80">{cursos.reduce((s, c) => s + (c.student_count || 0), 0)}</p>
+          <p className="text-xl font-semibold text-sb-on-surface/80">{cursos.reduce((s, c) => s + (Number(c.student_count) || 0), 0)}</p>
           <p className="text-[10px] text-sb-on-surface-variant/40 mt-0.5">Alumnos matriculados</p>
         </div>
         <div className="bg-sb-surface rounded-2xl p-4">
