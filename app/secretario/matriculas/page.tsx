@@ -195,16 +195,17 @@ export default function SecretarioMatriculasPage() {
       
       const get = (idx:number) => idx>=0 ? (cells[idx] || "") : ""
       const combinedName = (idxApellidos!==-1 && idxNombresOnly!==-1) ? `${get(idxNombresOnly)} ${get(idxApellidos)}`.trim() : ""
+      const rawDni = get(idxDni) || cells[2] || ""
       const rowData: BulkRow = {
         row: index + 2,
         student_code: idxCode>=0 ? get(idxCode) : (cells[0] || ""),
         student_name: combinedName || get(idxName) || cells[1] || "",
-        student_dni: get(idxDni) || cells[2] || "",
+        student_dni: String(rawDni).replace(/\D/g,"").slice(0,8),
         student_birth_date: get(idxBirth) || cells[3] || "",
         student_gender: (get(idxGender) || cells[4] || "").toUpperCase(),
         parent_name: get(idxParentName) || cells[5] || "",
-        parent_dni: get(idxParentDni) || cells[6] || "",
-        parent_phone: get(idxParentPhone) || cells[7] || "",
+        parent_dni: String(get(idxParentDni) || cells[6] || "").replace(/\D/g,"").slice(0,8),
+        parent_phone: String(get(idxParentPhone) || cells[7] || "").replace(/\D/g,"").slice(0,15),
         parent_email: get(idxParentEmail) || cells[8] || "",
         grade: get(idxGrade) || cells[9] || "",
         section: get(idxSection) || cells[10] || "",
