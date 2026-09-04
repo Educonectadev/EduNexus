@@ -41,6 +41,7 @@ interface BulkRow {
   parent_email: string
   grade: string
   section: string
+  shift: string
   valid: boolean
   errors: string[]
   duplicate: boolean
@@ -158,6 +159,7 @@ export default function SecretarioMatriculasPage() {
     const idxParentEmail = findIdx(["email padre","correo"])
     const idxGrade = findIdx(["grado","grade"])
     const idxSection = findIdx(["seccion","section"])
+    const idxShift = findIdx(["turno","shift"])
     // Skip header row
     const dataLines = lines.slice(1)
     
@@ -194,6 +196,7 @@ export default function SecretarioMatriculasPage() {
         parent_email: get(idxParentEmail) || cells[8] || "",
         grade: get(idxGrade) || cells[9] || "",
         section: get(idxSection) || cells[10] || "",
+        shift: get(idxShift) || cells[11] || "",
         valid: true,
         errors: [],
         duplicate: false,
@@ -380,6 +383,7 @@ export default function SecretarioMatriculasPage() {
         parent_email: row.parent_email,
         grade: row.grade,
         section: row.section,
+        shift: row.shift,
         year: new Date().getFullYear().toString(),
       }
 
