@@ -157,7 +157,7 @@ export default function SecretarioMatriculasPage() {
       for(let k of keys){ const i=headerCells.findIndex(h=>h.includes(k)); if(i!==-1) return i }
       return -1
     }
-    const idxCode = findIdx(["codigo alumno","codigo","code"])
+    const idxCode = findIdx(["codigo alumno"])
     const idxName = (()=>{ const a=findIdx(["nombre alumno","nombre del alumno","nombres y apellidos","nombre completo","alumno"]); return a!==-1?a: Math.max(0,findIdx(["nombre"])) })()
     const idxApellidos = findIdx(["apellidos","apellido"])
     const idxNombresOnly = findIdx(["nombres"])
@@ -172,6 +172,7 @@ export default function SecretarioMatriculasPage() {
     const idxGrade = findIdx(["grado","grade"])
     const idxSection = findIdx(["seccion","section"])
     const idxShift = findIdx(["turno","shift"])
+    console.log('[parseCSV] headerIdx',headerIdx,'headerCells',headerCells,'idxCode',idxCode,'idxName',idxName,'idxDni',idxDni,'idxBirth',idxBirth,'idxGrade',idxGrade)
     // Data desde después del header real
     const dataLines = lines.slice(headerIdx+1)
     
