@@ -1092,7 +1092,7 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
               <option value="">—</option>
               <option value="mañana">Mañana</option>
               <option value="tarde">Tarde</option>
-              <option value="noite">Noite</option>
+              <option value="noche">Noche</option>
             </select>
           </div>
         </div>
