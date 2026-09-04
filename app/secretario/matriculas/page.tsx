@@ -142,9 +142,9 @@ export default function SecretarioMatriculasPage() {
     const parseLine = (h:string) => {
       const c:string[]=[]; let cur=""; let q=false;
       for(const ch of h){ if(ch==='"') q=!q; else if(ch===","&&!q){ c.push(cur.trim()); cur="" } else cur+=ch } c.push(cur.trim())
-      return c.map(s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))
+      return c.map(s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,' ').trim())
     }
-    let headerIdx = 0; let headerCells = parseLine(lines[0])
+    let headerIdx = 0; let headerCells = parseLine(lines[0]).map(h=>h.replace(/\s+/g,' ').trim())
     const hasHeader = (cells:string[]) => cells.some(h=>h.includes("dni")||h.includes("nombre")||h.includes("alumno"))
     if(!hasHeader(headerCells)){
       for(let i=1;i<Math.min(5,lines.length);i++){
