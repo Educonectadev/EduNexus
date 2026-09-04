@@ -1116,6 +1116,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   const newCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "new").length
   const changedCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "changed").length
   const unchangedCount = rows.filter(r => r.valid && r.compareStatus === "unchanged").length
+  const [importLimit, setImportLimit] = React.useState<number>(10)
+  React.useEffect(()=>{ if(validCount>0 && importLimit>validCount) setImportLimit(validCount) }, [validCount])
+  const displayValid = Math.min(importLimit, validCount)
 
   if (step === "upload") {
     return (
@@ -1350,13 +1353,32 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           </table>
         </div>
         
-        {/* Footer */}
-        <div className="p-4 border-t border-sb-outline-variant/15 flex justify-end gap-3">
-          <SbBtn rounded onClick={onReset}>Cancelar</SbBtn>
-          <SbBtn variant="filled" rounded className="flex items-center gap-2"
-            onClick={onImport} disabled={validCount === 0}>
-            <Upload className="h-4 w-4" /> Importar {validCount} registros{changedCount > 0 ? ` (${changedCount} por actualizar)` : ""}
-          </SbBtn>
+        {/* Footer con contador */}
+        <div className="p-4 border-t border-sb-outline-variant/15 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-sb-on-surface-variant/60">Importar</span>
+            <input type="number" min={1} max={validCount} value={importLimit} onChange={e=>setImportLimit(Math.max(1, Math.min(validCount, parseInt(e.target.value)||1)))} className="w-20 h-8 text-center border border-sb-outline-variant/20 rounded-lg bg-transparent text-sm" />
+            <span className="text-sb-on-surface-variant/60">de {validCount} → <strong className="text-sb-on-surface">{displayValid} de {rows.length} serán importados</strong></span>
+          </div>
+          <div className="flex gap-3">
+            <SbBtn rounded onClick={onReset}>Cancelar</SbBtn>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2"
+              onClick={()=>{
+                // marca como skipped los excedentes
+                let count=0
+                const limited = rows.map(r=>{
+                  if(r.valid && !r.skipped){
+                    count++
+                    if(count>importLimit) return {...r, skipped:true}
+                  }
+                  return r
+                })
+                setRows(limited)
+                setTimeout(()=>onImport(), 50)
+              }} disabled={validCount === 0}>
+              <Upload className="h-4 w-4" /> Importar {displayValid}
+            </SbBtn>
+          </div>
         </div>
       </motion.div>
     )
