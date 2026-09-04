@@ -149,7 +149,7 @@ export default function SecretarioMatriculasPage() {
     const idxName = (()=>{ const a=findIdx(["nombre del alumno","nombres y apellidos","nombre completo","alumno"]); return a!==-1?a: Math.max(0,findIdx(["nombre"])) })()
     const idxApellidos = findIdx(["apellidos","apellido"])
     const idxNombresOnly = findIdx(["nombres"])
-    const idxDni = findIdx(["dni alumno","dni del alumno","documento alumno","dni"])
+    const idxDni = findIdx(["dni alumno","dni del alumno","documento alumno","nro doc","nro documento","documento","dni"])
     const idxBirth = findIdx(["fecha nac","nacimiento","birth"])
     const idxGender = findIdx(["genero","sexo","gender"])
     const idxParentName = findIdx(["nombre del padre","padre","apoderado"])
@@ -204,7 +204,13 @@ export default function SecretarioMatriculasPage() {
       const norm = (s: string) => s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       if (!rowData.student_name) rowData.errors.push("Nombre del alumno requerido")
       if (!rowData.student_dni || rowData.student_dni.length < 8) rowData.errors.push("DNI inválido")
-      if (rowData.student_gender && !["M", "F", "MASCULINO", "FEMENINO", "Masculino", "Femenino"].includes(rowData.student_gender)) rowData.errors.push("Género inválido")
+      // Género híbrido: autocorrige en vez de bloquear
+      if (rowData.student_gender) {
+        const g = rowData.student_gender.toLowerCase()
+        if (["f","femenino","fem","mujer"].some(v=>g.includes(v))) rowData.student_gender = "F"
+        else if (["m","masculino","masc","varon","hombre"].some(v=>g.includes(v))) rowData.student_gender = "M"
+        else rowData.student_gender = "" // deja vacío, no bloquea
+      }
       if (rowData.student_birth_date) {
         const converted = convertDate(rowData.student_birth_date)
         if (!converted) rowData.errors.push("Formato de fecha inválido (use AAAA-MM-DD)")
