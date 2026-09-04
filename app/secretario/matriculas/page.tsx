@@ -124,15 +124,14 @@ export default function SecretarioMatriculasPage() {
   // Bulk import functions
   const convertDate = (dateStr: string): string | null => {
     if (!dateStr) return null
-    // Convert DD/MM/YYYY to YYYY-MM-DD
-    const parts = dateStr.split("/")
-    if (parts.length === 3) {
-      const [day, month, year] = parts
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`
-    }
-    // If already in YYYY-MM-DD format, return as is
-    if (dateStr.includes("-")) return dateStr
-    return null
+    const s = String(dateStr).trim()
+    if (/^\d{4,5}$/.test(s)) { const n=parseInt(s,10); if(n>30000&&n<60000){ const d=new Date(Math.round((n-25569)*86400000)); return d.toISOString().split('T')[0] } }
+    let m = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/)
+    if(m) return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`
+    m = s.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/)
+    if(m) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`
+    if(s.includes("-")||s.includes("/")) return s
+    return s || null
   }
 
   const parseCSV = (text: string): BulkRow[] => {
@@ -231,8 +230,9 @@ export default function SecretarioMatriculasPage() {
         else rowData.student_gender = "" // deja vacío, no bloquea
       }
       if (rowData.student_birth_date) {
-        const converted = convertDate(rowData.student_birth_date)
-        if (!converted) rowData.errors.push("Formato de fecha inválido (use AAAA-MM-DD)")
+        const c = convertDate(rowData.student_birth_date)
+        if (c) rowData.student_birth_date = c
+        // no bloquea
       }
       
       // Grade: fuzzy match — "1ro" matches "1° de Primaria", "4to" matches "4° de Primaria"
