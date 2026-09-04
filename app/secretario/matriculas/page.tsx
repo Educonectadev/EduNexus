@@ -210,7 +210,7 @@ export default function SecretarioMatriculasPage() {
         parent_email: get(idxParentEmail) || cells[8] || "",
         grade: get(idxGrade) || cells[9] || "",
         section: get(idxSection) || cells[10] || "",
-        shift: get(idxShift) || cells[11] || "",
+        shift: get(idxShift) || "",
         valid: true,
         errors: [],
         duplicate: false,
