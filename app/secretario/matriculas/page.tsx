@@ -1217,7 +1217,6 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
               <RefreshCw className="h-3.5 w-3.5" /> Re-validar todo
             </button>
           )}
-          </div>
         </div>
         
         {/* Table */}
