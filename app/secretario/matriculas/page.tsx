@@ -847,10 +847,11 @@ export default function SecretarioMatriculasPage() {
               {/* Academic */}
               <div>
                 <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider mb-3">Información Académica</p>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <Info label="Grado" value={selected.grade} />
                   <Info label="Sección" value={selected.section} />
                   <Info label="Año" value={selected.year.toString()} />
+                  <Info label="Turno" value={selected.shift ? selected.shift.charAt(0).toUpperCase()+selected.shift.slice(1) : "—"} />
                 </div>
               </div>
 
