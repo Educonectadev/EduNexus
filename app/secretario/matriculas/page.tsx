@@ -1234,7 +1234,10 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                   <td className="py-2 px-3">
                     <input
                       value={row.student_name}
-                      onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,student_name:e.target.value}:r))}
+                      onChange={(e) => {
+                        const v=e.target.value
+                        setRows(rows.map((r,j)=>j===i?{...r,student_name:v, errors: !v?["Nombre requerido"]: r.errors.filter(x=>x!=="Nombre del alumno requerido" && x!=="Nombre requerido"), valid: !!v && (r.student_dni?.length>=8 || r.student_dni?.startsWith("TMP"))}:r))
+                      }}
                       className={`w-full text-xs bg-transparent border rounded-lg px-1.5 py-1 text-sb-on-surface focus:outline-none ${!row.valid && !row.student_name ? 'border-red-400/50' : 'border-sb-outline-variant/20 focus:border-sb-primary/30'}`}
                       placeholder="Alumno"
                     />
@@ -1254,7 +1257,11 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                   <td className="py-2 px-3">
                     <input
                       value={row.student_dni}
-                      onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,student_dni:e.target.value}:r))}
+                      onChange={(e) => {
+                        const v=e.target.value.replace(/\D/g,"").slice(0,8)
+                        const ok=v.length>=8
+                        setRows(rows.map((r,j)=>j===i?{...r,student_dni:v, errors: ok? r.errors.filter(x=>x!=="DNI inválido"): [...new Set([...r.errors,"DNI inválido"])], valid: !!r.student_name && ok}:r))
+                      }}
                       className={`w-24 text-xs bg-transparent border rounded-lg px-1.5 py-1 font-mono focus:outline-none ${!row.valid && (!row.student_dni||row.student_dni.length<8) ? 'border-red-400/50 text-red-400' : 'border-sb-outline-variant/20 text-sb-on-surface focus:border-sb-primary/30'}`}
                       placeholder="DNI"
                       maxLength={8}
