@@ -157,7 +157,7 @@ export default function SecretarioMatriculasPage() {
       for(let k of keys){ const i=headerCells.findIndex(h=>h.includes(k)); if(i!==-1) return i }
       return -1
     }
-    const idxCode = findIdx(["codigo alumno"])
+    const idxCode = findIdx(["codigo del alumno","codigo alumno","codigo","code"])
     const idxName = (()=>{ const a=findIdx(["nombre alumno","nombre del alumno","nombres y apellidos","nombre completo","alumno"]); return a!==-1?a: Math.max(0,findIdx(["nombre"])) })()
     const idxApellidos = findIdx(["apellidos","apellido"])
     const idxNombresOnly = findIdx(["nombres"])
