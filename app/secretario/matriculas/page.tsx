@@ -138,10 +138,20 @@ export default function SecretarioMatriculasPage() {
   const parseCSV = (text: string): BulkRow[] => {
     const lines = text.split("\n").filter(line => line.trim())
     if (lines.length < 2) return []
-    const headerCells = (() => {
-      const h = lines[0]; const c: string[]=[]; let cur=""; let q=false;
-      for(const ch of h){ if(ch==='"') q=!q; else if(ch===","&&!q){ c.push(cur.trim()); cur="" } else cur+=ch } c.push(cur.trim()); return c.map(s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))
-    })()
+    // Detecta fila real de header (DATOS COLEGIO tiene fila título antes)
+    const parseLine = (h:string) => {
+      const c:string[]=[]; let cur=""; let q=false;
+      for(const ch of h){ if(ch==='"') q=!q; else if(ch===","&&!q){ c.push(cur.trim()); cur="" } else cur+=ch } c.push(cur.trim())
+      return c.map(s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""))
+    }
+    let headerIdx = 0; let headerCells = parseLine(lines[0])
+    const hasHeader = (cells:string[]) => cells.some(h=>h.includes("dni")||h.includes("nombre")||h.includes("alumno"))
+    if(!hasHeader(headerCells)){
+      for(let i=1;i<Math.min(5,lines.length);i++){
+        const cand = parseLine(lines[i])
+        if(hasHeader(cand) && cand.filter(Boolean).length >= 3){ headerIdx=i; headerCells=cand; break }
+      }
+    }
     const findIdx = (keys: string[]) => {
       for(let k of keys){ const i=headerCells.findIndex(h=>h.includes(k)); if(i!==-1) return i }
       return -1
@@ -160,8 +170,8 @@ export default function SecretarioMatriculasPage() {
     const idxGrade = findIdx(["grado","grade"])
     const idxSection = findIdx(["seccion","section"])
     const idxShift = findIdx(["turno","shift"])
-    // Skip header row
-    const dataLines = lines.slice(1)
+    // Data desde después del header real
+    const dataLines = lines.slice(headerIdx+1)
     
     const parsed: BulkRow[] = dataLines.map((line, index) => {
       // Parse CSV considering quoted fields
