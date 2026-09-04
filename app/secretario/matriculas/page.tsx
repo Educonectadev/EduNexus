@@ -579,8 +579,9 @@ export default function SecretarioMatriculasPage() {
       {/* Tabs */}
       <div className="flex gap-1 p-1 bg-sb-surface-container rounded-xl">
         <button
-          onClick={() => setActiveTab("individual")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+          onClick={() => bulkStep !== "importing" && setActiveTab("individual")}
+          disabled={bulkStep === "importing"}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
             activeTab === "individual"
               ? "bg-sb-on-surface text-sb-surface"
               : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"
@@ -590,8 +591,9 @@ export default function SecretarioMatriculasPage() {
           Carga Individual
         </button>
         <button
-          onClick={() => setActiveTab("bulk")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+          onClick={() => bulkStep !== "importing" && setActiveTab("bulk")}
+          disabled={bulkStep === "importing"}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
             activeTab === "bulk"
               ? "bg-sb-on-surface text-sb-surface"
               : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"
