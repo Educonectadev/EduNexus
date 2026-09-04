@@ -1032,16 +1032,22 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
               <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Fecha Nac.</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className={`sb-input w-full flex items-center justify-between text-left text-[13px] ${!form.student_birth_date ? 'text-sb-on-surface-variant/40' : ''}`}>
-                    <span>{form.student_birth_date ? new Date(form.student_birth_date+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}) : 'dd/mm/aaaa'}</span>
+                  <button type="button" className={`sb-input w-full flex items-center justify-between text-left text-[13px] ${!form.student_birth_date || isNaN(new Date(form.student_birth_date+'T00:00:00').getTime()) ? 'text-sb-on-surface-variant/40' : ''}`}>
+                    <span>{(()=>{
+                      if(!form.student_birth_date) return 'dd/mm/aaaa'
+                      const d=new Date(form.student_birth_date+'T00:00:00')
+                      return isNaN(d.getTime()) ? 'dd/mm/aaaa' : d.toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'})
+                    })()}</span>
                     <CalendarIcon className="h-4 w-4 opacity-50" />
-                    {form.student_birth_date && (()=>{ const d=new Date(form.student_birth_date); const age=Math.floor((Date.now()-d.getTime())/31557600000); return <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{age}a</span> })()}
+                    {form.student_birth_date && !isNaN(new Date(form.student_birth_date+'T00:00:00').getTime()) && (()=>{
+                      const d=new Date(form.student_birth_date+'T00:00:00'); const age=Math.floor((Date.now()-d.getTime())/31557600000); if(isNaN(age)||age<0||age>100) return null; return <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{age}a</span>
+                    })()}
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 z-[9999]" align="start" sideOffset={8}>
                   <CalendarComp
                     mode="single"
-                    selected={form.student_birth_date ? new Date(form.student_birth_date+'T00:00:00') : undefined}
+                    selected={form.student_birth_date && !isNaN(new Date(form.student_birth_date+'T00:00:00').getTime()) ? new Date(form.student_birth_date+'T00:00:00') : undefined}
                     onSelect={(d: Date | undefined) => setForm({ ...form, student_birth_date: d ? d.toISOString().split('T')[0] : '' })}
                     captionLayout="dropdown"
                     className="rounded-lg border"
