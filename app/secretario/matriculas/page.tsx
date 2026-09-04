@@ -1199,6 +1199,21 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
               </div>
             )}
           </div>
+          {errorCount > 0 && (
+            <button onClick={() => {
+              const updated = rows.map(r => {
+                const errs: string[] = []
+                if (!r.student_name) errs.push("Nombre del alumno requerido")
+                if (!r.student_dni || r.student_dni.length < 8) errs.push("DNI inválido")
+                // genero ya autocorregido, no bloquea
+                return { ...r, errors: errs, valid: errs.length === 0 }
+              })
+              setRows(updated)
+            }} className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sb-primary/10 text-sb-primary text-xs font-medium hover:bg-sb-primary/15 transition-colors">
+              <RefreshCw className="h-3.5 w-3.5" /> Re-validar todo
+            </button>
+          )}
+          </div>
         </div>
         
         {/* Table */}
