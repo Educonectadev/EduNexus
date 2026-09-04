@@ -362,75 +362,67 @@ export default function SecretarioMatriculasPage() {
 
   const handleBulkImport = async () => {
     setBulkStep("importing")
-    setBulkProgress(0)
-    
+    setBulkProgress(10)
     const importableRows = bulkRows.filter(r => r.valid && !r.skipped)
-    let imported = 0, skipped = 0, errors = 0
-    
-    for (let i = 0; i < importableRows.length; i++) {
-      setBulkProgress(Math.round(((i + 1) / importableRows.length) * 100))
-
-      const row = importableRows[i]
-      const payload = {
-        student_code: row.student_code,
-        student_name: row.student_name,
-        student_dni: row.student_dni,
-        student_birth_date: convertDate(row.student_birth_date),
-        student_gender: row.student_gender === "MASCULINO" ? "M" : row.student_gender === "FEMENINO" ? "F" : row.student_gender,
-        parent_name: row.parent_name,
-        parent_dni: row.parent_dni,
-        parent_phone: row.parent_phone,
-        parent_email: row.parent_email,
-        grade: row.grade,
-        section: row.section,
-        shift: row.shift,
+    // Intento bulk rápido (1 request para 300-1000 filas)
+    try {
+      const payloadRows = importableRows.map(r => ({
+        student_code: r.student_code,
+        student_name: r.student_name,
+        student_dni: r.student_dni,
+        student_birth_date: convertDate(r.student_birth_date),
+        student_gender: r.student_gender === "MASCULINO" ? "M" : r.student_gender === "FEMENINO" ? "F" : r.student_gender,
+        parent_name: r.parent_name,
+        parent_dni: r.parent_dni,
+        parent_phone: r.parent_phone,
+        parent_email: r.parent_email,
+        grade: r.grade,
+        section: r.section,
+        shift: r.shift,
         year: new Date().getFullYear().toString(),
+      }))
+      setBulkProgress(30)
+      const res = await fetch("/api/secretario/enrollments/bulk", {
+        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+        body: JSON.stringify({ rows: payloadRows }),
+      })
+      const data = await res.json().catch(()=>({}))
+      if (res.ok) {
+        setBulkProgress(100)
+        const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
+        setBulkResults({ imported: data.imported || 0, skipped: (data.skipped||0)+userSkipped, errors: data.errors||0 })
+        setBulkStep("done"); fetchEnrollments(); return
       }
-
-      try {
-        let res
-        if (row.compareStatus === "changed" && row.existingEnrollmentId) {
-          res = await fetch(`/api/secretario/enrollments/${row.existingEnrollmentId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload),
-          })
-        } else {
-          res = await fetch("/api/secretario/enrollments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload),
-          })
+      throw new Error(data.error || "bulk failed")
+    } catch (e) {
+      console.error("bulk fallback a fila por fila", e)
+      // Fallback fila por fila si bulk falla
+      let imported = 0, skipped = 0, errors = 0
+      for (let i = 0; i < importableRows.length; i++) {
+        setBulkProgress(Math.round(((i + 1) / importableRows.length) * 100))
+        const row = importableRows[i]
+        const payload = {
+          student_code: row.student_code, student_name: row.student_name, student_dni: row.student_dni,
+          student_birth_date: convertDate(row.student_birth_date),
+          student_gender: row.student_gender === "MASCULINO" ? "M" : row.student_gender === "FEMENINO" ? "F" : row.student_gender,
+          parent_name: row.parent_name, parent_dni: row.parent_dni, parent_phone: row.parent_phone, parent_email: row.parent_email,
+          grade: row.grade, section: row.section, shift: row.shift, year: new Date().getFullYear().toString(),
         }
-
-        if (res.ok) {
-          imported++
-        } else {
-          const data = await res.json().catch(() => ({}))
-          console.error(`[Bulk Import] Row ${row.row} failed:`, res.status, data)
-          if (data.error === 'DUPLICATE_ENROLLMENT' || res.status === 409) {
-            skipped++
+        try {
+          let res2
+          if (row.compareStatus === "changed" && row.existingEnrollmentId) {
+            res2 = await fetch(`/api/secretario/enrollments/${row.existingEnrollmentId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(payload) })
           } else {
-            errors++
+            res2 = await fetch("/api/secretario/enrollments", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(payload) })
           }
-        }
-      } catch (e) {
-        console.error(`[Bulk Import] Row ${row.row} exception:`, e)
-        errors++
+          if (res2.ok) imported++; else { const d = await res2.json().catch(()=>({})); if(d.error==='DUPLICATE_ENROLLMENT'||res2.status===409) skipped++; else errors++ }
+        } catch { errors++ }
       }
-      
-      await new Promise(r => setTimeout(r, 50))
+      const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
+      skipped += userSkipped
+      setBulkResults({ imported, skipped, errors })
+      setBulkStep("done"); fetchEnrollments()
     }
-    
-    // Count duplicates that were skipped by user
-    const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
-    skipped += userSkipped
-    
-    setBulkResults({ imported, skipped, errors })
-    setBulkStep("done")
-    fetchEnrollments()
   }
 
   const downloadTemplate = () => {
