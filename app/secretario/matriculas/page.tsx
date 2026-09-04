@@ -1216,30 +1216,29 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           )}
         </div>
         
-        {/* Table */}
-        <div className="overflow-x-auto max-h-96 overflow-y-auto">
-          <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-sb-surface">
+        {/* Table Excel editable */}
+        <div className="overflow-x-auto max-h-[420px] overflow-y-auto border-t border-sb-outline-variant/15">
+          <table className="w-full text-xs border-collapse">
+            <thead className="sticky top-0 bg-sb-surface z-10">
               <tr className="border-b border-sb-outline-variant/15">
-                <th className="text-left py-2 px-3 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase">Fila</th>
-                <th className="text-left py-2 px-3 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase">Alumno</th>
-                <th className="text-left py-2 px-3 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase">DNI</th>
-                <th className="text-left py-2 px-3 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase">Grado</th>
-                <th className="text-left py-2 px-3 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase">Estado</th>
+                {["Fila","Código","Nombre*","DNI*","Fecha Nac","Género","Padre","DNI Padre","Tel","Email","Grado","Secc","Turno","Estado"].map(h=>(
+                  <th key={h} className="text-left py-2 px-2 text-[10px] font-medium text-sb-on-surface-variant/50 uppercase whitespace-nowrap">{h}</th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {rows.map((row, i) => (
                 <tr key={i} className={`border-b border-sb-outline-variant/10 ${!row.valid ? "bg-red-500/5" : row.duplicate ? "bg-amber-500/5" : row.compareStatus === "changed" ? "bg-amber-500/5" : row.compareStatus === "unchanged" ? "opacity-60" : ""}`}>
-                  <td className="py-2 px-3 font-mono text-xs text-sb-on-surface-variant/50">{row.row}</td>
-                  <td className="py-2 px-3">
+                  <td className="py-1 px-2 font-mono text-[11px] text-sb-on-surface-variant/50">{row.row}</td>
+                  <td className="py-1 px-1"><input value={row.student_code} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,student_code:e.target.value}:r))} className="w-20 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1 bg-transparent" placeholder="Cod" /></td>
+                  <td className="py-1 px-1">
                     <input
                       value={row.student_name}
                       onChange={(e) => {
                         const v=e.target.value
                         setRows(rows.map((r,j)=>j===i?{...r,student_name:v, errors: !v?["Nombre requerido"]: r.errors.filter(x=>x!=="Nombre del alumno requerido" && x!=="Nombre requerido"), valid: !!v && (r.student_dni?.length>=8 || r.student_dni?.startsWith("TMP"))}:r))
                       }}
-                      className={`w-full text-xs bg-transparent border rounded-lg px-1.5 py-1 text-sb-on-surface focus:outline-none ${!row.valid && !row.student_name ? 'border-red-400/50' : 'border-sb-outline-variant/20 focus:border-sb-primary/30'}`}
+                      className={`w-32 text-xs bg-transparent border rounded px-1 py-1 text-sb-on-surface focus:outline-none ${!row.valid && !row.student_name ? 'border-red-400/50' : 'border-sb-outline-variant/20 focus:border-sb-primary/30'}`}
                       placeholder="Alumno"
                     />
                     {row.compareStatus === "changed" && row.changes && row.changes.length > 0 && (
@@ -1255,39 +1254,16 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                       </div>
                     )}
                   </td>
-                  <td className="py-2 px-3">
-                    <input
-                      value={row.student_dni}
-                      onChange={(e) => {
-                        const v=e.target.value.replace(/\D/g,"").slice(0,8)
-                        const ok=v.length>=8
-                        setRows(rows.map((r,j)=>j===i?{...r,student_dni:v, errors: ok? r.errors.filter(x=>x!=="DNI inválido"): [...new Set([...r.errors,"DNI inválido"])], valid: !!r.student_name && ok}:r))
-                      }}
-                      className={`w-24 text-xs bg-transparent border rounded-lg px-1.5 py-1 font-mono focus:outline-none ${!row.valid && (!row.student_dni||row.student_dni.length<8) ? 'border-red-400/50 text-red-400' : 'border-sb-outline-variant/20 text-sb-on-surface focus:border-sb-primary/30'}`}
-                      placeholder="DNI"
-                      maxLength={8}
-                    />
-                  </td>
-                  <td className="py-2 px-3">
-                    <div className="flex gap-1">
-                      <select
-                        value={row.grade}
-                        onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,grade:e.target.value}:r))}
-                        className="text-xs bg-transparent border border-sb-outline-variant/20 rounded-lg px-1.5 py-1 text-sb-on-surface focus:border-sb-primary/30 focus:outline-none flex-1 min-w-0"
-                      >
-                        <option value="">Grado</option>
-                        {grades.map(g => <option key={g} value={g}>{g}</option>)}
-                      </select>
-                      <select
-                        value={row.section}
-                        onChange={(e) => setRows(rows.map((r,j)=>j===i?{...r,section:e.target.value}:r))}
-                        className="text-xs bg-transparent border border-sb-outline-variant/20 rounded-lg px-1.5 py-1 text-sb-on-surface focus:border-sb-primary/30 focus:outline-none w-12"
-                      >
-                        <option value="">Sec</option>
-                        {sections.map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
-                    </div>
-                  </td>
+                  <td className="py-1 px-1"><input value={row.student_dni} onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(0,8); const ok=v.length>=8; setRows(rows.map((r,j)=>j===i?{...r,student_dni:v, errors: ok? r.errors.filter(x=>x!=="DNI inválido"): [...new Set([...r.errors,"DNI inválido"])], valid: !!r.student_name && ok}:r))}} className={`w-20 text-[11px] border rounded px-1 py-1 font-mono ${!row.valid&&(!row.student_dni||row.student_dni.length<8)?'border-red-400/50':'border-sb-outline-variant/20'}`} placeholder="DNI" maxLength={8} /></td>
+                  <td className="py-1 px-1"><input value={row.student_birth_date} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,student_birth_date:e.target.value}:r))} className="w-24 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1" placeholder="dd/mm/aaaa" /></td>
+                  <td className="py-1 px-1"><select value={row.student_gender} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,student_gender:e.target.value}:r))} className="w-16 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1"><option value="">-</option><option value="M">M</option><option value="F">F</option></select></td>
+                  <td className="py-1 px-1"><input value={row.parent_name} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,parent_name:e.target.value}:r))} className="w-28 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1" placeholder="Padre" /></td>
+                  <td className="py-1 px-1"><input value={row.parent_dni} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,parent_dni:e.target.value.replace(/\D/g,"").slice(0,8)}:r))} className="w-20 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1" placeholder="DNI P" /></td>
+                  <td className="py-1 px-1"><input value={row.parent_phone} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,parent_phone:e.target.value}:r))} className="w-20 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1" placeholder="Tel" /></td>
+                  <td className="py-1 px-1"><input value={row.parent_email} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,parent_email:e.target.value}:r))} className="w-28 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1" placeholder="Email" /></td>
+                  <td className="py-1 px-1"><select value={row.grade} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,grade:e.target.value}:r))} className="w-28 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1"><option value="">Grado</option>{grades.map(g=><option key={g} value={g}>{g}</option>)}</select></td>
+                  <td className="py-1 px-1"><select value={row.section} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,section:e.target.value}:r))} className="w-12 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1"><option value="">Sec</option>{sections.map(s=><option key={s} value={s}>{s}</option>)}</select></td>
+                  <td className="py-1 px-1"><select value={row.shift} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,shift:e.target.value}:r))} className="w-20 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1"><option value="">Turno</option><option value="mañana">Mañana</option><option value="tarde">Tarde</option><option value="noche">Noche</option></select></td>
                   <td className="py-2 px-3">
                     {!row.valid ? (
                       <div className="flex flex-col gap-1">
