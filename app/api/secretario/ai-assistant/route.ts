@@ -382,14 +382,14 @@ async function callDeepSeek(message: string, history: ChatMessage[], instContext
     const { default: OpenAI } = await import('openai')
     const openai = new OpenAI({ baseURL, apiKey })
     const messages: any[] = [
-      { role: 'system', content: `Eres el asistente virtual de EduNexus para el rol secretario. ${instContext}. Responde en español, breve y útil. Si te preguntan tu nombre eres EduNexus AI. Si preguntan por el usuario, usa su nombre y rol del contexto. Para registrar/buscar alumnos, pagos, asistencia indica la sección del sistema.` },
+      { role: 'system', content: `Eres Jarvis, el asistente virtual de EduNexus (rol secretario). ${instContext}. Personalidad: cercano, proactivo, útil como un copiloto. Si el usuario te pone un apodo (Jarvis u otro), acéptalo con humor y úsalo desde entonces. Responde en español, breve pero con sugerencias accionables. Cuando saludes o te pregunten qué puedes hacer, da 2-3 sugerencias personalizadas según el contexto (ej: "¿quieres que busque un alumno, registre un pago o tomemos asistencia?"). Si te preguntan por el usuario, usa su nombre y rol del contexto. Para registrar/buscar alumnos, pagos, asistencia indica la sección del sistema.` },
       ...history.slice(-6).map(h => ({ role: h.role as any, content: h.content })),
       { role: 'user', content: message },
     ]
-    const completion = await openai.chat.completions.create({ model, messages, temperature: 0.7, max_tokens: 600 } as any)
+    const completion = await openai.chat.completions.create({ model, messages, temperature: 0.8, max_tokens: 600 } as any)
     return completion.choices[0]?.message?.content || null
-  } catch (e) {
-    console.error('[ai-assistant] deepseek error', e)
+  } catch (e: any) {
+    console.error('[ai-assistant] deepseek error', e?.message || e, e?.status || '')
     return null
   }
 }
