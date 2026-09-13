@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
         const id = crypto.randomUUID()
         const code = `ALU${String(Date.now()).slice(-6)}${batch + values.length}`
 
-        values.push([id, instId, firstName || row.name, lastName || '', row.dni || '', row.grade || '', row.section || '', row.shift || '', code])
+        values.push([id, instId, firstName || row.name, lastName || '', row.dni || '', row.grade || '', row.section || '', row.shift || '', code, 'active'])
       }
 
-      const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ')
+      const placeholders = values.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ')
       const flatValues = values.flat()
 
       try {
@@ -94,6 +94,22 @@ export async function POST(request: NextRequest) {
           created.push(chunk[j].lineNum)
         }
       } catch (e: any) {
+        // Fallback si la columna shift no existe (42703)
+        if (e.code === '42703' && e.message?.includes('shift')) {
+          try {
+            const fbValues = values.map(v => v.slice(0, 7).concat(v.slice(8))) // quita shift
+            const fbPlaceholders = fbValues.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ')
+            await pool.query(
+              `INSERT INTO students (id, institution_id, first_name, last_name, document_number, grade, section, code, status) VALUES ${fbPlaceholders}`,
+              fbValues.flat()
+            )
+            for (let j = 0; j < chunk.length; j++) created.push(chunk[j].lineNum)
+            continue
+          } catch (e2: any) {
+            errors.push(`Lote ${Math.floor(batch / BATCH_SIZE) + 1}: ${e2.message || 'error'}`)
+            continue
+          }
+        }
         errors.push(`Lote ${Math.floor(batch / BATCH_SIZE) + 1}: ${e.message || 'error'}`)
       }
     }

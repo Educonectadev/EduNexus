@@ -12,18 +12,36 @@ export async function GET(request: NextRequest) {
     const instId = await resolveInstId(request)
     if (!instId) return NextResponse.json([], { status: 200 })
 
-    const [enrollments] = await pool.query(
-      `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
-              s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
-              s.code, s.document_type, COALESCE(s.shift, e.shift, '') as shift
-       FROM enrollments e
-       LEFT JOIN students s ON e.student_id = s.id
-       WHERE s.institution_id = ?
-       ORDER BY e.created_at DESC`,
-      [instId]
-    )
-    return NextResponse.json(enrollments)
+    try {
+      const [enrollments] = await pool.query(
+        `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
+                s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
+                s.code, s.document_type, COALESCE(s.shift, e.shift, '') as shift
+         FROM enrollments e
+         LEFT JOIN students s ON e.student_id = s.id
+         WHERE e.institution_id = ?
+         ORDER BY e.created_at DESC`,
+        [instId]
+      )
+      return NextResponse.json(enrollments)
+    } catch (e: any) {
+      if (e.code === '42703') {
+        const [enrollments] = await pool.query(
+          `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
+                  s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
+                  s.code, s.document_type, '' as shift
+           FROM enrollments e
+           LEFT JOIN students s ON e.student_id = s.id
+           WHERE e.institution_id = ?
+           ORDER BY e.created_at DESC`,
+          [instId]
+        )
+        return NextResponse.json(enrollments)
+      }
+      throw e
+    }
   } catch (error: any) {
+    console.error('[GET /api/secretario/enrollments]', error)
     return NextResponse.json({ error: 'Error fetching enrollments', details: error.message }, { status: 500 })
   }
 }
