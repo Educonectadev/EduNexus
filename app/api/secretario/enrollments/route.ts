@@ -280,8 +280,8 @@ let parentId: string
     if (conn) {
       try { await conn.query('ROLLBACK') } catch {}
     }
-    console.error('[POST /api/secretario/enrollments]', error)
-    return NextResponse.json({ error: 'Error creating enrollment', details: error.message }, { status: 500 })
+    console.error('[POST /api/secretario/enrollments]', error, error?.code, error?.detail)
+    return NextResponse.json({ error: 'Error creating enrollment', details: error.message, code: error.code, detail: (error as any).detail }, { status: 500 })
   } finally {
     if (conn) {
       try { conn.release() } catch {}
