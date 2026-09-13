@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
-import { resolveInstId } from '@/lib/resolveInstId'
+import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
 import crypto from 'crypto'
 
@@ -382,7 +382,7 @@ async function callDeepSeek(message: string, history: ChatMessage[], instContext
     const { default: OpenAI } = await import('openai')
     const openai = new OpenAI({ baseURL, apiKey })
     const messages: any[] = [
-      { role: 'system', content: `Eres el asistente virtual de EduNexus para el rol secretario. Contexto de la institución: ${instContext}. Responde en español, de forma breve y útil. Si te piden registrar/buscar alumnos, pagos, asistencia, indica que use las secciones del sistema.` },
+      { role: 'system', content: `Eres el asistente virtual de EduNexus para el rol secretario. ${instContext}. Responde en español, breve y útil. Si te preguntan tu nombre eres EduNexus AI. Si preguntan por el usuario, usa su nombre y rol del contexto. Para registrar/buscar alumnos, pagos, asistencia indica la sección del sistema.` },
       ...history.slice(-6).map(h => ({ role: h.role as any, content: h.content })),
       { role: 'user', content: message },
     ]
@@ -414,8 +414,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
     }
 
-    // Intenta con DeepSeek si está configurado, con fallback a intents locales
-    const instContext = `institution ${instId}`
+    // Contexto con nombre/rol del usuario para que el LLM sepa quién eres
+    const auth = await getAuthPayload(request)
+    let userName = (auth?.full_name || auth?.name || auth?.email || 'usuario') as string
+    let role = (auth?.role || 'secretario') as string
+    let instName = instId
+    try {
+      const [u] = await pool.query(`SELECT full_name, email, role FROM users WHERE id = ? LIMIT 1`, [auth?.id || auth?.userId]) as any[]
+      if (u?.[0]) { userName = u[0].full_name || u[0].email || userName; role = u[0].role || role }
+      const [inst] = await pool.query(`SELECT name FROM institutions WHERE id = ? LIMIT 1`, [instId]) as any[]
+      if (inst?.[0]?.name) instName = inst[0].name
+    } catch {}
+    // Resumen rápido para contexto
+    let dbSummary = ''
+    try {
+      const [s] = await pool.query(`SELECT COUNT(*) as c FROM students WHERE institution_id = ?`, [instId]) as any[]
+      const [p] = await pool.query(`SELECT COUNT(*) as c FROM parents WHERE institution_id = ?`, [instId]) as any[]
+      dbSummary = `Alumnos: ${s?.[0]?.c || 0}, Padres: ${p?.[0]?.c || 0}`
+    } catch {}
+    const instContext = `Usuario: ${userName} (rol: ${role}), Institución: ${instName} (${instId}). ${dbSummary}. Responde personalizado usando el nombre del usuario cuando te pregunten quién soy / cómo me llamo.`
+
     const llmResponse = await callDeepSeek(message, history || [], instContext)
     if (llmResponse) {
       const { intent, params } = detectIntent(message)
