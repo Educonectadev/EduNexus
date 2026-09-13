@@ -149,12 +149,15 @@ export async function POST(request: NextRequest) {
       }
 
       try {
+        let ubd: string | null = student_birth_date || null
+        if (ubd && !/^\d{4}-\d{2}-\d{2}$/.test(ubd)) { const d=new Date(ubd); ubd = isNaN(d.getTime())?null:d.toISOString().split('T')[0]; if(ubd && (ubd<'1900-01-01'||ubd>'2030-01-01')) ubd=null }
+        let ucode = (student_code?.trim() || '').slice(0,20)
         await conn.query(
           `UPDATE students SET first_name = $1, last_name = $2, birth_date = COALESCE($3::date, birth_date), gender = COALESCE($4, gender),
             shift = COALESCE(NULLIF($6, ''), shift),
             code = COALESCE(NULLIF($5, ''), code)
             WHERE id = $7`,
-          [firstName, lastName, student_birth_date || null, student_gender || null, student_code?.trim() || '', shift || '', studentId]
+          [firstName, lastName, ubd, student_gender || null, ucode, shift || '', studentId]
         )
       } catch (e:any) {
         if (e.code === '42703') {
@@ -163,16 +166,22 @@ export async function POST(request: NextRequest) {
       }
     } else {
       studentId = crypto.randomUUID()
-      const code = student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`
+      let code = (student_code?.trim() || `ALU-${Date.now().toString(36).toUpperCase()}`).slice(0,20)
+      // birth_date viene a veces como "Secundaria" desde bulk mal mapeado
+      let bd: string | null = student_birth_date || null
+      if (bd && !/^\d{4}-\d{2}-\d{2}$/.test(bd)) {
+        const d = new Date(bd); bd = isNaN(d.getTime()) ? null : d.toISOString().split('T')[0]
+        if (bd && (bd < '1900-01-01' || bd > '2030-01-01')) bd = null
+      }
       try {
         await conn.query(
           `INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, shift, status)
            VALUES ($1, $2, $3, $4, $5, 'DNI', $6, NULLIF($7, '')::date, NULLIF($8, ''), $9, $10, $11, 'active')`,
-          [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || '', shift || '']
+          [studentId, instId, code, firstName, lastName, student_dni, bd, student_gender || null, grade || '', section || '', shift || '']
         )
       } catch (e:any) {
         if (e.code === '42703') {
-          await conn.query(`INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status) VALUES ($1,$2,$3,$4,$5,'DNI',$6,NULLIF($7,'')::date,NULLIF($8,''),$9,$10,'active')`, [studentId, instId, code, firstName, lastName, student_dni, student_birth_date || null, student_gender || null, grade || '', section || ''])
+          await conn.query(`INSERT INTO students (id, institution_id, code, first_name, last_name, document_type, document_number, birth_date, gender, grade, section, status) VALUES ($1,$2,$3,$4,$5,'DNI',$6,NULLIF($7,'')::date,NULLIF($8,''),$9,$10,'active')`, [studentId, instId, code, firstName, lastName, student_dni, bd, student_gender || null, grade || '', section || ''])
         } else throw e
       }
     }
