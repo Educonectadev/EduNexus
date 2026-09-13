@@ -373,6 +373,27 @@ async function executeIntent(
   }
 }
 
+async function callDeepSeek(message: string, history: ChatMessage[], instContext: string): Promise<string | null> {
+  const apiKey = process.env.DEEPSEEK_API_KEY
+  if (!apiKey) return null
+  try {
+    const baseURL = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com'
+    const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
+    const { default: OpenAI } = await import('openai')
+    const openai = new OpenAI({ baseURL, apiKey })
+    const messages: any[] = [
+      { role: 'system', content: `Eres el asistente virtual de EduNexus para el rol secretario. Contexto de la institución: ${instContext}. Responde en español, de forma breve y útil. Si te piden registrar/buscar alumnos, pagos, asistencia, indica que use las secciones del sistema.` },
+      ...history.slice(-6).map(h => ({ role: h.role as any, content: h.content })),
+      { role: 'user', content: message },
+    ]
+    const completion = await openai.chat.completions.create({ model, messages, temperature: 0.7, max_tokens: 600 } as any)
+    return completion.choices[0]?.message?.content || null
+  } catch (e) {
+    console.error('[ai-assistant] deepseek error', e)
+    return null
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const instId = await resolveInstId(request)
@@ -387,10 +408,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message } = body
+    const { message, history } = body as { message: string; history?: ChatMessage[] }
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
+    }
+
+    // Intenta con DeepSeek si está configurado, con fallback a intents locales
+    const instContext = `institution ${instId}`
+    const llmResponse = await callDeepSeek(message, history || [], instContext)
+    if (llmResponse) {
+      const { intent, params } = detectIntent(message)
+      const local = await executeIntent(intent, params, instId)
+      // Si el intent local tiene acciones útiles, las adjuntamos
+      return NextResponse.json({ response: llmResponse, actions: local.actions || [] })
     }
 
     const { intent, params } = detectIntent(message)
@@ -398,6 +429,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error: any) {
+    console.error('[ai-assistant]', error)
     return NextResponse.json({
       response: "Ocurrio un error al procesar tu solicitud. Intenta de nuevo.",
       actions: [],
