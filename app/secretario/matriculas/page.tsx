@@ -103,6 +103,8 @@ export default function SecretarioMatriculasPage() {
   }
   const [form, setForm] = React.useState(emptyForm)
 
+  // Pre-carga xlsx en background para que el primer import sea instantáneo
+  React.useEffect(() => { import("xlsx").catch(()=>{}) }, [])
   React.useEffect(() => {
     fetchEnrollments()
     Promise.all([
@@ -331,9 +333,12 @@ export default function SecretarioMatriculasPage() {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    
+    const t0 = performance.now()
     setBulkFile(file)
+    setBulkStep("preview") // muestra skeleton inmediato
+    setBulkRows([])
     const rows = await parseExcel(file)
+    console.log('[import] parseExcel', file.name, rows.length, 'en', Math.round(performance.now()-t0)+'ms')
 
     // Detect repeated DNI inside the file
     const seenDnis = new Set<string>()
@@ -346,9 +351,9 @@ export default function SecretarioMatriculasPage() {
       return r
     })
 
-    // Preview instantáneo sin esperar compare (para 994 filas)
+    // Preview instantáneo sin esperar compare
     setBulkRows(marked)
-    setBulkStep("preview")
+    // bulkStep ya está en preview
     // Si no había columna DNI (TMP), intenta autocompletar por nombre desde la BD
     const tmpRows = marked.filter(r => r.student_dni.startsWith("TMP") && r.student_name)
     if (tmpRows.length > 0 && tmpRows.length < 30) {
