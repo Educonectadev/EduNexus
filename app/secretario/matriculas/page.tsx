@@ -282,21 +282,40 @@ export default function SecretarioMatriculasPage() {
 
   const parseExcel = (file: File): Promise<BulkRow[]> => {
     return new Promise((resolve) => {
-      const isXlsx = file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls")
+      const ext = file.name.toLowerCase().split('.').pop()
+      const isXlsx = ext === "xlsx" || ext === "xls"
       const reader = new FileReader()
       reader.onload = async (e) => {
         try {
           if (isXlsx) {
             const XLSX = await import("xlsx")
             const data = e.target?.result as ArrayBuffer
-            const wb = XLSX.read(data, { type: "array" })
-            const sheet = wb.Sheets[wb.SheetNames[0]]
-            const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: false }) as unknown as string[][]
-            // Convert rows to CSV text for parseCSV
+            const wb = XLSX.read(data, { type: "array", cellDates: true })
+            // Busca la primera hoja con header válido, si no usa la primera
+            let bestRows: string[][] | null = null
+            for (const name of wb.SheetNames) {
+              const sheet = wb.Sheets[name]
+              const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: true, blankrows: false }) as unknown as any[][]
+              const strRows = rows.map(r => r.map((c:any) => {
+                if (c instanceof Date) return c.toISOString().split('T')[0]
+                if (typeof c === 'number' && c > 30000 && c < 60000) { // Excel date serial
+                  const d = new Date(Math.round((c - 25569) * 86400000)); return isNaN(d.getTime())?String(c):d.toISOString().split('T')[0]
+                }
+                return String(c ?? "").trim()
+              }))
+              const hasHeader = strRows.some(r => r.join(',').toLowerCase().includes('dni') || r.join(',').toLowerCase().includes('nombre'))
+              if (hasHeader) { bestRows = strRows; break }
+              if (!bestRows) bestRows = strRows
+            }
+            const rows = bestRows || []
             const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n")
-            resolve(parseCSV(csv))
+            const parsed = parseCSV(csv)
+            console.log('[parseExcel] xlsx rows', rows.length, 'parsed', parsed.length)
+            resolve(parsed)
           } else {
-            const text = e.target?.result as string
+            // CSV: detecta ; como separador
+            let text = e.target?.result as string
+            if (text.includes(';') && !text.includes(',')) text = text.replace(/;/g, ',')
             resolve(parseCSV(text))
           }
         } catch (err) {
@@ -1147,11 +1166,21 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
             className="hidden"
           />
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             <SbBtn variant="filled" rounded className="flex items-center gap-2"
-              onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4" /> Seleccionar Archivo
+              onClick={() => { if(fileInputRef.current){ fileInputRef.current.accept=".csv"; fileInputRef.current.click() }}}>
+              <FileSpreadsheet className="h-4 w-4" /> CSV
             </SbBtn>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => { if(fileInputRef.current){ fileInputRef.current.accept=".xlsx,.xls"; fileInputRef.current.click() }}}>
+              <FileSpreadsheet className="h-4 w-4" /> Excel (.xlsx)
+            </SbBtn>
+            <SbBtn variant="tonal" rounded className="flex items-center gap-2"
+              onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-4 w-4" /> Cualquiera
+            </SbBtn>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-3">
             <SbBtn variant="tonal" rounded className="flex items-center gap-2"
               onClick={() => {
                 const link = document.createElement("a")
