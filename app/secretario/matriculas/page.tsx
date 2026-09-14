@@ -174,7 +174,7 @@ export default function SecretarioMatriculasPage() {
     const idxGrade = findIdx(["grado","grade"])
     const idxSection = findIdx(["seccion","section"])
     const idxShift = findIdx(["turno","shift"])
-    console.log('[parseCSV] headerIdx',headerIdx,'headerCells',headerCells,'idxCode',idxCode,'idxName',idxName,'idxDni',idxDni,'idxBirth',idxBirth,'idxGrade',idxGrade)
+    console.log('[parseCSV] header',headerCells,'idx Birth',idxBirth,'idxGender',idxGender,'idxGrade',idxGrade,'idxSection',idxSection)
     // Data desde después del header real
     const dataLines = lines.slice(headerIdx+1)
     
