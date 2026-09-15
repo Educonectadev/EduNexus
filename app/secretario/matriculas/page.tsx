@@ -586,12 +586,13 @@ export default function SecretarioMatriculasPage() {
     } finally { setDeletingAll(false) }
   }
 
+  const norm = (s:string)=>s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
   const filtered = enrollments.filter(e => {
     const matchSearch = `${e.first_name} ${e.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
       e.document_number?.includes(search) ||
       e.grade?.toLowerCase().includes(search.toLowerCase())
-    const matchGrade = filterGrade === "all" || e.grade === filterGrade
-    const matchSection = filterSection === "all" || e.section === filterSection
+    const matchGrade = filterGrade === "all" || norm(e.grade||"") === norm(filterGrade) || norm(e.grade||"").startsWith(norm(filterGrade).split("°")[0])
+    const matchSection = filterSection === "all" || norm(e.section||"") === norm(filterSection)
     const matchYear = filterYear === "all" || e.year.toString() === filterYear
     const matchStatus = filterStatus === "all" || e.status === filterStatus
     return matchSearch && matchGrade && matchSection && matchYear && matchStatus
