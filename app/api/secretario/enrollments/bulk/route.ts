@@ -10,6 +10,11 @@ export async function POST(req: NextRequest){
   try{
     await conn.query('BEGIN')
     let imported=0, skipped=0, errors=0; let firstError: string | null = null
+    const details: Array<{dni:string; student_name:string; status:string; reason?:string; message?:string}> = []
+    const pushDetail = (r:any, status:string, reason?:string, message?:string)=>{
+      details.push({ dni: r.student_dni || '', student_name: r.student_name || '', status, reason, message })
+    }
+    const year = new Date().getFullYear()
     // Pre-fetch existing students by DNI for fast lookup
     const dnis = rows.map(r=>r.student_dni).filter(Boolean)
     const existingMap = new Map<string,string>()
@@ -29,7 +34,7 @@ export async function POST(req: NextRequest){
         let studentId = existingMap.get(r.student_dni)
         if(studentId){
           const exEnr = await conn.query(`SELECT id FROM enrollments WHERE student_id=$1 AND grade=$2 AND section=$3 AND year=$4`,[studentId, grade, section, r.year||new Date().getFullYear()])
-          if(exEnr.rows.length){ skipped++; continue }
+          if(exEnr.rows.length){ skipped++; pushDetail(r,'skipped','duplicate',`Ya matriculado en ${grade||'?'} ${section||'?'} ${r.year||year}`); continue }
           // update student data
           const parts = (r.student_name||'').trim().split(/\s+/); const first=parts[0]||''; const last=parts.slice(1).join(' ')||''
           try{
@@ -69,11 +74,11 @@ export async function POST(req: NextRequest){
           const exL=await conn.query(`SELECT id FROM parent_student WHERE parent_id=$1 AND student_id=$2`,[pid, studentId])
           if(!exL.rows.length) await conn.query(`INSERT INTO parent_student (parent_id,student_id,relationship,is_primary) VALUES ($1,$2,'padre',true)`,[pid, studentId])
         }
-        imported++
-      }catch(e:any){ console.error('bulk row',r.student_dni, e); if(!firstError) firstError = e.message || String(e); errors++ }
+        imported++; pushDetail(r,'imported')
+      }catch(e:any){ console.error('bulk row',r.student_dni, e); if(!firstError) firstError = e.message || String(e); errors++; pushDetail(r,'error','error', e.message || String(e)) }
     }
     await conn.query('COMMIT')
-    return NextResponse.json({ imported, skipped, errors, firstError })
+    return NextResponse.json({ imported, skipped, errors, firstError, details })
   }catch(e:any){ await conn.query('ROLLBACK').catch(()=>{}); return NextResponse.json({error:e.message},{status:500}) }
   finally{ conn.release() }
 }

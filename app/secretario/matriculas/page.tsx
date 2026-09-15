@@ -52,6 +52,21 @@ interface BulkRow {
   existingEnrollmentId?: string | null
 }
 
+interface BulkResultDetail {
+  dni?: string
+  student_name?: string
+  status: string
+  reason?: string
+  message?: string
+}
+
+interface BulkResults {
+  imported: number
+  skipped: number
+  errors: number
+  details?: BulkResultDetail[]
+}
+
 interface CompareResult {
   dni: string
   status: "new" | "unchanged" | "changed"
@@ -92,7 +107,7 @@ export default function SecretarioMatriculasPage() {
   const [bulkRows, setBulkRows] = React.useState<BulkRow[]>([])
   const [bulkStep, setBulkStep] = React.useState<"upload" | "preview" | "importing" | "done">("upload")
   const [bulkProgress, setBulkProgress] = React.useState(0)
-  const [bulkResults, setBulkResults] = React.useState<{ imported: number; skipped: number; errors: number } | null>(null)
+  const [bulkResults, setBulkResults] = React.useState<BulkResults | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   const emptyForm = {
@@ -440,7 +455,7 @@ export default function SecretarioMatriculasPage() {
       if (res.ok && data.imported > 0) {
         setBulkProgress(100)
         const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
-        setBulkResults({ imported: data.imported || 0, skipped: (data.skipped||0)+userSkipped, errors: data.errors||0 })
+        setBulkResults({ imported: data.imported || 0, skipped: (data.skipped||0)+userSkipped, errors: data.errors||0, details: data.details || [] })
         setBulkStep("done"); fetchEnrollments(); return
       }
       if (res.ok && data.imported===0) throw new Error(data.firstError || "bulk 0 importados")
@@ -449,6 +464,8 @@ export default function SecretarioMatriculasPage() {
       console.error("bulk fallback a fila por fila", e)
       // Fallback fila por fila si bulk falla
       let imported = 0, skipped = 0, errors = 0
+      const details: BulkResultDetail[] = []
+      const mark = (row: BulkRow, status: string, reason?: string, message?: string) => details.push({ dni: row.student_dni, student_name: row.student_name, status, reason, message })
       for (let i = 0; i < importableRows.length; i++) {
         setBulkProgress(Math.round(((i + 1) / importableRows.length) * 100))
         const row = importableRows[i]
@@ -466,12 +483,13 @@ export default function SecretarioMatriculasPage() {
           } else {
             res2 = await fetch("/api/secretario/enrollments", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify(payload) })
           }
-          if (res2.ok) imported++; else { const d = await res2.json().catch(()=>({})); if(d.error==='DUPLICATE_ENROLLMENT'||res2.status===409) skipped++; else errors++ }
-        } catch { errors++ }
+          if (res2.ok) { imported++; mark(row, "imported") }
+          else { const d = await res2.json().catch(()=>({})); if(d.error==='DUPLICATE_ENROLLMENT'||res2.status===409){ skipped++; mark(row, "skipped", "duplicate", `Ya matriculado en ${row.grade||'?'} ${row.section||'?'} ${payload.year}`) } else { errors++; mark(row, "error", "error", d.error || `HTTP ${res2.status}`) } }
+        } catch (err: any) { errors++; mark(row, "error", "error", err?.message || "Error de red") }
       }
       const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
       skipped += userSkipped
-      setBulkResults({ imported, skipped, errors })
+      setBulkResults({ imported, skipped, errors, details })
       setBulkStep("done"); fetchEnrollments()
     }
   }
@@ -1141,7 +1159,7 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   rows: BulkRow[]
   setRows: (rows: BulkRow[]) => void
   progress: number
-  results: { imported: number; skipped: number; errors: number } | null
+  results: BulkResults | null
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void
   onImport: () => void
   onReset: () => void
@@ -1155,9 +1173,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   const newCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "new").length
   const changedCount = rows.filter(r => r.valid && !r.skipped && r.compareStatus === "changed").length
   const unchangedCount = rows.filter(r => r.valid && r.compareStatus === "unchanged").length
-  const [importLimit, setImportLimit] = React.useState<number>(10)
-  React.useEffect(()=>{ if(validCount>0 && importLimit>validCount) setImportLimit(validCount) }, [validCount])
-  const displayValid = Math.min(importLimit, validCount)
+  const [importLimit, setImportLimit] = React.useState<number | null>(null)
+  React.useEffect(()=>{ if(importLimit!==null && importLimit>validCount) setImportLimit(validCount) }, [validCount])
+  const displayValid = importLimit == null ? validCount : Math.min(importLimit, validCount)
 
   if (step === "upload") {
     return (
@@ -1407,8 +1425,11 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
         <div className="p-4 border-t border-sb-outline-variant/15 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-sb-on-surface-variant/60">Importar</span>
-            <input type="number" min={1} max={validCount} value={importLimit} onChange={e=>setImportLimit(Math.max(1, Math.min(validCount, parseInt(e.target.value)||1)))} className="w-20 h-8 text-center border border-sb-outline-variant/20 rounded-lg bg-transparent text-sm" />
+            <input type="number" min={1} max={validCount} value={importLimit ?? validCount} onChange={e=>{ const v=parseInt(e.target.value); setImportLimit(e.target.value===""?null:(isNaN(v)?null:Math.max(1, Math.min(validCount, v)))) }} className="w-20 h-8 text-center border border-sb-outline-variant/20 rounded-lg bg-transparent text-sm" />
             <span className="text-sb-on-surface-variant/60">de {validCount} → <strong className="text-sb-on-surface">{displayValid} de {rows.length} serán importados</strong></span>
+            <button onClick={()=>setImportLimit(null)} className={`text-xs font-medium px-2 py-1 rounded-full border transition-colors ${importLimit===null?'bg-sb-primary/10 text-sb-primary border-sb-primary/30':'border-sb-outline-variant/20 text-sb-on-surface-variant/60 hover:text-sb-on-surface'}`}>
+              Todos
+            </button>
           </div>
           <div className="flex gap-3">
             <SbBtn rounded onClick={onReset}>Cancelar</SbBtn>
@@ -1419,7 +1440,7 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                 const limited = rows.map(r=>{
                   if(r.valid && !r.skipped){
                     count++
-                    if(count>importLimit) return {...r, skipped:true}
+                    if(count>displayValid) return {...r, skipped:true}
                   }
                   return r
                 })
@@ -1461,6 +1482,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   }
 
   if (step === "done" && results) {
+    const duplicated = (results.details || []).filter(d => d.status === "skipped" && d.reason === "duplicate")
+    const errored = (results.details || []).filter(d => d.status === "error")
+    const realSkipped = (results.details || []).filter(d => d.status === "skipped").length
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
         className="bg-sb-surface rounded-2xl p-8">
@@ -1475,23 +1499,70 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
               <p className="text-2xl font-semibold text-emerald-400">{results.imported}</p>
               <p className="text-xs text-sb-on-surface-variant/50">Importados</p>
             </div>
-            {results.skipped > 0 && (
+            {realSkipped > 0 && (
               <div className="text-center">
-                <p className="text-2xl font-semibold text-amber-400">{results.skipped}</p>
-                <p className="text-xs text-sb-on-surface-variant/50">Omitidos</p>
+                <p className="text-2xl font-semibold text-amber-400">{realSkipped}</p>
+                <p className="text-xs text-sb-on-surface-variant/50">Repetidos (ya matriculados)</p>
               </div>
             )}
             {results.errors > 0 && (
               <div className="text-center">
                 <p className="text-2xl font-semibold text-red-400">{results.errors}</p>
-                <p className="text-xs text-sb-on-surface-variant/50">Errores</p>
+                <p className="text-xs text-sb-on-surface-variant/50">Faltan modificar / errores</p>
               </div>
             )}
           </div>
+
+          {(results.skipped > 0 || results.errors > 0 || duplicated.length > 0) && (
+            <div className="text-left mb-6">
+              {duplicated.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-amber-400 mb-2 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5" /> Repetidos ({duplicated.length}) — ya existían, NO se duplicaron
+                  </p>
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-amber-400/20 divide-y divide-sb-outline-variant/10">
+                    {duplicated.map((d, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 px-3 py-1.5">
+                        <span className="text-[11px] text-sb-on-surface/80 truncate">{d.student_name || "—"}</span>
+                        <span className="text-[10px] font-mono text-sb-on-surface-variant/50 shrink-0">{d.dni}</span>
+                        <span className="text-[10px] text-amber-400/80 shrink-0">{d.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {errored.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-red-400 mb-2 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5" /> Faltan modificar ({errored.length}) — corrígelos y reintenta
+                  </p>
+                  <div className="max-h-40 overflow-y-auto rounded-xl border border-red-400/20 divide-y divide-sb-outline-variant/10">
+                    {errored.map((d, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 px-3 py-1.5">
+                        <span className="text-[11px] text-sb-on-surface/80 truncate">{d.student_name || "—"}</span>
+                        <span className="text-[10px] font-mono text-sb-on-surface-variant/50 shrink-0">{d.dni}</span>
+                        <span className="text-[10px] text-red-400/80 shrink-0">{d.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {results.skipped > 0 && realSkipped === 0 && (
+                <p className="text-xs text-sb-on-surface-variant/60">Algunos fueron omitidos por ti en la vista previa (marcados como duplicados).</p>
+              )}
+            </div>
+          )}
           
-          <SbBtn variant="filled" rounded onClick={onReset}>
-            Nueva Importación
-          </SbBtn>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {errored.length > 0 && (
+              <SbBtn variant="tonal" rounded onClick={() => setStep("preview")}>
+                <RefreshCw className="h-4 w-4" /> Volver y corregir
+              </SbBtn>
+            )}
+            <SbBtn variant="filled" rounded onClick={onReset}>
+              Nueva Importación
+            </SbBtn>
+          </div>
         </div>
       </motion.div>
     )
