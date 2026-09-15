@@ -274,8 +274,16 @@ export default function SecretarioMatriculasPage() {
         // no bloquea
       }
       
-      // Grade: fuzzy match — "1ro" matches "1° de Primaria", "4to" matches "4° de Primaria"
+      // Grade: compose Nivel + Grado ("1°" + "Primaria" → "1° de Primaria") y fuzzy match
       if (rowData.grade) {
+        if (idxNivel >= 0) {
+          const nivel = get(idxNivel)
+          const g = rowData.grade.trim()
+          if (nivel && !/de\s+/.test(g.toLowerCase())) {
+            const n = g.match(/\d+/)?.[0]
+            rowData.grade = n ? `${n}° de ${nivel}` : g
+          }
+        }
         const gradeNorm = norm(rowData.grade)
         const exactMatch = grades.some(g => norm(g) === gradeNorm)
         if (!exactMatch) {
@@ -329,7 +337,22 @@ export default function SecretarioMatriculasPage() {
             const data = e.target?.result as ArrayBuffer
             const wb = XLSX.read(data, { type: "array", cellDates: true })
             // Busca la primera hoja con header válido, si no usa la primera
-            let bestRows: string[][] | null = null
+            // Elige la hoja MÁS completa: puntúa su header por palabras clave
+            // (DNI > fecha > nombre...) y prefiera la que tiene DNI (datos completos)
+            const targetKeys = ["dni","nombre","fecha","genero","grado","seccion","turno","padre","email","correo","nivel"]
+            const scoreSheet = (strRows: string[][]) => {
+              let score = 0, hasDni = false, colCount = 0
+              for (let r = 0; r < Math.min(6, strRows.length); r++) {
+                for (const c of strRows[r]) {
+                  const n = c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+                  for (const t of targetKeys) { if (n.includes(t)) { score++; if (t === "dni") hasDni = true; break } }
+                }
+              }
+              const firstIdx = strRows.findIndex(r => r.some(c => /dni|nombre|alumno|ape/i.test(c)))
+              if (firstIdx >= 0) colCount = strRows[firstIdx]?.length || 0
+              return { score, hasDni, colCount, firstIdx }
+            }
+            let best: { rows: string[][]; s: { score: number; hasDni: boolean; colCount: number; firstIdx: number } } | null = null
             for (const name of wb.SheetNames) {
               const sheet = wb.Sheets[name]
               const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, defval: "", raw: true, blankrows: false }) as unknown as any[][]
@@ -339,13 +362,15 @@ export default function SecretarioMatriculasPage() {
                   const d = new Date(Math.round((c - 25569) * 86400000)); return isNaN(d.getTime())?String(c):d.toISOString().split('T')[0]
                 }
                 return String(c ?? "").trim()
-              }))
-              const hasHeader = strRows.some(r => r.join(',').toLowerCase().includes('dni') || r.join(',').toLowerCase().includes('nombre'))
-              if (hasHeader) { bestRows = strRows; break }
-              if (!bestRows) bestRows = strRows
+              })) as string[][]
+              const s = scoreSheet(strRows)
+              if (s.score < 3) continue
+              const isBetter = !best || (s.hasDni && !best.s.hasDni) || (s.hasDni === best.s.hasDni && (s.score > best.s.score || (s.score === best.s.score && s.colCount > best.s.colCount)))
+              if (isBetter) best = { rows: strRows, s }
             }
-            const rows = bestRows || []
-            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n")
+            const rows = best?.rows || []
+            const firstIdx = best?.s.firstIdx ?? 0
+            const csv = rows.slice(firstIdx).map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n")
             const parsed = parseCSV(csv)
             console.log('[parseExcel] xlsx rows', rows.length, 'parsed', parsed.length)
             resolve(parsed)
@@ -1301,7 +1326,16 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                 link.download = `plantilla_matricula_2026v2.csv`
                 link.click()
               }}>
-              <Download className="h-4 w-4" /> Descargar Plantilla
+              <Download className="h-4 w-4" /> Plantilla Estándar
+            </SbBtn>
+            <SbBtn variant="tonal" rounded className="flex items-center gap-2"
+              onClick={() => {
+                const link = document.createElement("a")
+                link.href = "/plantillas/colegio/plantilla_datos_colegio.csv"
+                link.download = `plantilla_datos_colegio.csv`
+                link.click()
+              }}>
+              <Download className="h-4 w-4" /> Plantilla Datos Colegio
             </SbBtn>
           </div>
           

@@ -227,16 +227,34 @@ export async function POST(request: NextRequest) {
       } else throw e
     }
 
-    if (parent_dni) {
-      const existingParent = await conn.query(
-        'SELECT id FROM parents WHERE document_number = $1 AND institution_id = $2',
-        [parent_dni, instId]
-      )
+    if (parent_dni || parent_email) {
+      let existingParent
+      if (parent_dni) {
+        existingParent = await conn.query(
+          'SELECT id FROM parents WHERE document_number = $1 AND institution_id = $2',
+          [parent_dni, instId]
+        )
+      } else {
+        // Sin DNI: busca por email (archivos tipo DATOS COLEGIO sin DNI del padre)
+        existingParent = await conn.query(
+          'SELECT id FROM parents WHERE LOWER(email) = LOWER($1) AND institution_id = $2',
+          [parent_email, instId]
+        )
+      }
 
 let parentId: string
 
     if (existingParent.rows.length > 0) {
       parentId = existingParent.rows[0].id
+      if (parent_phone || parent_email || parent_name) {
+        const pp = (parent_name || '').trim().split(/\s+/)
+        const nv = parent_name?.trim() ? [pp[0] || '', pp.slice(1).join(' ') || ''] : null
+        await conn.query(
+          `UPDATE parents SET first_name = COALESCE(NULLIF($1, ''), first_name), last_name = COALESCE(NULLIF($2, ''), last_name),
+           phone = COALESCE(NULLIF($3, ''), phone), email = COALESCE(NULLIF($4, ''), email) WHERE id = $5`,
+          [nv?.[0] || '', nv?.[1] || '', parent_phone || '', parent_email || '', parentId]
+        )
+      }
     } else {
       parentId = crypto.randomUUID()
       const parentNameParts = (parent_name || '').trim().split(/\s+/)
@@ -245,7 +263,7 @@ let parentId: string
       await conn.query(
         `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
          VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7)`,
-        [parentId, instId, parentFirst, parentLast, parent_dni, parent_phone || null, parent_email || null]
+        [parentId, instId, parentFirst, parentLast, parent_dni || null, parent_phone || null, parent_email || null]
       )
     }
 
