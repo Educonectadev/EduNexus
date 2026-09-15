@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
+import crypto from 'crypto'
 import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
 
@@ -54,7 +55,11 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
-    const { student_name, student_dni, student_birth_date, student_gender, grade, section, year, status } = body
+    const { student_name, student_dni, student_birth_date, student_gender, grade, section, year, status,
+            parent_name, parent_dni, parent_phone, parent_email, parent_relationship } = body
+
+    const relMap: Record<string, string> = { padre: 'padre', papa: 'padre', papá: 'padre', 'padre o apoderado': 'padre', madre: 'madre', mama: 'madre', mamá: 'madre', tutor: 'tutor', tutora: 'tutor', apoderado: 'apoderado', apoderada: 'apoderado' }
+    const relationship = relMap[String(parent_relationship || '').trim().toLowerCase()] || 'padre'
 
     if (!id || isNaN(Number(id))) {
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
@@ -94,6 +99,48 @@ export async function PUT(
        WHERE id = $5`,
       [grade || null, section || null, year || null, status || null, id]
     )
+
+    // Guarda/vincula al apoderado con el vínculo seleccionado
+    if (parent_dni && studentId) {
+      const existingParent = await conn.query(
+        `SELECT id FROM parents WHERE document_number = $1 AND institution_id = $2`,
+        [parent_dni, instId]
+      )
+      let parentId: string
+      if (existingParent.rows.length > 0) {
+        parentId = existingParent.rows[0].id
+        const pp = (parent_name || '').trim().split(/\s+/)
+        await conn.query(
+          `UPDATE parents SET first_name = COALESCE($1, first_name), last_name = COALESCE($2, last_name),
+           phone = COALESCE($3, phone), email = COALESCE($4, email)
+           WHERE id = $5`,
+          [pp[0] || null, pp.slice(1).join(' ') || null, parent_phone || null, parent_email || null, parentId]
+        )
+      } else {
+        parentId = crypto.randomUUID()
+        const pp = (parent_name || '').trim().split(/\s+/)
+        await conn.query(
+          `INSERT INTO parents (id, institution_id, first_name, last_name, document_type, document_number, phone, email)
+           VALUES ($1, $2, $3, $4, 'DNI', $5, $6, $7)`,
+          [parentId, instId, pp[0] || '', pp.slice(1).join(' ') || '', parent_dni, parent_phone || null, parent_email || null]
+        )
+      }
+      const existingLink = await conn.query(
+        `SELECT id FROM parent_student WHERE parent_id = $1 AND student_id = $2`,
+        [parentId, studentId]
+      )
+      if (existingLink.rows.length > 0) {
+        await conn.query(
+          `UPDATE parent_student SET relationship = $1, is_primary = true WHERE parent_id = $2 AND student_id = $3`,
+          [relationship, parentId, studentId]
+        )
+      } else {
+        await conn.query(
+          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, $3, true)`,
+          [parentId, studentId, relationship]
+        )
+      }
+    }
 
     await conn.query('COMMIT')
 

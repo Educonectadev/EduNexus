@@ -16,7 +16,15 @@ export async function GET(request: NextRequest) {
       const [enrollments] = await pool.query(
         `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
                 s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
-                s.code, s.document_type, COALESCE(s.shift, e.shift, '') as shift
+                s.code, s.document_type, COALESCE(s.shift, e.shift, '') as shift,
+                COALESCE((
+                  SELECT json_agg(json_build_object('parent_id', p.id, 'first_name', p.first_name, 'last_name', p.last_name,
+                    'document_number', p.document_number, 'phone', p.phone, 'email', p.email,
+                    'relationship', ps.relationship, 'is_primary', ps.is_primary))
+                  FROM parent_student ps
+                  JOIN parents p ON p.id = ps.parent_id AND p.institution_id = e.institution_id
+                  WHERE ps.student_id = e.student_id
+                ), '[]'::json) as parents
          FROM enrollments e
          LEFT JOIN students s ON e.student_id = s.id
          WHERE e.institution_id = ?
@@ -29,7 +37,15 @@ export async function GET(request: NextRequest) {
         const [enrollments] = await pool.query(
           `SELECT e.id, e.student_id, e.grade, e.section, e.year, e.status, e.created_at,
                   s.first_name, s.last_name, s.document_number, s.birth_date, s.gender,
-                  s.code, s.document_type, '' as shift
+                  s.code, s.document_type, '' as shift,
+                  COALESCE((
+                    SELECT json_agg(json_build_object('parent_id', p.id, 'first_name', p.first_name, 'last_name', p.last_name,
+                      'document_number', p.document_number, 'phone', p.phone, 'email', p.email,
+                      'relationship', ps.relationship, 'is_primary', ps.is_primary))
+                    FROM parent_student ps
+                    JOIN parents p ON p.id = ps.parent_id AND p.institution_id = e.institution_id
+                    WHERE ps.student_id = e.student_id
+                  ), '[]'::json) as parents
            FROM enrollments e
            LEFT JOIN students s ON e.student_id = s.id
            WHERE e.institution_id = ?
@@ -86,9 +102,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       student_code, student_name, student_dni, student_birth_date, student_gender,
-      parent_name, parent_dni, parent_phone, parent_email,
+      parent_name, parent_dni, parent_phone, parent_email, parent_relationship,
       grade, section, year, shift,
     } = body
+
+    const relMap: Record<string, string> = { padre: 'padre', papa: 'padre', papá: 'padre', 'padre o apoderado': 'padre', madre: 'madre', mama: 'madre', mamá: 'madre', tutor: 'tutor', tutora: 'tutor', apoderado: 'apoderado', apoderada: 'apoderado' }
+    const relationship = relMap[String(parent_relationship || '').trim().toLowerCase()] || 'padre'
 
     if (!student_name || !student_dni) {
       return NextResponse.json({ error: 'Nombre y DNI son requeridos' }, { status: 400 })
@@ -238,8 +257,13 @@ let parentId: string
       )
       if (existingLink.rows.length === 0) {
         await conn.query(
-          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, 'padre', true)`,
-          [parentId, studentId]
+          `INSERT INTO parent_student (parent_id, student_id, relationship, is_primary) VALUES ($1, $2, $3, true)`,
+          [parentId, studentId, relationship]
+        )
+      } else {
+        await conn.query(
+          `UPDATE parent_student SET relationship = $1 WHERE parent_id = $2 AND student_id = $3`,
+          [relationship, parentId, studentId]
         )
       }
     }

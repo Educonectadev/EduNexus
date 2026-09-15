@@ -26,6 +26,18 @@ interface Enrollment {
   code?: string
   document_type?: string
   shift?: string
+  parents?: ParentRecord[]
+}
+
+interface ParentRecord {
+  parent_id: string
+  first_name: string
+  last_name: string
+  document_number: string
+  phone: string | null
+  email: string | null
+  relationship: string
+  is_primary: boolean
 }
 
 interface BulkRow {
@@ -112,7 +124,7 @@ export default function SecretarioMatriculasPage() {
 
   const emptyForm = {
     student_name: "", student_dni: "", student_birth_date: "", student_gender: "",
-    parent_name: "", parent_dni: "", parent_phone: "", parent_email: "",
+    parent_name: "", parent_dni: "", parent_phone: "", parent_email: "", parent_relationship: "padre",
     grade: "", section: "", year: new Date().getFullYear().toString(),
     shift: "",
   }
@@ -573,12 +585,17 @@ export default function SecretarioMatriculasPage() {
   const openDetail = (enr: Enrollment) => { setSelected(enr); setDetailOpen(true) }
   const openEdit = (enr: Enrollment) => {
     setSelected(enr)
+    const parent = enr.parents?.[0]
     setForm({
       student_name: `${enr.first_name} ${enr.last_name}`.trim(),
       student_dni: enr.document_number || "",
       student_birth_date: enr.birth_date || "",
       student_gender: enr.gender || "",
-      parent_name: "", parent_dni: "", parent_phone: "", parent_email: "",
+      parent_name: parent ? `${parent.first_name} ${parent.last_name}`.trim() : "",
+      parent_dni: parent?.document_number || "",
+      parent_phone: parent?.phone || "",
+      parent_email: parent?.email || "",
+      parent_relationship: parent?.relationship || "padre",
       grade: enr.grade, section: enr.section, year: enr.year.toString(),
       shift: enr.shift || "",
     })
@@ -930,6 +947,30 @@ export default function SecretarioMatriculasPage() {
               <div className="h-px bg-sb-outline-variant/15" />
 
               <Info label="Fecha de matrícula" value={new Date(selected.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" })} />
+
+              {selected.parents && selected.parents.length > 0 && (
+                <>
+                  <div className="h-px bg-sb-outline-variant/15" />
+                  <div>
+                    <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider mb-3">Apoderados</p>
+                    <div className="space-y-3">
+                      {selected.parents.map((p) => (
+                        <div key={p.parent_id} className="rounded-xl bg-sb-surface-container/50 p-3.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-sb-on-surface">{p.first_name} {p.last_name}</p>
+                            <SbBadge color="bg-sb-primary/10 text-sb-primary capitalize">{p.relationship === "madre" ? "Madre" : p.relationship === "apoderado" ? "Apoderado" : p.relationship === "tutor" ? "Tutor" : "Padre"}</SbBadge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <Info label="DNI" value={p.document_number || "—"} />
+                            <Info label="Teléfono" value={p.phone || "—"} />
+                          </div>
+                          {p.email && <Info label="Email" value={p.email} />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             <div className="sb-modal-footer">
               <SbBtn variant="tonal" rounded className="flex-1 flex items-center justify-center gap-2" onClick={() => openEdit(selected)}>
@@ -1146,6 +1187,45 @@ function Form({ form, setForm, grades, sections }: { form: any; setForm: (f: any
               <option value="noche">Noche</option>
             </select>
           </div>
+        </div>
+      </div>
+      <div>
+        <p className="text-xs font-medium text-sb-on-surface-variant/50 mb-3 flex items-center gap-2">
+          <User className="h-3.5 w-3.5" /> Padre / Apoderado
+        </p>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Vínculo *</label>
+            <select value={form.parent_relationship || "padre"} onChange={(e) => setForm({ ...form, parent_relationship: e.target.value })} className="sbf-native-select w-full">
+              <option value="padre">Padre</option>
+              <option value="madre">Madre</option>
+              <option value="tutor">Tutor</option>
+              <option value="apoderado">Apoderado</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Nombre Completo</label>
+            <input placeholder="Juan Pérez Ramírez" value={form.parent_name}
+              onChange={(e) => setForm({ ...form, parent_name: e.target.value })} className="sb-input" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">DNI</label>
+              <input placeholder="12345678" value={form.parent_dni} maxLength={8}
+                onChange={(e) => setForm({ ...form, parent_dni: e.target.value.replace(/\D/g, "").slice(0, 8) })} className="sb-input" />
+            </div>
+            <div>
+              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Teléfono</label>
+              <input placeholder="9xx xxx xxx" value={form.parent_phone} maxLength={15}
+                onChange={(e) => setForm({ ...form, parent_phone: e.target.value.replace(/\D/g, "").slice(0, 15) })} className="sb-input" />
+            </div>
+            <div>
+              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Email</label>
+              <input placeholder="padre@correo.com" value={form.parent_email}
+                onChange={(e) => setForm({ ...form, parent_email: e.target.value })} className="sb-input" />
+            </div>
+          </div>
+          <p className="text-[10px] text-sb-on-surface-variant/30">Al matricular se crea la cuenta del apoderado y se vincula al alumno automáticamente (verá la ficha de matrícula en su portal).</p>
         </div>
       </div>
     </div>
