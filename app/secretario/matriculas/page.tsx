@@ -631,10 +631,10 @@ export default function SecretarioMatriculasPage() {
         <button
           onClick={() => bulkStep !== "importing" && setActiveTab("individual")}
           disabled={bulkStep === "importing"}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all cursor-pointer active:scale-[0.97] active:brightness-95 ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
             activeTab === "individual"
-              ? "bg-sb-on-surface text-sb-surface"
-              : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"
+              ? "bg-sb-on-surface text-sb-surface shadow-sm"
+              : "text-sb-on-surface-variant/60 hover:text-sb-on-surface hover:bg-sb-surface-container-high"
           }`}
         >
           <User className="h-4 w-4" />
@@ -643,10 +643,10 @@ export default function SecretarioMatriculasPage() {
         <button
           onClick={() => bulkStep !== "importing" && setActiveTab("bulk")}
           disabled={bulkStep === "importing"}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all cursor-pointer active:scale-[0.97] active:brightness-95 ${bulkStep==="importing"?"opacity-50 cursor-not-allowed":""} ${
             activeTab === "bulk"
-              ? "bg-sb-on-surface text-sb-surface"
-              : "text-sb-on-surface-variant/60 hover:text-sb-on-surface"
+              ? "bg-sb-on-surface text-sb-surface shadow-sm"
+              : "text-sb-on-surface-variant/60 hover:text-sb-on-surface hover:bg-sb-surface-container-high"
           }`}
         >
           <FileSpreadsheet className="h-4 w-4" />
