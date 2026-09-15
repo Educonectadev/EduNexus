@@ -164,8 +164,15 @@ export default function SecretarioMatriculasPage() {
     const idxApellidos = findIdx(["apellidos","apellido"])
     const idxNombresOnly = findIdx(["nombres"])
     const idxDni = findIdx(["dni alumno","dni del alumno","documento alumno","nro doc","nro documento","documento","dni"])
-    const idxBirth = findIdx(["fecha nacimiento","fecha nac","nacimiento","birth","fecha"])
-    const idxGender = findIdx(["genero","sexo","gender"])
+    const normalizeHeader = (h:string)=>h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")
+    const findIdxLoose = (keys:string[]) => {
+      const nKeys = keys.map(k=>normalizeHeader(k))
+      for(let k of nKeys){ const i=headerCells.findIndex(h=>normalizeHeader(h)===k); if(i!==-1) return i }
+      for(let k of nKeys){ const i=headerCells.findIndex(h=>normalizeHeader(h).includes(k)); if(i!==-1) return i }
+      return -1
+    }
+    const idxBirth = findIdxLoose(["fechanacimiento","fechanac","nacimiento","birth","fecha"])
+    const idxGender = findIdxLoose(["genero","sexo","gender","sex"])
     const idxParentName = findIdx(["nombre padre","nombre del padre","padre/apoderado","padre","apoderado"])
     const idxParentDni = findIdx(["dni padre","dni apoderado"])
     const idxParentPhone = findIdx(["telefono padre","telefono","celular","phone"])
@@ -226,12 +233,13 @@ export default function SecretarioMatriculasPage() {
         // modo híbrido: genera DNI temporal para no bloquear importación masiva
         rowData.student_dni = `TMP${String(rowData.row).padStart(6,"0")}`
       }
-      // Género híbrido: autocorrige en vez de bloquear
+      // Género híbrido: autocorrige en vez de bloquear (tolera Masculino/Femenino/M/F/1/2 etc)
       if (rowData.student_gender) {
-        const g = rowData.student_gender.toLowerCase()
-        if (["f","femenino","fem","mujer"].some(v=>g.includes(v))) rowData.student_gender = "F"
-        else if (["m","masculino","masc","varon","hombre"].some(v=>g.includes(v))) rowData.student_gender = "M"
-        else rowData.student_gender = "" // deja vacío, no bloquea
+        const g = rowData.student_gender.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim()
+        if (["f","femenino","fem","mujer","2","femenimo"].some(v=>g===v||g.includes(v))) rowData.student_gender = "F"
+        else if (["m","masculino","masc","varon","hombre","1","masculimo"].some(v=>g===v||g.includes(v))) rowData.student_gender = "M"
+        else if (g==="m"||g==="f") rowData.student_gender=g.toUpperCase()
+        else rowData.student_gender = ""
       }
       if (rowData.student_birth_date) {
         const c = convertDate(rowData.student_birth_date)
@@ -1174,17 +1182,18 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
           <div className="flex flex-wrap gap-2 justify-center">
             <SbBtn variant="filled" rounded className="flex items-center gap-2"
               onClick={() => { if(fileInputRef.current){ fileInputRef.current.accept=".csv"; fileInputRef.current.click() }}}>
-              <FileSpreadsheet className="h-4 w-4" /> CSV
+              <FileSpreadsheet className="h-4 w-4" /> CSV (plantilla)
             </SbBtn>
             <SbBtn variant="filled" rounded className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700"
               onClick={() => { if(fileInputRef.current){ fileInputRef.current.accept=".xlsx,.xls"; fileInputRef.current.click() }}}>
-              <FileSpreadsheet className="h-4 w-4" /> Excel (.xlsx)
+              <FileSpreadsheet className="h-4 w-4" /> Excel SIAGIE (.xlsx)
             </SbBtn>
             <SbBtn variant="tonal" rounded className="flex items-center gap-2"
               onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4" /> Cualquiera
+              <Upload className="h-4 w-4" /> Auto (cualquiera)
             </SbBtn>
           </div>
+          <p className="text-[11px] text-sb-on-surface-variant/40 mt-2">CSV: plantilla oficial · Excel: SIAGIE u otro formato — ambos auto-detectan F. Nacimiento, Sexo, 12/05/2015, Masculino/Femenino</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-3">
             <SbBtn variant="tonal" rounded className="flex items-center gap-2"
               onClick={() => {
