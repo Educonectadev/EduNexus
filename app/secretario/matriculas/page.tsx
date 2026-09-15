@@ -675,8 +675,8 @@ export default function SecretarioMatriculasPage() {
       ) : (
         <>
       {/* Search + Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
+      <div className="flex flex-col sm:flex-row gap-3 overflow-visible">
+        <div className="flex-1 min-w-0">
           <SbfSearchBar
             value={search}
             onChange={setSearch}
@@ -685,7 +685,7 @@ export default function SecretarioMatriculasPage() {
         </div>
 
         {/* Filter Dropdowns (Custom Select) */}
-        <div className="flex gap-2 flex-wrap items-center">
+        <div className="flex gap-2 flex-wrap items-center overflow-visible">
           <SbfSelect
             value={filterGrade}
             onChange={setFilterGrade}

@@ -239,6 +239,7 @@
 .sbf-select-wrap {
   position: relative;
   display: inline-flex;
+  overflow: visible;
 }
 
 .sbf-select-trigger {
