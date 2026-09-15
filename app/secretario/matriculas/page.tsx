@@ -831,10 +831,10 @@ export default function SecretarioMatriculasPage() {
               <AnimatePresence>
                 {filtered.map((enr, i) => (
                   <motion.tr key={enr.id}
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, filter: "blur(8px)", y: -10 }}
-                    transition={{ delay: i * 0.03, duration: 0.3 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: Math.min(i * 0.012, 0.35), duration: 0.15 }}
                     onClick={() => openDetail(enr)}>
                     <td className="font-medium text-sb-on-surface/80 text-[13px]">{enr.first_name} {enr.last_name}</td>
                     <td className="font-mono text-xs text-sb-on-surface-variant/50">{enr.document_number}</td>
@@ -870,9 +870,9 @@ export default function SecretarioMatriculasPage() {
               tabIndex={0}
               onClick={() => openDetail(enr)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(enr) } }}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.02, duration: 0.25 }}
+              transition={{ delay: Math.min(i * 0.01, 0.3), duration: 0.2 }}
               className="w-full text-left bg-sb-surface rounded-2xl p-4 active:scale-[0.99] transition-transform cursor-pointer"
             >
               <div className="flex items-start justify-between gap-3">
@@ -912,11 +912,18 @@ export default function SecretarioMatriculasPage() {
 
         {filtered.length === 0 && (
           <div className="text-center py-16">
-            <GraduationCap className="h-14 w-14 text-sb-on-surface-variant/15 mx-auto mb-3" />
-            <h3 className="text-base font-medium text-sb-on-surface/60">Sin matrículas</h3>
+            <Search className="h-14 w-14 text-sb-on-surface-variant/15 mx-auto mb-3" />
+            <h3 className="text-base font-medium text-sb-on-surface/60">
+              {search ? `No se encontró «${search.trim()}»` : activeFilters > 0 ? "Sin resultados con esos filtros" : "Sin matrículas"}
+            </h3>
             <p className="text-sm text-sb-on-surface-variant/30 mt-1">
-              {activeFilters > 0 || search ? "Intenta con otros filtros." : "Registra la primera matrícula para comenzar."}
+              {search ? "Revisa la ortografía o prueba con el DNI o apellido." : activeFilters > 0 ? "Intenta con otros filtros." : "Registra la primera matrícula para comenzar."}
             </p>
+            {(search || activeFilters > 0) && (
+              <button onClick={() => { setSearch(""); clearFilters() }} className="mt-4 text-sm font-medium text-sb-primary hover:underline">
+                Limpiar búsqueda y filtros
+              </button>
+            )}
           </div>
         )}
       </div>
