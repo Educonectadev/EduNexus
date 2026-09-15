@@ -289,32 +289,23 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  min-width: 100%;
+  min-width: 180px;
   background: var(--sb-surface, var(--md-sys-color-surface));
   border-radius: 16px;
-  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.15),
-              0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.18),
+              0 0 0 1px rgba(0, 0, 0, 0.06);
   padding: 6px;
-  z-index: var(--z-dropdown, 20);
-  opacity: 0;
-  transform: translateY(-8px) scale(0.96);
-  transform-origin: top left;
-  transition: opacity 200ms ease, transform 200ms cubic-bezier(0.34, 1.45, 0.5, 1);
-  pointer-events: none;
+  z-index: 50;
   max-height: 280px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--sb-outline-variant, var(--md-sys-color-outline-variant)) transparent;
+  border: 1px solid var(--sb-outline-variant, rgba(0,0,0,0.08));
 }
 .sbf-select-dropdown::-webkit-scrollbar { width: 4px; }
 .sbf-select-dropdown::-webkit-scrollbar-thumb {
   background: var(--sb-outline-variant, var(--md-sys-color-outline-variant));
   border-radius: 999px;
-}
-.sbf-select-wrap.open .sbf-select-dropdown {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
 }
 
 .sbf-select-option {
