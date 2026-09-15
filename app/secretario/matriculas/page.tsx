@@ -466,8 +466,9 @@ export default function SecretarioMatriculasPage() {
     setBulkStep("importing")
     setBulkProgress(10)
     const importableRows = bulkRows.filter(r => r.valid && !r.skipped)
-    // Intento bulk rápido (1 request para 300-1000 filas)
+    // Intento bulk rápido (envíado en lotes de 200 para 300-1000+ filas)
     try {
+      setBulkProgress(10)
       const payloadRows = importableRows.map(r => ({
         student_code: r.student_code,
         student_name: r.student_name,
@@ -483,20 +484,29 @@ export default function SecretarioMatriculasPage() {
         shift: r.shift,
         year: new Date().getFullYear().toString(),
       }))
-      setBulkProgress(30)
-      const res = await fetch("/api/secretario/enrollments/bulk", {
-        method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
-        body: JSON.stringify({ rows: payloadRows }),
-      })
-      const data = await res.json().catch(()=>({}))
-      if (res.ok && data.imported > 0) {
-        setBulkProgress(100)
-        const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
-        setBulkResults({ imported: data.imported || 0, skipped: (data.skipped||0)+userSkipped, errors: data.errors||0, details: data.details || [] })
-        setBulkStep("done"); fetchEnrollments(); return
+      // Envía en lotes de 200 para no exceder el timeout del servidor
+      const CHUNK = 200
+      let imported = 0, skipped = 0, errors = 0, firstError: string | null = null
+      const details: BulkResultDetail[] = []
+      for (let c = 0; c < payloadRows.length; c += CHUNK) {
+        const chunk = payloadRows.slice(c, c + CHUNK)
+        setBulkProgress(10 + Math.round((c / Math.max(1, payloadRows.length)) * 80))
+        const res = await fetch("/api/secretario/enrollments/bulk", {
+          method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include",
+          body: JSON.stringify({ rows: chunk }),
+        })
+        const data = await res.json().catch(()=>({}))
+        if (!res.ok) throw new Error(data.error || `bulk failed (${res.status})`)
+        imported += data.imported || 0
+        skipped += data.skipped || 0
+        errors += data.errors || 0
+        if (data.details) (details as BulkResultDetail[]).push(...data.details)
+        if (!firstError) firstError = data.firstError || null
       }
-      if (res.ok && data.imported===0) throw new Error(data.firstError || "bulk 0 importados")
-      throw new Error(data.error || "bulk failed")
+      setBulkProgress(100)
+      const userSkipped = bulkRows.filter(r => r.duplicate && r.skipped).length
+      setBulkResults({ imported, skipped: skipped + userSkipped, errors, details })
+      setBulkStep("done"); fetchEnrollments(); return
     } catch (e) {
       console.error("bulk fallback a fila por fila", e)
       // Fallback fila por fila si bulk falla
@@ -1282,6 +1292,12 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
   React.useEffect(()=>{ if(importLimit!==null && importLimit>validCount) setImportLimit(validCount) }, [validCount])
   const displayValid = importLimit == null ? validCount : Math.min(importLimit, validCount)
 
+  const PAGE_ROWS = 30
+  const [previewPage, setPreviewPage] = React.useState(0)
+  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_ROWS))
+  const safePage = Math.min(previewPage, pageCount - 1)
+  const visibleRows = rows.slice(safePage * PAGE_ROWS, (safePage + 1) * PAGE_ROWS)
+
   if (step === "upload") {
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -1429,7 +1445,9 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, i) => (
+              {visibleRows.map((row, li) => {
+                const i = safePage * PAGE_ROWS + li
+                return (
                 <tr key={i} className={`border-b border-sb-outline-variant/10 ${!row.valid ? "bg-red-500/5" : row.duplicate ? "bg-amber-500/5" : row.compareStatus === "changed" ? "bg-amber-500/5" : row.compareStatus === "unchanged" ? "opacity-60" : ""}`}>
                   <td className="py-1 px-2 font-mono text-[11px] text-sb-on-surface-variant/50">{row.row}</td>
                   <td className="py-1 px-1"><input value={row.student_code} onChange={e=>setRows(rows.map((r,j)=>j===i?{...r,student_code:e.target.value}:r))} className="w-20 text-[11px] border border-sb-outline-variant/20 rounded px-1 py-1 bg-transparent" placeholder="Cod" /></td>
@@ -1530,20 +1548,27 @@ function BulkImportView({ step, setStep, file, rows, setRows, progress, results,
                     )}
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
         
         {/* Footer con contador */}
-        <div className="p-4 border-t border-sb-outline-variant/15 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm">
+        <div className="p-4 border-t border-sb-outline-variant/15 flex flex-col lg:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm order-2 lg:order-1">
             <span className="text-sb-on-surface-variant/60">Importar</span>
             <input type="number" min={1} max={validCount} value={importLimit ?? validCount} onChange={e=>{ const v=parseInt(e.target.value); setImportLimit(e.target.value===""?null:(isNaN(v)?null:Math.max(1, Math.min(validCount, v)))) }} className="w-20 h-8 text-center border border-sb-outline-variant/20 rounded-lg bg-transparent text-sm" />
             <span className="text-sb-on-surface-variant/60">de {validCount} → <strong className="text-sb-on-surface">{displayValid} de {rows.length} serán importados</strong></span>
             <button onClick={()=>setImportLimit(null)} className={`text-xs font-medium px-2 py-1 rounded-full border transition-colors ${importLimit===null?'bg-sb-primary/10 text-sb-primary border-sb-primary/30':'border-sb-outline-variant/20 text-sb-on-surface-variant/60 hover:text-sb-on-surface'}`}>
               Todos
             </button>
+          </div>
+          <div className="flex items-center gap-1 order-1 lg:order-2 text-xs text-sb-on-surface-variant/50">
+            <span className="mr-2">Mostrando {safePage*PAGE_ROWS+1}–{Math.min((safePage+1)*PAGE_ROWS, rows.length)} de {rows.length}</span>
+            <button onClick={()=>setPreviewPage(Math.max(0, safePage-1))} disabled={safePage===0} className="h-7 px-2.5 rounded-lg border border-sb-outline-variant/20 hover:bg-sb-surface-container disabled:opacity-30">‹</button>
+            <button onClick={()=>setPreviewPage(Math.min(pageCount-1, safePage+1))} disabled={safePage>=pageCount-1} className="h-7 px-2.5 rounded-lg border border-sb-outline-variant/20 hover:bg-sb-surface-container disabled:opacity-30">›</button>
+            <span className="ml-2 font-mono">{safePage+1}/{pageCount}</span>
           </div>
           <div className="flex gap-3">
             <SbBtn rounded onClick={onReset}>Cancelar</SbBtn>
