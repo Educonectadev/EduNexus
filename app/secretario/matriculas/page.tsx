@@ -657,10 +657,17 @@ export default function SecretarioMatriculasPage() {
   }
 
   const norm = (s:string)=>s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  // Búsqueda inteligente: sin tildes, orden de palabras indiferente y en TODOS los campos
+  const smartMatch = (e: Enrollment, q: string): boolean => {
+    const query = q.trim()
+    if (!query) return true
+    const haystack = norm(`${e.first_name} ${e.last_name} ${e.document_number} ${e.code || ""} ${e.grade || ""} ${e.section || ""} ${e.shift || ""}`)
+    const tokens = query.toLowerCase().split(/\s+/).filter(Boolean)
+    return tokens.every(t => haystack.includes(t))
+  }
+
   const filtered = enrollments.filter(e => {
-    const matchSearch = `${e.first_name} ${e.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
-      e.document_number?.includes(search) ||
-      e.grade?.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = smartMatch(e, search)
     const matchGrade = filterGrade === "all" || norm(e.grade||"") === norm(filterGrade) || norm(e.grade||"").startsWith(norm(filterGrade).split("°")[0])
     const matchSection = filterSection === "all" || norm(e.section||"") === norm(filterSection)
     const matchYear = filterYear === "all" || e.year.toString() === filterYear
