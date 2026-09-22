@@ -265,25 +265,25 @@ function TareasInner() {
         {/* Header */}
         <header className="flex items-start justify-between mb-6 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1 text-sb-on-surface-variant">Panel Docente</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-sb-on-surface">Tareas</h1>
-            <p className="text-[13px] mt-2 text-sb-on-surface-variant">Gestiona las tareas de tus alumnos</p>
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>Tareas</h1>
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Gestiona las tareas de tus alumnos</p>
           </div>
           <div className="flex items-center gap-2 shrink-0 mt-1">
             {user && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-sb-on-surface">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-sb-on-surface whitespace-nowrap">{user.full_name}</span>
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>{user.full_name}</span>
               </div>
             )}
             <NotificationBell />
             <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-sb-on-surface" />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-sb-on-surface" />
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
             <button
               onClick={() => setDialogOpen(true)}
@@ -305,7 +305,7 @@ function TareasInner() {
           ].map(s => {
             const Icon = s.icon
             return (
-              <div key={s.label} className="p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02]" style={{
+              <div key={s.label} className="p-4" style={{
                 background: "var(--note-surface)",
                 borderRadius: "16px",
                 border: "1px solid var(--note-hairline)",
@@ -324,7 +324,7 @@ function TareasInner() {
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
           <div className="relative flex-1 group">
             <div
-              className="flex items-center h-11 gap-2.5 px-3 transition-all duration-200 group-hover:shadow-sm"
+              className="flex items-center h-11 gap-2.5 px-3"
               style={{
                 borderRadius: "14px",
                 background: "var(--note-fill)",
@@ -350,7 +350,7 @@ function TareasInner() {
           </div>
           <div className="relative sm:w-56 group">
             <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}
-              className="h-11 w-full px-4 pr-10 text-sm font-medium appearance-none cursor-pointer transition-all duration-200 hover:shadow-sm"
+              className="h-11 w-full px-4 pr-10 text-sm font-medium appearance-none cursor-pointer"
               style={{
                 borderRadius: "14px",
                 background: courseFilter ? "var(--note-fill)" : "transparent",
@@ -404,7 +404,7 @@ function TareasInner() {
                 <motion.div key={t.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25, delay: i * 0.03 }}
                   onClick={() => fetchTaskDetail(t.id)}
-                  className="group overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+                  className="group overflow-hidden cursor-pointer transition-colors"
                   style={{
                     borderRadius: "16px",
                     background: "var(--note-surface)",

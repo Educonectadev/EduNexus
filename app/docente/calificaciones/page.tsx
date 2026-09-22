@@ -287,7 +287,7 @@ function CalificacionesInner() {
         <header className="mb-4">
           <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Panel Docente</p>
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Calificaciones
             </h1>

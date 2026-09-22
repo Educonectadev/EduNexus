@@ -200,11 +200,11 @@ export default function DocenteHorariosPage() {
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
-      <div className="p-5 md:p-8 pb-24 md:pb-8">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
         {/* Header */}
         <header className="flex items-start justify-between mb-6 gap-4">
           <div>
-            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Panel Docente</p>
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
             <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
               Horarios
             </h1>

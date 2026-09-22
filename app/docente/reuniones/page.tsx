@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Handshake, Calendar, Clock, MapPin, Video, Copy, Check, Megaphone } from "@/components/ui/proicons"
-import { motion } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbBadge } from "@/components/ui/sb"
+import { Handshake, Calendar, Clock, MapPin, Video, Copy, Check, Megaphone, Sun, Moon } from "@/components/ui/proicons"
+import NotificationBell from "@/components/layout/notification-bell"
+import { useAuthStore } from "@/stores/auth-store"
+import { useTheme } from "next-themes"
+
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 interface Reunion {
   id: string; title: string; message: string; agenda: string; meeting_date: string; meeting_time: string
@@ -17,12 +19,7 @@ interface Comunicado {
 }
 
 const targetLabels: Record<string, string> = { all: "Todos", docente: "Docentes", padre: "Apoderados", secretario: "Secretaría" }
-const priorityLabels: Record<string, { label: string; color: string }> = {
-  baja: { label: "Baja", color: "bg-blue-400/10 text-blue-400/80" },
-  media: { label: "Media", color: "bg-yellow-400/10 text-yellow-400/80" },
-  alta: { label: "Alta", color: "bg-orange-400/10 text-orange-400/80" },
-  urgente: { label: "Urgente", color: "bg-red-400/10 text-red-400/80" },
-}
+const priorityLabels: Record<string, string> = { baja: "Baja", media: "Media", alta: "Alta", urgente: "Urgente" }
 
 function formatTime(t: string) { return t ? t.slice(0, 5) : "" }
 function isTodayOrFuture(d: string) { const t = new Date(); t.setHours(0,0,0,0); const m = new Date(d); m.setHours(0,0,0,0); return m >= t }
@@ -35,6 +32,8 @@ function timeAgo(d: string) {
 }
 
 export default function DocenteReunionesPage() {
+  const user = useAuthStore((s) => s.user)
+  const { theme, setTheme } = useTheme()
   const [reuniones, setReuniones] = React.useState<Reunion[]>([])
   const [comunicados, setComunicados] = React.useState<Comunicado[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -59,122 +58,178 @@ export default function DocenteReunionesPage() {
   const past = reuniones.filter(r => !isTodayOrFuture(r.meeting_date))
 
   return (
-    <div className="space-y-5">
-      <SbSectionHeader title="Reuniones y Comunicados" description="Reuniones y avisos de la dirección" />
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
+      <div className="p-6 md:p-8 pb-24 md:pb-8">
 
-      {/* ═══ TOGGLE REUNIONES / COMUNICADOS ═══ */}
-      <div className="flex bg-black/5 dark:bg-white/5 rounded-2xl p-1">
-        <button
-          onClick={() => setTab("reuniones")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-            tab === "reuniones"
-              ? "bg-white dark:bg-[#1a1a1c] text-black dark:text-white shadow-sm"
-              : "text-black/40 dark:text-white/40 hover:text-black/60 dark:hover:text-white/60"
-          )}
-        >
-          <Handshake className="h-4 w-4" />
-          Reuniones
-          {upcoming.length > 0 && (
-            <span className="h-5 min-w-[20px] px-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-center">
-              {upcoming.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setTab("comunicados")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-            tab === "comunicados"
-              ? "bg-white dark:bg-[#1a1a1c] text-black dark:text-white shadow-sm"
-              : "text-black/40 dark:text-white/40 hover:text-black/60 dark:hover:text-white/60"
-          )}
-        >
-          <Megaphone className="h-4 w-4" />
-          Comunicados
-          {comunicados.length > 0 && (
-            <span className="h-5 min-w-[20px] px-1 rounded-full bg-sb-primary/15 text-sb-primary text-[10px] font-bold flex items-center justify-center">
-              {comunicados.length}
-            </span>
-          )}
-        </button>
+        {/* ═══════════════ HEADER ═══════════════ */}
+        <header className="flex items-start justify-between mb-6 gap-4">
+          <div>
+            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Comunicación</p>
+            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+              Reuniones
+            </h1>
+            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Reuniones y avisos de la dirección</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            {user && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
+                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
+                  </span>
+                </div>
+                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                  {user.full_name}
+                </span>
+              </div>
+            )}
+            <NotificationBell />
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
+            </button>
+          </div>
+        </header>
+
+        {/* ═══════════════ TOGGLE ═══════════════ */}
+        <div className="flex mb-6 p-1" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+          <button
+            onClick={() => setTab("reuniones")}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-[13px] font-semibold transition-all duration-200"
+            style={{
+              borderRadius: "12px",
+              background: tab === "reuniones" ? "var(--note-surface)" : "transparent",
+              color: tab === "reuniones" ? "var(--note-text)" : "var(--note-muted)",
+              boxShadow: tab === "reuniones" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
+              fontFamily: FONT,
+            }}
+          >
+            <Handshake className="h-4 w-4" />
+            Reuniones
+            {upcoming.length > 0 && (
+              <span className="h-5 min-w-[20px] px-1 flex items-center justify-center text-[10px] font-bold" style={{ borderRadius: "999px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
+                {upcoming.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setTab("comunicados")}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-[13px] font-semibold transition-all duration-200"
+            style={{
+              borderRadius: "12px",
+              background: tab === "comunicados" ? "var(--note-surface)" : "transparent",
+              color: tab === "comunicados" ? "var(--note-text)" : "var(--note-muted)",
+              boxShadow: tab === "comunicados" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
+              fontFamily: FONT,
+            }}
+          >
+            <Megaphone className="h-4 w-4" />
+            Comunicados
+            {comunicados.length > 0 && (
+              <span className="h-5 min-w-[20px] px-1 flex items-center justify-center text-[10px] font-bold" style={{ borderRadius: "999px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
+                {comunicados.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* ═══════════════ CONTENT ═══════════════ */}
+        {tab === "reuniones" && (
+          <div className="space-y-4">
+            {!loading && reuniones.length === 0 && (
+              <EmptyState icon={Handshake} title="Sin reuniones" desc="La dirección no ha programado reuniones" />
+            )}
+
+            {upcoming.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-2 w-2 rounded-full" style={{ background: "#22c55e" }} />
+                  <h3 className="text-[12px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Próximas</h3>
+                  <span className="text-[10px] ml-auto" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{upcoming.length}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {upcoming.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} />)}
+                </div>
+              </div>
+            )}
+
+            {past.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="h-3 w-3" style={{ color: "var(--note-muted)", opacity: 0.4 }} />
+                  <h3 className="text-[12px] font-bold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Pasadas</h3>
+                  <span className="text-[10px] ml-auto" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{past.length}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {past.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} past />)}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === "comunicados" && (
+          <div className="flex flex-col gap-2">
+            {!loading && comunicados.length === 0 && (
+              <EmptyState icon={Megaphone} title="Sin comunicados" desc="No hay avisos de la dirección" />
+            )}
+            {comunicados.map(c => <ComunicadoCard key={c.id} c={c} onClick={() => { setShowDetails(c); setDetailType("comunicado") }} />)}
+          </div>
+        )}
+
+        {/* ═══════════════ MODAL ═══════════════ */}
+        {showDetails && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.4)" }}>
+            <div
+              className="w-full max-w-lg max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-[18px] font-bold truncate pr-4" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                    {showDetails.title}
+                  </h2>
+                  <button
+                    onClick={() => setShowDetails(null)}
+                    className="h-8 w-8 flex items-center justify-center shrink-0 text-[14px] font-bold transition-opacity hover:opacity-60"
+                    style={{ borderRadius: "999px", background: "var(--note-fill)", color: "var(--note-muted)" }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {detailType === "reunion" && (
+                  <ReunionDetail r={showDetails as Reunion} copiedLink={copiedLink} onCopyLink={handleCopyLink} />
+                )}
+                {detailType === "comunicado" && (
+                  <ComunicadoDetail c={showDetails as Comunicado} />
+                )}
+
+                <button
+                  onClick={() => setShowDetails(null)}
+                  className="w-full mt-6 py-3 text-[13px] font-semibold transition-opacity hover:opacity-80"
+                  style={{ borderRadius: "999px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* ═══ CONTENIDO REUNIONES ═══ */}
-      {tab === "reuniones" && (
-        <div className="space-y-4">
-          {!loading && reuniones.length === 0 && (
-            <EmptyState icon={Handshake} title="Sin reuniones" desc="La dirección no ha programado reuniones" />
-          )}
-
-          {upcoming.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Check className="h-3.5 w-3.5 text-emerald-400/70" />
-                <h3 className="text-xs font-semibold text-black/60 dark:text-white/60">Próximas</h3>
-                <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{upcoming.length}</span>
-              </div>
-              <div className="space-y-2">
-                {upcoming.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} />)}
-              </div>
-            </div>
-          )}
-
-          {past.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-3.5 w-3.5 text-black/20 dark:text-white/20" />
-                <h3 className="text-xs font-semibold text-black/40 dark:text-white/40">Pasadas</h3>
-                <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto">{past.length}</span>
-              </div>
-              <div className="space-y-2">
-                {past.map(r => <ReunionCard key={r.id} r={r} onCopyLink={handleCopyLink} copiedLink={copiedLink} onClick={() => { setShowDetails(r); setDetailType("reunion") }} past />)}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ═══ CONTENIDO COMUNICADOS ═══ */}
-      {tab === "comunicados" && (
-        <div className="space-y-2">
-          {!loading && comunicados.length === 0 && (
-            <EmptyState icon={Megaphone} title="Sin comunicados" desc="No hay avisos de la dirección" />
-          )}
-          {comunicados.map(c => <ComunicadoCard key={c.id} c={c} onClick={() => { setShowDetails(c); setDetailType("comunicado") }} />)}
-        </div>
-      )}
-
-      {/* ═══ MODAL ═══ */}
-      <SbModal open={!!showDetails} onClose={() => setShowDetails(null)} maxWidth="480px">
-        {showDetails && detailType === "reunion" && (
-          <>
-            <SbModalHeader title={(showDetails as Reunion).title} onClose={() => setShowDetails(null)} />
-            <SbModalBody><ReunionDetail r={showDetails as Reunion} copiedLink={copiedLink} onCopyLink={handleCopyLink} /></SbModalBody>
-            <SbModalFooter><SbBtn variant="filled" rounded className="w-full" onClick={() => setShowDetails(null)}>Cerrar</SbBtn></SbModalFooter>
-          </>
-        )}
-        {showDetails && detailType === "comunicado" && (
-          <>
-            <SbModalHeader title={(showDetails as Comunicado).title} onClose={() => setShowDetails(null)} />
-            <SbModalBody><ComunicadoDetail c={showDetails as Comunicado} /></SbModalBody>
-            <SbModalFooter><SbBtn variant="filled" rounded className="w-full" onClick={() => setShowDetails(null)}>Cerrar</SbBtn></SbModalFooter>
-          </>
-        )}
-      </SbModal>
     </div>
   )
 }
 
 /* ═══ EMPTY STATE ═══ */
-function EmptyState({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string }>; title: string; desc: string }) {
+function EmptyState({ icon: Icon, title, desc }: { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; title: string; desc: string }) {
   return (
-    <div className="text-center py-12 bg-white dark:bg-[#1a1a1c] sb-note rounded-[25px]">
-      <div className="w-16 h-16 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
-        <Icon className="h-7 w-7 text-black/15 dark:text-white/15" />
+    <div className="text-center py-12" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+      <div className="w-16 h-16 flex items-center justify-center mx-auto mb-3" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+        <Icon className="h-7 w-7" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
       </div>
-      <p className="text-sm font-medium text-black/50 dark:text-white/50">{title}</p>
-      <p className="text-xs text-black/30 dark:text-white/30 mt-0.5">{desc}</p>
+      <p className="text-[14px] font-semibold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{title}</p>
+      <p className="text-[12px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT, opacity: 0.6 }}>{desc}</p>
     </div>
   )
 }
@@ -182,43 +237,54 @@ function EmptyState({ icon: Icon, title, desc }: { icon: React.ComponentType<{ c
 /* ═══ REUNION DETAIL ═══ */
 function ReunionDetail({ r, copiedLink, onCopyLink }: { r: Reunion; copiedLink: string | null; onCopyLink: (l: string) => void }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <SbBadge color={isTodayOrFuture(r.meeting_date) ? "bg-emerald-400/10 text-emerald-400/80" : "bg-sb-surface-container-high text-sb-on-surface-variant/50"}>
-          {isTodayOrFuture(r.meeting_date) ? "Próxima" : "Finalizada"}
-        </SbBadge>
-        <SbBadge color="bg-sb-surface-container-high text-sb-on-surface-variant/50">{targetLabels[r.target_role] || "Todos"}</SbBadge>
-        {r.priority && <SbBadge color={priorityLabels[r.priority]?.color || ""}>{priorityLabels[r.priority]?.label || r.priority}</SbBadge>}
+        <Badge label={isTodayOrFuture(r.meeting_date) ? "Próxima" : "Finalizada"} />
+        <Badge label={targetLabels[r.target_role] || "Todos"} />
+        {r.priority && r.priority !== "media" && <Badge label={priorityLabels[r.priority] || r.priority} />}
       </div>
-      <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-3 border border-sb-outline-variant/10">
-        <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Fecha y hora</p>
-        <div className="flex items-center gap-3">
-          <Calendar className="h-4 w-4 text-sb-on-surface-variant/40" />
-          <span className="text-sm text-sb-on-surface">
+
+      <InfoBlock label="Fecha y hora">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+          <span className="text-[13px]" style={{ color: "var(--note-text)", fontFamily: FONT }}>
             {new Date(r.meeting_date).toLocaleDateString("es-PE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             {r.meeting_time && <> — {formatTime(r.meeting_time)}</>}
           </span>
         </div>
-      </div>
+      </InfoBlock>
+
       {r.location && (
-        <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-2 border border-sb-outline-variant/10">
-          <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Ubicación</p>
-          <div className="flex items-center gap-3"><MapPin className="h-4 w-4 text-sb-on-surface-variant/40" /><span className="text-sm text-sb-on-surface">{r.location}</span></div>
-        </div>
-      )}
-      {r.virtual_link && (
-        <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-2 border border-sb-outline-variant/10">
-          <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Enlace virtual</p>
+        <InfoBlock label="Ubicación">
           <div className="flex items-center gap-2">
-            <a href={r.virtual_link} target="_blank" rel="noopener noreferrer" className="text-sm text-sb-primary truncate flex-1 hover:underline">{r.virtual_link}</a>
-            <button onClick={() => onCopyLink(r.virtual_link!)} className="p-1.5 rounded-lg hover:bg-sb-surface-container-high transition-colors">
-              {copiedLink === r.virtual_link ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />}
+            <MapPin className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />
+            <span className="text-[13px]" style={{ color: "var(--note-text)", fontFamily: FONT }}>{r.location}</span>
+          </div>
+        </InfoBlock>
+      )}
+
+      {r.virtual_link && (
+        <InfoBlock label="Enlace virtual">
+          <div className="flex items-center gap-2">
+            <a href={r.virtual_link} target="_blank" rel="noopener noreferrer" className="text-[13px] truncate flex-1" style={{ color: "var(--note-text)", fontFamily: FONT }}>{r.virtual_link}</a>
+            <button onClick={() => onCopyLink(r.virtual_link!)} className="h-7 w-7 flex items-center justify-center shrink-0 transition-opacity hover:opacity-60" style={{ borderRadius: "8px", background: "var(--note-fill)" }}>
+              {copiedLink === r.virtual_link ? <Check className="h-3.5 w-3.5" style={{ color: "#22c55e" }} /> : <Copy className="h-3.5 w-3.5" style={{ color: "var(--note-muted)" }} />}
             </button>
           </div>
-        </div>
+        </InfoBlock>
       )}
-      {r.agenda && <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-2 border border-sb-outline-variant/10"><p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Agenda</p><p className="text-sm text-sb-on-surface whitespace-pre-wrap leading-relaxed">{r.agenda}</p></div>}
-      {r.message && <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-2 border border-sb-outline-variant/10"><p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Detalles</p><p className="text-sm text-sb-on-surface whitespace-pre-wrap leading-relaxed">{r.message}</p></div>}
+
+      {r.agenda && (
+        <InfoBlock label="Agenda">
+          <p className="text-[13px] whitespace-pre-wrap leading-relaxed" style={{ color: "var(--note-text)", fontFamily: FONT }}>{r.agenda}</p>
+        </InfoBlock>
+      )}
+
+      {r.message && (
+        <InfoBlock label="Detalles">
+          <p className="text-[13px] whitespace-pre-wrap leading-relaxed" style={{ color: "var(--note-text)", fontFamily: FONT }}>{r.message}</p>
+        </InfoBlock>
+      )}
     </div>
   )
 }
@@ -226,16 +292,20 @@ function ReunionDetail({ r, copiedLink, onCopyLink }: { r: Reunion; copiedLink: 
 /* ═══ COMUNICADO DETAIL ═══ */
 function ComunicadoDetail({ c }: { c: Comunicado }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <SbBadge color="bg-sb-primary/10 text-sb-primary">{targetLabels[c.target_role] || "Todos"}</SbBadge>
-        {c.priority && c.priority !== "media" && <SbBadge color={priorityLabels[c.priority]?.color || ""}>{priorityLabels[c.priority]?.label || c.priority}</SbBadge>}
+        <Badge label={targetLabels[c.target_role] || "Todos"} />
+        {c.priority && c.priority !== "media" && <Badge label={priorityLabels[c.priority] || c.priority} />}
       </div>
-      <div className="bg-sb-surface-container-high/50 rounded-xl p-4 space-y-2 border border-sb-outline-variant/10">
-        <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider">Mensaje</p>
-        <p className="text-sm text-sb-on-surface whitespace-pre-wrap leading-relaxed">{c.message}</p>
+
+      <InfoBlock label="Mensaje">
+        <p className="text-[13px] whitespace-pre-wrap leading-relaxed" style={{ color: "var(--note-text)", fontFamily: FONT }}>{c.message}</p>
+      </InfoBlock>
+
+      <div className="flex items-center gap-2">
+        <Clock className="h-3 w-3" style={{ color: "var(--note-muted)" }} />
+        <span className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{timeAgo(c.created_at)}</span>
       </div>
-      <div className="flex items-center gap-2 text-[11px] text-sb-on-surface-variant/40"><Clock className="h-3 w-3" /><span>{timeAgo(c.created_at)}</span></div>
     </div>
   )
 }
@@ -243,53 +313,88 @@ function ComunicadoDetail({ c }: { c: Comunicado }) {
 /* ═══ REUNION CARD ═══ */
 function ReunionCard({ r, onCopyLink, copiedLink, onClick, past }: { r: Reunion; onCopyLink: (l: string) => void; copiedLink: string | null; onClick: () => void; past?: boolean }) {
   return (
-    <motion.div layout className={cn("bg-white dark:bg-[#1a1a1c] sb-note rounded-2xl p-3 space-y-2 transition-all cursor-pointer", past && "opacity-50")} onClick={onClick}>
-      <div className="flex items-center justify-between">
+    <div
+      className="p-3 transition-all cursor-pointer group"
+      style={{
+        borderRadius: "16px",
+        background: "var(--note-fill)",
+        opacity: past ? 0.5 : 1,
+      }}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className={cn("h-9 w-9 rounded-xl flex items-center justify-center shrink-0", past ? "bg-black/5 dark:bg-white/5" : "bg-emerald-500/10")}>
-            <Handshake className={cn("h-4 w-4", past ? "text-black/20 dark:text-white/20" : "text-emerald-500/70")} />
+          <div className="h-9 w-9 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform" style={{ borderRadius: "12px", background: past ? "var(--note-fill-strong)" : "var(--note-fill-strong)" }}>
+            <Handshake className="h-4 w-4" style={{ color: "var(--note-text)" }} />
           </div>
           <div className="min-w-0">
-            <h3 className="text-[13px] font-semibold text-black dark:text-white truncate">{r.title}</h3>
-            {r.location && <p className="text-[11px] text-black/40 dark:text-white/40 flex items-center gap-1 mt-0.5"><MapPin className="h-2.5 w-2.5" /> {r.location}</p>}
+            <h3 className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{r.title}</h3>
+            {r.location && <p className="text-[11px] flex items-center gap-1 mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}><MapPin className="h-2.5 w-2.5" /> {r.location}</p>}
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          {r.virtual_link && (
-            <button onClick={e => { e.stopPropagation(); onCopyLink(r.virtual_link!) }} className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sb-primary/60 hover:text-sb-primary">
-              {copiedLink === r.virtual_link ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-            </button>
-          )}
-        </div>
+        {r.virtual_link && (
+          <button onClick={e => { e.stopPropagation(); onCopyLink(r.virtual_link!) }} className="h-7 w-7 flex items-center justify-center shrink-0 transition-opacity hover:opacity-60" style={{ borderRadius: "8px", background: "var(--note-fill-strong)" }}>
+            {copiedLink === r.virtual_link ? <Check className="h-3 w-3" style={{ color: "#22c55e" }} /> : <Copy className="h-3 w-3" style={{ color: "var(--note-muted)" }} />}
+          </button>
+        )}
       </div>
-      <div className="flex items-center gap-2">
-        <SbBadge color={past ? "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40" : "bg-emerald-400/10 text-emerald-400/80"}>{past ? "Finalizada" : "Próxima"}</SbBadge>
-        <SbBadge color="bg-black/5 dark:bg-white/5 text-black/50 dark:text-white/50">{targetLabels[r.target_role] || "Todos"}</SbBadge>
-        {r.priority && r.priority !== "media" && <SbBadge color={priorityLabels[r.priority]?.color || ""}>{priorityLabels[r.priority]?.label || r.priority}</SbBadge>}
-        <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{new Date(r.meeting_date).toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}{r.meeting_time && <>{formatTime(r.meeting_time)}</>}</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <Badge label={past ? "Finalizada" : "Próxima"} />
+        <Badge label={targetLabels[r.target_role] || "Todos"} />
+        {r.priority && r.priority !== "media" && <Badge label={priorityLabels[r.priority] || r.priority} />}
+        <span className="text-[10px] ml-auto flex items-center gap-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+          <Calendar className="h-2.5 w-2.5" />
+          {new Date(r.meeting_date).toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}
+          {r.meeting_time && <>{formatTime(r.meeting_time)}</>}
+        </span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
 /* ═══ COMUNICADO CARD ═══ */
 function ComunicadoCard({ c, onClick }: { c: Comunicado; onClick: () => void }) {
   return (
-    <motion.div layout className="bg-white dark:bg-[#1a1a1c] sb-note rounded-2xl p-3 space-y-2 transition-all cursor-pointer" onClick={onClick}>
+    <div
+      className="p-3 transition-all cursor-pointer group"
+      style={{ borderRadius: "16px", background: "var(--note-fill)" }}
+      onClick={onClick}
+    >
       <div className="flex items-center gap-2.5">
-        <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
-          <Megaphone className="h-4 w-4 text-sb-primary/70" />
+        <div className="h-9 w-9 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+          <Megaphone className="h-4 w-4" style={{ color: "var(--note-text)" }} />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-[13px] font-semibold text-black dark:text-white truncate">{c.title}</h3>
-          <p className="text-[11px] text-black/40 dark:text-white/40 line-clamp-1 mt-0.5">{c.message}</p>
+          <h3 className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{c.title}</h3>
+          <p className="text-[11px] line-clamp-1 mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{c.message}</p>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <SbBadge color="bg-sb-primary/10 text-sb-primary">{targetLabels[c.target_role] || "Todos"}</SbBadge>
-        {c.priority && c.priority !== "media" && <SbBadge color={priorityLabels[c.priority]?.color || ""}>{priorityLabels[c.priority]?.label || c.priority}</SbBadge>}
-        <span className="text-[10px] text-black/30 dark:text-white/30 ml-auto flex items-center gap-1"><Clock className="h-2.5 w-2.5" />{timeAgo(c.created_at)}</span>
+      <div className="flex items-center gap-2 mt-2">
+        <Badge label={targetLabels[c.target_role] || "Todos"} />
+        {c.priority && c.priority !== "media" && <Badge label={priorityLabels[c.priority] || c.priority} />}
+        <span className="text-[10px] ml-auto flex items-center gap-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+          <Clock className="h-2.5 w-2.5" />{timeAgo(c.created_at)}
+        </span>
       </div>
-    </motion.div>
+    </div>
+  )
+}
+
+/* ═══ SHARED: Badge ═══ */
+function Badge({ label }: { label: string }) {
+  return (
+    <span className="text-[10px] font-semibold px-2 py-0.5" style={{ borderRadius: "8px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
+      {label}
+    </span>
+  )
+}
+
+/* ═══ SHARED: InfoBlock ═══ */
+function InfoBlock({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="p-3 space-y-1.5" style={{ borderRadius: "12px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
+      <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{label}</p>
+      {children}
+    </div>
   )
 }

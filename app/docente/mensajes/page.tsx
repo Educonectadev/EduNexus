@@ -1,20 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { 
-  MessageCircle, Send, Search, ArrowLeft, 
-  Circle, CreditCard, Sun, Moon
-} from "@/components/ui/proicons"
+import { MessageCircle, Send, Search, ArrowLeft, Sun, Moon } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { connectSocket, getSocket } from '@/lib/socket'
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
 
-const staggerItem = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-}
+const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 interface Contact {
   id: string
@@ -60,7 +53,7 @@ export default function MessagesPage() {
     })
 
     socket.on('message:new', (message: Message) => {
-      if (selectedContact && 
+      if (selectedContact &&
           (message.sender_id === selectedContact.id || message.receiver_id === selectedContact.id)) {
         setMessages(prev => [...prev, message])
       }
@@ -155,78 +148,84 @@ export default function MessagesPage() {
 
   if (planError) {
     return (
-      <div className="min-h-screen bg-sb-background flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-sb-surface rounded-[6px] p-8 max-w-md w-full text-center shadow-lg"
-        >
-          <div className="w-16 h-16 bg-sb-primary/10 rounded-[6px] flex items-center justify-center mx-auto mb-4">
-            <MessageCircle className="w-8 h-8 text-sb-primary" />
+      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
+        <div className="p-6 md:p-8 pb-24 md:pb-8 flex items-center justify-center min-h-[60vh]">
+          <div className="p-8 max-w-md w-full text-center" style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+            <div className="h-16 w-16 flex items-center justify-center mx-auto mb-4" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
+              <MessageCircle className="h-7 w-7" style={{ color: "var(--note-muted)" }} />
+            </div>
+            <h2 className="text-[20px] font-bold mb-2" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+              Chat no disponible
+            </h2>
+            <p className="text-[13px] mb-6" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+              El chat en tiempo real está disponible en el plan Básico o superior.
+            </p>
+            <button
+              className="px-6 py-3 text-[13px] font-semibold transition-opacity hover:opacity-80"
+              style={{ borderRadius: "999px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}
+            >
+              Mejorar Plan
+            </button>
           </div>
-          <h2 className="text-xl font-bold text-sb-on-surface mb-2">
-            Chat no disponible
-          </h2>
-          <p className="text-sb-on-surface/60 mb-6">
-            El chat en tiempo real está disponible en el plan Básico o superior.
-          </p>
-          <button className="px-6 py-3 bg-sb-primary text-white rounded-[6px] font-medium hover:opacity-90 transition-opacity">
-            Mejorar Plan
-          </button>
-        </motion.div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c]">
+    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
       <div className="h-full flex">
-        <div className={`w-80 bg-white dark:bg-[#17171a] flex flex-col ${
-          selectedContact ? 'hidden md:flex' : 'flex'
-        }`}>
-          <div className="p-4 border-b border-[#E5E5E5] dark:border-[#27272a]">
+
+        {/* ═══════════════ CONTACTS SIDEBAR ═══════════════ */}
+        <div className={`w-80 flex flex-col border-r shrink-0 ${selectedContact ? 'hidden md:flex' : 'flex'}`}
+          style={{ borderColor: "var(--note-hairline)", background: "var(--note-surface)" }}
+        >
+          <div className="p-4" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
             <div className="flex items-center justify-between mb-3">
-              <h1 className="text-xl font-bold text-[#f4f4f5] flex items-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Mensajes
-              </h1>
               <div className="flex items-center gap-2">
+                <div className="h-9 w-9 flex items-center justify-center" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
+                  <MessageCircle className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                </div>
+                <h1 className="text-[16px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Mensajes</h1>
+              </div>
+              <div className="flex items-center gap-1">
                 <NotificationBell />
-                <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-[#27272a] hover:opacity-80 transition-opacity relative">
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-[#000] dark:text-[#f4f4f5]" />
-                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-[#000] dark:text-[#f4f4f5]" />
+                <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+                  <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+                  <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
                 </button>
               </div>
             </div>
             {user && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5F5F5] dark:bg-[#27272a]">
-                <div className="h-6 w-6 rounded-full bg-[#E5E5E5] dark:bg-[#3f3f46] flex items-center justify-center">
-                  <span className="text-[9px] font-semibold text-[#000] dark:text-[#f4f4f5]">
+              <div className="flex items-center gap-2 px-3 py-1.5 mb-3" style={{ borderRadius: "999px", background: "var(--note-fill)" }}>
+                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
                   </span>
                 </div>
-                <span className="text-sm md:text-base font-medium text-[#000] dark:text-[#f4f4f5] whitespace-nowrap">
+                <span className="text-[13px] font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                   {user.full_name}
                 </span>
               </div>
             )}
-            <div className="relative mt-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666] dark:text-[#a1a1aa]" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--note-muted)" }} />
               <input
                 type="text"
                 placeholder="Buscar contactos..."
                 value={contactSearch}
                 onChange={(e) => setContactSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-[#F5F5F5] dark:bg-[#27272a] border border-[#E5E5E5] dark:border-[#E5E5E5] rounded-[6px] text-sm text-[#000] dark:text-[#f4f4f5] placeholder:text-[#666] dark:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
+                className="w-full pl-9 pr-4 py-2.5 text-[13px] focus:outline-none"
+                style={{ borderRadius: "12px", background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
               />
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {loading ? (
-              <div className="p-4 text-center text-[#666] dark:text-[#a1a1aa]">Cargando...</div>
+              <div className="p-4 text-center text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Cargando...</div>
             ) : contacts.length === 0 ? (
-              <div className="p-4 text-center text-[#666] dark:text-[#a1a1aa]">No hay contactos</div>
+              <div className="p-4 text-center text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>No hay contactos</div>
             ) : (
               contacts
                 .filter(c => {
@@ -238,26 +237,28 @@ export default function MessagesPage() {
                 <button
                   key={contact.id}
                   onClick={() => selectContact(contact)}
-                  className={`w-full p-4 flex items-center gap-3 hover:bg-[#F5F5F5] dark:hover:bg-[#F5F5F5] dark:bg-[#27272a] transition-colors text-left ${
-                    selectedContact?.id === contact.id ? 'bg-[#F5F5F5] dark:bg-[#27272a]' : ''
-                  }`}
+                  className="w-full p-3 flex items-center gap-3 text-left transition-colors"
+                  style={{
+                    background: selectedContact?.id === contact.id ? "var(--note-fill)" : "transparent",
+                    borderBottom: "1px solid var(--note-hairline)",
+                  }}
                 >
-                  <div className="relative">
-                    <div className="w-10 h-10 bg-[#E5E5E5] dark:bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
-                      <span className="text-sm font-medium text-[#000] dark:text-[#f4f4f5]">
+                  <div className="relative shrink-0">
+                    <div className="w-10 h-10 flex items-center justify-center" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+                      <span className="text-[11px] font-semibold" style={{ color: "var(--note-text)" }}>
                         {contact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
                     </div>
                     {onlineUsers.includes(contact.id) && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-[6px] border-2 border-white dark:border-[#17171a]" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full" style={{ background: "#22c55e", border: "2px solid var(--note-surface)" }} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[#000] dark:text-[#f4f4f5] truncate">{contact.full_name}</p>
-                    <p className="text-xs text-[#666] dark:text-[#a1a1aa] capitalize">{contact.role}</p>
+                    <p className="text-[13px] font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{contact.full_name}</p>
+                    <p className="text-[11px] capitalize" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{contact.role}</p>
                   </div>
                   {contact.unread_count > 0 && (
-                    <span className="w-5 h-5 bg-[#000] dark:bg-white text-white dark:text-black text-xs rounded-[6px] flex items-center justify-center">
+                    <span className="h-5 min-w-5 px-1.5 flex items-center justify-center text-[10px] font-bold" style={{ borderRadius: "999px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
                       {contact.unread_count}
                     </span>
                   )}
@@ -267,53 +268,64 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className={`flex-1 flex flex-col ${!selectedContact ? 'hidden md:flex' : 'flex'}`}>
+        {/* ═══════════════ CHAT AREA ═══════════════ */}
+        <div className={`flex-1 flex flex-col min-w-0 ${!selectedContact ? 'hidden md:flex' : 'flex'}`}
+          style={{ background: "var(--note-fill)" }}
+        >
           {!selectedContact ? (
-            <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#17171a]">
+            <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <MessageCircle className="w-12 h-12 text-[#E5E5E5] dark:text-[#3f3f46] mx-auto mb-4" />
-                <p className="text-[#666] dark:text-[#a1a1aa]">Selecciona un contacto para chatear</p>
+                <div className="h-16 w-16 flex items-center justify-center mx-auto mb-3" style={{ borderRadius: "16px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+                  <MessageCircle className="h-6 w-6" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+                </div>
+                <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Selecciona un contacto para chatear</p>
               </div>
             </div>
           ) : (
             <>
-              <div className="p-4 bg-white dark:bg-[#17171a] border-b border-[#E5E5E5] dark:border-[#27272a] flex items-center gap-3">
+              {/* Chat header */}
+              <div className="p-4 flex items-center gap-3" style={{ background: "var(--note-surface)", borderBottom: "1px solid var(--note-hairline)" }}>
                 <button
                   onClick={() => setSelectedContact(null)}
-                  className="md:hidden p-2 hover:bg-[#F5F5F5] dark:hover:bg-[#F5F5F5] dark:bg-[#27272a] rounded-[6px]"
+                  className="md:hidden h-9 w-9 flex items-center justify-center transition-opacity hover:opacity-60"
+                  style={{ borderRadius: "10px", background: "var(--note-fill)", color: "var(--note-muted)" }}
                 >
-                  <ArrowLeft className="w-5 h-5 text-[#000] dark:text-[#f4f4f5]" />
+                  <ArrowLeft className="w-4 h-4" />
                 </button>
-                <div className="w-10 h-10 bg-[#E5E5E5] dark:bg-[#3f3f46] rounded-[6px] flex items-center justify-center">
-                  <span className="text-sm font-medium text-[#000] dark:text-[#f4f4f5]">
+                <div className="w-10 h-10 flex items-center justify-center" style={{ borderRadius: "12px", background: "var(--note-fill-strong)" }}>
+                  <span className="text-[11px] font-semibold" style={{ color: "var(--note-text)" }}>
                     {selectedContact.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium text-[#000] dark:text-[#f4f4f5]">{selectedContact.full_name}</p>
-                  <p className="text-xs text-[#666] dark:text-[#a1a1aa]">
+                  <p className="text-[14px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{selectedContact.full_name}</p>
+                  <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                     {onlineUsers.includes(selectedContact.id) ? 'En línea' : 'Desconectado'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F5F5F5] dark:bg-[#0a0a0b]">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
                     className={`flex ${msg.sender_id === selectedContact.id ? 'justify-start' : 'justify-end'}`}
                   >
-                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-[6px] ${
-                      msg.sender_id === selectedContact.id
-                        ? 'bg-[#E5E5E5] dark:bg-[#3f3f46] text-[#000] dark:text-[#f4f4f5]'
-                        : 'bg-[#000] dark:bg-white text-white dark:text-black'
-                    }`}>
-                      <p className="text-sm">{msg.message}</p>
-                      <p className={`text-xs mt-1 ${
-                        msg.sender_id === selectedContact.id
-                          ? 'text-[#666] dark:text-[#a1a1aa]'
-                          : 'text-white/60 dark:text-black/60'
-                      }`}>
+                    <div
+                      className="max-w-xs lg:max-w-md px-4 py-2.5"
+                      style={{
+                        borderRadius: "16px",
+                        background: msg.sender_id === selectedContact.id ? "var(--note-surface)" : "var(--note-solid-bg)",
+                        color: msg.sender_id === selectedContact.id ? "var(--note-text)" : "var(--note-solid-fg)",
+                        border: msg.sender_id === selectedContact.id ? "1px solid var(--note-hairline)" : "none",
+                      }}
+                    >
+                      <p className="text-[13px]" style={{ fontFamily: FONT }}>{msg.message}</p>
+                      <p className="text-[10px] mt-1" style={{
+                        color: msg.sender_id === selectedContact.id ? "var(--note-muted)" : "rgba(255,255,255,0.5)",
+                        fontFamily: FONT
+                      }}>
                         {new Date(msg.created_at).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -321,15 +333,16 @@ export default function MessagesPage() {
                 ))}
                 {typing && (
                   <div className="flex justify-start">
-                    <div className="bg-[#E5E5E5] dark:bg-[#3f3f46] px-4 py-2 rounded-[6px]">
-                      <p className="text-sm text-[#666] dark:text-[#a1a1aa]">Escribiendo...</p>
+                    <div className="px-4 py-2.5" style={{ borderRadius: "16px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}>
+                      <p className="text-[13px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribiendo...</p>
                     </div>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="p-4 bg-white dark:bg-[#17171a] border-t border-[#E5E5E5] dark:border-[#27272a]">
+              {/* Input */}
+              <div className="p-4" style={{ background: "var(--note-surface)", borderTop: "1px solid var(--note-hairline)" }}>
                 <div className="flex items-center gap-3">
                   <input
                     type="text"
@@ -337,14 +350,16 @@ export default function MessagesPage() {
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Escribe un mensaje..."
-                    className="flex-1 px-4 py-3 bg-[#F5F5F5] dark:bg-[#27272a] border border-[#E5E5E5] dark:border-[#E5E5E5] rounded-[6px] text-[#000] dark:text-[#f4f4f5] placeholder:text-[#666] dark:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
+                    className="flex-1 px-4 py-3 text-[13px] focus:outline-none"
+                    style={{ borderRadius: "12px", background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!newMessage.trim()}
-                    className="p-3 bg-[#000] dark:bg-white text-white dark:text-black rounded-[6px] hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="h-11 w-11 flex items-center justify-center shrink-0 transition-opacity hover:opacity-80 disabled:opacity-30"
+                    style={{ borderRadius: "12px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)" }}
                   >
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                   </button>
                 </div>
               </div>
