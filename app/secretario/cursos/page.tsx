@@ -430,19 +430,21 @@ export default function CursosSecretarioPage() {
     return cursos.filter(c => c.teacher_id === formData.teacher_id)
   }, [formData.teacher_id, cursos])
 
+  const selectedTeacher = React.useMemo(
+    () => docentes.find(d => (d.teacher_id || d.id) === formData.teacher_id) || null,
+    [formData.teacher_id, docentes]
+  )
+
   const handleTeacherChange = (id: string) => {
     const teacher = docentes.find(d => (d.teacher_id || d.id) === id)
     setFormData(prev => {
       const next = { ...prev, teacher_id: id }
-      const tcs = cursos.filter(c => c.teacher_id === id)
-      if (tcs.length === 1) {
-        next.name = tcs[0].name
-        next.code = tcs[0].code
-        next.grade = tcs[0].grade
-        next.section = tcs[0].section
-      } else if (!next.name && teacher?.subject) {
-        next.name = teacher.subject
-        next.code = genCode(teacher.subject, next.grade, next.section)
+      if (teacher) {
+        const subject = teacher.subject || teacher.specialization || ""
+        if (subject && !next.name) {
+          next.name = subject
+          next.code = genCode(subject, next.grade, next.section)
+        }
       }
       return next
     })
@@ -698,7 +700,7 @@ export default function CursosSecretarioPage() {
         })()}
       </div>
 
-      <SbModal open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} maxWidth="520px">
+      <SbModal open={dialogOpen} onClose={() => { setDialogOpen(false); setEditing(null) }} maxWidth="560px">
         <SbModalBody noPadding>
           <div className="px-6 pt-6 pb-4">
             <h3 className="text-lg font-semibold text-sb-on-surface">{editing ? "Editar curso" : "Nuevo curso"}</h3>
@@ -707,59 +709,107 @@ export default function CursosSecretarioPage() {
             </p>
           </div>
           <div className="px-6 space-y-4 pb-2">
+            {/* DOCENTE — primero para que auto-genere nombre */}
             <div>
-              <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Nombre del curso *</label>
-              <SbInput placeholder="Ej: Matemática, Comunicación..." value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Docente</label>
+              <select value={formData.teacher_id} onChange={e => handleTeacherChange(e.target.value)} className="sbf-native-select w-full">
+                <option value="">Sin asignar</option>
+                {docentes.map(d => {
+                  const subj = d.subject || d.specialization
+                  return (
+                    <option key={d.id} value={d.teacher_id || d.id}>
+                      {d.full_name}{subj ? ` — ${subj}` : ""}
+                    </option>
+                  )
+                })}
+              </select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Código *</label>
-                <SbInput placeholder="Ej: MAT-01" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
-              </div>
-              <div>
-                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Grado *</label>
-                <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value, code: formData.name ? genCode(formData.name, e.target.value, formData.section) : formData.code})} className="sbf-native-select w-full">
-                  <option value="">Seleccionar grado...</option>
-                  {academicGrades.length > 0 ? academicGrades.map(g => <option key={g} value={g}>{g}</option>) : (GRADES as string[]).map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Sección</label>
-                <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value, code: formData.name ? genCode(formData.name, formData.grade, e.target.value) : formData.code})} className="sbf-native-select w-full">
-                  {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>Sección {s}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">Docente</label>
-                <select value={formData.teacher_id} onChange={e => handleTeacherChange(e.target.value)} className="sbf-native-select w-full">
-                  <option value="">Sin asignar</option>
-                  {docentes.map(d => (
-                    <option key={d.id} value={d.teacher_id || d.id}>{d.full_name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            {formData.teacher_id && (
-              <div>
-                <label className="text-[11px] text-sb-on-surface-variant/40 mb-1 block">
-                  {teacherCourses.length > 0 ? "Curso que dicta el docente" : "Materia del docente"}
-                </label>
-                {teacherCourses.length > 0 ? (
-                  <select value="" onChange={e => pickTeacherCourse(e.target.value)} className="sbf-native-select w-full">
-                    <option value="">Seleccionar curso para autocompletar...</option>
-                    {teacherCourses.map(c => (
-                      <option key={c.id} value={c.id}>{c.name} · {c.code} · {c.grade} {c.section}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="text-xs text-sb-on-surface-variant/50 bg-sb-surface-container/40 rounded-xl px-3 py-2">
-                    Este docente no tiene cursos aún. Se usa su materia para sugerir el nombre y autogenerar el código.
+
+            {/* Card info del docente seleccionado */}
+            {selectedTeacher && (
+              <div className="rounded-2xl border border-sb-outline-variant/15 bg-sb-surface-container-low/40 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-sb-primary/10 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-sb-primary/70">
+                      {selectedTeacher.full_name?.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-sb-on-surface truncate">{selectedTeacher.full_name}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {(selectedTeacher.subject || selectedTeacher.specialization) && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary/80 font-medium">
+                          {selectedTeacher.subject || selectedTeacher.specialization}
+                        </span>
+                      )}
+                      {selectedTeacher.contract_type && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-sb-surface text-sb-on-surface-variant/50">
+                          {selectedTeacher.contract_type}
+                        </span>
+                      )}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        selectedTeacher.status === 'activo'
+                          ? 'bg-emerald-500/10 text-emerald-600'
+                          : 'bg-sb-surface text-sb-on-surface-variant/40'
+                      }`}>
+                        {selectedTeacher.status === 'activo' ? 'Activo' : selectedTeacher.status || 'Sin estado'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {teacherCourses.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-sb-outline-variant/10">
+                    <p className="text-[10px] font-medium text-sb-on-surface-variant/40 uppercase tracking-wider mb-2">Cursos que ya dicta</p>
+                    <div className="space-y-1.5">
+                      {teacherCourses.map(c => (
+                        <button key={c.id} onClick={() => pickTeacherCourse(c.id)}
+                          className="w-full flex items-center gap-2 text-left px-3 py-2 rounded-xl hover:bg-sb-surface-container/60 transition-colors group">
+                          <BookOpen className="h-3.5 w-3.5 text-sb-on-surface-variant/30 shrink-0" />
+                          <span className="text-xs font-medium text-sb-on-surface/80 flex-1 truncate">{c.name}</span>
+                          <span className="text-[10px] text-sb-on-surface-variant/30 font-mono">{c.code}</span>
+                          <span className="text-[10px] text-sb-on-surface-variant/30">{c.grade} {c.section}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {teacherCourses.length === 0 && (selectedTeacher.subject || selectedTeacher.specialization) && (
+                  <div className="mt-3 pt-3 border-t border-sb-outline-variant/10">
+                    <div className="flex items-center gap-2 text-xs text-sb-on-surface-variant/50">
+                      <CheckCircle className="h-3.5 w-3.5 text-sb-primary/50 shrink-0" />
+                      <span>Nombre del curso autogenerado desde su materia: <strong className="text-sb-on-surface/70">{selectedTeacher.subject || selectedTeacher.specialization}</strong></span>
+                    </div>
                   </div>
                 )}
               </div>
             )}
+
+            {/* NOMBRE + CÓDIGO */}
+            <div>
+              <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Nombre del curso *</label>
+              <SbInput placeholder="Ej: Matemática, Comunicación..." value={formData.name} onChange={e => setFormData({...formData, name: e.target.value, code: genCode(e.target.value, formData.grade, formData.section)})} />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Código *</label>
+              <SbInput placeholder="Se auto-genera del nombre y grado" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+            </div>
+
+            {/* GRADO + SECCIÓN */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Grado *</label>
+                <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value, code: genCode(formData.name, e.target.value, formData.section)})} className="sbf-native-select w-full">
+                  <option value="">Seleccionar grado...</option>
+                  {academicGrades.length > 0 ? academicGrades.map(g => <option key={g} value={g}>{g}</option>) : (GRADES as string[]).map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Sección</label>
+                <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value, code: genCode(formData.name, formData.grade, e.target.value)})} className="sbf-native-select w-full">
+                  {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>Sección {s}</option>)}
+                </select>
+              </div>
+            </div>
           </div>
         </SbModalBody>
         <div className="px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
