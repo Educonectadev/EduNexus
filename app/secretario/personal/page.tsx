@@ -14,6 +14,52 @@ interface Staff {
 
 function initials(name: string) { return name.split(" ").map(w => w[0]).filter(Boolean).join("").toUpperCase().slice(0, 2) }
 
+const SUBJECTS = ["Matemática", "Comunicación", "Ciencia y Tecnología", "Historia", "Geografía", "Inglés", "Educación Física", "Arte", "Música", "Religión", "Tutoría", "Química", "Física", "Biología", "Literatura", "Economía", "Informática"]
+
+function SubjectSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = React.useState(false)
+  const [search, setSearch] = React.useState("")
+  const ref = React.useRef<HTMLDivElement>(null)
+
+  const filtered = SUBJECTS.filter(s => s.toLowerCase().includes(search.toLowerCase()))
+
+  React.useEffect(() => {
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <button type="button" onClick={() => setOpen(!open)}
+        className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-left flex items-center justify-between border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
+        <span className={value ? "text-sb-on-surface" : "text-sb-on-surface/50"}>{value || "Seleccionar asignatura..."}</span>
+        <svg className={`h-4 w-4 text-sb-on-surface/40 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {open && (
+        <div className="absolute z-50 w-full mt-1 bg-sb-surface rounded-xl border border-sb-outline-variant/20 shadow-lg overflow-hidden">
+          <div className="p-2">
+            <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar asignatura..."
+              className="w-full h-9 px-3 rounded-lg bg-sb-surface-container text-[13px] text-sb-on-surface placeholder:text-sb-on-surface/40 outline-none" />
+          </div>
+          <div className="max-h-48 overflow-y-auto pb-1">
+            {filtered.length === 0 ? (
+              <div className="px-3 py-2 text-[12px] text-sb-on-surface/40">Sin resultados</div>
+            ) : (
+              filtered.map(s => (
+                <button key={s} type="button" onClick={() => { onChange(s); setOpen(false); setSearch("") }}
+                  className={`w-full px-3 py-2 text-left text-[13px] rounded-lg transition-colors ${s === value ? "bg-sb-primary/10 text-sb-primary font-medium" : "text-sb-on-surface hover:bg-sb-surface-container-high"}`}>
+                  {s}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const roleLabels: Record<string, string> = { docente: "Docente", secretario: "Secretario" }
 
 export default function SecretarioPersonalPage() {
@@ -301,9 +347,39 @@ export default function SecretarioPersonalPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[12px] text-sb-on-surface/80">Email (opcional — se genera automáticamente)</label>
-              <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="doc.juan.perez@iep.edu.pe"
-                className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              <label className="text-[12px] text-sb-on-surface/80">Email (opcional)</label>
+              <div className="flex gap-2">
+                <div className="relative flex-1 min-w-0">
+                  <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="Se genera automáticamente si se deja vacío"
+                    className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+                </div>
+                {formData.full_name && (
+                  <button type="button" className="h-11 px-4 rounded-xl bg-sb-primary/10 text-sb-primary text-[13px] font-medium hover:bg-sb-primary/20 transition-colors whitespace-nowrap"
+                    onClick={() => {
+                      const clean = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
+                      const parts = clean(formData.full_name).split(/\s+/)
+                      const first = parts[0] || ""
+                      const last = parts[parts.length - 1] || ""
+                      const prefix = formData.role === "secretario" ? "sec" : "doc"
+                      setFormData({...formData, email: `${prefix}.${first}.${last}@iep.edu.pe`})
+                    }}
+                  >
+                    Auto
+                  </button>
+                )}
+              </div>
+              {formData.full_name && !formData.email && (
+                <p className="text-[10px] text-sb-on-surface-variant/50">
+                  Sugerido: {(() => {
+                    const clean = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z\s]/g, "").trim()
+                    const parts = clean(formData.full_name).split(/\s+/)
+                    const first = parts[0] || ""
+                    const last = parts[parts.length - 1] || ""
+                    const prefix = formData.role === "secretario" ? "sec" : "doc"
+                    return `${prefix}.${first}.${last}@iep.edu.pe`
+                  })()}
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
@@ -328,8 +404,7 @@ export default function SecretarioPersonalPage() {
             {formData.role === "docente" && (
               <div className="space-y-2">
                 <label className="text-[12px] text-sb-on-surface/80">Asignatura</label>
-                <input value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} placeholder="Matemática"
-                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+                <SubjectSelect value={formData.subject} onChange={(v) => setFormData({...formData, subject: v})} />
               </div>
             )}
           </div>
