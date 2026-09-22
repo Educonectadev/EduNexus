@@ -87,8 +87,8 @@ export const notifyAll = (
 
 export const notifyUsers = (
   institutionId: string, userIds: string[], title: string, message: string,
-  type = 'info', category = 'general', priority = 'media',
-) => createNotify({ institutionId, title, message, type, category, priority, userIds })
+  type = 'info', category = 'general', priority = 'media', targetRole = 'all',
+) => createNotify({ institutionId, title, message, type, category, priority, userIds, targetRole })
 
 // Notifica a los padres vinculados a uno o varios alumnos
 export async function notifyParentsOfStudents(

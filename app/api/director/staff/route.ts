@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         [userId],
         'Contrato docente registrado',
         `Tu contrato fue registrado en la institución${subject ? ` como docente de ${subject}` : ''}. Bienvenido(a), ${full_name}.`,
-        'contract', 'contratos', 'alta'
+        'contract', 'contratos', 'alta', 'docente'
       )
     }
 
