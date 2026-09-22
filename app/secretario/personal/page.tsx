@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar, Trash2, Check } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
-import { SbSectionHeader, SbModal, SbModalBody, SbBtn, SbBadge } from "@/components/ui/sb"
+import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbBadge } from "@/components/ui/sb"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
 
 interface Staff {
