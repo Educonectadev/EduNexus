@@ -31,6 +31,7 @@ import {
   Calendar,
   UserCheck,
   BookMarked,
+  Video,
 } from "@/components/ui/proicons"
 
 interface NavItem {
@@ -84,6 +85,7 @@ const docenteNav: NavItem[] = [
   { title: "Calificaciones", href: "/docente/calificaciones", icon: BookMarked },
   { title: "Tareas", href: "/docente/tareas", icon: ClipboardList },
   { title: "Materiales", href: "/docente/materiales", icon: FileText },
+  { title: "Clases Virtuales", href: "/docente/virtual-classes", icon: Video },
   { title: "Calendario", href: "/docente/calendario", icon: Calendar },
   { title: "Mensajes", href: "/docente/mensajes", icon: MessageSquare },
 ]

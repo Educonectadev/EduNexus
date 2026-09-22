@@ -83,7 +83,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (action === 'update_submission' && submission_id) {
       await pool.query(
-        `UPDATE homework_submissions SET status = ?, grade = ?, feedback = ?, submitted_at = IF(? = 'submitted', NOW(), submitted_at) WHERE id = ?`,
+        `UPDATE homework_submissions SET status = $1, grade = $2, feedback = $3, submitted_at = CASE WHEN $4 = 'submitted' THEN NOW() ELSE submitted_at END WHERE id = $5`,
         [status || 'submitted', grade || null, feedback || null, status || 'submitted', submission_id]
       )
       return NextResponse.json({ success: true })

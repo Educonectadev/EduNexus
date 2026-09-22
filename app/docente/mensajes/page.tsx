@@ -39,6 +39,7 @@ export default function MessagesPage() {
   const user = useAuthStore((s) => s.user)
   const { theme, setTheme } = useTheme()
   const [contacts, setContacts] = useState<Contact[]>([])
+  const [contactSearch, setContactSearch] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [newMessage, setNewMessage] = useState('')
@@ -214,6 +215,8 @@ export default function MessagesPage() {
               <input
                 type="text"
                 placeholder="Buscar contactos..."
+                value={contactSearch}
+                onChange={(e) => setContactSearch(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-[#F5F5F5] dark:bg-[#27272a] border border-[#E5E5E5] dark:border-[#E5E5E5] rounded-[6px] text-sm text-[#000] dark:text-[#f4f4f5] placeholder:text-[#666] dark:text-[#a1a1aa] focus:outline-none focus:ring-2 focus:ring-[#000]/20"
               />
             </div>
@@ -225,7 +228,13 @@ export default function MessagesPage() {
             ) : contacts.length === 0 ? (
               <div className="p-4 text-center text-[#666] dark:text-[#a1a1aa]">No hay contactos</div>
             ) : (
-              contacts.map((contact) => (
+              contacts
+                .filter(c => {
+                  if (!contactSearch) return true
+                  const q = contactSearch.toLowerCase()
+                  return c.full_name?.toLowerCase().includes(q) || c.role?.toLowerCase().includes(q)
+                })
+                .map((contact) => (
                 <button
                   key={contact.id}
                   onClick={() => selectContact(contact)}

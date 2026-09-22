@@ -10,7 +10,10 @@ export function getSocket(): any {
     if (!url) return null
     socket = io(url, {
       autoConnect: false,
-      reconnection: false,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
       timeout: 5000,
     })
   }

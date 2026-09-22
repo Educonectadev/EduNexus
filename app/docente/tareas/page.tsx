@@ -4,7 +4,7 @@ import * as React from "react"
 import { useSearchParams } from "next/navigation"
 import {
   ClipboardList, Plus, Calendar, CheckCircle2, Clock, AlertTriangle,
-  BookOpen, Users, X, Eye, Search, GraduationCap, Sun, Moon, Check, ChevronDown,
+  BookOpen, Users, X, Eye, Search, GraduationCap, Sun, Moon, Check, ChevronDown, Trash2,
 } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { motion, AnimatePresence } from "framer-motion"
@@ -213,6 +213,34 @@ function TareasInner() {
       console.error("Error grading submission:", e)
     } finally {
       setGradingTaskId(null)
+    }
+  }
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm("¿Eliminar esta tarea? Esta acción no se puede deshacer.")) return
+    try {
+      const res = await fetch(`/api/docente/tareas/${taskId}`, { method: "DELETE" })
+      if (res.ok) {
+        setDetailOpen(false)
+        setSelectedTask(null)
+        fetchTasks()
+      }
+    } catch (e) {
+      console.error("Error deleting task:", e)
+    }
+  }
+
+  const handleToggleStatus = async (taskId: string, newStatus: string) => {
+    try {
+      await fetch(`/api/docente/tareas/${taskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      })
+      fetchTaskDetail(taskId)
+      fetchTasks()
+    } catch (e) {
+      console.error("Error updating status:", e)
     }
   }
 
@@ -590,9 +618,14 @@ function TareasInner() {
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-5 pb-0">
                   <h2 className="text-[18px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{selectedTask.title}</h2>
-                  <button onClick={() => { setDetailOpen(false); setSelectedTask(null) }} className="h-8 w-8 rounded-xl flex items-center justify-center transition-colors" style={{ background: "var(--note-fill)" }}>
-                    <X className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleDeleteTask(selectedTask.id)} className="h-8 w-8 rounded-xl flex items-center justify-center transition-colors hover:bg-red-500/10" title="Eliminar tarea">
+                      <Trash2 className="h-4 w-4 text-red-400" />
+                    </button>
+                    <button onClick={() => { setDetailOpen(false); setSelectedTask(null) }} className="h-8 w-8 rounded-xl flex items-center justify-center transition-colors" style={{ background: "var(--note-fill)" }}>
+                      <X className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                    </button>
+                  </div>
                 </div>
                 {/* Modal Body */}
                 <div className="p-5">
@@ -606,10 +639,20 @@ function TareasInner() {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="rounded-xl p-3" style={{ background: "var(--note-fill)" }}>
                           <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Estado</p>
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--note-text)" }} />
-                            {statusConfig[selectedTask.status].label}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {(['pending', 'delivered', 'graded'] as const).map((s) => (
+                              <button key={s} onClick={() => handleToggleStatus(selectedTask.id, s)}
+                                className="text-[10px] font-semibold px-2.5 py-1 transition-all"
+                                style={{
+                                  borderRadius: "8px",
+                                  background: selectedTask.status === s ? "var(--note-text)" : "var(--note-fill-strong)",
+                                  color: selectedTask.status === s ? "var(--note-surface)" : "var(--note-muted)",
+                                  fontFamily: FONT
+                                }}>
+                                {statusConfig[s].label}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                         <div className="rounded-xl p-3" style={{ background: "var(--note-fill)" }}>
                           <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Prioridad</p>

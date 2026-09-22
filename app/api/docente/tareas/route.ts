@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
         LEFT JOIN enrollments e2 ON e2.course_id = h.course_id
         LEFT JOIN students s2 ON e2.student_id = s2.id
         WHERE h.course_id IN (
-          SELECT c.id FROM courses c WHERE c.teacher_id = ? AND c.status = 'active'
+          SELECT c.id FROM courses c
+          JOIN teachers t ON c.teacher_id = t.id
+          WHERE t.user_id = ? AND c.status = 'active'
         )
         GROUP BY h.id, h.title, h.description, h.subject, h.start_date, h.due_date, h.status, h.priority,
                  h.assigned_by, h.student_id, h.course_id, h.created_at

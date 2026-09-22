@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon } from "@/components/ui/proicons"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon, Download } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -239,6 +239,41 @@ function CalificacionesInner() {
     return sorted[sorted.length - 1].score >= sorted[sorted.length - 2].score
   }
 
+  const exportPDF = async () => {
+    const { jsPDF } = await import("jspdf")
+    const autoTable = (await import("jspdf-autotable")).default
+    const doc = new jsPDF("landscape")
+
+    doc.setFontSize(16)
+    doc.text(`Libro de Calificaciones — ${courseLabel}`, 14, 15)
+    doc.setFontSize(10)
+    doc.text(`Generado: ${new Date().toLocaleDateString("es-PE")} | Docente: ${user?.full_name || ""}`, 14, 22)
+
+    const periods = [...new Set(students.flatMap(s => s.grades.map(g => g.period)))].sort()
+    const head = [["#", "Alumno", "DNI", ...periods, "Promedio"]]
+    const body = students.map((s, i) => {
+      const avg = calcAverage(s.grades)
+      const row: (string | number)[] = [i + 1, studentName(s), s.document_number || ""]
+      for (const p of periods) {
+        const g = s.grades.find(gr => gr.period === p)
+        row.push(g ? Number(g.score) : "-")
+      }
+      row.push(avg || "-")
+      return row
+    })
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 28,
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [30, 30, 30] },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    })
+
+    doc.save(`calificaciones_${courseLabel.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`)
+  }
+
   const averages = students.map(s => calcAverage(s.grades))
   const avgGeneral = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length) : 0
   const bestScore = students.length ? Math.max(...students.map(s => s.grades.length ? Math.max(...s.grades.map(g => g.score)) : 0)) : 0
@@ -316,6 +351,11 @@ function CalificacionesInner() {
               <button className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
                 <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
               </button>
+              {students.length > 0 && (
+                <button className="h-10 px-4 text-sm font-medium flex items-center justify-center gap-2 rounded-xl transition-all hover:opacity-80 active:scale-[0.97]" style={{ border: "1.5px solid var(--note-hairline)", color: "var(--note-text)", fontFamily: FONT }} onClick={exportPDF}>
+                  <Download className="h-4 w-4" /> <span className="hidden sm:inline">PDF</span>
+                </button>
+              )}
             </div>
           </div>
         </header>

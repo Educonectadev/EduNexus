@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Sun, Moon } from "@/components/ui/proicons"
+import { Clock, MapPin, Coffee, Calendar, BookOpen, GraduationCap, X, Users, Sun, Moon, ArrowLeftRight } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
@@ -159,6 +159,7 @@ export default function DocenteHorariosPage() {
   const user = useAuthStore((s) => s.user)
   const { theme, setTheme } = useTheme()
   const [horarios, setHorarios] = React.useState<Horario[]>([])
+  const [substitutions, setSubstitutions] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
   const [activeDay, setActiveDay] = React.useState<number | null>(null)
   const [selectedHorario, setSelectedHorario] = React.useState<Horario | null>(null)
@@ -168,8 +169,12 @@ export default function DocenteHorariosPage() {
     let cancelled = false
     ;(async () => {
       try {
-        const r = await fetch("/api/docente/horarios")
+        const [r, rSub] = await Promise.all([
+          fetch("/api/docente/horarios"),
+          fetch("/api/docente/substitutions?range=week"),
+        ])
         if (!cancelled && r.ok) setHorarios(await r.json())
+        if (!cancelled && rSub.ok) setSubstitutions(await rSub.json())
       } catch {}
       finally { if (!cancelled) setLoading(false) }
     })()
@@ -247,6 +252,54 @@ export default function DocenteHorariosPage() {
             </div>
           ))}
         </div>
+
+        {/* Substitutions Section */}
+        {substitutions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-6 p-4"
+            style={{ borderRadius: "20px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <ArrowLeftRight className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+              <span className="text-xs font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                Suplencias esta semana
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: "var(--note-fill)", color: "var(--note-muted)" }}>
+                {substitutions.length}
+              </span>
+            </div>
+            <div className="space-y-2">
+              {substitutions.map((sub) => (
+                <div key={sub.id} className="flex items-center gap-3 p-2.5" style={{ borderRadius: "12px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
+                  <div className="h-8 w-8 flex items-center justify-center shrink-0" style={{ borderRadius: "10px", background: sub.my_role === 'substitute' ? "#10b98120" : "#f59e0b20" }}>
+                    <ArrowLeftRight className="h-3.5 w-3.5" style={{ color: sub.my_role === 'substitute' ? "#10b981" : "#f59e0b" }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                      {sub.course_name} — {sub.grade} {sub.section}
+                    </p>
+                    <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                      {sub.my_role === 'substitute'
+                        ? `Sustituyendo a ${sub.original_teacher_name}`
+                        : `Sustituido por ${sub.substitute_teacher_name}`
+                      } · {new Date(sub.date).toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric', month: 'short' })}
+                    </p>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full shrink-0" style={{
+                    background: sub.my_role === 'substitute' ? "#10b98120" : "#f59e0b20",
+                    color: sub.my_role === 'substitute' ? "#10b981" : "#f59e0b",
+                    fontFamily: FONT
+                  }}>
+                    {sub.my_role === 'substitute' ? 'Sustituto' : 'Original'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Day Filters */}
         <motion.div

@@ -17,7 +17,7 @@ import {
   MessageSquare, Calendar, UserCheck, BookMarked, Search, User,
   ArrowRight, Clock, AlertCircle, X, Layers, Plus,
   LayoutGrid, ArrowLeftRight, Receipt,
-  Sparkles,
+  Sparkles, Video,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
@@ -88,6 +88,7 @@ const navByRole: Record<string, NavItem[]> = {
     { title: "Notas", href: "/docente/calificaciones", icon: BookMarked },
     { title: "Tareas", href: "/docente/tareas", icon: ClipboardList },
     { title: "Materiales", href: "/docente/materiales", icon: FileText },
+    { title: "Clases Virtuales", href: "/docente/virtual-classes", icon: Video },
     { title: "Calendario", href: "/docente/calendario", icon: Calendar },
     { title: "Mensajes", href: "/docente/mensajes", icon: MessageSquare },
   ],
@@ -190,6 +191,7 @@ const navSectionsByRole: Record<string, { title: string; items: NavItem[] }[]> =
     ]},
     { title: "Recursos", items: [
       { title: "Materiales", href: "/docente/materiales", icon: FileText },
+      { title: "Clases Virtuales", href: "/docente/virtual-classes", icon: Video },
       { title: "Calendario", href: "/docente/calendario", icon: Calendar },
       { title: "Mensajes", href: "/docente/mensajes", icon: MessageSquare },
     ]},
