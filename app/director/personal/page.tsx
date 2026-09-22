@@ -128,8 +128,8 @@ export default function DirectorPersonalPage() {
               <span className="hidden sm:inline">Importar Sec.</span>
               <input type="file" accept=".csv" onChange={e => handleImport(e, '/api/dev/secretarios/import')} className="hidden" disabled={importing} />
             </label>
-            <SbBtn variant="filled" rounded className="flex items-center gap-1.5 text-xs" onClick={() => { setDialogOpen(true); resetForm() }}>
-              <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Contratar</span><span className="sm:hidden">Nuevo</span>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold" onClick={() => { setDialogOpen(true); resetForm() }}>
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Contratar</span><span className="sm:hidden">Nuevo</span>
             </SbBtn>
             {total > 0 && (
               <button
