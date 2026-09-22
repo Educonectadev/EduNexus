@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar, Trash2 } from "@/components/ui/proicons"
+import { Plus, Mail, Phone, BadgeCheck, GraduationCap, Briefcase, Search, X, Users, ChevronRight, BookOpen, Calendar, Trash2, Check } from "@/components/ui/proicons"
 import { cn } from "@/lib/utils"
 import { SbSectionHeader, SbModal, SbModalBody, SbBtn, SbBadge } from "@/components/ui/sb"
 import ImportarDocentesModal from "@/components/secretario/importar-docentes-modal"
@@ -24,6 +24,12 @@ export default function SecretarioPersonalPage() {
   const [importOpen, setImportOpen] = React.useState(false)
   const [deleteAllOpen, setDeleteAllOpen] = React.useState(false)
   const [deletingAll, setDeletingAll] = React.useState(false)
+  const [dialogOpen, setDialogOpen] = React.useState(false)
+  const [saving, setSaving] = React.useState(false)
+  const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
+  const [formData, setFormData] = React.useState({
+    full_name: "", email: "", role: "docente", subject: "", dni: "", phone: "", grade_level: "", contract_type: " indefinido"
+  })
 
   const fetchStaff = async () => {
     try {
@@ -51,6 +57,29 @@ export default function SecretarioPersonalPage() {
     return s.full_name?.toLowerCase().includes(q) || s.email?.toLowerCase().includes(q) || s.dni?.includes(q) || s.subject?.toLowerCase().includes(q)
   })
 
+  const resetForm = () => {
+    setFormData({ full_name: "", email: "", role: "docente", subject: "", dni: "", phone: "", grade_level: "", contract_type: " indefinido" })
+  }
+
+  const handleCreate = async () => {
+    if (!formData.full_name || !formData.dni) return
+    setSaving(true)
+    try {
+      const res = await fetch("/api/director/staff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        if (data.credentials) setCredentials(data.credentials)
+        setDialogOpen(false)
+        resetForm()
+        fetchStaff()
+      }
+    } catch {} finally { setSaving(false) }
+  }
+
   const counts = {
     docente: staff.filter(s => s.role === "docente").length,
     secretario: staff.filter(s => s.role === "secretario").length,
@@ -67,6 +96,9 @@ export default function SecretarioPersonalPage() {
             </SbBtn>
             <SbBtn rounded className="flex items-center gap-2" onClick={() => setImportOpen(true)}>
               <Plus className="h-4 w-4" /> Importar personal
+            </SbBtn>
+            <SbBtn variant="filled" rounded className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold" onClick={() => { setDialogOpen(true); resetForm() }}>
+              <Plus className="h-4 w-4" /> Contratar
             </SbBtn>
           </div>
         }
@@ -242,6 +274,96 @@ export default function SecretarioPersonalPage() {
                   if (res.ok) { setStaff([]); setDeleteAllOpen(false) }
                 } finally { setDeletingAll(false) }
               }}>{deletingAll ? "Eliminando..." : "Eliminar Todo"}</SbBtn>
+            </div>
+          </SbModalBody>
+        </SbModal>
+      )}
+
+      <SbModal open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm:max-w-lg">
+        <SbModalHeader title="Contratar Personal" onClose={() => setDialogOpen(false)} />
+        <SbModalBody>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Nombre completo *</label>
+              <input value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} placeholder="Juan Pérez"
+                className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">DNI *</label>
+                <input value={formData.dni} onChange={e => setFormData({...formData, dni: e.target.value})} placeholder="12345678"
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Teléfono</label>
+                <input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="999888777"
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface font-mono focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[12px] text-sb-on-surface/80">Email (opcional — se genera automáticamente)</label>
+              <input value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="doc.juan.perez@iep.edu.pe"
+                className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Rol</label>
+                <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
+                  <option value="docente">Docente</option>
+                  <option value="secretario">Secretario</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Tipo de contrato</label>
+                <select value={formData.contract_type} onChange={e => setFormData({...formData, contract_type: e.target.value})}
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all">
+                  <option value=" indefinido">Indefinido</option>
+                  <option value=" temporal">Temporal</option>
+                  <option value=" practicas">Prácticas</option>
+                  <option value=" servicio">Servicio</option>
+                </select>
+              </div>
+            </div>
+            {formData.role === "docente" && (
+              <div className="space-y-2">
+                <label className="text-[12px] text-sb-on-surface/80">Asignatura</label>
+                <input value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} placeholder="Matemática"
+                  className="w-full h-11 rounded-xl bg-sb-surface-container px-4 text-[14px] text-sb-on-surface placeholder:text-sb-on-surface/50 border border-transparent focus:outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+              </div>
+            )}
+          </div>
+        </SbModalBody>
+        <SbModalFooter className="flex flex-col sm:flex-row gap-2">
+          <SbBtn variant="outlined" size="sm" rounded onClick={() => setDialogOpen(false)} className="flex-1">
+            Cancelar
+          </SbBtn>
+          <SbBtn variant="filled" size="sm" rounded onClick={handleCreate} disabled={saving || !formData.full_name || !formData.dni} className="flex-1">
+            {saving ? "Creando..." : "Contratar"}
+          </SbBtn>
+        </SbModalFooter>
+      </SbModal>
+
+      {credentials && (
+        <SbModal open={!!credentials} onClose={() => setCredentials(null)} maxWidth="sm:max-w-md">
+          <SbModalBody>
+            <div className="text-center py-4">
+              <div className="h-16 w-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                <Check className="h-8 w-8 text-emerald-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-sb-on-surface mb-2">Personal contratado</h3>
+              <p className="text-sm text-sb-on-surface-variant/60 mb-4">Se creó la cuenta exitosamente. Comparte estas credenciales con el nuevo miembro:</p>
+              <div className="bg-sb-surface-container rounded-xl p-4 space-y-2">
+                <div className="text-left">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase">Email</p>
+                  <p className="text-sm font-mono text-sb-on-surface">{credentials.email}</p>
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] text-sb-on-surface-variant/40 uppercase">Contraseña</p>
+                  <p className="text-sm font-mono text-sb-on-surface">{credentials.password}</p>
+                </div>
+              </div>
+              <SbBtn variant="filled" rounded className="w-full mt-4" onClick={() => setCredentials(null)}>Entendido</SbBtn>
             </div>
           </SbModalBody>
         </SbModal>
