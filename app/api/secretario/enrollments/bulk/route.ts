@@ -2,26 +2,50 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import crypto from 'crypto'
 import { resolveInstId } from '@/lib/resolveInstId'
+import { checkPlanLimit } from '@/lib/checkPlanLimit'
 export async function POST(req: NextRequest){
   const instId = await resolveInstId(req); if(!instId) return NextResponse.json({error:'No inst'},{status:401})
   const { rows } = await req.json() as { rows: any[] }
   if(!rows?.length) return NextResponse.json({error:'empty'},{status:400})
+
+  // Check plan limit before processing
+  const limitCheck = await checkPlanLimit(instId, 'students')
+  if(!limitCheck.allowed){
+    return NextResponse.json({error: limitCheck.message, limit: limitCheck.limit, current: limitCheck.current},{status:403})
+  }
+
   const conn:any = await (pool as any).rawPool.connect()
   try{
     await conn.query('BEGIN')
-    let imported=0, skipped=0, errors=0; let firstError: string | null = null
-    const details: Array<{dni:string; student_name:string; status:string; reason?:string; message?:string}> = []
-    const pushDetail = (r:any, status:string, reason?:string, message?:string)=>{
-      details.push({ dni: r.student_dni || '', student_name: r.student_name || '', status, reason, message })
-    }
-    const year = new Date().getFullYear()
-    // Pre-fetch existing students by DNI for fast lookup
+
+    // Pre-fetch existing students by DNI for fast lookup and limit check
     const dnis = rows.map(r=>r.student_dni).filter(Boolean)
     const existingMap = new Map<string,string>()
     if(dnis.length){
       const res = await conn.query(`SELECT id, document_number FROM students WHERE institution_id=$1 AND document_number = ANY($2)`, [instId, dnis])
       for(const r of res.rows) existingMap.set(r.document_number, r.id)
     }
+
+    // Count new students (not already existing) to check against limit
+    const newStudentsCount = rows.filter(r => r.student_dni && !existingMap.has(r.student_dni)).length
+    if(limitCheck.current + newStudentsCount > limitCheck.limit){
+      await conn.query('ROLLBACK')
+      const remaining = limitCheck.limit - limitCheck.current
+      return NextResponse.json({
+        error: `El plan permite un máximo de ${limitCheck.limit} estudiantes. Actualmente tienes ${limitCheck.current} y estás intentando agregar ${newStudentsCount} nuevos. Solo puedes agregar ${remaining} estudiantes más. Actualiza tu plan para continuar.`,
+        limit: limitCheck.limit,
+        current: limitCheck.current,
+        tryingToAdd: newStudentsCount,
+        remaining
+      },{status:403})
+    }
+
+    let imported=0, skipped=0, errors=0; let firstError: string | null = null
+    const details: Array<{dni:string; student_name:string; status:string; reason?:string; message?:string}> = []
+    const pushDetail = (r:any, status:string, reason?:string, message?:string)=>{
+      details.push({ dni: r.student_dni || '', student_name: r.student_name || '', status, reason, message })
+    }
+    const year = new Date().getFullYear()
     // Ensure grades/sections exist cache (usa conn con $)
     const gradeCache = new Set<string>()
     const gRes = await conn.query(`SELECT LOWER(name) as n FROM academic_grades WHERE institution_id=$1`,[instId])

@@ -496,7 +496,15 @@ export default function SecretarioMatriculasPage() {
           body: JSON.stringify({ rows: chunk }),
         })
         const data = await res.json().catch(()=>({}))
-        if (!res.ok) throw new Error(data.error || `bulk failed (${res.status})`)
+        if (!res.ok) {
+          if (res.status === 403 && data.error) {
+            setBulkStep("done")
+            setBulkResults({ imported: 0, skipped: 0, errors: importableRows.length, details: [{ dni: '', student_name: '', status: 'error', reason: 'limit', message: data.error }] })
+            toast({ title: 'Límite del plan alcanzado', description: data.error, variant: 'destructive' })
+            return
+          }
+          throw new Error(data.error || `bulk failed (${res.status})`)
+        }
         imported += data.imported || 0
         skipped += data.skipped || 0
         errors += data.errors || 0
