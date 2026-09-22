@@ -79,6 +79,13 @@ export default function PlanesPage() {
 
   React.useEffect(() => { fetchPlans() }, [])
 
+  React.useEffect(() => {
+    if (viewing && plans.length > 0) {
+      const updated = plans.find(p => p.id === viewing.id)
+      if (updated) setViewing(updated)
+    }
+  }, [plans])
+
   const fetchPlans = async () => {
     try {
       const res = await fetch("/api/dev/planes")
