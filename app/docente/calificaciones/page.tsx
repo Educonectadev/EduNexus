@@ -2,42 +2,21 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon, Download } from "@/components/ui/proicons"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon, Download, ChevronDown } from "@/components/ui/proicons"
 import NotificationBell from "@/components/layout/notification-bell"
-import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { SbBtn, SbModal, SbModalHeader, SbModalBody, SbModalFooter } from "@/components/ui/sb"
 import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
 
 interface Grade {
-  id: string
-  student_id: string
-  course_id: string
-  period: string
-  score: number
-  max_score: number
-  notes: string | null
-  created_at: string
+  id: string; student_id: string; course_id: string; period: string
+  score: number; max_score: number; notes: string | null; created_at: string
 }
-
 interface Student {
-  id: string
-  code: string
-  first_name: string
-  last_name: string
-  document_number: string
-  grade: string
-  section: string
-  grades: Grade[]
+  id: string; code: string; first_name: string; last_name: string
+  document_number: string; grade: string; section: string; grades: Grade[]
 }
-
 interface Course {
-  id: string
-  name: string
-  code: string
-  grade: string
-  section: string
+  id: string; name: string; code: string; grade: string; section: string
 }
 
 const PERIODS = ["Bimestre 1", "Bimestre 2", "Bimestre 3", "Bimestre 4"]
@@ -46,28 +25,22 @@ const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
 
-function getAvatarColor(_name: string) {
-  return "bg-foreground/10"
-}
-
-function getGradeColor(g: number) { return g >= 18 ? "font-bold" : g >= 11 ? "" : "opacity-60" }
-function getGradeBg(g: number) { return g >= 18 ? "bg-foreground/10" : g >= 11 ? "bg-foreground/5" : "bg-foreground/10" }
-function getGradeBarColor(g: number) { return g >= 18 ? "bg-foreground" : g >= 11 ? "bg-muted-foreground" : "bg-muted-foreground" }
-
 function calcAverage(grades: Grade[]) {
   if (grades.length === 0) return 0
-  const sum = grades.reduce((a, g) => a + Number(g.score), 0)
-  return Number((sum / grades.length).toFixed(1))
+  return Number((grades.reduce((a, g) => a + Number(g.score), 0) / grades.length).toFixed(1))
 }
 
 function studentName(s: Student) { return `${s.first_name} ${s.last_name}` }
 
+function gradeColor(g: number) {
+  if (g >= 18) return { text: "var(--note-text)", bg: "var(--note-fill-strong)", label: "AD" }
+  if (g >= 14) return { text: "var(--note-text)", bg: "var(--note-fill)", label: "A" }
+  if (g >= 11) return { text: "var(--note-muted)", bg: "var(--note-fill)", label: "B" }
+  return { text: "var(--note-muted)", bg: "var(--note-fill)", label: "C" }
+}
+
 export default function CalificacionesPage() {
-  return (
-    <React.Suspense fallback={null}>
-      <CalificacionesInner />
-    </React.Suspense>
-  )
+  return <React.Suspense fallback={null}><CalificacionesInner /></React.Suspense>
 }
 
 function CalificacionesInner() {
@@ -111,43 +84,28 @@ function CalificacionesInner() {
         setCourseId(prev => prev && data.courses.some((c: Course) => c.id === prev) ? prev : data.courses[0].id)
         setRegisterCourseId(prev => prev && data.courses.some((c: Course) => c.id === prev) ? prev : data.courses[0].id)
       }
-    } catch (e: any) {
-      setError(e.message)
-    } finally {
-      setLoading(false)
-    }
+    } catch (e: any) { setError(e.message) } finally { setLoading(false) }
   }, [])
 
   const loadCourseData = React.useCallback(async (id: string) => {
-    setLoading(true)
-    setError(null)
+    setLoading(true); setError(null)
     try {
       const res = await fetch(`/api/docente/calificaciones?course_id=${id}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Error al cargar")
       setStudents(Array.isArray(data.students) ? data.students : [])
-      if (data.course) {
-        setCourseLabel(`${data.course.name} · ${data.course.grade} "${data.course.section}"`)
-      }
-    } catch (e: any) {
-      setError(e.message)
-    } finally {
-      setLoading(false)
-    }
+      if (data.course) setCourseLabel(`${data.course.name} · ${data.course.grade} "${data.course.section}"`)
+    } catch (e: any) { setError(e.message) } finally { setLoading(false) }
   }, [])
 
-  React.useEffect(() => { ;(async () => { await loadCourses() })() }, [loadCourses])
-  React.useEffect(() => { if (courseId) { ;(async () => { await loadCourseData(courseId) })() } }, [courseId, loadCourseData])
+  React.useEffect(() => { loadCourses() }, [loadCourses])
+  React.useEffect(() => { if (courseId) loadCourseData(courseId) }, [courseId, loadCourseData])
 
   React.useEffect(() => {
     if (!registerCourseId || !registerOpen) { setRegisterStudents([]); return }
     if (registerCourseId === courseId) { setRegisterStudents(students); return }
     ;(async () => {
-      try {
-        const res = await fetch(`/api/docente/calificaciones?course_id=${registerCourseId}`)
-        const data = await res.json()
-        setRegisterStudents(Array.isArray(data.students) ? data.students : [])
-      } catch { setRegisterStudents([]) }
+      try { const res = await fetch(`/api/docente/calificaciones?course_id=${registerCourseId}`); const data = await res.json(); setRegisterStudents(Array.isArray(data.students) ? data.students : []) } catch { setRegisterStudents([]) }
     })()
   }, [registerCourseId, registerOpen, courseId, students])
 
@@ -155,11 +113,7 @@ function CalificacionesInner() {
     try {
       const target = selected?.grades.find(g => g.id === gradeId)
       if (!target) return
-      await fetch("/api/docente/calificaciones", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId, course_id: target.course_id, period: target.period, score: newScore, max_score: MAX_SCORE }),
-      })
+      await fetch("/api/docente/calificaciones", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ student_id: studentId, course_id: target.course_id, period: target.period, score: newScore, max_score: MAX_SCORE }) })
       setStudents(prev => prev.map(s => s.id !== studentId ? s : { ...s, grades: s.grades.map(g => g.id !== gradeId ? g : { ...g, score: newScore }) }))
       setSelected(prev => prev ? { ...prev, grades: prev.grades.map(g => g.id !== gradeId ? g : { ...g, score: newScore }) } : null)
       if (courseId) loadCourseData(courseId)
@@ -178,11 +132,7 @@ function CalificacionesInner() {
 
   const handleAddGrade = async (studentId: string) => {
     if (!newPeriod || !newScore) return
-    const res = await fetch("/api/docente/calificaciones", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null }),
-    })
+    const res = await fetch("/api/docente/calificaciones", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null }) })
     const data = await res.json()
     if (data.success && data.id) {
       const newGrade = { id: data.id, student_id: studentId, course_id: courseId, period: newPeriod, score: Number(newScore), max_score: MAX_SCORE, notes: newNotes || null, created_at: new Date().toISOString() }
@@ -197,40 +147,24 @@ function CalificacionesInner() {
     if (!registerStudentId || !registerScore || !registerPeriod) return
     setSaving(true)
     try {
-      await fetch("/api/docente/calificaciones", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: registerStudentId, course_id: registerCourseId, period: registerPeriod, score: Number(registerScore), max_score: MAX_SCORE }),
-      })
-      setRegisterOpen(false)
-      setRegisterStudentId(""); setRegisterPeriod(""); setRegisterScore("")
+      await fetch("/api/docente/calificaciones", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ student_id: registerStudentId, course_id: registerCourseId, period: registerPeriod, score: Number(registerScore), max_score: MAX_SCORE }) })
+      setRegisterOpen(false); setRegisterStudentId(""); setRegisterPeriod(""); setRegisterScore("")
       if (registerCourseId === courseId) loadCourseData(courseId)
       else { setCourseId(registerCourseId); setRegisterCourseId(registerCourseId) }
-    } finally {
-      setSaving(false)
-    }
+    } finally { setSaving(false) }
   }
 
   const handleSaveCell = async (studentId: string, period: string, rawValue: string) => {
     const value = Number(rawValue)
     if (rawValue === "" || isNaN(value) || value < 0 || value > MAX_SCORE) return
     const cellKey = `${studentId}:${period}`
-    setSavingCell(cellKey)
-    setSaveError(null)
+    setSavingCell(cellKey); setSaveError(null)
     try {
-      const res = await fetch("/api/docente/calificaciones", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ student_id: studentId, course_id: courseId, period, score: value, max_score: MAX_SCORE }),
-      })
+      const res = await fetch("/api/docente/calificaciones", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ student_id: studentId, course_id: courseId, period, score: value, max_score: MAX_SCORE }) })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Error al guardar")
       loadCourseData(courseId)
-    } catch (e: any) {
-      setSaveError(e.message)
-    } finally {
-      setSavingCell(null)
-    }
+    } catch (e: any) { setSaveError(e.message) } finally { setSavingCell(null) }
   }
 
   const getTrend = (grades: Grade[]) => {
@@ -243,93 +177,62 @@ function CalificacionesInner() {
     const { jsPDF } = await import("jspdf")
     const autoTable = (await import("jspdf-autotable")).default
     const doc = new jsPDF("landscape")
-
-    doc.setFontSize(16)
-    doc.text(`Libro de Calificaciones — ${courseLabel}`, 14, 15)
-    doc.setFontSize(10)
-    doc.text(`Generado: ${new Date().toLocaleDateString("es-PE")} | Docente: ${user?.full_name || ""}`, 14, 22)
-
+    doc.setFontSize(16); doc.text(`Libro de Calificaciones — ${courseLabel}`, 14, 15)
+    doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleDateString("es-PE")} | Docente: ${user?.full_name || ""}`, 14, 22)
     const periods = [...new Set(students.flatMap(s => s.grades.map(g => g.period)))].sort()
     const head = [["#", "Alumno", "DNI", ...periods, "Promedio"]]
     const body = students.map((s, i) => {
-      const avg = calcAverage(s.grades)
-      const row: (string | number)[] = [i + 1, studentName(s), s.document_number || ""]
-      for (const p of periods) {
-        const g = s.grades.find(gr => gr.period === p)
-        row.push(g ? Number(g.score) : "-")
-      }
-      row.push(avg || "-")
-      return row
+      const avg = calcAverage(s.grades); const row: (string | number)[] = [i + 1, studentName(s), s.document_number || ""]
+      for (const p of periods) { const g = s.grades.find(gr => gr.period === p); row.push(g ? Number(g.score) : "-") }
+      row.push(avg || "-"); return row
     })
-
-    autoTable(doc, {
-      head,
-      body,
-      startY: 28,
-      styles: { fontSize: 9, cellPadding: 3 },
-      headStyles: { fillColor: [30, 30, 30] },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-    })
-
+    autoTable(doc, { head, body, startY: 28, styles: { fontSize: 9, cellPadding: 3 }, headStyles: { fillColor: [30, 30, 30] }, alternateRowStyles: { fillColor: [245, 245, 245] } })
     doc.save(`calificaciones_${courseLabel.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`)
   }
 
   const averages = students.map(s => calcAverage(s.grades))
   const avgGeneral = averages.length ? (averages.reduce((a, b) => a + b, 0) / averages.length) : 0
   const bestScore = students.length ? Math.max(...students.map(s => s.grades.length ? Math.max(...s.grades.map(g => g.score)) : 0)) : 0
-
-
+  const approvedCount = students.filter(s => calcAverage(s.grades) >= 11 && calcAverage(s.grades) > 0).length
+  const approvedPct = students.length ? Math.round((approvedCount / students.length) * 100) : 0
 
   return (
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
       <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
-        {/* Header */}
-        <header className="mb-4">
+
+        {/* HEADER */}
+        <header>
           <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>
-              Calificaciones
-            </h1>
-            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-              Gestiona las notas de tus alumnos
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0 mt-1">
-            {user && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
-                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>
-                    {user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}
-                  </span>
+            <div>
+              <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
+              <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>Calificaciones</h1>
+              <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Gestiona las notas de tus alumnos</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 mt-1">
+              {user && (
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
+                  <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                    <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>{user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}</span>
+                  </div>
+                  <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>{user.full_name}</span>
                 </div>
-                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>
-                  {user.full_name}
-                </span>
-              </div>
-            )}
-            <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
-            </button>
-          </div>
+              )}
+              <NotificationBell />
+              <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+                <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
+                <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
+              </button>
+            </div>
           </div>
 
-          {/* Controls - Mobile responsive */}
+          {/* Controls */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4">
             <div className="sm:w-56">
-              <select
-                value={courseId}
-                onChange={e => setCourseId(e.target.value)}
-                disabled={loading}
+              <select value={courseId} onChange={e => setCourseId(e.target.value)} disabled={loading}
                 className="w-full h-10 px-3 text-[13px] font-medium rounded-xl transition-all"
-                style={{ border: `1.5px solid ${courseId ? "var(--note-text)" : "var(--note-hairline)"}`, background: courseId ? "var(--note-fill)" : "transparent", color: courseId ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}
-              >
+                style={{ border: `1.5px solid ${courseId ? "var(--note-text)" : "var(--note-hairline)"}`, background: courseId ? "var(--note-fill)" : "transparent", color: courseId ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
                 {courses.length === 0 && <option value="">Sin cursos asignados</option>}
-                {courses.map(c => (
-                  <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>
-                ))}
+                {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2">
@@ -338,11 +241,7 @@ function CalificacionesInner() {
                   {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
                     <button key={key} onClick={() => setViewMode(key)}
                       className="h-9 px-4 text-[13px] font-semibold flex items-center justify-center rounded-full transition-all duration-200"
-                      style={{
-                        background: viewMode === key ? "var(--note-text)" : "transparent",
-                        color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)",
-                        fontFamily: FONT
-                      }}>
+                      style={{ background: viewMode === key ? "var(--note-text)" : "transparent", color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)", fontFamily: FONT }}>
                       {label}
                     </button>
                   ))}
@@ -360,398 +259,291 @@ function CalificacionesInner() {
           </div>
         </header>
 
-        {error && (
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
-        )}
+        {error && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">{error}</div>}
 
         {loading ? (
           <div className="animate-pulse space-y-6">
-            <div className="grid grid-cols-3 gap-2">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-28" style={{ background: "var(--note-fill)", borderRadius: "16px" }} />
-              ))}
-            </div>
-            <div className="h-64 animate-pulse" style={{ background: "var(--note-fill)", borderRadius: "16px" }} />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-28" style={{ background: "var(--note-fill)", borderRadius: "20px" }} />)}</div>
+            <div className="h-96" style={{ background: "var(--note-fill)", borderRadius: "24px" }} />
           </div>
         ) : students.length === 0 ? (
-          <div
-            className="py-16 text-center"
-            style={{
-              background: "var(--note-surface)",
-              borderRadius: "24px",
-              border: "1px solid var(--note-hairline)"
-            }}
-          >
-            <BookMarked
-              className="h-10 w-10 mx-auto mb-3"
-              style={{ color: "var(--note-muted)", opacity: 0.3 }}
-            />
-            <p className="text-xs font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+          <div className="py-20 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
+            <BookMarked className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
+            <p className="text-sm font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
               {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
             </p>
           </div>
         ) : viewMode === "tabla" ? (
-          <TablaNotas
-            key={courseId}
-            students={students}
-            courseId={courseId}
-            maxScore={MAX_SCORE}
-            savingCell={savingCell}
-            saveError={saveError}
-            onSaveCell={handleSaveCell}
-          />
+          <TablaNotas key={courseId} students={students} courseId={courseId} maxScore={MAX_SCORE} savingCell={savingCell} saveError={saveError} onSaveCell={handleSaveCell} />
         ) : (
           <>
-            {/* Stats */}
-            <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-3 gap-2 sm:gap-3">
+            {/* HERO STATS */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
-                { label: "Promedio", value: avgGeneral.toFixed(1), icon: BarChart3 },
-                { label: "Mejor Nota", value: bestScore, icon: TrendingUp },
-                { label: "Alumnos", value: students.length, icon: BookMarked },
-              ].map(s => (
-                <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  className="p-3 sm:p-4"
-                  style={{
-                    background: "var(--note-surface)",
-                    borderRadius: "16px",
-                    border: "1px solid var(--note-hairline)"
-                  }}
-                >
-                  <div className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center mb-2" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
-                    <s.icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                { label: "Promedio General", value: avgGeneral.toFixed(1), sub: `de ${MAX_SCORE}`, pct: (avgGeneral / MAX_SCORE) * 100 },
+                { label: "Mejor Nota", value: bestScore, sub: "puntuación máxima", pct: (bestScore / MAX_SCORE) * 100 },
+                { label: "Aprobados", value: `${approvedPct}%`, sub: `${approvedCount} de ${students.length}`, pct: approvedPct },
+                { label: "Total Alumnos", value: students.length, sub: "matriculados", pct: 100 },
+              ].map((s, i) => (
+                <div key={i} className="p-4 transition-all duration-300 hover:scale-[1.02]" style={{ background: "var(--note-surface)", borderRadius: "20px", border: "1px solid var(--note-hairline)" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.8px] mb-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.label}</p>
+                  <p className="text-2xl font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.value}</p>
+                  <p className="text-[10px] mt-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.sub}</p>
+                  <div className="h-1 rounded-full mt-3 overflow-hidden" style={{ background: "var(--note-fill)" }}>
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(s.pct, 100)}%`, background: "var(--note-text)" }} />
                   </div>
-                  <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-                    {s.label}
-                  </p>
-                  <p className="mt-1 text-base sm:text-lg font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>
-                    {s.value}
-                  </p>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
 
-            {/* Student list */}
-            <div
-              className="overflow-hidden"
-              style={{
-                background: "var(--note-surface)",
-                borderRadius: "24px",
-                border: "1px solid var(--note-hairline)"
-              }}
-            >
-              <AnimatePresence>
-                {students.map((s, i) => {
-                  const avg = calcAverage(s.grades)
-                  const trend = getTrend(s.grades)
-                  return (
-                    <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.25, delay: i * 0.03 }}
-                      onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                      className="flex items-center justify-between px-3 sm:px-4 py-3 transition-colors cursor-pointer group"
-                      style={{ borderBottom: i < students.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                    >
-                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
-                          <span className="text-[9px] sm:text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
-                          <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
-                            <span className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.grades.length} notas</span>
-                            {s.grades.slice(-3).map((g, j) => (
-                              <span key={j} className={`text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded-xl ${getGradeBg(g.score)} ${getGradeColor(g.score)}`}>{g.score}</span>
-                            ))}
-                            {s.grades.length > 3 && <span className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>+{s.grades.length - 3}</span>}
-                          </div>
+            {/* STUDENT LIST */}
+            <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
+              {students.map((s, i) => {
+                const avg = calcAverage(s.grades)
+                const trend = getTrend(s.grades)
+                const gc = gradeColor(avg)
+                const isLast = i === students.length - 1
+                return (
+                  <div key={s.id}
+                    onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
+                    className="flex items-center justify-between px-4 py-3.5 transition-all duration-200 cursor-pointer group"
+                    style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105" style={{ background: "var(--note-fill-strong)" }}>
+                        <span className="text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.grades.length} notas</span>
+                          {s.grades.slice(-4).map((g, j) => (
+                            <span key={j} className="text-[9px] font-mono px-1.5 py-0.5 rounded-lg" style={{ background: gradeColor(g.score).bg, color: gradeColor(g.score).text }}>{g.score}</span>
+                          ))}
+                          {s.grades.length > 4 && <span className="text-[10px]" style={{ color: "var(--note-muted)" }}>+{s.grades.length - 4}</span>}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                        {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> : <TrendingDown className="h-3.5 w-3.5 text-red-400" />}
-                        <span className={`text-base sm:text-lg font-bold ${avg === 0 ? "opacity-40" : getGradeColor(avg)}`} style={{ color: "var(--note-text)" }}>{avg === 0 ? "—" : avg}</span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {trend ? <TrendingUp className="h-3.5 w-3.5" style={{ color: "var(--note-text)", opacity: 0.5 }} /> : <TrendingDown className="h-3.5 w-3.5" style={{ color: "var(--note-muted)", opacity: 0.5 }} />}
+                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(avg / MAX_SCORE) * 100}%`, background: "var(--note-text)" }} />
                       </div>
-                    </motion.div>
-                  )
-                })}
-              </AnimatePresence>
+                      <span className="text-base font-bold w-8 text-right" style={{ color: avg === 0 ? "var(--note-muted)" : "var(--note-text)", opacity: avg === 0 ? 0.3 : 1, fontFamily: FONT }}>{avg === 0 ? "—" : avg}</span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </>
         )}
 
-        {/* ===== DETAIL MODAL ===== */}
-        <SbModal open={detailOpen} onClose={() => setDetailOpen(false)} maxWidth="560px">
-          {selected && (
-            <>
-              <SbModalHeader title="" onClose={() => setDetailOpen(false)} />
-              <SbModalBody>
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-                  <div className="flex items-center gap-2.5 sm:gap-3 mb-4">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
-                      <span className="text-sm sm:text-base font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(selected))}</span>
+        {/* DETAIL MODAL */}
+        {detailOpen && selected && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDetailOpen(false)}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <div className="relative w-full max-w-[560px] max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
+              {/* Modal Header */}
+              <div className="sticky top-0 z-10 px-6 pt-6 pb-4" style={{ background: "var(--note-surface)", borderBottom: "1px solid var(--note-hairline)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-2xl flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
+                    <span className="text-sm font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(selected))}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-bold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(selected)}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{courseLabel} · {selected.grades.length} calificaciones</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-2xl font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{selected.grades.length ? calcAverage(selected.grades) : "—"}</p>
+                    <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-6 py-5 space-y-5">
+                {/* Progress */}
+                {selected.grades.length > 0 && (
+                  <div className="p-4" style={{ background: "var(--note-fill)", borderRadius: "16px" }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Rendimiento</span>
+                      <span className="text-sm font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-base sm:text-lg font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(selected)}</p>
-                      <p className="text-[10px] sm:text-xs mt-0.5 truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{courseLabel} · {selected.grades.length} calificaciones</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className={`text-xl sm:text-2xl font-bold ${selected.grades.length ? getGradeColor(calcAverage(selected.grades)) : "opacity-40"}`} style={{ color: "var(--note-text)" }}>
-                        {selected.grades.length ? calcAverage(selected.grades) : "—"}
-                      </p>
-                      <p className="text-[9px] sm:text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</p>
+                    <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill-strong)" }}>
+                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%`, background: "var(--note-text)" }} />
                     </div>
                   </div>
+                )}
 
-                  {selected.grades.length > 0 && (
-                    <div className="rounded-xl p-3 mb-4" style={{ background: "var(--note-fill)" }}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
-                          <span className="text-[15px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Rendimiento</span>
-                        </div>
-                        <span className={`text-sm font-bold ${getGradeColor(calcAverage(selected.grades))}`} style={{ fontFamily: FONT }}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
+                {/* Grades */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial de Notas</p>
+                  <div className="space-y-2">
+                    {selected.grades.map(g => (
+                      <div key={g.id} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors group" style={{ background: "var(--note-fill)" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "var(--note-fill)" }}>
+                        {editGradeId === g.id ? (
+                          <>
+                            <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)} autoFocus
+                              className="h-9 w-16 text-center text-sm font-bold rounded-xl focus:outline-none focus:ring-2" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
+                            <div className="flex-1 flex items-center gap-1">
+                              <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))} className="h-8 px-3 rounded-lg text-xs font-bold transition-all hover:opacity-90" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>Guardar</button>
+                              <button onClick={() => { setEditGradeId(null); setEditScore("") }} className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-80" style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)", fontFamily: FONT }}>Cancelar</button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: gradeColor(g.score).bg }}>
+                              <span className="text-sm font-bold" style={{ color: gradeColor(g.score).text }}>{g.score}</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{g.period}</p>
+                              <p className="text-[10px] truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
+                                {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}{g.notes ? ` · ${g.notes}` : ""}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: "var(--note-muted)" }}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button onClick={() => handleDeleteGrade(g.id)} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: "var(--note-muted)" }}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--note-fill-strong)" }}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%` }}
-                          transition={{ duration: 0.8, delay: 0.2 }}
-                          className="h-full rounded-full"
-                          style={{ background: "var(--note-text)" }}
-                        />
+                    ))}
+                    {selected.grades.length === 0 && (
+                      <div className="text-center py-16 rounded-xl" style={{ border: "1px dashed var(--note-hairline)" }}>
+                        <BookMarked className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
+                        <p className="text-sm" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin calificaciones</p>
                       </div>
-                    </div>
-                  )}
-
-                  <div className="mb-4">
-                    <p className="text-[15px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial de Notas</p>
-                    <div className="space-y-2">
-                      {selected.grades.map((g) => (
-                        <div key={g.id} className="flex items-center gap-2 sm:gap-3 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 group transition-colors"
-                          style={{ background: "var(--note-fill)" }}
-                          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
-                          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--note-fill)" }}
-                        >
-                          {editGradeId === g.id ? (
-                            <>
-                              <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)}
-                                className="sb-input rounded-xl text-sm h-8 w-14 sm:w-16 text-center" autoFocus />
-                              <div className="flex items-center gap-1">
-                                <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}
-                                  className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-90 active:scale-[0.97]"
-                                  style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
-                                  Guardar
-                                </button>
-                                <button onClick={() => { setEditGradeId(null); setEditScore("") }}
-                                  className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
-                                  style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)", fontFamily: FONT }}>
-                                  Cancelar
-                                </button>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
-                                <span className={`text-xs sm:text-sm font-bold ${getGradeColor(g.score)}`}>{g.score}</span>
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs sm:text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{g.period}</p>
-                                <p className="text-[9px] sm:text-[10px] truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-                                  {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}
-                                  {g.notes ? ` · ${g.notes}` : ""}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-0.5 sm:gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }}
-                                  className="h-7 w-7 rounded-xl flex items-center justify-center transition-colors"
-                                  style={{ color: "var(--note-muted)" }}
-                                  onMouseEnter={(e) => { e.currentTarget.style.color = "var(--note-text)"; e.currentTarget.style.background = "var(--note-fill)" }}
-                                  onMouseLeave={(e) => { e.currentTarget.style.color = "var(--note-muted)"; e.currentTarget.style.background = "transparent" }}
-                                >
-                                  <Pencil className="h-3.5 w-3.5" />
-                                </button>
-                                <button onClick={() => handleDeleteGrade(g.id)}
-                                  className="h-7 w-7 rounded-xl flex items-center justify-center transition-colors"
-                                  style={{ color: "var(--note-muted)" }}
-                                  onMouseEnter={(e) => { e.currentTarget.style.color = "#ef4444"; e.currentTarget.style.background = "rgba(239,68,68,0.1)" }}
-                                  onMouseLeave={(e) => { e.currentTarget.style.color = "var(--note-muted)"; e.currentTarget.style.background = "transparent" }}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      ))}
-                      {selected.grades.length === 0 && (
-                        <div className="text-center py-20 rounded-xl" style={{ border: "1px dashed var(--note-hairline)" }}>
-                          <BookMarked className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
-                          <p className="text-sm" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin calificaciones</p>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
+                </div>
 
-                  <div className="rounded-xl p-3 sm:p-4" style={{ background: "var(--note-fill)" }}>
-                    <p className="text-[15px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Agregar Nota</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)}
-                        className="text-sm rounded-xl h-9 px-3"
-                        style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                        <option value="">Bimestre</option>
-                        {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
-                      </select>
-                      <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)}
-                        className="rounded-xl text-sm h-9 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                      <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)}
-                        className="rounded-xl text-sm h-9 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                    </div>
-                    <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
-                      className="w-full mt-2 h-9 rounded-lg text-xs font-semibold disabled:opacity-30 transition-all hover:opacity-90 active:scale-[0.98]"
-                      style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
-                      Agregar
-                    </button>
+                {/* Add Grade */}
+                <div className="p-4" style={{ background: "var(--note-fill)", borderRadius: "16px" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Agregar Nota</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)} className="text-sm rounded-xl h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
+                      <option value="">Bimestre</option>
+                      {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)} className="rounded-xl text-sm h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
+                    <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="rounded-xl text-sm h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
                   </div>
-                </motion.div>
-              </SbModalBody>
-            </>
-          )}
-        </SbModal>
+                  <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
+                    className="w-full mt-3 h-10 rounded-xl text-sm font-bold disabled:opacity-30 transition-all hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
+                    Agregar
+                  </button>
+                </div>
+              </div>
 
-        {/* ===== REGISTER DIALOG ===== */}
-        <SbModal open={registerOpen} onClose={() => setRegisterOpen(false)} maxWidth="400px">
-          <SbModalHeader title="Registrar calificacion" onClose={() => setRegisterOpen(false)} />
-          <SbModalBody>
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <div>
-                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</label>
-                <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }}
-                  className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                  {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
-                </select>
+              {/* Close */}
+              <div className="sticky bottom-0 px-6 py-4" style={{ background: "var(--note-surface)", borderTop: "1px solid var(--note-hairline)" }}>
+                <button onClick={() => setDetailOpen(false)} className="w-full h-10 rounded-xl text-sm font-semibold transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>Cerrar</button>
               </div>
-              <div>
-                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</label>
-                <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)}
-                  className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                  <option value="">{registerStudents.length > 0 ? "Seleccionar alumno..." : "Cargando alumnos..."}</option>
-                  {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Bimestre</label>
-                <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                  <option value="">Seleccionar bimestre...</option>
-                  {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[15px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Nota (0-{MAX_SCORE})</label>
-                <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)}
-                  className="rounded-xl text-sm h-10 w-full px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-              </div>
-            </motion.div>
-          </SbModalBody>
-          <SbModalFooter>
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <button className="h-10 px-5 text-sm font-semibold rounded-lg transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
-              <button className="h-10 px-5 text-sm font-bold rounded-lg transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
-                {saving ? "Guardando..." : "Guardar"}
-              </button>
             </div>
-          </SbModalFooter>
-        </SbModal>
+          </div>
+        )}
+
+        {/* REGISTER DIALOG */}
+        {registerOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setRegisterOpen(false)}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <div className="relative w-full max-w-[420px]" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
+              <div className="px-6 pt-6 pb-4">
+                <h3 className="text-lg font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Registrar calificación</h3>
+                <p className="text-[11px] mt-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Completa los datos para registrar una nota</p>
+              </div>
+              <div className="px-6 space-y-4 pb-2">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</label>
+                  <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
+                    {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</label>
+                  <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
+                    <option value="">{registerStudents.length > 0 ? "Seleccionar alumno..." : "Cargando alumnos..."}</option>
+                    {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Bimestre</label>
+                  <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
+                    <option value="">Seleccionar bimestre...</option>
+                    {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Nota (0-{MAX_SCORE})</label>
+                  <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)} className="rounded-xl text-sm h-10 w-full px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
+                </div>
+              </div>
+              <div className="px-6 py-4 flex items-center gap-2" style={{ borderTop: "1px solid var(--note-hairline)" }}>
+                <button className="flex-1 h-10 text-sm font-semibold rounded-xl transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
+                <button className="flex-1 h-10 text-sm font-bold rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+                  {saving ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-/* ===== LIBRO DE NOTAS (matriz por bimestres) ===== */
-function TablaNotas({
-  students,
-  courseId,
-  maxScore,
-  savingCell,
-  saveError,
-  onSaveCell,
-}: {
-  students: Student[]
-  courseId: string
-  maxScore: number
-  savingCell: string | null
-  saveError: string | null
-  onSaveCell: (studentId: string, period: string, rawValue: string) => void
+/* TABLE VIEW */
+function TablaNotas({ students, courseId, maxScore, savingCell, saveError, onSaveCell }: {
+  students: Student[]; courseId: string; maxScore: number; savingCell: string | null; saveError: string | null; onSaveCell: (studentId: string, period: string, rawValue: string) => void
 }) {
   const [drafts, setDrafts] = React.useState<Record<string, string>>({})
-
-  const approvedCount = students.filter(s => {
-    const avg = calcAverage(s.grades)
-    return avg >= 11
-  }).length
-  const disapprovedCount = students.filter(s => {
-    const avg = calcAverage(s.grades)
-    return avg > 0 && avg < 11
-  }).length
+  const approvedCount = students.filter(s => calcAverage(s.grades) >= 11 && calcAverage(s.grades) > 0).length
+  const disapprovedCount = students.filter(s => { const a = calcAverage(s.grades); return a > 0 && a < 11 }).length
   const noGradeCount = students.filter(s => s.grades.length === 0).length
-
   const gradeFor = (s: Student, period: string) => s.grades.find(g => g.period === period)
-
   const cellKey = (studentId: string, period: string) => `${studentId}:${period}`
-
-  const commit = (studentId: string, period: string) => {
-    const key = cellKey(studentId, period)
-    const value = drafts[key]
-    if (value === undefined) return
-    onSaveCell(studentId, period, value)
-  }
-
-  const avgClass = (avg: number) => avg === 0 ? "text-[var(--note-muted)] opacity-40" : avg >= 11 ? "text-[var(--note-text)]" : "text-[var(--note-muted)]"
+  const commit = (studentId: string, period: string) => { const key = cellKey(studentId, period); const value = drafts[key]; if (value === undefined) return; onSaveCell(studentId, period, value) }
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
-      {saveError && (
-        <div className="px-5 pt-4">
-          <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div>
-        </div>
-      )}
+    <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
+      {saveError && <div className="px-5 pt-4"><div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div></div>}
       <div className="px-5 pt-5 pb-4" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Libro de notas</p>
-            <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribe la nota (0-{maxScore}) y presiona Enter o haz clic fuera para guardar</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Libro de notas</p>
+            <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribe la nota (0-{maxScore}) y presiona Enter para guardar</p>
           </div>
           <div className="flex items-center gap-3 text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" /> {approvedCount} Aprobados</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400" /> {disapprovedCount} Desaprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-text)" }} /> {approvedCount} Aprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-muted)", opacity: 0.4 }} /> {disapprovedCount} Desaprobados</span>
             <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-fill-strong)" }} /> {noGradeCount} Sin nota</span>
           </div>
         </div>
       </div>
-
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr style={{ background: "var(--note-fill-strong)" }}>
+            <tr style={{ background: "var(--note-fill)" }}>
               <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</th>
-              {PERIODS.map(p => (
-                <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-                  B{p.split(" ")[1]}
-                </th>
-              ))}
+              {PERIODS.map(p => <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>B{p.split(" ")[1]}</th>)}
               <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</th>
             </tr>
           </thead>
           <tbody>
             {students.map((s, i) => {
               const avg = calcAverage(s.grades)
-              const isLast = i === students.length - 1
               return (
-                <tr key={s.id} className="transition-colors" style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-                >
+                <tr key={s.id} className="transition-colors" style={{ borderBottom: i < students.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
@@ -764,39 +556,22 @@ function TablaNotas({
                     </div>
                   </td>
                   {PERIODS.map(p => {
-                    const g = gradeFor(s, p)
-                    const key = cellKey(s.id, p)
-                    const value = drafts[key] !== undefined ? drafts[key] : g ? String(g.score) : ""
-                    const isSaving = savingCell === key
-                    const color = g ? (g.score >= 11 ? "text-emerald-600" : "text-red-500") : "text-[var(--note-muted)] opacity-50"
+                    const g = gradeFor(s, p); const key = cellKey(s.id, p); const value = drafts[key] !== undefined ? drafts[key] : g ? String(g.score) : ""; const isSaving = savingCell === key
                     return (
                       <td key={p} className="px-3 py-2 text-center">
                         <div className="relative inline-block">
-                          <input
-                            type="number"
-                            min={0}
-                            max={maxScore}
-                            step="0.5"
-                            value={value}
-                            placeholder="—"
+                          <input type="number" min={0} max={maxScore} step="0.5" value={value} placeholder="—"
                             onChange={e => setDrafts(prev => ({ ...prev, [key]: e.target.value }))}
-                            onBlur={() => commit(s.id, p)}
-                            onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
-                            className={`w-14 h-9 rounded-xl text-center text-sm font-semibold focus:outline-none focus:ring-2 transition-all ${color}`}
-                            style={{ background: "var(--note-fill-strong)", "--tw-ring-color": "var(--note-muted)" } as any}
-                          />
-                          {isSaving && (
-                            <span className="absolute -top-1 -right-1 h-2.5 w-2.5">
-                              <span className="absolute inset-0 rounded-full animate-ping" style={{ background: "var(--note-muted)", opacity: 0.3 }} />
-                              <span className="absolute inset-0 rounded-full" style={{ background: "var(--note-text)" }} />
-                            </span>
-                          )}
+                            onBlur={() => commit(s.id, p)} onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
+                            className="w-14 h-9 rounded-xl text-center text-sm font-semibold focus:outline-none focus:ring-2 transition-all"
+                            style={{ background: "var(--note-fill-strong)", color: g ? (g.score >= 11 ? "var(--note-text)" : "var(--note-muted)") : "var(--note-muted)", opacity: g ? 1 : 0.5, fontFamily: FONT } as any} />
+                          {isSaving && <span className="absolute -top-1 -right-1 h-2.5 w-2.5"><span className="absolute inset-0 rounded-full animate-ping" style={{ background: "var(--note-muted)", opacity: 0.3 }} /><span className="absolute inset-0 rounded-full" style={{ background: "var(--note-text)" }} /></span>}
                         </div>
                       </td>
                     )
                   })}
                   <td className="px-4 py-2 text-center">
-                    <span className={`text-base font-bold ${avgClass(avg)}`}>{avg === 0 ? "—" : avg.toFixed(1)}</span>
+                    <span className="text-base font-bold" style={{ color: avg === 0 ? "var(--note-muted)" : "var(--note-text)", opacity: avg === 0 ? 0.3 : 1, fontFamily: FONT }}>{avg === 0 ? "—" : avg.toFixed(1)}</span>
                   </td>
                 </tr>
               )

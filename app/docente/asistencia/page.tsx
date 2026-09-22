@@ -9,16 +9,15 @@ import { useAuthStore } from "@/stores/auth-store"
 import { useTheme } from "next-themes"
 
 const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
-
 type Tab = "personal" | "alumnos"
 type StudentStatus = "present" | "late" | "absent" | "justified" | null
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
-  present:    { label: "A tiempo",   dot: "var(--note-text)" },
-  late:       { label: "Tardanza",   dot: "var(--note-muted)" },
-  absent:     { label: "Ausente",    dot: "var(--note-muted)" },
-  justified:  { label: "Justificado",dot: "var(--note-text)" },
-  early_leave:{ label: "Salida anticipada", dot: "var(--note-muted)" },
+  present: { label: "A tiempo", dot: "var(--note-text)" },
+  late: { label: "Tardanza", dot: "var(--note-muted)" },
+  absent: { label: "Ausente", dot: "var(--note-muted)" },
+  justified: { label: "Justificado", dot: "var(--note-text)" },
+  early_leave: { label: "Salida anticipada", dot: "var(--note-muted)" },
 }
 
 function getLocalDateStr(d = new Date()) {
@@ -47,28 +46,8 @@ function getWeekDays(history: any[]) {
   return days
 }
 
-/* ═══ SHARED COMPONENTS ═══ */
-function Card({ children, className = "", style, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={className} style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)", ...style }} {...props}>
-      {children}
-    </div>
-  )
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{children}</p>
-}
-
-function StatusDot({ color }: { color: string }) {
-  return <span className="h-1.5 w-1.5 rounded-full inline-block" style={{ background: color }} />
-}
-
-/* ═══ MAIN PAGE ═══ */
 export default function AsistenciaPage() {
-  return (
-    <React.Suspense fallback={null}><AsistenciaInner /></React.Suspense>
-  )
+  return <React.Suspense fallback={null}><AsistenciaInner /></React.Suspense>
 }
 
 function AsistenciaInner() {
@@ -87,7 +66,7 @@ function AsistenciaInner() {
     <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
       <div className="p-6 md:p-8 pb-24 md:pb-8">
 
-        {/* ═══ HEADER ═══ */}
+        {/* HEADER */}
         <header className="flex items-start justify-between mb-6 gap-4">
           <div>
             <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Control</p>
@@ -104,25 +83,19 @@ function AsistenciaInner() {
               </div>
             )}
             <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Cambiar tema" title="Cambiar tema" className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
+            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
               <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
               <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
             </button>
           </div>
         </header>
 
-        {/* ═══ TABS ═══ */}
+        {/* TABS */}
         <div className="flex mb-6 p-1" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className="flex-1 h-11 text-[13px] font-semibold flex items-center justify-center transition-all duration-200"
-              style={{
-                borderRadius: "12px",
-                background: tab === t.key ? "var(--note-surface)" : "transparent",
-                color: tab === t.key ? "var(--note-text)" : "var(--note-muted)",
-                boxShadow: tab === t.key ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
-                fontFamily: FONT,
-              }}>
+              style={{ borderRadius: "12px", background: tab === t.key ? "var(--note-surface)" : "transparent", color: tab === t.key ? "var(--note-text)" : "var(--note-muted)", boxShadow: tab === t.key ? "0 1px 3px rgba(0,0,0,0.06)" : "none", fontFamily: FONT }}>
               {t.label}
             </button>
           ))}
@@ -134,7 +107,7 @@ function AsistenciaInner() {
   )
 }
 
-/* ═══ MI ASISTENCIA ═══ */
+/* MI ASISTENCIA */
 function MiAsistencia() {
   const [attendance, setAttendance] = React.useState<any>(null)
   const [schedule, setSchedule] = React.useState<any>(null)
@@ -167,10 +140,7 @@ function MiAsistencia() {
       const now = new Date()
       const localTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
       const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-      const res = await fetch("/api/docente/attendance", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, date: targetDate || localDate, time: localTime }),
-      })
+      const res = await fetch("/api/docente/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, date: targetDate || localDate, time: localTime }) })
       const data = await res.json()
       if (data.success) { setAttendance(data.attendance); if (data.schedule) setSchedule(data.schedule); setPendingCheckout(null) }
       else if (res.status === 409 && data.pendingCheckout) setPendingCheckout(data.pendingCheckout)
@@ -180,8 +150,8 @@ function MiAsistencia() {
 
   if (loading) return (
     <div className="space-y-4">
-      <div className="h-40 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
-      <div className="h-24 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
+      <div className="h-48 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
+      <div className="h-28 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
     </div>
   )
 
@@ -189,43 +159,58 @@ function MiAsistencia() {
   const s = attendance?.status ? STATUS_CONFIG[attendance.status] : null
   const weekDays = getWeekDays(history)
   const hasPending = !!pendingCheckout
+  const workedMinutes = checkedIn && checkedOut ? Math.round((new Date(`2000-01-01T${checkedOut}`).getTime() - new Date(`2000-01-01T${checkedIn}`).getTime()) / 60000) : null
 
   return (
     <div className="space-y-4">
 
-      {/* Jornada de hoy */}
-      <Card>
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-5">
+      {/* JORNADA DE HOY */}
+      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
                 {new Date().toLocaleDateString("es-PE", { weekday: "long" })}
               </p>
-              <p className="text-lg font-bold mt-0.5 capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+              <p className="text-xl font-bold mt-0.5 capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>
                 {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "long" })}
               </p>
             </div>
             {s && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium" style={{ borderRadius: "12px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-                <StatusDot color={s.dot} />{s.label}
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.dot }} />{s.label}
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            {[{ label: "Entrada", icon: LogIn, time: checkedIn?.slice(0, 5), sched: schedule?.start_time },
-              { label: "Salida", icon: LogOut, time: checkedOut?.slice(0, 5), sched: schedule?.end_time }].map(item => (
-              <div key={item.label} style={{ borderRadius: "16px", background: "var(--note-fill)", padding: "16px" }}>
+          {/* Timeline visual */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {[{ label: "Entrada", icon: LogIn, time: checkedIn?.slice(0, 5), sched: schedule?.start_time, active: !!checkedIn },
+              { label: "Salida", icon: LogOut, time: checkedOut?.slice(0, 5), sched: schedule?.end_time, active: !!checkedOut }].map(item => (
+              <div key={item.label} className="p-4" style={{ borderRadius: "16px", background: item.active ? "var(--note-fill-strong)" : "var(--note-fill)" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <item.icon className="h-3.5 w-3.5" style={{ color: item.time ? "var(--note-text)" : "var(--note-muted)", opacity: item.time ? 1 : 0.4 }} />
+                  <div className="h-8 w-8 rounded-xl flex items-center justify-center" style={{ background: item.active ? "var(--note-text)" : "var(--note-fill-strong)" }}>
+                    <item.icon className="h-4 w-4" style={{ color: item.active ? "var(--note-surface)" : "var(--note-muted)", opacity: item.active ? 1 : 0.4 }} />
+                  </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{item.label}</span>
                 </div>
-                <p className="text-3xl font-bold" style={{ color: item.time ? "var(--note-text)" : "var(--note-muted)", opacity: item.time ? 1 : 0.3, fontFamily: FONT }}>{item.time || "—:——"}</p>
+                <p className="text-3xl font-bold tabular-nums" style={{ color: item.time ? "var(--note-text)" : "var(--note-muted)", opacity: item.time ? 1 : 0.25, fontFamily: FONT }}>{item.time || "—:——"}</p>
                 {item.sched && <p className="text-[10px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Programado {item.sched}</p>}
               </div>
             ))}
           </div>
 
+          {/* Work summary */}
+          {workedMinutes !== null && (
+            <div className="flex items-center gap-3 mb-5 px-4 py-3" style={{ borderRadius: "12px", background: "var(--note-fill)" }}>
+              <Clock className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+              <span className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
+                Jornada: {Math.floor(workedMinutes / 60)}h {workedMinutes % 60}min
+              </span>
+            </div>
+          )}
+
+          {/* Action buttons */}
           {hasPending && (
             <div className="space-y-2">
               <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Salida pendiente del {safeFormatDate(pendingCheckout.date)}</p>
@@ -258,31 +243,32 @@ function MiAsistencia() {
               <Check className="h-4 w-4" />Jornada completada
             </div>
           )}
-        </div>
-        {scheduleError && (
-          <div className="mx-5 mb-4 p-3 flex items-center gap-3" style={{ borderRadius: "14px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
-            <Clock className="h-4 w-4 shrink-0" style={{ color: "var(--note-muted)" }} />
-            <p className="text-[13px] font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{scheduleError}</p>
-          </div>
-        )}
-      </Card>
 
-      {/* Semana */}
-      <Card>
+          {scheduleError && (
+            <div className="mt-3 p-3 flex items-center gap-3" style={{ borderRadius: "12px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
+              <Clock className="h-4 w-4 shrink-0" style={{ color: "var(--note-muted)" }} />
+              <p className="text-[13px] font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{scheduleError}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SEMANA */}
+      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
+        <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
+          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Esta semana</span>
+          <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{history.length} registros</span>
+        </div>
         <div className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Semana</span>
-            <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{history.length} registros</span>
-          </div>
           <div className="flex items-end justify-between gap-2">
-            {weekDays.map((d) => {
+            {weekDays.map(d => {
               const isToday = getLocalDateStr() === d.iso
               const hasData = !!d.status
               return (
                 <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full aspect-square max-w-[40px] flex items-center justify-center"
-                    style={{ borderRadius: "12px", background: hasData ? "var(--note-fill-strong)" : "var(--note-fill)", border: isToday ? "1.5px solid var(--note-text)" : "1px solid var(--note-hairline)" }}>
-                    {hasData && <span className="text-[10px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}</span>}
+                  <div className="w-full aspect-square max-w-[42px] flex items-center justify-center transition-all duration-200"
+                    style={{ borderRadius: "14px", background: hasData ? "var(--note-fill-strong)" : "var(--note-fill)", border: isToday ? "2px solid var(--note-text)" : "1px solid var(--note-hairline)" }}>
+                    {hasData && <span className="text-[11px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}</span>}
                   </div>
                   <div className="flex flex-col items-center">
                     <span className="text-[9px] font-semibold uppercase" style={{ color: isToday ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>{d.label}</span>
@@ -293,25 +279,29 @@ function MiAsistencia() {
             })}
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Historial */}
-      <Card>
+      {/* HISTORIAL */}
+      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
         <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial reciente</span>
           <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{history.length} registros</span>
         </div>
         {history.length === 0 ? (
           <div className="py-16 text-center">
-            <Calendar className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+            <Calendar className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
             <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin registros aún</p>
           </div>
         ) : (
           <div>
             {history.slice(0, 7).map((h: any, i: number) => {
               const isLast = i === Math.min(history.length, 7) - 1
+              const statusCfg = STATUS_CONFIG[h.status]
               return (
-                <div key={h.id || i} className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}>
+                <div key={h.id || i} className="flex items-center justify-between px-5 py-3.5 transition-colors"
+                  style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 flex items-center justify-center shrink-0" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
                       <Calendar className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
@@ -325,19 +315,19 @@ function MiAsistencia() {
                     </div>
                   </div>
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-                    <StatusDot color={STATUS_CONFIG[h.status]?.dot || "var(--note-text)"} />{STATUS_CONFIG[h.status]?.label || "A tiempo"}
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusCfg?.dot || "var(--note-text)" }} />{statusCfg?.label || "A tiempo"}
                   </span>
                 </div>
               )
             })}
           </div>
         )}
-      </Card>
+      </div>
     </div>
   )
 }
 
-/* ═══ PORTAL SELECT ═══ */
+/* PORTAL SELECT */
 function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
   value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; placeholder: string; icon?: React.ElementType
 }) {
@@ -371,7 +361,7 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
               return (
                 <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setOpen(false) }}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors"
-                  style={{ background: isSelected ? "var(--note-fill)" : "transparent", color: isSelected ? "var(--note-text)" : "var(--note-text)", fontFamily: FONT }}>
+                  style={{ background: isSelected ? "var(--note-fill)" : "transparent", color: "var(--note-text)", fontFamily: FONT }}>
                   <span className="flex-1">{opt.label}</span>
                   {isSelected && <Check className="h-4 w-4" style={{ color: "var(--note-text)" }} />}
                 </button>
@@ -384,7 +374,7 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
   )
 }
 
-/* ═══ DATE PICKER ═══ */
+/* DATE PICKER */
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
 const MonthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
@@ -457,7 +447,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   )
 }
 
-/* ═══ ASISTENCIA ALUMNOS ═══ */
+/* ASISTENCIA ALUMNOS */
 function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const [courses, setCourses] = React.useState<any[]>([])
   const [selectedCourse, setSelectedCourse] = React.useState(prefillCourse)
@@ -507,15 +497,15 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
   return (
     <div className="space-y-3">
-      {/* Selector */}
-      <Card>
+      {/* SELECTOR */}
+      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
         <div className="p-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-10 w-10 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
               <Users className="h-5 w-5" style={{ color: "var(--note-muted)" }} />
             </div>
             <div>
-              <SectionLabel>Seleccionar curso y fecha</SectionLabel>
+              <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Seleccionar curso y fecha</p>
               <p className="text-[10px] mt-0.5" style={{ color: "var(--note-muted)", opacity: 0.6, fontFamily: FONT }}>Elige el curso y la fecha para registrar asistencia</p>
             </div>
           </div>
@@ -530,16 +520,16 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               <DatePickerDropdown date={date} onSelect={setDate} />
             </div>
             <button onClick={handleCargar} disabled={loading || !selectedCourse}
-              className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30"
+              className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.98]"
               style={{ borderRadius: "12px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
               {loading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Search className="h-4 w-4" />}
               Cargar
             </button>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* View toggle */}
+      {/* VIEW TOGGLE */}
       {selectedCourse && (
         <div className="flex p-1" style={{ borderRadius: "12px", background: "var(--note-fill)" }}>
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
@@ -552,9 +542,9 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
         </div>
       )}
 
-      {/* Stats Table */}
+      {/* STATS TABLE */}
       {alumnoView === "estadisticas" && selectedCourse && (
-        <Card>
+        <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
           <div className="px-5 pt-5 pb-3" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
@@ -582,14 +572,16 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                 <tbody>
                   {stats.length === 0 ? (
                     <tr><td colSpan={7} className="py-16 text-center">
-                      <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+                      <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
                       <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin registros</p>
                     </td></tr>
                   ) : stats.map((s, i) => (
-                    <tr key={s.id} style={{ borderBottom: i < stats.length - 1 ? "1px solid var(--note-hairline)" : "none" }}>
+                    <tr key={s.id} className="transition-colors" style={{ borderBottom: i < stats.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+                          <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
                             <span className="text-[9px] font-bold" style={{ color: "var(--note-text)" }}>{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                           </div>
                           <div className="min-w-0">
@@ -606,7 +598,7 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 justify-end">
                           <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
-                            <div className="h-full rounded-full" style={{ width: `${s.rate}%`, background: "var(--note-text)", opacity: s.rate >= 80 ? 0.9 : 0.5 }} />
+                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.rate}%`, background: "var(--note-text)", opacity: s.rate >= 80 ? 0.9 : 0.5 }} />
                           </div>
                           <span className="text-xs font-bold w-9 text-right" style={{ color: "var(--note-text)", opacity: s.rate >= 80 ? 1 : 0.6, fontFamily: FONT }}>{s.rate}%</span>
                         </div>
@@ -617,32 +609,34 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
               </table>
             </div>
           )}
-        </Card>
+        </div>
       )}
 
-      {/* Registro */}
+      {/* REGISTRO */}
       {loaded && students.length > 0 && alumnoView === "registro" && (
         <>
+          {/* Summary cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {summary.map(item => {
               const Icon = item.icon
               return (
-                <div key={item.label} className="p-4" style={{ background: "var(--note-surface)", borderRadius: "16px", border: "1px solid var(--note-hairline)" }}>
+                <div key={item.label} className="p-4 transition-all duration-300 hover:scale-[1.02]" style={{ background: "var(--note-surface)", borderRadius: "20px", border: "1px solid var(--note-hairline)" }}>
                   <div className="h-8 w-8 flex items-center justify-center mb-2" style={{ background: "var(--note-fill)", borderRadius: "10px" }}>
                     <Icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
                   </div>
-                  <SectionLabel>{item.label}</SectionLabel>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{item.label}</p>
                   <p className="mt-1.5 text-lg font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>{item.value}</p>
                 </div>
               )
             })}
           </div>
 
-          <Card>
+          {/* Student list */}
+          <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
             <div className="px-5 pt-4 pb-3">
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
-                  <SectionLabel>Lista de alumnos</SectionLabel>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Lista de alumnos</p>
                   <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{filtered.length} de {students.length} alumnos</p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -674,10 +668,12 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
             <div style={{ borderTop: "1px solid var(--note-hairline)" }}>
               {filtered.map((s, i) => (
-                <div key={s.id} className="flex items-center justify-between gap-3 px-5 py-3 transition-colors"
-                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--note-hairline)" : "none", background: s.status ? "var(--note-fill)" : "transparent" }}>
+                <div key={s.id} className="flex items-center justify-between gap-3 px-5 py-3 transition-all duration-200"
+                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--note-hairline)" : "none", background: s.status ? "var(--note-fill)" : "transparent" }}
+                  onMouseEnter={e => { if (!s.status) e.currentTarget.style.background = "var(--note-fill)" }}
+                  onMouseLeave={e => { if (!s.status) e.currentTarget.style.background = "transparent" }}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
+                    <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
                       <span className="text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
@@ -688,8 +684,8 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                   <div className="flex gap-1.5 shrink-0">
                     {statusChips.map(chip => (
                       <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
-                        className="h-8 px-3 rounded-xl text-[11px] font-bold transition-all flex items-center gap-1"
-                        style={{ borderRadius: "10px", background: s.status === chip.status ? "var(--note-fill-strong)" : "var(--note-fill)", color: s.status === chip.status ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
+                        className="h-8 px-3 rounded-xl text-[11px] font-bold transition-all duration-200 flex items-center gap-1"
+                        style={{ background: s.status === chip.status ? "var(--note-fill-strong)" : "var(--note-fill)", color: s.status === chip.status ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
                         {chip.label}{s.status === chip.status && <Check className="h-3 w-3" />}
                       </button>
                     ))}
@@ -697,8 +693,9 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
 
+          {/* Save bar */}
           <div className="flex items-center gap-4 sticky bottom-4 backdrop-blur-xl p-4" style={{ borderRadius: "20px", border: "1px solid var(--note-hairline)", background: "var(--note-surface)" }}>
             <div className="flex-1 space-y-1.5">
               <p className="text-sm font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{marked} de {students.length} marcados</p>
@@ -716,17 +713,17 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
       )}
 
       {loaded && students.length === 0 && (
-        <Card className="py-16 text-center">
-          <UserX className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+        <div className="py-16 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
+          <UserX className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
           <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>No hay alumnos en este curso</p>
-        </Card>
+        </div>
       )}
 
       {!loaded && courses.length === 0 && (
-        <Card className="py-16 text-center">
-          <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.3 }} />
+        <div className="py-16 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
+          <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
           <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin cursos asignados</p>
-        </Card>
+        </div>
       )}
     </div>
   )
