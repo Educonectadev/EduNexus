@@ -30,6 +30,9 @@ export default function LoginPadrePage() {
       if (result.user.role !== "padre") {
         setError("Esta cuenta no es de padre. Usa el login general."); setLoading(false); return
       }
+      if (result.token) {
+        try { localStorage.setItem("edu_token", result.token) } catch {}
+      }
       router.push("/padre/dashboard")
     } catch { setError("Error de conexión"); setLoading(false) }
   }

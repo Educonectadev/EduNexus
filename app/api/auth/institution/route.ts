@@ -23,7 +23,8 @@ async function effectiveTrialEnds(inst: any): Promise<string | null> {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
     if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
@@ -71,7 +72,8 @@ export async function PATCH(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
     if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')

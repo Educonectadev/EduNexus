@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 import crypto from 'crypto'
+import { extractToken } from '@/lib/resolveInstId'
 
 // Autenticado: crea una solicitud de contratación tras vencer el trial.
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    const token = extractToken(request)
     if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')

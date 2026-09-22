@@ -4,7 +4,8 @@ import pool from '@/lib/db'
 
 export async function GET(req: Request) {
   try {
-    const token = req.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    const authHeader = req.headers.get('authorization')
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : req.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
 
     if (!token) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 })

@@ -9,6 +9,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
+import { authFetch } from "@/lib/auth-fetch"
 import { Logo } from "@/components/ui/logo"
 import {
   LayoutDashboard, Building2, Users, CreditCard, Settings, Shield,
@@ -279,7 +280,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   React.useEffect(() => {
     const getUser = async () => {
       try {
-        const res = await fetch("/api/auth/me")
+        const res = await authFetch("/api/auth/me")
         if (!res.ok) { router.push("/login"); return }
         const data = await res.json()
         setUser({
@@ -291,7 +292,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         setInstitutionId(data.user.institutionId)
 
         if (data.user.role !== "super_admin" && data.user.institutionId) {
-          const instRes = await fetch("/api/auth/institution")
+          const instRes = await authFetch("/api/auth/institution")
           if (instRes.ok) {
             const inst = await instRes.json()
             if (inst.trial?.isExpired) setTrialExpired(true)
@@ -328,7 +329,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" })
+    await authFetch("/api/auth/logout", { method: "POST" })
     logout()
     router.push("/login")
   }

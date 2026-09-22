@@ -96,17 +96,10 @@ export async function POST(req: NextRequest) {
     const userId = (userRows as any[])[0]?.id
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const response = NextResponse.json({
-      message: 'Institución creada exitosamente',
-      institutionCode: code,
-      institutionId,
-      mode: isDemo ? 'demo' : 'free',
-      trialDays: isDemo ? 15 : 20,
-      redirectTo: '/director/dashboard',
-    })
+    let token: string | null = null
 
     if (userId) {
-      const token = await new SignJWT({
+      token = await new SignJWT({
         userId,
         email,
         role: 'director',
@@ -124,6 +117,11 @@ export async function POST(req: NextRequest) {
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
       })
+    }
+
+    if (token) {
+      const body = await response.json()
+      return NextResponse.json({ ...body, token }, { status: 200 })
     }
 
     return response

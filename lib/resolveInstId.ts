@@ -2,8 +2,14 @@ import { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 
+export function extractToken(request: NextRequest): string | null {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader?.startsWith('Bearer ')) return authHeader.slice(7)
+  return request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1] || null
+}
+
 export async function getAuthPayload(request: NextRequest): Promise<Record<string, any> | null> {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+  const token = extractToken(request)
   if (!token) return null
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')

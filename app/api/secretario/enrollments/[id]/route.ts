@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 import crypto from 'crypto'
-import { resolveInstId, getAuthPayload } from '@/lib/resolveInstId'
+import { resolveInstId, getAuthPayload, extractToken } from '@/lib/resolveInstId'
 import { logAudit } from '@/lib/audit'
 
 async function getAuthUser(request: NextRequest) {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+  const token = extractToken(request)
   if (!token) return null
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')

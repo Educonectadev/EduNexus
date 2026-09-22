@@ -1,6 +1,20 @@
 import { create } from 'zustand'
 import { User, UserRole } from '@/types'
 
+const TOKEN_KEY = 'edu_token'
+
+export function getAuthToken(): string | null {
+  try { return localStorage.getItem(TOKEN_KEY) } catch { return null }
+}
+
+export function setAuthToken(token: string) {
+  try { localStorage.setItem(TOKEN_KEY, token) } catch {}
+}
+
+export function clearAuthToken() {
+  try { localStorage.removeItem(TOKEN_KEY) } catch {}
+}
+
 interface AuthState {
   user: User | null
   role: UserRole | null
@@ -22,5 +36,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   setRole: (role) => set({ role }),
   setInstitutionId: (institutionId) => set({ institutionId }),
   setIsLoading: (isLoading) => set({ isLoading }),
-  logout: () => set({ user: null, role: null, institutionId: null }),
+  logout: () => {
+    clearAuthToken()
+    set({ user: null, role: null, institutionId: null })
+  },
 }))

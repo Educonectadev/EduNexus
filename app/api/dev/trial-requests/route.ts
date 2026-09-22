@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
+import { extractToken } from '@/lib/resolveInstId'
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+    const token = extractToken(request)
     if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')

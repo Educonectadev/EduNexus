@@ -199,7 +199,8 @@ async function dumpInto(institutionId: string, studentsCount: number) {
 }
 
 export async function POST(request: NextRequest) {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+  const { extractToken } = await import('@/lib/resolveInstId')
+  const token = extractToken(request)
   if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
   try {
