@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { User, Mail, Calendar, Shield, Phone, Save, Key, Eye, EyeOff, Fingerprint, Building2, LogOut, Layers, Globe, Sparkles, Check } from "@/components/ui/proicons"
+import { User, Mail, Calendar, Shield, Phone, Save, Key, Eye, EyeOff, Fingerprint, Building2, LogOut, Layers, Globe, Sparkles, Check, Briefcase, Clock, BadgeCheck, GraduationCap, BookOpen, Hash } from "@/components/ui/proicons"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -11,6 +11,42 @@ import { DesignSelector } from "@/components/ui/design-selector"
 import { useDesign } from "@/contexts/design-context"
 
 type V = "classic" | "minimal"
+
+interface InstitutionInfo {
+  id: string
+  name: string | null
+  code: string | null
+  level: string
+  type: string
+  district: string
+  province: string
+  status: string
+  logo: string | null
+  plan: string | null
+}
+
+type ContractStatus = "vigente" | "vencido" | "pendiente" | "sin_fechas" | "sin_datos"
+
+interface ContractInfo {
+  type: string | null
+  start: string | null
+  end: string | null
+  status: ContractStatus
+  months: number
+}
+
+interface CourseInfo {
+  id: string
+  name: string
+  grade: string
+  section: string
+}
+
+interface TeachingInfo {
+  courses: CourseInfo[]
+  grades: string[]
+  sections: string[]
+}
 
 interface UserProfile {
   id: string
@@ -21,6 +57,15 @@ interface UserProfile {
   institutionId: string | null
   phone?: string
   createdAt?: string
+  dni?: string
+  status?: string
+  lastLogin?: string | null
+  subject?: string
+  gradeLevel?: string
+  specialization?: string
+  institution?: InstitutionInfo | null
+  contract?: ContractInfo | null
+  teaching?: TeachingInfo | null
 }
 
 interface ThemeOption {
@@ -43,6 +88,37 @@ const PERFIL_DESIGNS = [
 const roleLabels: Record<string, string> = {
   dev: "Developer", super_admin: "Super Admin", admin: "Administrador", director: "Director",
   secretario: "Secretario", docente: "Docente", padre: "Apoderado",
+}
+
+const fmtDate = (v?: string | null) => {
+  if (!v) return "—"
+  const d = new Date(v)
+  if (Number.isNaN(d.getTime())) return "—"
+  return d.toLocaleDateString("es-PE", { year: "numeric", month: "short", day: "numeric" })
+}
+
+const fmtDateTime = (v?: string | null) => {
+  if (!v) return "Nunca"
+  const d = new Date(v)
+  if (Number.isNaN(d.getTime())) return "—"
+  return `${d.toLocaleDateString("es-PE", { year: "numeric", month: "short", day: "numeric" })} · ${d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}`
+}
+
+const fmtAntiguedad = (months: number) => {
+  if (months <= 0) return "Menos de 1 mes"
+  const y = Math.floor(months / 12)
+  const m = months % 12
+  if (!y) return `${m} mes${m === 1 ? "" : "es"}`
+  if (!m) return `${y} año${y === 1 ? "" : "s"}`
+  return `${y} año${y === 1 ? "" : "s"} y ${m} mes${m === 1 ? "" : "es"}`
+}
+
+const CONTRACT_BADGES: Record<ContractStatus, { label: string; cls: string }> = {
+  vigente: { label: "Vigente", cls: "bg-emerald-500/10 text-emerald-500" },
+  vencido: { label: "Vencido", cls: "bg-red-500/10 text-red-500" },
+  pendiente: { label: "Por iniciar", cls: "bg-amber-500/10 text-amber-500" },
+  sin_fechas: { label: "Sin fechas", cls: "bg-sb-surface-container-high text-sb-on-surface-variant/60" },
+  sin_datos: { label: "Sin contrato", cls: "bg-sb-surface-container-high text-sb-on-surface-variant/60" },
 }
 
 const spring = { type: "spring", stiffness: 400, damping: 32, mass: 0.7 } as const
@@ -221,6 +297,7 @@ function InfoSection({ v, d, className, delay }: { v: V; d: PerfilData; classNam
           {[
             { icon: Mail, k: "Email", val: d.profile?.email },
             { icon: Phone, k: "Teléfono", val: d.profile?.phone || "—" },
+            { icon: Hash, k: "DNI", val: d.profile?.dni || "—" },
             { icon: Calendar, k: "Miembro desde", val: d.profile?.createdAt ? new Date(d.profile.createdAt).toLocaleDateString("es-PE") : "—" },
             { icon: Shield, k: "ID", val: d.profile?.id?.slice(0, 16), mono: true },
           ].map(({ icon: Icon, k, val, mono }) => (
@@ -236,7 +313,7 @@ function InfoSection({ v, d, className, delay }: { v: V; d: PerfilData; classNam
               <div className="sm:w-28 sm:shrink-0">
                 <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Institución</dt>
               </div>
-              <dd className="flex-1 truncate text-sm">{d.profile.institutionId}</dd>
+              <dd className="flex-1 truncate text-sm">{d.profile.institution?.name || d.profile.institutionId}</dd>
             </div>
           )}
         </dl>
@@ -245,6 +322,7 @@ function InfoSection({ v, d, className, delay }: { v: V; d: PerfilData; classNam
           {[
             { icon: Mail, k: "Email", v: d.profile?.email },
             { icon: Phone, k: "Teléfono", v: d.profile?.phone || "—" },
+            { icon: Hash, k: "DNI", v: d.profile?.dni || "—" },
             { icon: Calendar, k: "Miembro desde", v: d.profile?.createdAt ? new Date(d.profile.createdAt).toLocaleDateString("es-PE") : "—" },
             { icon: Shield, k: "ID", v: d.profile?.id?.slice(0, 16), mono: true },
           ].map(({ icon: Icon, k, v, mono }) => (
@@ -264,13 +342,227 @@ function InfoSection({ v, d, className, delay }: { v: V; d: PerfilData; classNam
                 <Building2 className="h-4 w-4 text-sb-on-surface-variant/50" />
               </div>
               <div className="min-w-0">
-                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Institución</dt>
-                <dd className="truncate text-sm">{d.profile.institutionId}</dd>
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Colegio</dt>
+                <dd className="truncate text-sm">
+                  {d.profile.institution?.name || d.profile.institutionId}
+                  {d.profile.institution?.code ? <span className="ml-1.5 font-mono text-xs text-sb-on-surface-variant/50">{d.profile.institution.code}</span> : null}
+                </dd>
               </div>
             </div>
           )}
         </dl>
       )}
+    </motion.section>
+  )
+}
+
+function SchoolContractSection({ v, d, className, delay, bare }: { v: V; d: PerfilData; className?: string; delay?: number; bare?: boolean }) {
+  const inst = d.profile?.institution
+  const c = d.profile?.contract
+  const badge = CONTRACT_BADGES[c?.status || "sin_datos"]
+  const rows: { icon: React.ComponentType<{ className?: string }>; k: string; val: string; mono?: boolean }[] = [
+    { icon: Building2, k: "Colegio", val: inst?.name || "Sin colegio asignado" },
+    { icon: Hash, k: "Código", val: inst?.code || "—", mono: true },
+    { icon: GraduationCap, k: "Nivel · Plan", val: [inst?.level, inst?.plan].filter(Boolean).join(" · ") || "—" },
+    { icon: Briefcase, k: "Tipo de contrato", val: c?.type || "—" },
+    { icon: Calendar, k: "Inicio", val: fmtDate(c?.start) },
+    {
+      icon: Calendar, k: "Fin",
+      val: c?.end ? fmtDate(c.end) : (c?.type && /indefinido|planilla/i.test(c.type) ? "Sin vencimiento" : "—"),
+    },
+    { icon: Clock, k: "Antigüedad", val: fmtAntiguedad(c?.months || 0) },
+  ]
+  const badgeEl = (
+    <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider", badge.cls)}>
+      {badge.label}
+    </span>
+  )
+  const body = (
+    <>
+      {bare && <div className="mb-4 flex justify-end">{badgeEl}</div>}
+      {v === "minimal" ? (
+        <dl className="divide-y divide-sb-outline-variant/20">
+          {rows.map(({ icon: Icon, k, val, mono }) => (
+            <div key={k} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex shrink-0 items-center gap-2 sm:w-32">
+                <Icon className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+              </div>
+              <dd className={cn("min-w-0 flex-1 truncate text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <dl className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+          {rows.map(({ icon: Icon, k, val, mono }) => (
+            <div key={k} className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high">
+                <Icon className="h-4 w-4 text-sb-on-surface-variant/50" />
+              </div>
+              <div className="min-w-0">
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+                <dd className={cn("truncate text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      )}
+    </>
+  )
+  if (bare) return body
+  return (
+    <motion.section {...fadeUp} transition={{ ...spring, delay }} className={cn(cardCls(v), className)}>
+      <SectionHeader
+        icon={Building2} v={v}
+        title="Colegio y contrato"
+        desc="Dónde estás contratado y tu tipo de vinculación"
+        action={badgeEl}
+      />
+      {body}
+    </motion.section>
+  )
+}
+
+function TeachingSection({ v, d, className, delay, bare }: { v: V; d: PerfilData; className?: string; delay?: number; bare?: boolean }) {
+  const p = d.profile
+  const t = p?.teaching
+  const courses = t?.courses || []
+  const meta: { icon: React.ComponentType<{ className?: string }>; k: string; val: string }[] = [
+    { icon: BookOpen, k: "Asignatura", val: p?.subject || "—" },
+    { icon: GraduationCap, k: "Grado / Nivel", val: p?.gradeLevel || "—" },
+    { icon: BadgeCheck, k: "Especialización", val: p?.specialization || "—" },
+  ]
+  const chipCls = "rounded-full bg-sb-surface-container-high px-2.5 py-1 text-xs font-medium text-sb-on-surface-variant"
+  const countEl = (
+    <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/50">
+      {courses.length} curso{courses.length === 1 ? "" : "s"}
+    </span>
+  )
+
+  const body = (
+    <>
+      {bare && <div className="mb-4 flex justify-end">{countEl}</div>}
+
+      <dl className={cn("mb-5", v === "minimal" ? "divide-y divide-sb-outline-variant/20" : "grid gap-x-6 gap-y-5 sm:grid-cols-3")}>
+        {meta.map(({ icon: Icon, k, val }) =>
+          v === "minimal" ? (
+            <div key={k} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex shrink-0 items-center gap-2 sm:w-32">
+                <Icon className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+              </div>
+              <dd className="min-w-0 flex-1 truncate text-sm">{val}</dd>
+            </div>
+          ) : (
+            <div key={k} className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sb-surface-container-high">
+                <Icon className="h-4 w-4 text-sb-on-surface-variant/50" />
+              </div>
+              <div className="min-w-0">
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+                <dd className="truncate text-sm">{val}</dd>
+              </div>
+            </div>
+          )
+        )}
+      </dl>
+
+      {(t?.grades?.length || t?.sections?.length) ? (
+        <div className="mb-4 space-y-2.5">
+          {!!t?.grades?.length && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Grados</span>
+              {t.grades.map(g => <span key={g} className={chipCls}>{g}</span>)}
+            </div>
+          )}
+          {!!t?.sections?.length && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">Secciones</span>
+              {t.sections.map(s => <span key={s} className={chipCls}>{s}</span>)}
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {courses.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-sb-outline-variant/40 px-4 py-6 text-center">
+          <p className="text-xs text-sb-on-surface-variant/60">Aún no tienes cursos asignados.</p>
+          <p className="mt-1 text-[11px] text-sb-on-surface-variant/40">Tu director puede asignarte cursos desde Horarios → Docentes.</p>
+        </div>
+      ) : (
+        <ul className="space-y-1.5">
+          {courses.slice(0, 12).map(c => (
+            <li key={c.id} className="flex items-center justify-between gap-3 rounded-xl bg-sb-surface-container-high px-3.5 py-2.5">
+              <span className="min-w-0 truncate text-sm text-sb-on-surface">{c.name || "Curso sin nombre"}</span>
+              <span className="shrink-0 rounded-full bg-sb-surface-container-highest px-2.5 py-1 font-mono text-[11px] text-sb-on-surface-variant">
+                {[c.grade, c.section].filter(Boolean).join(" · ") || "—"}
+              </span>
+            </li>
+          ))}
+          {courses.length > 12 && (
+            <li className="px-1 pt-1 text-[11px] text-sb-on-surface-variant/50">+{courses.length - 12} cursos más</li>
+          )}
+        </ul>
+      )}
+    </>
+  )
+  if (bare) return body
+  return (
+    <motion.section {...fadeUp} transition={{ ...spring, delay: delay ?? 0 }} className={cn(cardCls(v), className)}>
+      <SectionHeader
+        icon={BookOpen} v={v}
+        title="Lo que dicta"
+        desc="Asignaturas, grados y secciones a tu cargo"
+        action={countEl}
+      />
+      {body}
+    </motion.section>
+  )
+}
+
+function SystemSection({ v, d, className, delay, bare }: { v: V; d: PerfilData; className?: string; delay?: number; bare?: boolean }) {
+  const p = d.profile
+  const rows: { icon: React.ComponentType<{ className?: string }>; k: string; val: string; mono?: boolean }[] = [
+    { icon: Shield, k: "Rol", val: roleLabels[p?.role || ""] || p?.role || "—" },
+    { icon: BadgeCheck, k: "Cuenta", val: p?.status === "inactive" ? "Inactiva" : "Activa" },
+    { icon: Clock, k: "Último acceso", val: fmtDateTime(p?.lastLogin) },
+    { icon: Globe, k: "Entorno", val: "Web · EduNexus" },
+    { icon: Hash, k: "ID de cuenta", val: p?.id?.slice(0, 16) || "—", mono: true },
+  ]
+  const body = (
+    <>
+      {v === "minimal" ? (
+        <dl className="divide-y divide-sb-outline-variant/20">
+          {rows.map(({ icon: Icon, k, val, mono }) => (
+            <div key={k} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:gap-4">
+              <div className="flex shrink-0 items-center gap-2 sm:w-32">
+                <Icon className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />
+                <dt className="text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+              </div>
+              <dd className={cn("min-w-0 flex-1 truncate text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <dl className="space-y-3">
+          {rows.map(({ icon: Icon, k, val, mono }) => (
+            <div key={k} className="flex items-center justify-between gap-3 rounded-xl bg-sb-surface-container-high px-3.5 py-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Icon className="h-4 w-4 shrink-0 text-sb-on-surface-variant/40" />
+                <dt className="shrink-0 text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
+              </div>
+              <dd className={cn("min-w-0 truncate text-right text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </>
+  )
+  if (bare) return body
+  return (
+    <motion.section {...fadeUp} transition={{ ...spring, delay }} className={cn(cardCls(v), className)}>
+      <SectionHeader icon={Shield} v={v} title="Sistema" desc="Tu cuenta dentro de la plataforma" />
+      {body}
     </motion.section>
   )
 }
@@ -457,6 +749,8 @@ function SystemDesignSection({ v, d, className, delay }: { v: V; d: PerfilData; 
 }
 
 function ClassicLayout({ d }: { d: PerfilData }) {
+  const isDocente = d.profile?.role === "docente"
+  const hasSchool = !!d.profile?.institution?.name || !!d.profile?.institutionId
   return (
     <div className="space-y-5">
       <Hero d={d} />
@@ -465,23 +759,35 @@ function ClassicLayout({ d }: { d: PerfilData }) {
         <SessionSection v="classic" d={d} delay={0.09} />
       </div>
       <div className="grid gap-5 lg:grid-cols-3">
-        <PasswordSection v="classic" d={d} className="lg:col-span-2" delay={0.12} />
-        <ThemeSection v="classic" d={d} delay={0.15} />
+        {hasSchool && <SchoolContractSection v="classic" d={d} className="lg:col-span-2" delay={0.12} />}
+        <SystemSection v="classic" d={d} className={hasSchool ? "" : "lg:col-span-3"} delay={0.15} />
+      </div>
+      {isDocente && <TeachingSection v="classic" d={d} delay={0.18} />}
+      <div className="grid gap-5 lg:grid-cols-3">
+        <PasswordSection v="classic" d={d} className="lg:col-span-2" delay={0.21} />
+        <ThemeSection v="classic" d={d} delay={0.24} />
       </div>
       <div className="grid gap-5 lg:grid-cols-2">
-        <SystemDesignSection v="classic" d={d} delay={0.18} />
+        <SystemDesignSection v="classic" d={d} delay={0.27} />
       </div>
     </div>
   )
 }
 
-const M_SECTIONS = [
-  { id: "info", label: "Información", icon: User },
-  { id: "sesion", label: "Sesión", icon: Globe },
-  { id: "password", label: "Contraseña", icon: Key },
-  { id: "tema", label: "Tema", icon: Layers },
-  { id: "diseno", label: "Diseño", icon: Sparkles },
-] as const
+type MSection = { id: string; label: string; icon: React.ComponentType<{ className?: string }> }
+
+function buildMSections(opts: { hasSchool: boolean; isDocente: boolean }): MSection[] {
+  return [
+    { id: "info", label: "Información", icon: User },
+    ...(opts.hasSchool ? [{ id: "colegio", label: "Colegio y contrato", icon: Building2 }] : []),
+    ...(opts.isDocente ? [{ id: "dicta", label: "Lo que dicta", icon: BookOpen }] : []),
+    { id: "sistema", label: "Sistema", icon: Shield },
+    { id: "sesion", label: "Sesión", icon: Globe },
+    { id: "password", label: "Contraseña", icon: Key },
+    { id: "tema", label: "Tema", icon: Layers },
+    { id: "diseno", label: "Diseño", icon: Sparkles },
+  ]
+}
 
 function MBlock({ id, index, label, title, desc, children }: {
   id: string; index: number; label: string; title: string; desc?: string; children: React.ReactNode
@@ -522,6 +828,10 @@ function MProfileBar({ d }: { d: PerfilData }) {
 
 function MinimalLayout({ d }: { d: PerfilData }) {
   const [active, setActive] = React.useState<string>("info")
+  const isDocente = d.profile?.role === "docente"
+  const hasSchool = !!d.profile?.institution?.name || !!d.profile?.institutionId
+  const sections = React.useMemo(() => buildMSections({ hasSchool, isDocente }), [hasSchool, isDocente])
+  const idx = (id: string) => Math.max(0, sections.findIndex(s => s.id === id))
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -530,9 +840,9 @@ function MinimalLayout({ d }: { d: PerfilData }) {
       },
       { rootMargin: "-25% 0px -65% 0px" }
     )
-    M_SECTIONS.forEach(s => { const el = document.getElementById(`perfil-${s.id}`); if (el) observer.observe(el) })
+    sections.forEach(s => { const el = document.getElementById(`perfil-${s.id}`); if (el) observer.observe(el) })
     return () => observer.disconnect()
-  }, [])
+  }, [sections])
 
   const scrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault()
@@ -546,7 +856,7 @@ function MinimalLayout({ d }: { d: PerfilData }) {
       {/* ===== Índice sticky ===== */}
       <aside className="lg:w-48 lg:shrink-0">
         <nav className="flex gap-1.5 overflow-x-auto pb-1 lg:sticky lg:top-24 lg:flex-col lg:overflow-visible lg:pb-0">
-          {M_SECTIONS.map((s, i) => (
+          {sections.map((s, i) => (
             <a
               key={s.id}
               href={`#perfil-${s.id}`}
@@ -571,7 +881,7 @@ function MinimalLayout({ d }: { d: PerfilData }) {
       <div className="min-w-0 flex-1">
         <MProfileBar d={d} />
         <div className="space-y-12 pt-8">
-          <MBlock id="info" index={0} label="Información" title="Información personal" desc="Tus datos de contacto">
+          <MBlock id="info" index={idx("info")} label="Información" title="Información personal" desc="Tus datos de contacto">
             {d.editMode ? (
               <div className="space-y-4">
                 <div>
@@ -602,9 +912,10 @@ function MinimalLayout({ d }: { d: PerfilData }) {
                   {[
                     { k: "Email", val: d.profile?.email },
                     { k: "Teléfono", val: d.profile?.phone || "—" },
+                    { k: "DNI", val: d.profile?.dni || "—" },
                     { k: "Miembro desde", val: d.profile?.createdAt ? new Date(d.profile.createdAt).toLocaleDateString("es-PE") : "—" },
                     { k: "ID", val: d.profile?.id?.slice(0, 16), mono: true },
-                    ...(d.profile?.role !== "dev" && d.profile?.institutionId ? [{ k: "Institución", val: d.profile.institutionId }] : []),
+                    ...(d.profile?.role !== "dev" && d.profile?.institutionId ? [{ k: "Colegio", val: d.profile.institution?.name || d.profile.institutionId }] : []),
                   ].map(({ k, val, mono }) => (
                     <div key={k} className="flex items-center justify-between gap-4 border-b border-sb-outline-variant/15 py-3">
                       <dt className="shrink-0 text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
@@ -617,7 +928,23 @@ function MinimalLayout({ d }: { d: PerfilData }) {
             )}
           </MBlock>
 
-          <MBlock id="sesion" index={1} label="Sesión" title="Esta sesión">
+          {hasSchool && (
+            <MBlock id="colegio" index={idx("colegio")} label="Colegio y contrato" title="Dónde estás contratado" desc="Colegio, tipo de contrato, vigencia y antigüedad">
+              <SchoolContractSection v="minimal" d={d} bare />
+            </MBlock>
+          )}
+
+          {isDocente && (
+            <MBlock id="dicta" index={idx("dicta")} label="Lo que dicta" title="Asignaturas y cursos" desc="Grados, secciones y cursos a tu cargo">
+              <TeachingSection v="minimal" d={d} bare />
+            </MBlock>
+          )}
+
+          <MBlock id="sistema" index={idx("sistema")} label="Sistema" title="Tu cuenta en el sistema" desc="Rol, estado de la cuenta y último acceso">
+            <SystemSection v="minimal" d={d} bare />
+          </MBlock>
+
+          <MBlock id="sesion" index={idx("sesion")} label="Sesión" title="Esta sesión">
             <div className="flex items-center gap-3 rounded-lg border border-sb-outline-variant/40 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
@@ -633,7 +960,7 @@ function MinimalLayout({ d }: { d: PerfilData }) {
             </button>
           </MBlock>
 
-          <MBlock id="password" index={2} label="Contraseña" title="Actualiza tu contraseña">
+          <MBlock id="password" index={idx("password")} label="Contraseña" title="Actualiza tu contraseña">
             {d.showPassForm ? (
               <form onSubmit={d.handleChangePassword} className="space-y-4">
                 <div className="relative">
@@ -696,7 +1023,7 @@ function MinimalLayout({ d }: { d: PerfilData }) {
             )}
           </MBlock>
 
-          <MBlock id="tema" index={3} label="Tema" title="Modo y color">
+          <MBlock id="tema" index={idx("tema")} label="Tema" title="Modo y color">
             <div className="grid grid-cols-4 gap-3 sm:grid-cols-7">
               {THEMES.map(t => {
                 const isActive = (d.resolvedTheme === t.mode) && (d.themeVariant === t.variant)
@@ -713,7 +1040,7 @@ function MinimalLayout({ d }: { d: PerfilData }) {
             </div>
           </MBlock>
 
-          <MBlock id="diseno" index={4} label="Diseño" title="Identidad del sistema">
+          <MBlock id="diseno" index={idx("diseno")} label="Diseño" title="Identidad del sistema">
             <DesignSelector />
           </MBlock>
         </div>

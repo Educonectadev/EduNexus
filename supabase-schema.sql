@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS users (
   grade_level VARCHAR(100) DEFAULT '',
   specialization VARCHAR(255) DEFAULT '',
   contract_type VARCHAR(50) DEFAULT '',
+  contract_start_date DATE DEFAULT NULL,
+  contract_end_date DATE DEFAULT NULL,
   last_login TIMESTAMP NULL,
   status VARCHAR(20) DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
