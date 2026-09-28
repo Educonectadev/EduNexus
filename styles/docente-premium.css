@@ -566,16 +566,16 @@ html.dark [data-role="docente"] aside svg {
 
 /* Dropdown/popover de opciones (SbDropdown, SbSearchSelect) */
 [data-role="docente"] main [class*="shadow-[0_8px_32px"],
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl,
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl {
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl.absolute,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl.absolute {
   background: var(--sb-surface) !important;
   border: 1px solid var(--sb-outline-variant) !important;
   border-radius: 14px !important;
   box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.45) !important;
   padding: 6px;
 }
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl button,
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl.absolute button,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl.absolute button,
 [data-role="docente"] main .nb-option {
   width: 100%;
   border: none;
@@ -595,8 +595,8 @@ html.dark [data-role="docente"] aside svg {
   transition: background 120ms, color 120ms,
               transform 150ms cubic-bezier(0.34, 1.45, 0.5, 1);
 }
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl button:hover,
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button:hover,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-2xl.absolute button:hover,
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl.absolute button:hover,
 [data-role="docente"] main .nb-option:hover {
   background: var(--sb-surface-container);
   color: var(--sb-on-surface);
@@ -605,7 +605,7 @@ html.dark [data-role="docente"] aside svg {
   transform: scale(0.97);
 }
 [data-role="docente"] main .nb-option.selected,
-[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl button[class*="bg-sb-surface-container-high"] {
+[data-role="docente"] main [class*="bg-sb-surface-container"].rounded-xl.absolute button[class*="bg-sb-surface-container-high"] {
   background: var(--sb-surface-container-high);
   color: var(--sb-on-surface);
   font-weight: 550;

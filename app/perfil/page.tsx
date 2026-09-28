@@ -6,9 +6,8 @@ import { User, Mail, Calendar, Shield, Phone, Save, Key, Eye, EyeOff, Fingerprin
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { useToast } from "@/components/ui/sb"
+import { useToast, SbSectionHeader } from "@/components/ui/sb"
 import { DesignSelector } from "@/components/ui/design-selector"
-import { useDesign } from "@/contexts/design-context"
 
 type V = "classic" | "minimal"
 
@@ -80,11 +79,6 @@ const THEMES: ThemeOption[] = [
   { name: "Rojo",   mode: "light", variant: "red",   colors: ["#e4bdb6", "#fdd2cb", "#ffddd6"] },
   { name: "Naranja",mode: "light", variant: "orange",colors: ["#e3c0aa", "#fdd6bf", "#ffe0cc"] },
 ]
-const PERFIL_DESIGNS = [
-  { id: "stepbro-money", label: "Clásico", desc: "Diseño del sistema original" },
-  { id: "minimal", label: "Minimal", desc: "Aplica el estilo Minimal a todo el panel" },
-]
-
 const roleLabels: Record<string, string> = {
   dev: "Developer", super_admin: "Super Admin", admin: "Administrador", director: "Director",
   secretario: "Secretario", docente: "Docente", padre: "Apoderado",
@@ -145,7 +139,7 @@ interface PerfilData {
 
 const cardCls = (v: V) => v === "minimal"
   ? "rounded-xl border border-sb-outline-variant/40 bg-sb-surface-container-low/60 p-6"
-  : "rounded-[26px] bg-sb-surface-container p-6"
+  : "rounded-2xl bg-sb-surface-container border border-sb-outline-variant/8 p-6"
 
 const inputCls = (v: V) => v === "minimal"
   ? "w-full h-10 rounded-lg border border-sb-outline-variant/50 bg-transparent px-3.5 text-sm text-sb-on-surface outline-none transition-colors focus:border-sb-on-surface placeholder:text-sb-on-surface-variant/40"
@@ -230,7 +224,7 @@ function Hero({ d }: { d: PerfilData }) {
   return (
     <motion.section
       {...fadeUp} transition={{ ...spring, delay: 0.03 }}
-      className="relative overflow-hidden rounded-[28px] bg-sb-surface-container p-6 md:p-8"
+      className="relative overflow-hidden rounded-2xl bg-sb-surface-container border border-sb-outline-variant/8 p-6 md:p-8"
     >
       <div
         aria-hidden
@@ -248,9 +242,6 @@ function Hero({ d }: { d: PerfilData }) {
           </div>
           <p className="mt-1 truncate text-sm text-sb-on-surface-variant/70">{d.profile?.email}</p>
         </div>
-        <button onClick={d.handleLogout} className={cn(btnGhost, "shrink-0 text-red-400/80 hover:bg-red-400/10 hover:text-red-400")}>
-          <LogOut className="h-3.5 w-3.5" /> Salir
-        </button>
       </div>
     </motion.section>
   )
@@ -774,285 +765,9 @@ function ClassicLayout({ d }: { d: PerfilData }) {
   )
 }
 
-type MSection = { id: string; label: string; icon: React.ComponentType<{ className?: string }> }
-
-function buildMSections(opts: { hasSchool: boolean; isDocente: boolean }): MSection[] {
-  return [
-    { id: "info", label: "Información", icon: User },
-    ...(opts.hasSchool ? [{ id: "colegio", label: "Colegio y contrato", icon: Building2 }] : []),
-    ...(opts.isDocente ? [{ id: "dicta", label: "Lo que dicta", icon: BookOpen }] : []),
-    { id: "sistema", label: "Sistema", icon: Shield },
-    { id: "sesion", label: "Sesión", icon: Globe },
-    { id: "password", label: "Contraseña", icon: Key },
-    { id: "tema", label: "Tema", icon: Layers },
-    { id: "diseno", label: "Diseño", icon: Sparkles },
-  ]
-}
-
-function MBlock({ id, index, label, title, desc, children }: {
-  id: string; index: number; label: string; title: string; desc?: string; children: React.ReactNode
-}) {
-  return (
-    <section id={`perfil-${id}`} className="scroll-mt-28">
-      <header className="mb-5 border-b border-sb-outline-variant/30 pb-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-sb-on-surface-variant/50">
-          {String(index + 1).padStart(2, "0")} — {label}
-        </p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight">{title}</h2>
-        {desc && <p className="mt-1 text-xs text-sb-on-surface-variant/60">{desc}</p>}
-      </header>
-      {children}
-    </section>
-  )
-}
-
-function MProfileBar({ d }: { d: PerfilData }) {
-  return (
-    <div className="flex flex-wrap items-center gap-4 border-b border-sb-outline-variant/30 pb-6">
-      <Avatar profile={d.profile} initials={d.initials} v="minimal" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="truncate text-xl font-bold tracking-tight">{d.profile?.fullName || "Sin nombre"}</h2>
-          <span className="rounded-md border border-sb-outline-variant/50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant">
-            {roleLabels[d.profile?.role || ""] || d.profile?.role || "—"}
-          </span>
-        </div>
-        <p className="mt-0.5 truncate text-sm text-sb-on-surface-variant/70">{d.profile?.email}</p>
-      </div>
-      <button onClick={d.handleLogout} className={cn(btnGhost, "shrink-0 text-red-400/80 hover:bg-red-400/10 hover:text-red-400")}>
-        <LogOut className="h-3.5 w-3.5" /> Salir
-      </button>
-    </div>
-  )
-}
-
-function MinimalLayout({ d }: { d: PerfilData }) {
-  const [active, setActive] = React.useState<string>("info")
-  const isDocente = d.profile?.role === "docente"
-  const hasSchool = !!d.profile?.institution?.name || !!d.profile?.institutionId
-  const sections = React.useMemo(() => buildMSections({ hasSchool, isDocente }), [hasSchool, isDocente])
-  const idx = (id: string) => Math.max(0, sections.findIndex(s => s.id === id))
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id.replace("perfil-", "")) })
-      },
-      { rootMargin: "-25% 0px -65% 0px" }
-    )
-    sections.forEach(s => { const el = document.getElementById(`perfil-${s.id}`); if (el) observer.observe(el) })
-    return () => observer.disconnect()
-  }, [sections])
-
-  const scrollTo = (id: string) => (e: React.MouseEvent) => {
-    e.preventDefault()
-    document.getElementById(`perfil-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
-
-  const toggle = "absolute right-3 top-[38px] text-sb-on-surface-variant/40 hover:text-sb-on-surface-variant"
-
-  return (
-    <div className="flex flex-col gap-8 lg:flex-row">
-      {/* ===== Índice sticky ===== */}
-      <aside className="lg:w-48 lg:shrink-0">
-        <nav className="flex gap-1.5 overflow-x-auto pb-1 lg:sticky lg:top-24 lg:flex-col lg:overflow-visible lg:pb-0">
-          {sections.map((s, i) => (
-            <a
-              key={s.id}
-              href={`#perfil-${s.id}`}
-              onClick={scrollTo(s.id)}
-              className={cn(
-                "flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                active === s.id
-                  ? "bg-sb-surface-container-high font-semibold text-sb-on-surface"
-                  : "text-sb-on-surface-variant/70 hover:bg-sb-surface-container-high/60 hover:text-sb-on-surface"
-              )}
-            >
-              <span className={cn("font-mono text-[10px]", active === s.id ? "text-sb-primary" : "text-sb-on-surface-variant/40")}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {s.label}
-            </a>
-          ))}
-        </nav>
-      </aside>
-
-      {/* ===== Contenido editorial ===== */}
-      <div className="min-w-0 flex-1">
-        <MProfileBar d={d} />
-        <div className="space-y-12 pt-8">
-          <MBlock id="info" index={idx("info")} label="Información" title="Información personal" desc="Tus datos de contacto">
-            {d.editMode ? (
-              <div className="space-y-4">
-                <div>
-                  <FieldLabel>Nombre completo</FieldLabel>
-                  <input value={d.fullName} onChange={e => d.setFullName(e.target.value)} className={inputCls("minimal")} placeholder="Tu nombre completo" />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <FieldLabel>Teléfono</FieldLabel>
-                    <input value={d.phone} onChange={e => d.setPhone(e.target.value)} className={inputCls("minimal")} placeholder="+51 999 999 999" />
-                  </div>
-                  <div>
-                    <FieldLabel>Email</FieldLabel>
-                    <input value={d.profile?.email || ""} disabled className={cn(inputCls("minimal"), "cursor-not-allowed opacity-50")} />
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <button onClick={d.handleSave} disabled={d.saving} className={btnPrimary("minimal")}>
-                    {d.saving ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sb-surface border-t-transparent" /> : <Save className="h-3.5 w-3.5" />}
-                    {d.saving ? "Guardando..." : "Guardar cambios"}
-                  </button>
-                  <button onClick={() => { d.setEditMode(false); d.setFullName(d.profile?.fullName || ""); d.setPhone("") }} className={btnGhost}>Cancelar</button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <dl className="grid gap-x-10 sm:grid-cols-2">
-                  {[
-                    { k: "Email", val: d.profile?.email },
-                    { k: "Teléfono", val: d.profile?.phone || "—" },
-                    { k: "DNI", val: d.profile?.dni || "—" },
-                    { k: "Miembro desde", val: d.profile?.createdAt ? new Date(d.profile.createdAt).toLocaleDateString("es-PE") : "—" },
-                    { k: "ID", val: d.profile?.id?.slice(0, 16), mono: true },
-                    ...(d.profile?.role !== "dev" && d.profile?.institutionId ? [{ k: "Colegio", val: d.profile.institution?.name || d.profile.institutionId }] : []),
-                  ].map(({ k, val, mono }) => (
-                    <div key={k} className="flex items-center justify-between gap-4 border-b border-sb-outline-variant/15 py-3">
-                      <dt className="shrink-0 text-[10px] uppercase tracking-wider text-sb-on-surface-variant/40">{k}</dt>
-                      <dd className={cn("truncate text-right text-sm", mono && "font-mono text-xs text-sb-on-surface-variant/70")}>{val}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <button onClick={() => d.setEditMode(true)} className={cn(btnGhost, "mt-4")}><User className="h-3.5 w-3.5" /> Editar</button>
-              </>
-            )}
-          </MBlock>
-
-          {hasSchool && (
-            <MBlock id="colegio" index={idx("colegio")} label="Colegio y contrato" title="Dónde estás contratado" desc="Colegio, tipo de contrato, vigencia y antigüedad">
-              <SchoolContractSection v="minimal" d={d} bare />
-            </MBlock>
-          )}
-
-          {isDocente && (
-            <MBlock id="dicta" index={idx("dicta")} label="Lo que dicta" title="Asignaturas y cursos" desc="Grados, secciones y cursos a tu cargo">
-              <TeachingSection v="minimal" d={d} bare />
-            </MBlock>
-          )}
-
-          <MBlock id="sistema" index={idx("sistema")} label="Sistema" title="Tu cuenta en el sistema" desc="Rol, estado de la cuenta y último acceso">
-            <SystemSection v="minimal" d={d} bare />
-          </MBlock>
-
-          <MBlock id="sesion" index={idx("sesion")} label="Sesión" title="Esta sesión">
-            <div className="flex items-center gap-3 rounded-lg border border-sb-outline-variant/40 px-4 py-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium">Web — {typeof navigator !== "undefined" ? navigator.platform : "—"}</p>
-                <p className="mt-0.5 text-[11px] text-sb-on-surface-variant/50">Navegador activo en este dispositivo</p>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-                <span className="text-[10px] font-medium text-emerald-400/80">Activa</span>
-              </div>
-            </div>
-            <button onClick={d.handleLogout} className={cn(btnGhost, "mt-3 text-red-400/80 hover:bg-red-400/10 hover:text-red-400")}>
-              <LogOut className="h-3.5 w-3.5" /> Cerrar sesión
-            </button>
-          </MBlock>
-
-          <MBlock id="password" index={idx("password")} label="Contraseña" title="Actualiza tu contraseña">
-            {d.showPassForm ? (
-              <form onSubmit={d.handleChangePassword} className="space-y-4">
-                <div className="relative">
-                  <FieldLabel>Contraseña actual</FieldLabel>
-                  <input
-                    type={d.showCurrent ? "text" : "password"}
-                    value={d.currentPassword}
-                    onChange={e => d.setCurrentPassword(e.target.value)}
-                    className={cn(inputCls("minimal"), "pr-11")}
-                    placeholder="••••••••" required
-                  />
-                  <button type="button" onClick={() => d.setShowCurrent(!d.showCurrent)} className={toggle}>
-                    {d.showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="relative">
-                    <FieldLabel>Nueva contraseña</FieldLabel>
-                    <input
-                      type={d.showNew ? "text" : "password"}
-                      value={d.newPassword}
-                      onChange={e => d.setNewPassword(e.target.value)}
-                      className={cn(inputCls("minimal"), "pr-11")}
-                      placeholder="••••••••" required minLength={6}
-                    />
-                    <button type="button" onClick={() => d.setShowNew(!d.showNew)} className={toggle}>
-                      {d.showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <FieldLabel>Confirmar contraseña</FieldLabel>
-                    <input
-                      type={d.showConfirm ? "text" : "password"}
-                      value={d.confirmPassword}
-                      onChange={e => d.setConfirmPassword(e.target.value)}
-                      className={cn(inputCls("minimal"), "pr-11")}
-                      placeholder="••••••••" required minLength={6}
-                    />
-                    <button type="button" onClick={() => d.setShowConfirm(!d.showConfirm)} className={toggle}>
-                      {d.showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <button type="submit" disabled={d.changingPass} className={btnPrimary("minimal")}>
-                    {d.changingPass ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sb-surface border-t-transparent" /> : <Fingerprint className="h-3.5 w-3.5" />}
-                    {d.changingPass ? "Actualizando..." : "Actualizar contraseña"}
-                  </button>
-                  <button type="button" onClick={() => { d.setShowPassForm(false); d.setCurrentPassword(""); d.setNewPassword(""); d.setConfirmPassword("") }} className={btnGhost}>Cancelar</button>
-                </div>
-              </form>
-            ) : (
-              <div className="flex items-center justify-between gap-4 rounded-lg border border-sb-outline-variant/40 px-4 py-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Contraseña</p>
-                  <p className="mt-0.5 text-[11px] text-sb-on-surface-variant/50">Última actualización no registrada</p>
-                </div>
-                <button onClick={() => d.setShowPassForm(true)} className={cn(btnGhost, "shrink-0")}><Key className="h-3.5 w-3.5" /> Cambiar</button>
-              </div>
-            )}
-          </MBlock>
-
-          <MBlock id="tema" index={idx("tema")} label="Tema" title="Modo y color">
-            <div className="grid grid-cols-4 gap-3 sm:grid-cols-7">
-              {THEMES.map(t => {
-                const isActive = (d.resolvedTheme === t.mode) && (d.themeVariant === t.variant)
-                return (
-                  <button key={t.name} onClick={() => d.handleTheme(t)} className="flex flex-col items-center gap-2">
-                    <span
-                      className={cn("block aspect-square w-full rounded-lg transition-all", isActive && "ring-2 ring-sb-primary ring-offset-2 ring-offset-sb-background")}
-                      style={{ background: t.colors[0] }}
-                    />
-                    <span className={cn("text-[10px]", isActive ? "font-semibold text-sb-on-surface" : "text-sb-on-surface-variant/50")}>{t.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </MBlock>
-
-          <MBlock id="diseno" index={idx("diseno")} label="Diseño" title="Identidad del sistema">
-            <DesignSelector />
-          </MBlock>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function PerfilPage() {
   const { toast } = useToast()
   const { setTheme, resolvedTheme } = useTheme()
-  const { currentDesign, setDesign } = useDesign()
   const router = useRouter()
   const [themeVariant, setThemeVariant] = React.useState<string>(() => {
     const s = getInitial("sb-theme-variant", "")
@@ -1082,11 +797,6 @@ export default function PerfilPage() {
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [themeVariant])
-
-  const handlePerfilDesign = (id: string) => {
-    setDesign(id)
-    toast(`Diseño aplicado: ${PERFIL_DESIGNS.find(d => d.id === id)?.label}`, "success")
-  }
 
   const handleTheme = (t: ThemeOption) => {
     setTheme(t.mode)
@@ -1151,36 +861,19 @@ export default function PerfilPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 md:px-8 py-8 md:py-12 text-sb-on-surface">
       {/* ===== Header ===== */}
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <motion.header {...fadeUp} transition={spring}>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-sb-primary">Cuenta</p>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Mi perfil</h1>
-          <p className="mt-1.5 text-sm text-sb-on-surface-variant/70">Gestiona tu información y el aspecto de tu espacio.</p>
-        </motion.header>
-
-        {/* ===== Switch de diseño ===== */}
-        <div className="flex rounded-full bg-sb-surface-container p-1">
-          {PERFIL_DESIGNS.map(d => (
-            <motion.button
-              key={d.id}
-              onClick={() => handlePerfilDesign(d.id)}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-semibold transition-colors",
-                currentDesign.id === d.id ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant hover:text-sb-on-surface"
-              )}
-            >
-              {d.label}
-            </motion.button>
-          ))}
-        </div>
+      <div className="mb-6">
+        <SbSectionHeader
+          title="Mi perfil"
+          description="Gestiona tu información y el aspecto de tu espacio."
+          action={
+            <button onClick={handleLogout} className="sb-btn outlined rounded flex items-center gap-2 text-xs">
+              <LogOut className="h-3.5 w-3.5" /> Cerrar sesión
+            </button>
+          }
+        />
       </div>
 
-      {currentDesign.id === "minimal" ? (
-        <MinimalLayout d={data} />
-      ) : (
-        <ClassicLayout d={data} />
-      )}
+      <ClassicLayout d={data} />
     </div>
   )
 }
