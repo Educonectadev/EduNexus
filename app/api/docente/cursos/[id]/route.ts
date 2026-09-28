@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload } from '@/lib/resolveInstId'
+import { academicLevel, levelMismatch } from '@/lib/academic-level'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,6 +29,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Curso no encontrado o no asignado' }, { status: 404 })
     }
 
+    const [me] = await pool.query(`SELECT grade_level FROM users WHERE id = ?`, [userId])
+    const teacherGradeLevel = (me as any[])[0]?.grade_level || ''
+
     const [teachers] = await pool.query(
       `SELECT t.id, u.id as user_id, u.full_name, u.email
        FROM courses c
@@ -54,6 +58,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         grade: course.grade,
         section: course.section,
         student_count: course.student_count,
+        level: academicLevel(course.grade),
+        teacher_level: academicLevel(teacherGradeLevel),
+        level_mismatch: levelMismatch(teacherGradeLevel, course.grade),
       },
       teachers: teachers as any[],
       students: students as any[],

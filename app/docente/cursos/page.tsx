@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronRight, MapPin } from "@/components/ui/proicons"
+import { BookOpen, Users, GraduationCap, Clock, Calendar, ChevronRight, MapPin, AlertTriangle } from "@/components/ui/proicons"
 import Link from "next/link"
 import { useAuthStore } from "@/stores/auth-store"
 import { SbSectionHeader, SbBadge } from "@/components/ui/sb"
@@ -10,6 +10,7 @@ const DAY_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 interface Course {
   id: string; name: string; grade: string; section: string; students: number
+  level?: string; teacher_level?: string; level_mismatch?: boolean
 }
 
 interface Horario {
@@ -32,7 +33,11 @@ function CourseCard({ course, schedule, index }: { course: Course; schedule: Hor
   return (
     <Link
       href={`/docente/cursos/${course.id}`}
-      className="block rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5 transition-all duration-300 group hover:border-sb-outline-variant/25 hover:bg-sb-surface-container/40"
+      className={`block rounded-2xl bg-sb-surface border p-5 transition-all duration-300 group ${
+        course.level_mismatch
+          ? "border-red-500/40 hover:border-red-500/60"
+          : "border-sb-outline-variant/10 hover:border-sb-outline-variant/25 hover:bg-sb-surface-container/40"
+      }`}
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-start gap-3 min-w-0">
@@ -43,10 +48,15 @@ function CourseCard({ course, schedule, index }: { course: Course; schedule: Hor
             <h3 className="text-sm font-semibold truncate text-sb-on-surface">
               {course.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               <SbBadge color="bg-sb-surface-container-high text-sb-on-surface-variant/60">
                 {course.grade} {course.section}
               </SbBadge>
+              {course.level_mismatch && (
+                <SbBadge color="bg-red-500/15 text-red-600 dark:text-red-400">
+                  Nivel no coincide
+                </SbBadge>
+              )}
               <span className="text-[11px] text-sb-on-surface-variant/50">
                 {course.students} alumno{course.students !== 1 ? "s" : ""}
               </span>
@@ -143,6 +153,8 @@ export default function CursosPage() {
 
   const totalStudents = courses.reduce((a, c) => a + (c.students || 0), 0)
   const avgStudents = courses.length > 0 ? Math.round(totalStudents / courses.length) : 0
+  const mismatches = courses.filter((c) => c.level_mismatch)
+  const teacherLevel = courses.find((c) => c.teacher_level)?.teacher_level || ""
 
   const today = new Date()
   const todayIdx = today.getDay() === 0 ? 7 : today.getDay()
@@ -166,6 +178,20 @@ export default function CursosPage() {
             : "Cursos asignados este periodo académico"
         }
       />
+
+      {!loading && mismatches.length > 0 && (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+              {mismatches.length} curso{mismatches.length !== 1 ? "s" : ""} fuera de tu nivel
+            </p>
+            <p className="text-xs mt-0.5 text-sb-on-surface-variant/60">
+              Tu Grado/Nivel asignado es {teacherLevel || "sin definir"}: {mismatches.map((c) => `${c.grade} ${c.section}`).join(", ")}. Revisa esta asignación con tu secretaría.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-3">
         {[

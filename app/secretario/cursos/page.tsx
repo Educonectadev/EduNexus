@@ -256,6 +256,7 @@ export default function CursosSecretarioPage() {
 
   const [formData, setFormData] = React.useState({ name: "", code: "", grade: "", section: "A", teacher_id: "" })
   const [saving, setSaving] = React.useState(false)
+  const [saveError, setSaveError] = React.useState<string | null>(null)
   const [importOpen, setImportOpen] = React.useState(false)
   const [importKey, setImportKey] = React.useState(0)
 
@@ -408,12 +409,14 @@ export default function CursosSecretarioPage() {
 
   const openCreate = () => {
     setEditing(null)
+    setSaveError(null)
     setFormData({ name: "", code: "", grade: "", section: "A", teacher_id: "" })
     setDialogOpen(true)
   }
 
   const openEdit = (c: Course) => {
     setEditing(c)
+    setSaveError(null)
     setFormData({ name: c.name, code: c.code, grade: c.grade, section: c.section, teacher_id: c.teacher_id || "" })
     setDialogOpen(true)
   }
@@ -459,12 +462,20 @@ export default function CursosSecretarioPage() {
   const handleSave = async () => {
     if (!formData.name || !formData.code || !formData.grade) return
     setSaving(true)
+    setSaveError(null)
     try {
       const url = editing ? `/api/secretario/cursos/${editing.id}` : "/api/secretario/cursos"
       const method = editing ? "PUT" : "POST"
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) })
       if (res.ok) { setDialogOpen(false); setEditing(null); fetchData() }
-    } catch {}
+      else {
+        const data = await res.json().catch(() => null)
+        const detail = data?.details ? ` (${data.details})` : ""
+        setSaveError(`${data?.error || `Error del servidor (${res.status})`}${detail}`)
+      }
+    } catch {
+      setSaveError("No se pudo conectar con el servidor. Intenta nuevamente.")
+    }
     finally { setSaving(false) }
   }
 
@@ -812,6 +823,12 @@ export default function CursosSecretarioPage() {
             </div>
           </div>
         </SbModalBody>
+        {saveError && (
+          <div className="mx-6 mb-3 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
+            <p className="text-xs leading-relaxed text-red-600 dark:text-red-400">{saveError}</p>
+          </div>
+        )}
         <div className="px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
           <SbBtn rounded onClick={() => { setDialogOpen(false); setEditing(null) }}>Cancelar</SbBtn>
           <div className="flex-1" />

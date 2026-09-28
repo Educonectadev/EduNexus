@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
+import { normalizeTeacherId, validateCourseFields } from './_teacher-id'
 import crypto from 'crypto'
 
 export async function GET(request: NextRequest) {
@@ -46,15 +47,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Nombre, código y grado son requeridos' }, { status: 400 })
     }
 
+    const tooLong = validateCourseFields({ name, code, grade, section })
+    if (tooLong) {
+      return NextResponse.json({ error: tooLong }, { status: 400 })
+    }
+
+    const teacherId = await normalizeTeacherId(instId, teacher_id)
     const id = crypto.randomUUID()
     await pool.query(
       `INSERT INTO courses (id, institution_id, name, code, grade, section, teacher_id, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')`,
-      [id, instId, name, code, grade, section || 'A', teacher_id || null]
+      [id, instId, name, code, grade, section || 'A', teacherId]
     )
 
     return NextResponse.json({ success: true, id })
   } catch (error: any) {
-    return NextResponse.json({ error: 'Error creating curso', details: error.message }, { status: 500 })
+    console.error('[cursos] POST error:', error?.message || error)
+    return NextResponse.json({ error: 'Error creating curso', details: error?.message }, { status: 500 })
   }
 }

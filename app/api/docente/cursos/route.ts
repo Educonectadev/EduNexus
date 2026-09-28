@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload } from '@/lib/resolveInstId'
+import { academicLevel, levelMismatch } from '@/lib/academic-level'
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,7 +51,18 @@ export async function GET(request: NextRequest) {
       [userId]
     )
 
-    return NextResponse.json(rows)
+    const [me] = await pool.query(`SELECT grade_level FROM users WHERE id = ?`, [userId])
+    const teacherGradeLevel = (me as any[])[0]?.grade_level || ''
+    const teacherLevel = academicLevel(teacherGradeLevel)
+
+    const enriched = (rows as any[]).map(r => ({
+      ...r,
+      level: academicLevel(r.grade),
+      teacher_level: teacherLevel,
+      level_mismatch: levelMismatch(teacherGradeLevel, r.grade),
+    }))
+
+    return NextResponse.json(enriched)
   } catch (error) {
     return NextResponse.json({ error: 'Error fetching courses' }, { status: 500 })
   }

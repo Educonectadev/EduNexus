@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BookOpen, Users, Calendar, Clock, CheckCircle, UserCheck, BookMarked, ClipboardList, FileText, Video } from "@/components/ui/proicons"
+import { BookOpen, Users, Calendar, Clock, CheckCircle, UserCheck, BookMarked, ClipboardList, FileText, Video, AlertTriangle } from "@/components/ui/proicons"
 import { MinimalistDashboardView } from "@/components/dashboard/minimalist/minimalist-dashboard-view"
 import { useAuthStore } from "@/stores/auth-store"
 
@@ -22,6 +22,8 @@ interface TeacherCourse {
   grade: string
   section: string
   students: number
+  teacher_level?: string
+  level_mismatch?: boolean
 }
 
 function toMin(t: string) {
@@ -86,6 +88,8 @@ export default function DocenteDashboard() {
   }, [today])
 
   const totalStudents = courses.reduce((a, c) => a + (c.students || 0), 0)
+  const mismatches = courses.filter((c) => c.level_mismatch)
+  const teacherLevel = courses.find((c) => c.teacher_level)?.teacher_level || ""
   const todayIdx = today.getDay() === 0 ? 7 : today.getDay()
   const todaySchedule = horarios
     .filter(h => h.day_of_week === todayIdx)
@@ -131,7 +135,20 @@ export default function DocenteDashboard() {
   }))
 
   return (
-    <div className="w-full pt-4">
+    <div className="w-full pt-4 space-y-4">
+      {!loading && mismatches.length > 0 && (
+        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+              {mismatches.length} curso{mismatches.length !== 1 ? "s" : ""} fuera de tu nivel
+            </p>
+            <p className="text-xs mt-0.5 text-sb-on-surface-variant/60">
+              Tu Grado/Nivel asignado es {teacherLevel || "sin definir"}: {mismatches.map((c) => `${c.grade} ${c.section}`).join(", ")}. Revisa esta asignación con tu secretaría.
+            </p>
+          </div>
+        </div>
+      )}
       <MinimalistDashboardView
         userName={teacherName}
         metrics={metrics}
