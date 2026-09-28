@@ -143,7 +143,7 @@ export function DocumentLibrary({ open, onClose, onSelect, mode = "manage" }: Do
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[70] bg-black/30"
+            className="fixed inset-0 z-[80] bg-black/30"
             onClick={onClose}
           />
 
@@ -157,7 +157,7 @@ export function DocumentLibrary({ open, onClose, onSelect, mode = "manage" }: Do
               stiffness: 400,
               damping: 25,
             }}
-            className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-[70] sm:w-[520px] sm:max-h-[80vh] bg-sb-surface rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-[80] sm:w-[520px] sm:max-h-[80vh] bg-sb-surface rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-sb-outline-variant/10 shrink-0">

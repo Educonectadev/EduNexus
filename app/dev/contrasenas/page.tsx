@@ -221,7 +221,7 @@ export default function DevContrasenasPage() {
       {/* Institution Users Modal */}
       <AnimatePresence>
         {selectedInstitution && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => setSelectedInstitution(null)}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80]" onClick={() => setSelectedInstitution(null)}>
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -314,7 +314,7 @@ export default function DevContrasenasPage() {
       {/* Reset Modal */}
       <AnimatePresence>
         {resetModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }}>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80]" onClick={() => { setResetModal(null); setNewPassword(""); setShowPassword(false) }}>
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}

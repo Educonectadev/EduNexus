@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 import { computeTrialStatus, addBusinessDays } from '@/lib/trial'
+import { getAuthPayload } from '@/lib/resolveInstId'
 
 // Base del trial: si la columna trial_ends_at no existe (migración pendiente),
 // se calcula desde el created_at de la institución para que el conteo funcione igual.
@@ -23,12 +23,8 @@ async function effectiveTrialEnds(inst: any): Promise<string | null> {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-    if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
+    const payload = await getAuthPayload(request)
+    if (!payload) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     if (!payload.institutionId) {
       return NextResponse.json({ error: 'Sin institución asociada' }, { status: 400 })
@@ -72,12 +68,8 @@ export async function PATCH(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-    if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
+    const payload = await getAuthPayload(request)
+    if (!payload) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
     if (!payload.institutionId) {
       return NextResponse.json({ id: null, name: '' }, { status: 401 })

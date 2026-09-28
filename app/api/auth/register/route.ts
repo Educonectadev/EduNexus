@@ -109,7 +109,20 @@ export async function POST(req: NextRequest) {
         .setIssuedAt()
         .setExpirationTime('7d')
         .sign(secret)
+    }
 
+    // Una sola respuesta: así el Set-Cookie del auto-login viaja junto al body.
+    const response = NextResponse.json({
+      message: 'Institución creada exitosamente',
+      institutionCode: code,
+      institutionId,
+      mode: isDemo ? 'demo' : 'free',
+      trialDays: isDemo ? 15 : 20,
+      redirectTo: '/director/dashboard',
+      ...(token ? { token } : {}),
+    })
+
+    if (token) {
       response.cookies.set('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -117,11 +130,6 @@ export async function POST(req: NextRequest) {
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
       })
-    }
-
-    if (token) {
-      const body = await response.json()
-      return NextResponse.json({ ...body, token }, { status: 200 })
     }
 
     return response

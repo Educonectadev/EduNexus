@@ -290,13 +290,15 @@
 
     /* ============================================
        z-index scale (stepbro)
+       base < nav (60) < paneles (70) < modales (80)
+       < dropdowns portales (90) < tooltips (95) < toasts (100)
        ============================================ */
     --z-base: 0;
-    --z-dropdown: 20;
+    --z-nav: 60;
+    --z-dropdown: 70;
+    --z-modal-backdrop: 80;
+    --z-modal: 80;
     --z-sticky: 100;
-    --z-modal-backdrop: 50;
-    --z-modal: 60;
-    --z-nav: 40;
     --z-toast: 100;
     --z-tooltip: 9999;
 

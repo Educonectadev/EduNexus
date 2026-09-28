@@ -129,7 +129,7 @@ export default function FilterButtonTest() {
                 y: -8,
               }}
               transition={springTransition}
-              className="absolute left-0 top-12 z-50 w-80 max-w-full overflow-hidden origin-top"
+              className="absolute left-0 top-12 z-[70] w-80 max-w-full overflow-hidden origin-top"
             >
               <motion.div
                 initial={{ scale: 0.95, filter: "blur(4px)" }}

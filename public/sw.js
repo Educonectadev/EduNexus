@@ -1,19 +1,38 @@
-/* EduNexus Service Worker v6 */
-const CACHE = 'edunexus-v6'
+/* EduNexus Service Worker v7 */
+const CACHE = 'edunexus-v7'
 const OFFLINE_URL = '/offline.html'
 
 const PRECACHE = [
   '/',
-  '/manifest.json',
   '/icon.svg',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
+  OFFLINE_URL,
 ]
+
+function isSameOrigin(url) {
+  try {
+    return new URL(url, self.location.origin).origin === self.location.origin
+  } catch (e) {
+    return false
+  }
+}
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE))
+    caches.open(CACHE).then((cache) =>
+      Promise.all(
+        PRECACHE.map((url) =>
+          fetch(new Request(url, { cache: 'no-cache' }))
+            .then((res) => {
+              if (!res || !res.ok || !isSameOrigin(res.url)) return undefined
+              return cache.put(url, res)
+            })
+            .catch(() => undefined)
+        )
+      )
+    )
   )
 })
 
@@ -27,19 +46,31 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+function canCache(response) {
+  if (!response || !response.ok) return false
+  if (response.redirected && !isSameOrigin(response.url)) return false
+  return isSameOrigin(response.url)
+}
+
+function cachePut(request, response) {
+  if (!canCache(response)) return undefined
+  const clone = response.clone()
+  return caches.open(CACHE).then((cache) => cache.put(request, clone)).catch(() => undefined)
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
   const url = new URL(event.request.url)
   if (url.searchParams.has('_rsc')) return
   if (url.pathname.startsWith('/api/')) return
   if (url.pathname.startsWith('/_next/static/')) return
+  if (url.origin !== self.location.origin) return
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          const clone = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(event.request, clone))
+          cachePut(event.request, response)
           return response
         })
         .catch(() => caches.match(event.request).then((r) => r || caches.match(OFFLINE_URL)))
@@ -52,8 +83,7 @@ self.addEventListener('fetch', (event) => {
       caches.match(event.request).then((cached) => {
         if (cached) return cached
         return fetch(event.request).then((response) => {
-          const clone = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(event.request, clone))
+          cachePut(event.request, response)
           return response
         })
       })
@@ -64,10 +94,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.ok) {
-          const clone = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(event.request, clone))
-        }
+        cachePut(event.request, response)
         return response
       })
       .catch(() => caches.match(event.request))

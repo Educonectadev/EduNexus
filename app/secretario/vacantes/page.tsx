@@ -333,7 +333,7 @@ export default function VacantesPage() {
       {/* Toast */}
       {toast && (
         <div className={cn(
-          "fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg border",
+          "fixed bottom-5 left-1/2 -translate-x-1/2 z-[70] px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg border",
           toast.ok ? "bg-emerald-600 text-white border-emerald-500" : "bg-red-600 text-white border-red-500"
         )}>
           {toast.msg}

@@ -12,13 +12,16 @@ const roleRouteMap: Record<string, string> = {
   dev: '/dev',
 }
 
-function extractToken(request: NextRequest): string | null {
+function extractTokens(request: NextRequest): string[] {
+  const tokens: string[] = []
   const authHeader = request.headers.get('authorization')
-  if (authHeader?.startsWith('Bearer ')) return authHeader.slice(7)
-  return request.cookies.get('token')?.value || null
+  if (authHeader?.startsWith('Bearer ')) tokens.push(authHeader.slice(7))
+  const cookieToken = request.cookies.get('token')?.value
+  if (cookieToken && !tokens.includes(cookieToken)) tokens.push(cookieToken)
+  return tokens
 }
 
-async function verifyRole(token: string): Promise<string | null> {
+async function verifyRoleForToken(token: string): Promise<string | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
     const { payload } = await jwtVerify(token, secret)
@@ -26,6 +29,16 @@ async function verifyRole(token: string): Promise<string | null> {
   } catch {
     return null
   }
+}
+
+async function resolveRole(request: NextRequest): Promise<string | null> {
+  // Header Authorization y cookie son intentos independientes: si uno está
+  // vencido o no coincide, se prueba el otro antes de rechazar la petición.
+  for (const token of extractTokens(request)) {
+    const role = await verifyRoleForToken(token)
+    if (role) return role
+  }
+  return null
 }
 
 export async function middleware(request: NextRequest) {
@@ -38,11 +51,8 @@ export async function middleware(request: NextRequest) {
   // API routes: check Authorization header first, cookie as fallback
   if (pathname.startsWith('/api')) {
     if (pathname.startsWith('/api/dev') && process.env.NODE_ENV === 'production') {
-      const token = extractToken(request)
-      if (token) {
-        const role = await verifyRole(token)
-        if (role === 'dev' || role === 'director') return NextResponse.next()
-      }
+      const role = await resolveRole(request)
+      if (role === 'dev' || role === 'director') return NextResponse.next()
       return NextResponse.json({ error: 'Not available in production' }, { status: 403 })
     }
     return NextResponse.next()
@@ -50,11 +60,8 @@ export async function middleware(request: NextRequest) {
 
   // Allow dev routes for dev role in production
   if (pathname.startsWith('/dev') && process.env.NODE_ENV === 'production') {
-    const token = extractToken(request)
-    if (token) {
-      const role = await verifyRole(token)
-      if (role === 'dev') return NextResponse.next()
-    }
+    const role = await resolveRole(request)
+    if (role === 'dev') return NextResponse.next()
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
@@ -65,28 +72,25 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some(route => pathname === route)
 
   if (isPublicRoute) {
-    const token = extractToken(request)
-    if (token) {
-      const role = await verifyRole(token)
-      if (role) {
-        const expectedRoute = roleRouteMap[role]
-        if (expectedRoute && expectedRoute !== '/') {
-          return NextResponse.redirect(new URL(expectedRoute, request.url))
-        }
+    const role = await resolveRole(request)
+    if (role) {
+      const expectedRoute = roleRouteMap[role]
+      if (expectedRoute && expectedRoute !== '/') {
+        return NextResponse.redirect(new URL(expectedRoute, request.url))
       }
     }
     return NextResponse.next()
   }
 
-  const token = extractToken(request)
+  const tokens = extractTokens(request)
 
-  if (!token) {
+  if (tokens.length === 0) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
-  const role = await verifyRole(token)
+  const role = await resolveRole(request)
 
   if (!role) {
     const response = NextResponse.redirect(new URL('/login', request.url))

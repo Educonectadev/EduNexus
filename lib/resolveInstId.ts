@@ -1,15 +1,22 @@
-import { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
 
-export function extractToken(request: NextRequest): string | null {
+type HeaderCarrier = { headers: { get(name: string): string | null } }
+
+export function extractTokens(request: HeaderCarrier): string[] {
+  const tokens: string[] = []
   const authHeader = request.headers.get('authorization')
-  if (authHeader?.startsWith('Bearer ')) return authHeader.slice(7)
-  return request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1] || null
+  if (authHeader?.startsWith('Bearer ')) tokens.push(authHeader.slice(7))
+  const cookieToken = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
+  if (cookieToken && !tokens.includes(cookieToken)) tokens.push(cookieToken)
+  return tokens
 }
 
-export async function getAuthPayload(request: NextRequest): Promise<Record<string, any> | null> {
-  const token = extractToken(request)
+export function extractToken(request: HeaderCarrier): string | null {
+  return extractTokens(request)[0] || null
+}
+
+export async function verifyToken(token: string | null | undefined): Promise<Record<string, any> | null> {
   if (!token) return null
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
@@ -24,7 +31,17 @@ export async function getAuthPayload(request: NextRequest): Promise<Record<strin
   }
 }
 
-export async function resolveInstId(request: NextRequest): Promise<string | null> {
+export async function getAuthPayload(request: HeaderCarrier): Promise<Record<string, any> | null> {
+  // Prueba el header Authorization y luego la cookie: así un token viejo
+  // en localStorage nunca anula una cookie todavía válida (y viceversa).
+  for (const token of extractTokens(request)) {
+    const claims = await verifyToken(token)
+    if (claims) return claims
+  }
+  return null
+}
+
+export async function resolveInstId(request: HeaderCarrier): Promise<string | null> {
   const user = await getAuthPayload(request)
   if (!user) return null
   if (user.institutionId) return user.institutionId as string

@@ -75,7 +75,9 @@ export function usePushSettings(): PushSettings & {
     init()
 
     const onBeforeInstall = (e: Event) => {
-      e.preventDefault()
+      // No preventDefault(): si suprimimos el evento Chrome registra
+      // "Banner not shown: beforeinstallpromptevent.preventDefault() called"
+      // y deja de mostrar su propio banner de instalación.
       setInstallPrompt(e as BeforeInstallPromptEvent)
       setCanInstall(true)
     }
@@ -126,14 +128,22 @@ export function usePushSettings(): PushSettings & {
   }, [requestPermission])
 
   const promptInstall = React.useCallback(async (): Promise<boolean> => {
-    if (installPrompt) {
+    if (!installPrompt) return false
+    try {
       installPrompt.prompt()
-      await installPrompt.userChoice
+      const choice = await installPrompt.userChoice
+      if (choice?.outcome === 'accepted') {
+        setStandalone(true)
+      }
+      return choice?.outcome === 'accepted'
+    } catch {
+      // Chrome puede rechazar prompt() si no suprimimos el evento:
+      // en ese caso ya se mostró el banner nativo del navegador.
+      return false
+    } finally {
       setInstallPrompt(null)
       setCanInstall(false)
-      return true
     }
-    return false
   }, [installPrompt])
 
   return {

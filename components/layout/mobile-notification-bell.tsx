@@ -85,13 +85,13 @@ export default function MobileNotificationBell() {
       <AnimatePresence>
         {open && (
           <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-[65]" onClick={() => setOpen(false)} />
             <motion.div
               initial={{ opacity: 0, y: -8, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96 }}
               transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-              className="fixed top-12 right-2 left-2 z-50 bg-sb-surface-container/95 backdrop-blur-3xl rounded-[10px] border border-sb-outline-variant/20 shadow-2xl max-h-[70vh] overflow-hidden"
+              className="fixed top-12 right-2 left-2 z-[70] bg-sb-surface-container/95 backdrop-blur-3xl rounded-[10px] border border-sb-outline-variant/20 shadow-2xl max-h-[70vh] overflow-hidden"
             >
               <div className="flex items-center justify-between px-3 py-2 border-b border-sb-outline-variant/10">
                 <div className="flex items-center gap-2">

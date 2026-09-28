@@ -75,6 +75,33 @@ export default function RootLayout({
         <meta name="theme-color" content="#1a3a8a" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+if(window.__eduAuthFetch)return;window.__eduAuthFetch=1;
+var original=window.fetch;if(typeof original!=='function')return;
+window.fetch=function(input,init){
+try{
+var token=null;
+try{token=window.localStorage.getItem('edu_token')}catch(e){}
+if(token){
+var href=typeof input==='string'?input:(input&&input.url)||'';
+var url=new URL(href,window.location.href);
+if(url.origin===window.location.origin&&url.pathname.indexOf('/api/')===0){
+var headers=new Headers((init&&init.headers)||(input&&input.headers)||undefined);
+if(!headers.has('Authorization')){
+headers.set('Authorization','Bearer '+token);
+if(typeof Request!=='undefined'&&input instanceof Request){input=new Request(input,{headers:headers})}
+else{init=Object.assign({},init,{headers:headers})}
+}
+}
+}
+}catch(e){}
+return original.call(this,input,init)
+};
+})();`,
+          }}
+        />
       </head>
       <body className={`${manrope.variable} ${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`} suppressHydrationWarning>
         <svg aria-hidden="true" style={{position:'absolute',width:0,height:0,overflow:'hidden'}}>

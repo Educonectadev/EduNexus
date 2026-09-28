@@ -1,29 +1,15 @@
 import { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
+import { getAuthPayload } from '@/lib/resolveInstId'
 
 export async function getPadreUserId(request: NextRequest): Promise<string | null> {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-  if (!token) return null
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
-    return (payload.userId as string) || null
-  } catch {
-    return null
-  }
+  const payload = await getAuthPayload(request)
+  return (payload?.userId as string) || null
 }
 
 export async function getPadreInstitutionId(request: NextRequest): Promise<string | null> {
-  const token = request.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-  if (!token) return null
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
-    return (payload.institutionId as string) || null
-  } catch {
-    return null
-  }
+  const payload = await getAuthPayload(request)
+  return (payload?.institutionId as string) || null
 }
 
 export async function getPadreChildrenIds(userId: string): Promise<string[]> {

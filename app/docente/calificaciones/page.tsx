@@ -341,7 +341,7 @@ function CalificacionesInner() {
 
         {/* DETAIL MODAL */}
         {detailOpen && selected && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setDetailOpen(false)}>
+          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setDetailOpen(false)}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
             <div className="relative w-full max-w-[560px] max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
               {/* Modal Header */}
@@ -453,7 +453,7 @@ function CalificacionesInner() {
 
         {/* REGISTER DIALOG */}
         {registerOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setRegisterOpen(false)}>
+          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setRegisterOpen(false)}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
             <div className="relative w-full max-w-[420px]" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
               <div className="px-6 pt-6 pb-4">

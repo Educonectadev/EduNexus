@@ -364,7 +364,7 @@ export function SbDropdown({ trigger, children, align = "left", className }: {
             exit={{ opacity: 0, y: -8, filter: "blur(8px)" }}
             transition={{ duration: 0.2 }}
             className={cn(
-              "absolute z-50 mt-2 min-w-[180px] py-1.5",
+              "absolute z-[70] mt-2 min-w-[180px] py-1.5",
               "bg-sb-surface-container rounded-2xl",
               "border border-sb-outline-variant/15",
               "shadow-[0_8px_32px_-8px_rgba(0,0,0,0.25)]",
@@ -481,7 +481,7 @@ export function SbSearchSelect({ value, onChange, placeholder, options, classNam
             exit={{ opacity: 0, y: dropUp ? 4 : -4, filter: "blur(4px)" }}
             transition={{ duration: 0.15 }}
             className={cn(
-              "absolute z-[60] w-full bg-sb-surface-container border border-sb-outline-variant rounded-xl overflow-hidden shadow-lg",
+              "absolute z-[70] w-full bg-sb-surface-container border border-sb-outline-variant rounded-xl overflow-hidden shadow-lg",
               dropUp ? "bottom-full mb-1" : "top-full mt-1"
             )}
           >
@@ -664,7 +664,7 @@ export function SbNavPill({ items, activeHref, maxVisible = 5 }: {
       <AnimatePresence>
         {sheetOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-50 bg-background/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-[80] bg-background/60 backdrop-blur-sm md:hidden"
             onClick={() => setSheetOpen(false)}>
             <motion.div initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 36, mass: 0.8 }}

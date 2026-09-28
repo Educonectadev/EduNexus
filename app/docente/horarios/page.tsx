@@ -51,7 +51,7 @@ function DetailModal({ horario, open, onClose }: { horario: Horario | null; open
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-[80] flex items-center justify-center p-4 transition-all duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       style={{ background: open ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0)" }}
       onClick={onClose}
     >

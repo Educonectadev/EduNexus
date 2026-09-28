@@ -724,7 +724,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           {searchOpen && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 md:hidden bg-background/80 backdrop-blur-3xl">
+            className="fixed inset-0 z-[80] md:hidden bg-background/80 backdrop-blur-3xl">
             <div className="flex flex-col h-full">
               <div className="flex items-center gap-3 px-4 h-14">
                 <button onClick={() => { setSearchOpen(false); setSearchQuery("") }}

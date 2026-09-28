@@ -144,7 +144,7 @@ export default function DevPerfilPage() {
           initial={{ opacity: 0, y: -14, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -14, scale: 0.96 }}
-          className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-50 px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg text-center sm:text-left ${
+          className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 z-[70] px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg text-center sm:text-left ${
             toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
           }`}
         >

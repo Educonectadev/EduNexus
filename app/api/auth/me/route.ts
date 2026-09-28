@@ -1,18 +1,18 @@
 import { NextResponse } from 'next/server'
-import { jwtVerify } from 'jose'
 import pool from '@/lib/db'
+import { extractTokens, verifyToken } from '@/lib/resolveInstId'
 
 export async function GET(req: Request) {
   try {
-    const authHeader = req.headers.get('authorization')
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : req.headers.get('cookie')?.match(/token=([^;]+)/)?.[1]
-
-    if (!token) {
-      return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    let payload: Record<string, any> | null = null
+    for (const token of extractTokens(req)) {
+      payload = await verifyToken(token)
+      if (payload) break
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'educonecta-secret')
-    const { payload } = await jwtVerify(token, secret)
+    if (!payload) {
+      return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+    }
 
     const [users] = await pool.query(
       'SELECT id, email, full_name, phone, avatar_url, created_at FROM users WHERE id = ?',

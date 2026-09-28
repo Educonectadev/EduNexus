@@ -166,7 +166,7 @@ export default function PlanesPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg ${
+            className={`fixed top-4 right-4 z-[70] px-4 py-3 rounded-xl text-[13px] font-medium shadow-lg ${
               toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
             }`}
           >

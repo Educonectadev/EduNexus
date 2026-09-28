@@ -342,7 +342,7 @@ export default function CursoDetallePage() {
       <AnimatePresence>
         {fichaOpen && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-[80] flex items-start sm:items-center justify-center p-4 overflow-y-auto"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px]" onClick={() => setFichaOpen(false)} />
             <motion.div

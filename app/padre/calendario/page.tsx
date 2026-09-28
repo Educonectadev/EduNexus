@@ -277,7 +277,7 @@ export default function CalendarioPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/40 backdrop-blur-sm p-4 md:p-6"
+            className="fixed inset-0 z-[80] flex items-end md:items-center justify-center bg-black/40 backdrop-blur-sm p-4 md:p-6"
             onClick={() => setSelectedDay(null)}
           >
             <motion.div

@@ -492,7 +492,7 @@ export default function DevUsuariosPage() {
                     animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                     exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
                     transition={{ type: "spring", stiffness: 300, damping: 30, mass: 1 }}
-                    className="absolute right-0 z-50 w-80"
+                    className="absolute right-0 z-[70] w-80"
                     style={{ bottom: 0 }}
                   >
                     <div className="bg-[var(--sb-surface-container)] rounded-2xl border border-[var(--sb-outline-variant)]/15 shadow-2xl shadow-black/20 p-4">

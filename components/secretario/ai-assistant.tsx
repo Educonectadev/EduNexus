@@ -143,6 +143,6 @@ export function AIAssistantContent(){
   )
 }
 function AIAssistant({open,onClose}:{open:boolean;onClose:()=>void}){
-  return <AnimatePresence>{open&&<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm" onClick={onClose}><motion.div initial={{y:"100%"}} animate={{y:0}} exit={{y:"100%"}} transition={{type:"spring",damping:25,stiffness:300}} className="fixed inset-x-0 bottom-0 h-[88vh] bg-sb-surface rounded-t-2xl overflow-hidden md:inset-0 md:h-auto md:max-w-lg md:m-auto md:rounded-2xl md:max-h-[85vh]" onClick={e=>e.stopPropagation()}><AIAssistantContent/></motion.div></motion.div>}</AnimatePresence>
+  return <AnimatePresence>{open&&<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm" onClick={onClose}><motion.div initial={{y:"100%"}} animate={{y:0}} exit={{y:"100%"}} transition={{type:"spring",damping:25,stiffness:300}} className="fixed inset-x-0 bottom-0 h-[88vh] bg-sb-surface rounded-t-2xl overflow-hidden md:inset-0 md:h-auto md:max-w-lg md:m-auto md:rounded-2xl md:max-h-[85vh]" onClick={e=>e.stopPropagation()}><AIAssistantContent/></motion.div></motion.div>}</AnimatePresence>
 }
 export default AIAssistant

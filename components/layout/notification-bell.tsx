@@ -96,7 +96,7 @@ export default function NotificationBell() {
             exit={{ opacity: 0, y: -16, scale: 0.96 }}
             transition={{ duration: 0.25, ease: [0.37, 0.35, 0, 1] }}
             onClick={() => { markOneRead(live.id); closeLive(); setDetailNotif(live) }}
-            className="fixed top-4 left-1/2 z-[70] -translate-x-1/2 w-[calc(100vw-32px)] max-w-[380px] text-left bg-sb-surface-container/[0.96] backdrop-blur-2xl rounded-2xl border border-sb-outline-variant/20 shadow-2xl shadow-black/10 p-3.5 flex items-start gap-3"
+            className="fixed top-4 left-1/2 z-[95] -translate-x-1/2 w-[calc(100vw-32px)] max-w-[380px] text-left bg-sb-surface-container/[0.96] backdrop-blur-2xl rounded-2xl border border-sb-outline-variant/20 shadow-2xl shadow-black/10 p-3.5 flex items-start gap-3"
           >
             <div className="h-9 w-9 rounded-xl bg-sb-primary/10 flex items-center justify-center shrink-0">
               <BellRing className="h-4 w-4 text-sb-primary" />
@@ -115,13 +115,13 @@ export default function NotificationBell() {
       <AnimatePresence>
         {open && (
           <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-[65]" onClick={() => setOpen(false)} />
             <motion.div
               initial={{ opacity: 0, y: -8, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.98 }}
               transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-              className="fixed top-16 right-3 left-3 sm:left-auto sm:right-4 z-50 bg-sb-surface-container/95 backdrop-blur-3xl rounded-[10px] border border-sb-outline-variant/20 shadow-2xl max-h-[75vh] overflow-hidden w-auto sm:w-[380px]"
+              className="fixed top-16 right-3 left-3 sm:left-auto sm:right-4 z-[70] bg-sb-surface-container/95 backdrop-blur-3xl rounded-[10px] border border-sb-outline-variant/20 shadow-2xl max-h-[75vh] overflow-hidden w-auto sm:w-[380px]"
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-sb-outline-variant/10">
                 <div className="flex items-center gap-2">

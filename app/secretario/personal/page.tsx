@@ -37,7 +37,7 @@ function SubjectSelect({ value, onChange }: { value: string; onChange: (v: strin
         <svg className={`h-4 w-4 text-sb-on-surface/40 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
-        <div className="absolute z-50 w-full mt-1 bg-sb-surface rounded-xl border border-sb-outline-variant/20 shadow-lg overflow-hidden">
+        <div className="absolute z-[70] w-full mt-1 bg-sb-surface rounded-xl border border-sb-outline-variant/20 shadow-lg overflow-hidden">
           <div className="p-2">
             <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar asignatura..."
               className="w-full h-9 px-3 rounded-lg bg-sb-surface-container text-[13px] text-sb-on-surface placeholder:text-sb-on-surface/40 outline-none" />

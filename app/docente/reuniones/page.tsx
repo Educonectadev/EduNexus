@@ -179,7 +179,7 @@ export default function DocenteReunionesPage() {
 
         {/* ═══════════════ MODAL ═══════════════ */}
         {showDetails && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.4)" }}>
+          <div className="fixed inset-0 flex items-center justify-center z-[80] p-4" style={{ background: "rgba(0,0,0,0.4)" }}>
             <div
               className="w-full max-w-lg max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
               style={{ borderRadius: "24px", background: "var(--note-surface)", border: "1px solid var(--note-hairline)" }}
