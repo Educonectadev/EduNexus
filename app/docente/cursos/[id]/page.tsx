@@ -3,13 +3,12 @@
 import * as React from "react"
 import {
   ArrowLeft, BookOpen, Users, UserRound, GraduationCap, Mail, BadgeCheck,
-  Phone, UserCheck, BookMarked, ClipboardList, Upload, Calendar, Clock,
-  Star, X, MessageSquare,
+  Phone, UserCheck, BookMarked, ClipboardList, Upload, X, MessageSquare,
 } from "@/components/ui/proicons"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { SbTabs, SbBtn, SbBadge, SbEmpty } from "@/components/ui/sb"
+import { SbTabs, SbBtn, SbBadge, SbEmpty, SbSectionHeader } from "@/components/ui/sb"
 
 interface Teacher {
   id: string
@@ -148,46 +147,40 @@ export default function CursoDetallePage() {
 
   if (loading) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c]">
-        <div className="p-6 md:p-8 pb-24 md:pb-8 space-y-5">
-          <div className="h-6 w-48 bg-black/5 dark:bg-white/5 rounded animate-pulse" />
-          <div className="bg-white dark:bg-[#17171a] rounded-[20px] p-5 animate-pulse space-y-3">
-            <div className="h-11 w-11 rounded-[14px] bg-black/5 dark:bg-white/5" />
-            <div className="h-4 w-40 rounded bg-black/5 dark:bg-white/5" />
-            <div className="h-3 w-24 rounded bg-black/5 dark:bg-white/5" />
-          </div>
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white dark:bg-[#17171a] rounded-[20px] p-5 animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-[14px] bg-black/5 dark:bg-white/5" />
-                <div className="space-y-2">
-                  <div className="h-4 w-32 rounded bg-black/5 dark:bg-white/5" />
-                  <div className="h-3 w-20 rounded bg-black/5 dark:bg-white/5" />
-                </div>
+      <div className="space-y-5">
+        <div className="h-6 w-48 bg-sb-surface-container rounded animate-pulse" />
+        <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5 animate-pulse space-y-3">
+          <div className="h-11 w-11 rounded-xl bg-sb-surface-container" />
+          <div className="h-4 w-40 rounded bg-sb-surface-container" />
+          <div className="h-3 w-24 rounded bg-sb-surface-container" />
+        </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5 animate-pulse">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-xl bg-sb-surface-container" />
+              <div className="space-y-2">
+                <div className="h-4 w-32 rounded bg-sb-surface-container" />
+                <div className="h-3 w-20 rounded bg-sb-surface-container" />
               </div>
             </div>
+          </div>
         ))}
-        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c]">
-        <div className="p-6 md:p-8 pb-24 md:pb-8">
-          <SbEmpty icon={BookOpen} title="No se pudo cargar el curso" description={error} />
-        </div>
+      <div className="space-y-5">
+        <SbEmpty icon={BookOpen} title="No se pudo cargar el curso" description={error} />
       </div>
     )
   }
 
   if (!course) {
     return (
-      <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c]">
-        <div className="p-6 md:p-8 pb-24 md:pb-8">
-          <SbEmpty icon={BookOpen} title="Curso no encontrado" description="El curso no existe o no está asignado." />
-        </div>
+      <div className="space-y-5">
+        <SbEmpty icon={BookOpen} title="Curso no encontrado" description="El curso no existe o no está asignado." />
       </div>
     )
   }
@@ -203,73 +196,67 @@ export default function CursoDetallePage() {
   ]
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
-      <div className="p-6 md:p-8 pb-24 md:pb-8">
-      <Link href="/docente/cursos" className="inline-flex items-center gap-1.5 text-sm text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">
-        <ArrowLeft className="h-4 w-4" />
-        Mis Cursos
-      </Link>
+    <div className="space-y-5">
+      <div className="space-y-3">
+        <Link href="/docente/cursos" className="inline-flex items-center gap-1.5 text-sm text-sb-on-surface-variant/60 hover:text-sb-on-surface transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Mis Cursos
+        </Link>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+          <SbSectionHeader
+            title={course.name}
+            description={`${course.grade} - Sección ${course.section} · Código ${course.code}`}
+          />
+        </motion.div>
+      </div>
 
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="pt-2">
-        <p className="text-[14px] font-medium mb-1 text-[#a1a1aa]">Panel Docente</p>
-        <h1 className="text-[36px] md:text-[48px] font-bold leading-tight text-[#f4f4f5]">
-          {course.name}
-        </h1>
-        <p className="text-[13px] mt-2 text-[#a1a1aa]">
-          {course.grade} - Sección {course.section} · Código {course.code}
-        </p>
-      </motion.div>
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {quickActions.map((a, i) => {
           const Icon = a.icon
           return (
             <motion.div key={a.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 + i * 0.04 }}>
-              <Link href={a.href} className="block p-5 rounded-[20px] bg-white dark:bg-[#17171a] hover:shadow-md hover:bg-black/10 dark:hover:bg-white/10 transition-all group">
-                <div className="h-10 w-10 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center mb-3">
-                  <Icon className="h-5 w-5 group-hover:scale-110 transition-transform text-[#000] dark:text-[#f4f4f5]" />
+              <Link href={a.href} className="block p-5 rounded-2xl bg-sb-surface border border-sb-outline-variant/10 hover:bg-sb-surface-container/50 hover:border-sb-outline-variant/25 transition-all group">
+                <div className="h-10 w-10 rounded-xl bg-sb-surface-container flex items-center justify-center mb-3 transition-transform group-hover:scale-110">
+                  <Icon className="h-5 w-5 text-sb-on-surface" />
                 </div>
-                <p className="text-[15px] font-bold text-[#000] dark:text-[#f4f4f5]">{a.label}</p>
-                <p className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa] mt-0.5">{a.desc}</p>
+                <p className="text-sm font-semibold text-sb-on-surface">{a.label}</p>
+                <p className="text-[11px] text-sb-on-surface-variant/50 mt-1">{a.desc}</p>
               </Link>
             </motion.div>
           )
         })}
       </div>
 
-      {/* Stats */}
-      <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 gap-3 mt-6">
-        <motion.div variants={staggerItem} className="rounded-[20px] bg-white dark:bg-[#17171a] p-5">
-          <div className="mb-4 h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+      <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }} className="grid grid-cols-2 gap-3">
+        <motion.div variants={staggerItem} className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5">
+          <div className="mb-4 h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center">
+            <GraduationCap className="h-5 w-5 text-sb-on-surface-variant/60" />
           </div>
-          <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Alumnos</p>
-          <p className="mt-1.5 text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{students.length}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Alumnos</p>
+          <p className="mt-1.5 text-2xl font-semibold text-sb-on-surface">{students.length}</p>
         </motion.div>
-        <motion.div variants={staggerItem} className="rounded-[20px] bg-white dark:bg-[#17171a] p-5">
-          <div className="mb-4 h-9 w-9 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
-            <UserRound className="h-5 w-5 text-[#000] dark:text-[#f4f4f5]" />
+        <motion.div variants={staggerItem} className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5">
+          <div className="mb-4 h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center">
+            <UserRound className="h-5 w-5 text-sb-on-surface-variant/60" />
           </div>
-          <p className="text-[12px] font-medium text-[#666] dark:text-[#a1a1aa]">Docentes</p>
-          <p className="mt-1.5 text-[28px] font-bold text-[#000] dark:text-[#f4f4f5]">{teachers.length}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Docentes</p>
+          <p className="mt-1.5 text-2xl font-semibold text-sb-on-surface">{teachers.length}</p>
         </motion.div>
       </motion.div>
 
-      {/* Tabs */}
-      <div className="mt-6">
-      <SbTabs
-        tabs={[
-          { id: "alumnos", label: `Alumnos (${students.length})` },
-          { id: "docentes", label: `Docentes (${teachers.length})` },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+      <div>
+        <SbTabs
+          tabs={[
+            { id: "alumnos", label: `Alumnos (${students.length})` },
+            { id: "docentes", label: `Docentes (${teachers.length})` },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
 
       {activeTab === "alumnos" && (
-        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.04 } } }} className="space-y-2 mt-4">
+        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.04 } } }} className="space-y-2">
           {students.length === 0 ? (
             <SbEmpty icon={Users} title="Sin alumnos" description="Todavía no hay alumnos matriculados en este curso." />
           ) : (
@@ -278,20 +265,20 @@ export default function CursoDetallePage() {
                 key={s.id}
                 variants={staggerItem}
                 onClick={() => openFicha(s.id)}
-                className="w-full text-left bg-white dark:bg-[#17171a] rounded-[20px] p-4 flex items-center gap-3 hover:-translate-y-px hover:opacity-90 hover:bg-black/10 dark:hover:bg-white/10 transition-all cursor-pointer group">
+                className="w-full text-left bg-sb-surface border border-sb-outline-variant/10 rounded-2xl p-4 flex items-center gap-3 hover:bg-sb-surface-container/50 hover:border-sb-outline-variant/25 transition-all cursor-pointer group">
                 <div className={`h-9 w-9 rounded-xl ${getAvatarColor(`${s.first_name} ${s.last_name}`)} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                   <span className="text-white text-xs font-bold">{initials(`${s.first_name} ${s.last_name}`)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate">{s.first_name} {s.last_name}</p>
-                  <p className="text-xs text-[#666] dark:text-[#a1a1aa]">{s.code}{s.document_number ? ` · DNI ${s.document_number}` : ""}</p>
+                  <p className="text-sm font-medium text-sb-on-surface truncate">{s.first_name} {s.last_name}</p>
+                  <p className="text-xs text-sb-on-surface-variant/50">{s.code}{s.document_number ? ` · DNI ${s.document_number}` : ""}</p>
                 </div>
                 {s.gender && (
                   <SbBadge color={s.gender === "F" ? "bg-pink-500/10 text-pink-500" : "bg-blue-500/10 text-blue-500"}>
                     {s.gender === "F" ? "Femenino" : "Masculino"}
                   </SbBadge>
                 )}
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#000] dark:text-[#f4f4f5] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1 rounded-full bg-sb-surface-container-high text-sb-on-surface-variant/60 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   Ver ficha
                 </span>
               </motion.button>
@@ -301,21 +288,21 @@ export default function CursoDetallePage() {
       )}
 
       {activeTab === "docentes" && (
-        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.04 } } }} className="space-y-2 mt-4">
+        <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.04 } } }} className="space-y-2">
           {teachers.length === 0 ? (
             <SbEmpty icon={UserRound} title="Sin docentes" description="Aún no hay docentes asignados a este curso." />
           ) : (
             teachers.map(t => (
-              <motion.div key={t.id} variants={staggerItem} className="bg-white dark:bg-[#17171a] rounded-[20px] p-4 flex items-center gap-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors group">
+              <motion.div key={t.id} variants={staggerItem} className="bg-sb-surface border border-sb-outline-variant/10 rounded-2xl p-4 flex items-center gap-3 hover:bg-sb-surface-container/50 transition-colors group">
                 <div className={`h-9 w-9 rounded-xl ${getAvatarColor(t.full_name)} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                   <span className="text-white text-xs font-bold">{initials(t.full_name)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate">{t.full_name}</p>
+                    <p className="text-sm font-medium text-sb-on-surface truncate">{t.full_name}</p>
                     <BadgeCheck className="h-4 w-4 text-emerald-500 shrink-0" />
                   </div>
-                  <p className="text-xs text-[#666] dark:text-[#a1a1aa] flex items-center gap-1">
+                  <p className="text-xs text-sb-on-surface-variant/50 flex items-center gap-1">
                     <Mail className="h-3 w-3" /> {t.email}
                   </p>
                 </div>
@@ -326,19 +313,18 @@ export default function CursoDetallePage() {
         </motion.div>
       )}
 
-      <div className="mt-6 bg-white dark:bg-[#17171a] rounded-[20px] p-4 flex items-start gap-3">
-          <div className="h-8 w-8 rounded-[14px] bg-black/5 dark:bg-white/5 flex items-center justify-center shrink-0">
-            <BookOpen className="h-4 w-4 text-[#000] dark:text-[#f4f4f5]" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5]">Información del curso</p>
-            <p className="text-xs text-[#666] dark:text-[#a1a1aa] mt-0.5">
-              {course.name} · {course.grade} - Sección {course.section} · Código {course.code}
-            </p>
-          </div>
+      <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-4 flex items-start gap-3">
+        <div className="h-8 w-8 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0">
+          <BookOpen className="h-4 w-4 text-sb-on-surface-variant/60" />
         </div>
+        <div>
+          <p className="text-sm font-medium text-sb-on-surface">Información del curso</p>
+          <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">
+            {course.name} · {course.grade} - Sección {course.section} · Código {course.code}
+          </p>
+        </div>
+      </div>
 
-      {/* ===== FICHA DEL ALUMNO ===== */}
       <AnimatePresence>
         {fichaOpen && (
           <motion.div
@@ -350,72 +336,71 @@ export default function CursoDetallePage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.98 }}
               transition={{ duration: 0.2, ease: [0.37, 0.35, 0, 1] }}
-              className="relative bg-white dark:bg-[#17171a] rounded-[20px] w-full max-w-[560px] shadow-2xl shadow-black/30 max-h-[90vh] overflow-y-auto">
+              className="relative bg-sb-surface rounded-2xl w-full max-w-[560px] shadow-2xl shadow-black/20 max-h-[90vh] overflow-y-auto">
               {fichaLoading ? (
                 <div className="p-10 flex flex-col items-center gap-3">
-                  <div className="h-8 w-8 border-2 border-[#E5E5E5] dark:border-[#E5E5E5] border-t-[#000] dark:border-t-[#f4f4f5] rounded-xl animate-spin" />
-                  <p className="text-sm text-[#666] dark:text-[#a1a1aa]">Cargando ficha...</p>
+                  <div className="h-8 w-8 border-2 border-sb-outline-variant border-t-sb-on-surface rounded-xl animate-spin" />
+                  <p className="text-sm text-sb-on-surface-variant/50">Cargando ficha...</p>
                 </div>
               ) : !ficha ? (
                 <div className="p-10 text-center">
-                  <p className="text-sm text-[#666] dark:text-[#a1a1aa]">No se pudo cargar la ficha del alumno</p>
+                  <p className="text-sm text-sb-on-surface-variant/50">No se pudo cargar la ficha del alumno</p>
                   <SbBtn rounded className="mt-4" onClick={() => setFichaOpen(false)}>Cerrar</SbBtn>
                 </div>
               ) : (
                 <div>
                   <button onClick={() => setFichaOpen(false)}
-                    className="absolute right-3 top-3 h-8 w-8 rounded-[14px] flex items-center justify-center bg-black/5 dark:bg-white/5 text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:text-[#f4f4f5] transition-colors z-10">
+                    aria-label="Cerrar ficha"
+                    className="absolute right-3 top-3 h-8 w-8 rounded-xl flex items-center justify-center bg-sb-surface-container text-sb-on-surface-variant/50 hover:text-sb-on-surface transition-colors z-10">
                     <X className="h-4 w-4" />
                   </button>
 
-                  {/* Header */}
-                  <div className="p-5 pb-4 flex items-center gap-4 bg-black/5 dark:bg-white/5">
-                    <div className={`h-16 w-16 rounded-[14px] ${getAvatarColor(`${ficha.student.first_name} ${ficha.student.last_name}`)} flex items-center justify-center shrink-0`}>
+                  <div className="p-5 pb-4 flex items-center gap-4 bg-sb-surface-container/60">
+                    <div className={`h-16 w-16 rounded-2xl ${getAvatarColor(`${ficha.student.first_name} ${ficha.student.last_name}`)} flex items-center justify-center shrink-0`}>
                       <span className="text-lg font-bold text-white">{initials(`${ficha.student.first_name} ${ficha.student.last_name}`)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-lg font-bold text-[#000] dark:text-[#f4f4f5] truncate">{ficha.student.first_name} {ficha.student.last_name}</p>
-                      <p className="text-xs text-[#666] dark:text-[#a1a1aa] mt-0.5">{ficha.course?.name || "Sin curso"} · {ficha.student.grade} &quot;{ficha.student.section}&quot;</p>
+                      <p className="text-lg font-semibold text-sb-on-surface truncate">{ficha.student.first_name} {ficha.student.last_name}</p>
+                      <p className="text-xs text-sb-on-surface-variant/50 mt-0.5">{ficha.course?.name || "Sin curso"} · {ficha.student.grade} &quot;{ficha.student.section}&quot;</p>
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {ficha.student.document_number && (
-                          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">DNI: {ficha.student.document_number}</span>
+                          <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-sb-surface-container-high text-sb-on-surface-variant/60">DNI: {ficha.student.document_number}</span>
                         )}
                         {ficha.student.gender && (
-                          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-[#666] dark:text-[#a1a1aa]">{ficha.student.gender === "F" ? "Femenino" : "Masculino"}</span>
+                          <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-sb-surface-container-high text-sb-on-surface-variant/60">{ficha.student.gender === "F" ? "Femenino" : "Masculino"}</span>
                         )}
                         {ficha.student.academic_condition && ficha.student.academic_condition !== "studying" && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-[6px] bg-amber-500/10 text-amber-600">{ficha.student.academic_condition}</span>
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">{ficha.student.academic_condition}</span>
                         )}
                       </div>
                     </div>
                   </div>
 
                   <div className="p-5 space-y-5">
-                    {/* Notas */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
+                        <p className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest flex items-center gap-1.5">
                           <BookMarked className="h-3.5 w-3.5" /> Notas en el curso
                         </p>
                         {ficha.grades.length > 0 && (
-                          <span className="text-sm font-bold text-[#000] dark:text-[#f4f4f5]">{calcAverage(ficha.grades)}</span>
+                          <span className="text-sm font-semibold text-sb-on-surface">{calcAverage(ficha.grades)}</span>
                         )}
                       </div>
                       {ficha.grades.length === 0 ? (
-                        <div className="rounded-[14px] bg-black/5 dark:bg-white/5 py-6 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin calificaciones registradas</p>
+                        <div className="rounded-xl bg-sb-surface-container py-6 text-center">
+                          <p className="text-xs text-sb-on-surface-variant/50">Sin calificaciones registradas</p>
                         </div>
                       ) : (
                         <div className="grid grid-cols-4 gap-2">
                           {PERIODS.map(p => {
                             const g = ficha.grades.find(x => x.period === p)
                             return (
-                              <div key={p} className="rounded-[14px] bg-black/5 dark:bg-white/5 p-3 text-center">
-                                <p className="text-[9px] text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-1.5">B{p.split(" ")[1]}</p>
+                              <div key={p} className="rounded-xl bg-sb-surface-container p-3 text-center">
+                                <p className="text-[9px] text-sb-on-surface-variant/50 uppercase tracking-wider mb-1.5">B{p.split(" ")[1]}</p>
                                 {g ? (
-                                  <p className={`text-lg font-bold ${Number(g.score) >= 11 ? "text-emerald-600" : "text-red-500"}`}>{Number(g.score)}</p>
+                                  <p className={`text-lg font-semibold ${Number(g.score) >= 11 ? "text-emerald-600" : "text-red-500"}`}>{Number(g.score)}</p>
                                 ) : (
-                                  <p className="text-lg font-bold text-[#666] dark:text-[#a1a1aa]">—</p>
+                                  <p className="text-lg font-semibold text-sb-on-surface-variant/50">—</p>
                                 )}
                               </div>
                             )
@@ -424,26 +409,25 @@ export default function CursoDetallePage() {
                       )}
                     </div>
 
-                    {/* Asistencia */}
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider flex items-center gap-1.5">
+                        <p className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest flex items-center gap-1.5">
                           <UserCheck className="h-3.5 w-3.5" /> Asistencia
                         </p>
-                        <span className="text-[11px] font-medium text-[#666] dark:text-[#a1a1aa]">{ficha.attendance.total} registros</span>
+                        <span className="text-[11px] font-medium text-sb-on-surface-variant/50">{ficha.attendance.total} registros</span>
                       </div>
                       {ficha.attendance.total === 0 ? (
-                        <div className="rounded-[14px] bg-black/5 dark:bg-white/5 py-6 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin registros de asistencia</p>
+                        <div className="rounded-xl bg-sb-surface-container py-6 text-center">
+                          <p className="text-xs text-sb-on-surface-variant/50">Sin registros de asistencia</p>
                         </div>
                       ) : (
                         <>
                           <div className="flex items-center gap-2 mb-3">
-                            <div className="flex-1 h-2 rounded-[12px] bg-black/5 dark:bg-white/5 overflow-hidden">
-                              <div className={`h-full rounded-[12px] transition-all duration-700 ${ficha.attendance.rate >= 80 ? "bg-emerald-400" : ficha.attendance.rate >= 60 ? "bg-amber-400" : "bg-red-400"}`}
+                            <div className="flex-1 h-2 rounded-full bg-sb-surface-container overflow-hidden">
+                              <div className={`h-full rounded-full transition-all duration-700 ${ficha.attendance.rate >= 80 ? "bg-emerald-400" : ficha.attendance.rate >= 60 ? "bg-amber-400" : "bg-red-400"}`}
                                 style={{ width: `${ficha.attendance.rate}%` }} />
                             </div>
-                            <span className="text-sm font-bold text-[#000] dark:text-[#f4f4f5]">{ficha.attendance.rate}%</span>
+                            <span className="text-sm font-semibold text-sb-on-surface">{ficha.attendance.rate}%</span>
                           </div>
                           <div className="grid grid-cols-4 gap-2 mb-3">
                             {[
@@ -452,17 +436,17 @@ export default function CursoDetallePage() {
                               { label: "Faltas", value: ficha.attendance.absent, color: "text-red-500", bg: "bg-red-500/8" },
                               { label: "Justific.", value: ficha.attendance.justified, color: "text-blue-600", bg: "bg-blue-500/8" },
                             ].map(stat => (
-                              <div key={stat.label} className={`rounded-[14px] ${stat.bg} p-2 text-center`}>
-                                <p className={`text-base font-bold ${stat.color}`}>{stat.value}</p>
-                                <p className="text-[9px] text-[#666] dark:text-[#a1a1aa]">{stat.label}</p>
+                              <div key={stat.label} className={`rounded-xl ${stat.bg} p-2 text-center`}>
+                                <p className={`text-base font-semibold ${stat.color}`}>{stat.value}</p>
+                                <p className="text-[9px] text-sb-on-surface-variant/50">{stat.label}</p>
                               </div>
                             ))}
                           </div>
                           {ficha.recentAttendance.length > 0 && (
                             <div className="flex gap-1.5 flex-wrap">
                               {ficha.recentAttendance.map(r => (
-                                <span key={r.date} className="inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-[12px] bg-black/5 dark:bg-white/5 text-[#666] dark:text-[#a1a1aa]">
-                                  <span className={`h-1.5 w-1.5 rounded-[12px] ${ATT_DOT[r.status] || "bg-[#666] dark:bg-[#a1a1aa]"}`} />
+                                <span key={r.date} className="inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-sb-surface-container text-sb-on-surface-variant/50">
+                                  <span className={`h-1.5 w-1.5 rounded-full ${ATT_DOT[r.status] || "bg-sb-on-surface-variant/40"}`} />
                                   {new Date(r.date + "T00:00:00").toLocaleDateString("es-PE", { day: "2-digit", month: "short" })}
                                 </span>
                               ))}
@@ -472,46 +456,45 @@ export default function CursoDetallePage() {
                       )}
                     </div>
 
-                    {/* Padres */}
                     <div>
-                      <p className="text-[10px] font-semibold text-[#666] dark:text-[#a1a1aa] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                      <p className="text-[11px] font-semibold text-sb-on-surface-variant/50 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                         <Users className="h-3.5 w-3.5" /> Apoderados ({ficha.parents.length})
                       </p>
                       {ficha.parents.length === 0 ? (
-                        <div className="rounded-[14px] bg-black/5 dark:bg-white/5 py-5 text-center">
-                          <p className="text-xs text-[#666] dark:text-[#a1a1aa]">Sin apoderados vinculados</p>
+                        <div className="rounded-xl bg-sb-surface-container py-5 text-center">
+                          <p className="text-xs text-sb-on-surface-variant/50">Sin apoderados vinculados</p>
                         </div>
                       ) : (
                         <div className="space-y-2">
                           {ficha.parents.map(p => (
-                            <div key={p.id} className="rounded-[14px] bg-black/5 dark:bg-white/5 p-3.5 flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-[14px] bg-black/5 dark:bg-white/5 flex items-center justify-center shrink-0">
-                                <span className="text-[10px] font-bold text-[#000] dark:text-[#f4f4f5]">{initials(`${p.first_name} ${p.last_name}`)}</span>
+                            <div key={p.id} className="rounded-xl bg-sb-surface-container/60 p-3.5 flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-xl bg-sb-surface-container flex items-center justify-center shrink-0">
+                                <span className="text-[10px] font-semibold text-sb-on-surface">{initials(`${p.first_name} ${p.last_name}`)}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[#000] dark:text-[#f4f4f5] truncate capitalize">{p.first_name} {p.last_name}</p>
-                                <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] capitalize">
+                                <p className="text-sm font-medium text-sb-on-surface truncate capitalize">{p.first_name} {p.last_name}</p>
+                                <p className="text-[10px] text-sb-on-surface-variant/50 capitalize">
                                   {p.relationship}{p.is_primary ? " · Principal" : ""}{p.occupation ? ` · ${p.occupation}` : ""}
                                 </p>
-                                {p.phone && <p className="text-[10px] text-[#666] dark:text-[#a1a1aa] mt-0.5">{p.phone}</p>}
+                                {p.phone && <p className="text-[10px] text-sb-on-surface-variant/50 mt-0.5">{p.phone}</p>}
                               </div>
                               <div className="flex gap-1 shrink-0">
                                 {p.phone && (
                                   <a href={`https://wa.me/${String(p.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
                                     title="Escribir por WhatsApp"
-                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors">
+                                    className="h-8 w-8 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 transition-colors">
                                     <MessageSquare className="h-4 w-4" />
                                   </a>
                                 )}
                                 {p.phone && (
                                   <a href={`tel:${p.phone}`} title="Llamar"
-                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-black/5 dark:bg-white/5 text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:text-[#f4f4f5] transition-colors">
+                                    className="h-8 w-8 rounded-xl flex items-center justify-center bg-sb-surface text-sb-on-surface-variant/60 hover:text-sb-on-surface transition-colors">
                                     <Phone className="h-4 w-4" />
                                   </a>
                                 )}
                                 {p.email && (
                                   <a href={`mailto:${p.email}`} title="Enviar correo"
-                                    className="h-8 w-8 rounded-[14px] flex items-center justify-center bg-black/5 dark:bg-white/5 text-[#666] dark:text-[#a1a1aa] hover:text-[#000] dark:text-[#f4f4f5] transition-colors">
+                                    className="h-8 w-8 rounded-xl flex items-center justify-center bg-sb-surface text-sb-on-surface-variant/60 hover:text-sb-on-surface transition-colors">
                                     <Mail className="h-4 w-4" />
                                   </a>
                                 )}
@@ -522,8 +505,7 @@ export default function CursoDetallePage() {
                       )}
                     </div>
 
-                    {/* Acciones */}
-                    <div className="flex gap-2 pt-2 border-t border-[#E5E5E5] dark:border-[#27272a]">
+                    <div className="flex gap-2 pt-2 border-t border-sb-outline-variant/15">
                       <SbBtn variant="filled" rounded className="flex-1" onClick={() => router.push(`/docente/calificaciones?curso=${course.id}`)}>
                         <BookMarked className="h-4 w-4" /> Calificaciones
                       </SbBtn>
@@ -538,7 +520,6 @@ export default function CursoDetallePage() {
           </motion.div>
         )}
       </AnimatePresence>
-      </div>
     </div>
   )
 }

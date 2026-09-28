@@ -564,6 +564,7 @@ html.dark[data-theme="oled"], [data-theme="oled"] {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sb-surface: var(--sb-surface);
   --color-sb-surface-container: var(--sb-surface-container);
+  --color-sb-surface-container-low: var(--sb-surface-container-low);
   --color-sb-surface-container-high: var(--sb-surface-container-high);
   --color-sb-surface-container-highest: var(--sb-surface-container-highest);
   --color-sb-on-surface: var(--sb-on-surface);

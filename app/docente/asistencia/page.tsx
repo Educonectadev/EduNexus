@@ -3,21 +3,18 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useSearchParams } from "next/navigation"
-import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Clock, ChevronDown, ChevronLeft, ChevronRight, Sun, Moon } from "@/components/ui/proicons"
-import NotificationBell from "@/components/layout/notification-bell"
-import { useAuthStore } from "@/stores/auth-store"
-import { useTheme } from "next-themes"
+import { LogIn, LogOut, Check, UserCheck, UserX, Search, XCircle, Calendar, Users, Clock, ChevronDown, ChevronLeft, ChevronRight } from "@/components/ui/proicons"
+import { SbSectionHeader, SbBtn } from "@/components/ui/sb"
 
-const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 type Tab = "personal" | "alumnos"
 type StudentStatus = "present" | "late" | "absent" | "justified" | null
 
-const STATUS_CONFIG: Record<string, { label: string; dot: string }> = {
-  present: { label: "A tiempo", dot: "var(--note-text)" },
-  late: { label: "Tardanza", dot: "var(--note-muted)" },
-  absent: { label: "Ausente", dot: "var(--note-muted)" },
-  justified: { label: "Justificado", dot: "var(--note-text)" },
-  early_leave: { label: "Salida anticipada", dot: "var(--note-muted)" },
+const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
+  present: { label: "A tiempo", color: "bg-emerald-500/10 text-emerald-600", dot: "bg-emerald-500" },
+  late: { label: "Tardanza", color: "bg-amber-500/10 text-amber-600", dot: "bg-amber-500" },
+  absent: { label: "Ausente", color: "bg-red-500/10 text-red-600", dot: "bg-red-500" },
+  justified: { label: "Justificado", color: "bg-blue-500/10 text-blue-600", dot: "bg-blue-500" },
+  early_leave: { label: "Salida anticipada", color: "bg-sb-surface-container-high text-sb-on-surface-variant/60", dot: "bg-sb-on-surface-variant/40" },
 }
 
 function getLocalDateStr(d = new Date()) {
@@ -52,8 +49,6 @@ export default function AsistenciaPage() {
 
 function AsistenciaInner() {
   const searchParams = useSearchParams()
-  const user = useAuthStore((s) => s.user)
-  const { theme, setTheme } = useTheme()
   const prefilterCourse = searchParams.get("curso") || ""
   const [tab, setTab] = React.useState<Tab>(prefilterCourse ? "alumnos" : "personal")
   const [prefillCourse, setPrefillCourse] = React.useState(prefilterCourse)
@@ -63,46 +58,23 @@ function AsistenciaInner() {
   ]
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
-      <div className="p-6 md:p-8 pb-24 md:pb-8">
+    <div className="space-y-5">
+      <SbSectionHeader
+        title="Asistencia"
+        description="Control de tu marcación y la asistencia de tus alumnos"
+      />
 
-        {/* HEADER */}
-        <header className="flex items-start justify-between mb-6 gap-4">
-          <div>
-            <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Control</p>
-            <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>Asistencia</h1>
-            <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Control de tu marcación y la asistencia de tus alumnos</p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0 mt-1">
-            {user && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
-                  <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>{user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}</span>
-                </div>
-                <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>{user.full_name}</span>
-              </div>
-            )}
-            <NotificationBell />
-            <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-              <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
-              <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
-            </button>
-          </div>
-        </header>
-
-        {/* TABS */}
-        <div className="flex mb-6 p-1" style={{ borderRadius: "16px", background: "var(--note-fill)" }}>
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              className="flex-1 h-11 text-[13px] font-semibold flex items-center justify-center transition-all duration-200"
-              style={{ borderRadius: "12px", background: tab === t.key ? "var(--note-surface)" : "transparent", color: tab === t.key ? "var(--note-text)" : "var(--note-muted)", boxShadow: tab === t.key ? "0 1px 3px rgba(0,0,0,0.06)" : "none", fontFamily: FONT }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {tab === "personal" ? <MiAsistencia /> : <AsistenciaAlumnos prefillCourse={prefillCourse} />}
+      {/* TABS */}
+      <div className="flex gap-1 p-1 bg-sb-surface-container rounded-2xl">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={`flex-1 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-200 ${tab === t.key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/50 hover:text-sb-on-surface/70"}`}>
+            {t.label}
+          </button>
+        ))}
       </div>
+
+      {tab === "personal" ? <MiAsistencia /> : <AsistenciaAlumnos prefillCourse={prefillCourse} />}
     </div>
   )
 }
@@ -149,9 +121,9 @@ function MiAsistencia() {
   }
 
   if (loading) return (
-    <div className="space-y-4">
-      <div className="h-48 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
-      <div className="h-28 animate-pulse" style={{ borderRadius: "24px", background: "var(--note-fill)" }} />
+    <div className="space-y-5">
+      <div className="h-48 animate-pulse rounded-2xl bg-sb-surface-container" />
+      <div className="h-28 animate-pulse rounded-2xl bg-sb-surface-container" />
     </div>
   )
 
@@ -162,102 +134,94 @@ function MiAsistencia() {
   const workedMinutes = checkedIn && checkedOut ? Math.round((new Date(`2000-01-01T${checkedOut}`).getTime() - new Date(`2000-01-01T${checkedIn}`).getTime()) / 60000) : null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
 
       {/* JORNADA DE HOY */}
-      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-                {new Date().toLocaleDateString("es-PE", { weekday: "long" })}
-              </p>
-              <p className="text-xl font-bold mt-0.5 capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>
-                {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "long" })}
-              </p>
-            </div>
-            {s && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium" style={{ borderRadius: "12px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.dot }} />{s.label}
-              </span>
-            )}
+      <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">
+              {new Date().toLocaleDateString("es-PE", { weekday: "long" })}
+            </p>
+            <p className="text-xl font-semibold tracking-tight mt-0.5 capitalize text-sb-on-surface">
+              {new Date().toLocaleDateString("es-PE", { day: "numeric", month: "long" })}
+            </p>
           </div>
-
-          {/* Timeline visual */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {[{ label: "Entrada", icon: LogIn, time: checkedIn?.slice(0, 5), sched: schedule?.start_time, active: !!checkedIn },
-              { label: "Salida", icon: LogOut, time: checkedOut?.slice(0, 5), sched: schedule?.end_time, active: !!checkedOut }].map(item => (
-              <div key={item.label} className="p-4" style={{ borderRadius: "16px", background: item.active ? "var(--note-fill-strong)" : "var(--note-fill)" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-8 w-8 rounded-xl flex items-center justify-center" style={{ background: item.active ? "var(--note-text)" : "var(--note-fill-strong)" }}>
-                    <item.icon className="h-4 w-4" style={{ color: item.active ? "var(--note-surface)" : "var(--note-muted)", opacity: item.active ? 1 : 0.4 }} />
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{item.label}</span>
-                </div>
-                <p className="text-3xl font-bold tabular-nums" style={{ color: item.time ? "var(--note-text)" : "var(--note-muted)", opacity: item.time ? 1 : 0.25, fontFamily: FONT }}>{item.time || "—:——"}</p>
-                {item.sched && <p className="text-[10px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Programado {item.sched}</p>}
-              </div>
-            ))}
-          </div>
-
-          {/* Work summary */}
-          {workedMinutes !== null && (
-            <div className="flex items-center gap-3 mb-5 px-4 py-3" style={{ borderRadius: "12px", background: "var(--note-fill)" }}>
-              <Clock className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
-              <span className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>
-                Jornada: {Math.floor(workedMinutes / 60)}h {workedMinutes % 60}min
-              </span>
-            </div>
-          )}
-
-          {/* Action buttons */}
-          {hasPending && (
-            <div className="space-y-2">
-              <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Salida pendiente del {safeFormatDate(pendingCheckout.date)}</p>
-              <button onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}
-                className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
-                style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
-                {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
-                Marcar Salida Pendiente
-              </button>
-            </div>
-          )}
-          {!hasPending && !checkedIn && (
-            <button onClick={() => handleCheck("check-in")} disabled={actionLoading}
-              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
-              style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
-              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogIn className="h-4 w-4" />}
-              Marcar Entrada
-            </button>
-          )}
-          {!hasPending && checkedIn && !checkedOut && (
-            <button onClick={() => handleCheck("check-out")} disabled={actionLoading}
-              className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 hover:opacity-90 active:scale-[0.98]"
-              style={{ borderRadius: "14px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
-              Marcar Salida
-            </button>
-          )}
-          {!hasPending && checkedIn && checkedOut && (
-            <div className="w-full h-12 text-sm font-bold flex items-center justify-center gap-2" style={{ borderRadius: "14px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>
-              <Check className="h-4 w-4" />Jornada completada
-            </div>
-          )}
-
-          {scheduleError && (
-            <div className="mt-3 p-3 flex items-center gap-3" style={{ borderRadius: "12px", background: "var(--note-fill)", border: "1px solid var(--note-hairline)" }}>
-              <Clock className="h-4 w-4 shrink-0" style={{ color: "var(--note-muted)" }} />
-              <p className="text-[13px] font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{scheduleError}</p>
-            </div>
+          {s && (
+            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium ${s.color}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />{s.label}
+            </span>
           )}
         </div>
+
+        {/* Timeline visual */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {[{ label: "Entrada", icon: LogIn, time: checkedIn?.slice(0, 5), sched: schedule?.start_time, active: !!checkedIn },
+            { label: "Salida", icon: LogOut, time: checkedOut?.slice(0, 5), sched: schedule?.end_time, active: !!checkedOut }].map(item => (
+            <div key={item.label} className={`p-4 rounded-2xl ${item.active ? "bg-sb-surface-container-high/50" : "bg-sb-surface-container-low/50"}`}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className={`h-8 w-8 rounded-xl flex items-center justify-center ${item.active ? "bg-sb-on-surface text-sb-surface" : "bg-sb-surface-container text-sb-on-surface-variant/50"}`}>
+                  <item.icon className="h-4 w-4" />
+                </div>
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">{item.label}</span>
+              </div>
+              <p className={`text-3xl font-semibold tabular-nums ${item.time ? "text-sb-on-surface" : "text-sb-on-surface/30"}`}>{item.time || "—:——"}</p>
+              {item.sched && <p className="text-[11px] mt-2 text-sb-on-surface-variant/50">Programado {item.sched}</p>}
+            </div>
+          ))}
+        </div>
+
+        {/* Work summary */}
+        {workedMinutes !== null && (
+          <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl bg-sb-surface-container-low/50">
+            <Clock className="h-4 w-4 text-sb-on-surface-variant/50" />
+            <span className="text-sm font-medium text-sb-on-surface">
+              Jornada: {Math.floor(workedMinutes / 60)}h {workedMinutes % 60}min
+            </span>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        {hasPending && (
+          <div className="space-y-2">
+            <p className="text-[11px] text-sb-on-surface-variant/50">Salida pendiente del {safeFormatDate(pendingCheckout.date)}</p>
+            <SbBtn variant="filled" rounded className="w-full h-12 text-sm font-semibold" onClick={() => handleCheck("check-out", pendingCheckout.date)} disabled={actionLoading}>
+              {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
+              Marcar Salida Pendiente
+            </SbBtn>
+          </div>
+        )}
+        {!hasPending && !checkedIn && (
+          <SbBtn variant="filled" rounded className="w-full h-12 text-sm font-semibold" onClick={() => handleCheck("check-in")} disabled={actionLoading}>
+            {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogIn className="h-4 w-4" />}
+            Marcar Entrada
+          </SbBtn>
+        )}
+        {!hasPending && checkedIn && !checkedOut && (
+          <SbBtn variant="tonal" rounded className="w-full h-12 text-sm font-semibold" onClick={() => handleCheck("check-out")} disabled={actionLoading}>
+            {actionLoading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <LogOut className="h-4 w-4" />}
+            Marcar Salida
+          </SbBtn>
+        )}
+        {!hasPending && checkedIn && checkedOut && (
+          <div className="w-full h-12 text-sm font-medium flex items-center justify-center gap-2 rounded-xl bg-sb-surface-container text-sb-on-surface-variant/50">
+            <Check className="h-4 w-4" />Jornada completada
+          </div>
+        )}
+
+        {scheduleError && (
+          <div className="mt-3 p-3 flex items-center gap-3 rounded-xl bg-sb-surface-container-low/50 border border-sb-outline-variant/10">
+            <Clock className="h-4 w-4 shrink-0 text-sb-on-surface-variant/50" />
+            <p className="text-[13px] font-medium text-sb-on-surface">{scheduleError}</p>
+          </div>
+        )}
       </div>
 
       {/* SEMANA */}
-      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-        <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Esta semana</span>
-          <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{history.length} registros</span>
+      <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10">
+        <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-sb-outline-variant/10">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Esta semana</span>
+          <span className="text-[11px] font-medium text-sb-on-surface-variant/50">{history.length} registros</span>
         </div>
         <div className="p-5">
           <div className="flex items-end justify-between gap-2">
@@ -266,13 +230,12 @@ function MiAsistencia() {
               const hasData = !!d.status
               return (
                 <div key={d.iso} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full aspect-square max-w-[42px] flex items-center justify-center transition-all duration-200"
-                    style={{ borderRadius: "14px", background: hasData ? "var(--note-fill-strong)" : "var(--note-fill)", border: isToday ? "2px solid var(--note-text)" : "1px solid var(--note-hairline)" }}>
-                    {hasData && <span className="text-[11px] font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}</span>}
+                  <div className={`w-full aspect-square max-w-[42px] flex items-center justify-center rounded-xl border transition-all duration-200 ${hasData ? "bg-sb-surface-container-high border-sb-outline-variant/20" : "bg-sb-surface-container-low/50 border-sb-outline-variant/10"} ${isToday ? "ring-1 ring-sb-on-surface/30" : ""}`}>
+                    {hasData && <span className="text-[11px] font-semibold text-sb-on-surface">{d.status === "present" ? "✓" : d.status === "late" ? "T" : d.status === "absent" ? "✗" : "J"}</span>}
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-[9px] font-semibold uppercase" style={{ color: isToday ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>{d.label}</span>
-                    <span className="text-[11px] font-bold" style={{ color: isToday ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>{d.day}</span>
+                    <span className={`text-[9px] font-semibold uppercase ${isToday ? "text-sb-on-surface" : "text-sb-on-surface-variant/50"}`}>{d.label}</span>
+                    <span className={`text-[11px] font-semibold ${isToday ? "text-sb-on-surface" : "text-sb-on-surface-variant/50"}`}>{d.day}</span>
                   </div>
                 </div>
               )
@@ -282,40 +245,36 @@ function MiAsistencia() {
       </div>
 
       {/* HISTORIAL */}
-      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
-        <div className="px-5 pt-4 pb-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial reciente</span>
-          <span className="text-[10px] font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{history.length} registros</span>
+      <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden">
+        <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-sb-outline-variant/10">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Historial reciente</span>
+          <span className="text-[11px] font-medium text-sb-on-surface-variant/50">{history.length} registros</span>
         </div>
         {history.length === 0 ? (
           <div className="py-16 text-center">
-            <Calendar className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-            <p className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin registros aún</p>
+            <Calendar className="h-8 w-8 mx-auto mb-3 text-sb-on-surface-variant/15" />
+            <p className="text-[11px] text-sb-on-surface-variant/50">Sin registros aún</p>
           </div>
         ) : (
-          <div>
+          <div className="divide-y divide-sb-outline-variant/10">
             {history.slice(0, 7).map((h: any, i: number) => {
-              const isLast = i === Math.min(history.length, 7) - 1
               const statusCfg = STATUS_CONFIG[h.status]
               return (
-                <div key={h.id || i} className="flex items-center justify-between px-5 py-3.5 transition-colors"
-                  style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
+                <div key={h.id || i} className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-sb-surface-container-low/50">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 flex items-center justify-center shrink-0" style={{ borderRadius: "10px", background: "var(--note-fill)" }}>
-                      <Calendar className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                    <div className="h-9 w-9 flex items-center justify-center shrink-0 rounded-xl bg-sb-surface-container">
+                      <Calendar className="h-4 w-4 text-sb-on-surface-variant/50" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-medium capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>{safeFormatDate(h.date)}</p>
+                      <p className="text-[13px] font-medium capitalize text-sb-on-surface">{safeFormatDate(h.date)}</p>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Ent: {h.check_in ? h.check_in.slice(0, 5) : '—:——'}</span>
-                        <span className="text-[11px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sal: {h.check_out ? h.check_out.slice(0, 5) : '—:——'}</span>
+                        <span className="text-[11px] text-sb-on-surface-variant/50">Ent: {h.check_in ? h.check_in.slice(0, 5) : '—:——'}</span>
+                        <span className="text-[11px] text-sb-on-surface-variant/50">Sal: {h.check_out ? h.check_out.slice(0, 5) : '—:——'}</span>
                       </div>
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-medium px-2.5 py-1" style={{ borderRadius: "8px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusCfg?.dot || "var(--note-text)" }} />{statusCfg?.label || "A tiempo"}
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusCfg?.color || "bg-sb-surface-container text-sb-on-surface-variant/60"}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${statusCfg?.dot || "bg-sb-on-surface-variant/40"}`} />{statusCfg?.label || "A tiempo"}
                   </span>
                 </div>
               )
@@ -347,23 +306,21 @@ function PortalSelect({ value, onChange, options, placeholder, icon: Icon }: {
   return (
     <>
       <button ref={triggerRef} type="button" onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 px-3 text-[13px] font-medium transition-all cursor-pointer text-left"
-        style={{ borderRadius: "14px", border: `1.5px solid ${value ? "var(--note-solid-bg)" : "var(--note-hairline)"}`, background: value ? "var(--note-fill)" : "transparent", color: value ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
-        {Icon && <Icon className="h-4 w-4 shrink-0 opacity-50" />}
-        <span className="flex-1 truncate">{selected?.label || placeholder}</span>
-        <ChevronDown className={`h-4 w-4 shrink-0 opacity-40 transition-transform ${open ? "rotate-180" : ""}`} />
+        className="sb-input h-10 w-full flex items-center gap-2 text-[13px] font-medium transition-all cursor-pointer text-left">
+        {Icon && <Icon className="h-4 w-4 shrink-0 text-sb-on-surface-variant/50" />}
+        <span className={`flex-1 truncate ${value ? "text-sb-on-surface" : "text-sb-on-surface-variant/50"}`}>{selected?.label || placeholder}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-sb-on-surface-variant/40 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && createPortal(
         <div ref={panelRef} className="fixed z-[9999]" style={{ top: pos.top, left: pos.left, width: pos.width }}>
-          <div className="max-h-[260px] overflow-y-auto py-1.5" style={{ background: "var(--note-surface)", borderRadius: "16px", border: "1px solid var(--note-hairline)", boxShadow: "0 12px 40px -8px rgba(0,0,0,0.18)" }}>
+          <div className="max-h-[260px] overflow-y-auto py-1.5 bg-sb-surface rounded-xl border border-sb-outline-variant/20 shadow-lg">
             {options.map(opt => {
               const isSelected = opt.value === value
               return (
                 <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setOpen(false) }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors"
-                  style={{ background: isSelected ? "var(--note-fill)" : "transparent", color: "var(--note-text)", fontFamily: FONT }}>
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-left transition-colors ${isSelected ? "bg-sb-surface-container-high text-sb-on-surface" : "text-sb-on-surface hover:bg-sb-surface-container-low/50"}`}>
                   <span className="flex-1">{opt.label}</span>
-                  {isSelected && <Check className="h-4 w-4" style={{ color: "var(--note-text)" }} />}
+                  {isSelected && <Check className="h-4 w-4 text-sb-on-surface" />}
                 </button>
               )
             })}
@@ -404,27 +361,26 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
   return (
     <>
       <button ref={triggerRef} type="button" onClick={() => setOpen(!open)}
-        className="h-10 w-full flex items-center gap-2 px-3 text-[13px] font-medium transition-all cursor-pointer text-left"
-        style={{ borderRadius: "14px", border: `1.5px solid ${date ? "var(--note-solid-bg)" : "var(--note-hairline)"}`, background: date ? "var(--note-fill)" : "transparent", color: date ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
-        <Calendar className="h-4 w-4 shrink-0 opacity-50" />
-        <span className="flex-1 truncate capitalize">{date ? safeFormatDate(date) : "Seleccionar fecha"}</span>
-        <ChevronDown className={`h-4 w-4 shrink-0 opacity-40 transition-transform ${open ? "rotate-180" : ""}`} />
+        className="sb-input h-10 w-full flex items-center gap-2 text-[13px] font-medium transition-all cursor-pointer text-left">
+        <Calendar className="h-4 w-4 shrink-0 text-sb-on-surface-variant/50" />
+        <span className={`flex-1 truncate capitalize ${date ? "text-sb-on-surface" : "text-sb-on-surface-variant/50"}`}>{date ? safeFormatDate(date) : "Seleccionar fecha"}</span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-sb-on-surface-variant/40 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && createPortal(
         <div ref={panelRef} className="fixed z-[9999]" style={{ top: pos.top, left: pos.left, width: pos.width }}>
-          <div className="p-4" style={{ background: "var(--note-surface)", borderRadius: "16px", border: "1px solid var(--note-hairline)", boxShadow: "0 12px 40px -8px rgba(0,0,0,0.18)" }}>
+          <div className="p-4 bg-sb-surface rounded-2xl border border-sb-outline-variant/20 shadow-lg">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold capitalize" style={{ color: "var(--note-text)", fontFamily: FONT }}>{MonthNames[month]} {year}</p>
+              <p className="text-sm font-semibold capitalize text-sb-on-surface">{MonthNames[month]} {year}</p>
               <div className="flex gap-1">
                 {[new Date(year, month - 1, 1), new Date(year, month + 1, 1)].map((d, i) => (
-                  <button key={i} onClick={() => setViewDate(d)} className="h-7 w-7 flex items-center justify-center transition-colors" style={{ borderRadius: "8px", color: "var(--note-muted)" }}>
+                  <button key={i} onClick={() => setViewDate(d)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-sb-surface-container-high transition-colors text-sb-on-surface-variant/50">
                     {i === 0 ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                   </button>
                 ))}
               </div>
             </div>
             <div className="grid grid-cols-7 mb-1">
-              {WEEKDAYS.map(d => <div key={d} className="text-center py-1"><span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", opacity: 0.4, fontFamily: FONT }}>{d}</span></div>)}
+              {WEEKDAYS.map(d => <div key={d} className="text-center py-1"><span className="text-[10px] font-semibold uppercase tracking-wider text-sb-on-surface-variant/30">{d}</span></div>)}
             </div>
             <div className="grid grid-cols-7 gap-px">
               {days.map((day, i) => {
@@ -433,8 +389,7 @@ function DatePickerDropdown({ date, onSelect }: { date: string; onSelect: (d: st
                 const isToday = dateStr === today, isSelected = dateStr === date, isFuture = dateStr > today
                 return (
                   <button key={day} onClick={() => !isFuture && onSelect(dateStr)} disabled={isFuture}
-                    className="h-8 w-full flex items-center justify-center text-[12px] font-medium transition-colors"
-                    style={{ borderRadius: "8px", background: isSelected ? "var(--note-solid-bg)" : isToday ? "var(--note-fill)" : "transparent", color: isSelected ? "var(--note-solid-fg)" : "var(--note-text)", opacity: isFuture ? 0.25 : 1, cursor: isFuture ? "not-allowed" : "pointer", fontFamily: FONT }}>
+                    className={`h-8 w-full flex items-center justify-center text-[12px] font-medium rounded-lg transition-colors ${isSelected ? "bg-sb-on-surface text-sb-surface" : isToday ? "bg-sb-primary/10 text-sb-primary ring-1 ring-sb-primary/30" : isFuture ? "text-sb-on-surface-variant/20 cursor-not-allowed" : "text-sb-on-surface/70 hover:bg-sb-surface-container-high"}`}>
                     {day}
                   </button>
                 )
@@ -496,46 +451,41 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
   const summary = [{ label: "Presentes", value: counts.present, icon: UserCheck }, { label: "Tardanzas", value: counts.late, icon: Clock }, { label: "Faltas", value: counts.absent, icon: XCircle }, { label: "Justificados", value: counts.justified, icon: Check }]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {/* SELECTOR */}
-      <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-        <div className="p-5">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-10 w-10 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
-              <Users className="h-5 w-5" style={{ color: "var(--note-muted)" }} />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Seleccionar curso y fecha</p>
-              <p className="text-[10px] mt-0.5" style={{ color: "var(--note-muted)", opacity: 0.6, fontFamily: FONT }}>Elige el curso y la fecha para registrar asistencia</p>
-            </div>
+      <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-sb-surface-container">
+            <Users className="h-5 w-5 text-sb-on-surface-variant/50" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</p>
-              <PortalSelect value={selectedCourse} onChange={v => { setSelectedCourse(v); setStatsLoaded(false); setStats([]) }} placeholder="Seleccionar curso" icon={Users}
-                options={courses.map(c => ({ value: c.id, label: `${c.name} - ${c.grade} ${c.section}` }))} />
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Fecha</p>
-              <DatePickerDropdown date={date} onSelect={setDate} />
-            </div>
-            <button onClick={handleCargar} disabled={loading || !selectedCourse}
-              className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.98]"
-              style={{ borderRadius: "12px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
-              {loading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Search className="h-4 w-4" />}
-              Cargar
-            </button>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Seleccionar curso y fecha</p>
+            <p className="text-[11px] mt-0.5 text-sb-on-surface-variant/50">Elige el curso y la fecha para registrar asistencia</p>
           </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+          <div className="space-y-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Curso</p>
+            <PortalSelect value={selectedCourse} onChange={v => { setSelectedCourse(v); setStatsLoaded(false); setStats([]) }} placeholder="Seleccionar curso" icon={Users}
+              options={courses.map(c => ({ value: c.id, label: `${c.name} - ${c.grade} ${c.section}` }))} />
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Fecha</p>
+            <DatePickerDropdown date={date} onSelect={setDate} />
+          </div>
+          <SbBtn variant="filled" rounded className="h-10 px-5 text-sm font-semibold" onClick={handleCargar} disabled={loading || !selectedCourse}>
+            {loading ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : <Search className="h-4 w-4" />}
+            Cargar
+          </SbBtn>
         </div>
       </div>
 
       {/* VIEW TOGGLE */}
       {selectedCourse && (
-        <div className="flex p-1" style={{ borderRadius: "12px", background: "var(--note-fill)" }}>
+        <div className="flex gap-1 p-1 bg-sb-surface-container rounded-2xl">
           {([["registro", "Registrar asistencia"], ["estadisticas", "Estadísticas 30 días"]] as const).map(([key, label]) => (
             <button key={key} onClick={() => { setAlumnoView(key); if (key === "estadisticas") loadStats() }}
-              className="flex-1 py-2 text-[12px] font-semibold text-center transition-all"
-              style={{ borderRadius: "10px", background: alumnoView === key ? "var(--note-surface)" : "transparent", color: alumnoView === key ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
+              className={`flex-1 rounded-xl px-3 py-1.5 text-xs font-medium text-center transition-all ${alumnoView === key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/50 hover:text-sb-on-surface/70"}`}>
               {label}
             </button>
           ))}
@@ -544,63 +494,60 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
 
       {/* STATS TABLE */}
       {alumnoView === "estadisticas" && selectedCourse && (
-        <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
-          <div className="px-5 pt-5 pb-3" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
+        <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden">
+          <div className="px-5 pt-5 pb-3 border-b border-sb-outline-variant/10">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 flex items-center justify-center" style={{ background: "var(--note-fill)", borderRadius: "12px" }}>
-                <Users className="h-5 w-5" style={{ color: "var(--note-muted)" }} />
+              <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-sb-surface-container">
+                <Users className="h-5 w-5 text-sb-on-surface-variant/50" />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Asistencia últimos 30 días</p>
-                <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Resumen por alumno</p>
+                <p className="text-sm font-semibold text-sb-on-surface">Asistencia últimos 30 días</p>
+                <p className="text-[11px] mt-0.5 text-sb-on-surface-variant/50">Resumen por alumno</p>
               </div>
             </div>
           </div>
           {statsLoading ? (
-            <div className="py-10 text-center"><div className="h-5 w-5 border-2 rounded-full animate-spin mx-auto" style={{ borderColor: "var(--note-fill)", borderTopColor: "var(--note-text)" }} /></div>
+            <div className="py-10 text-center"><div className="h-5 w-5 border-2 border-sb-surface-container border-t-sb-on-surface rounded-full animate-spin mx-auto" /></div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-sm">
                 <thead>
-                  <tr style={{ background: "var(--note-fill)" }}>
+                  <tr className="bg-sb-surface-container/50">
                     {["Alumno", "A tiempo", "Tardanzas", "Faltas", "Justific.", "Registros", "% Asistencia"].map(h => (
-                      <th key={h} className={`px-5 py-3 text-[10px] font-semibold uppercase tracking-wider ${h === "Alumno" || h === "% Asistencia" ? "text-left" : "text-center"}`}
-                        style={{ color: "var(--note-muted)", opacity: 0.6, fontFamily: FONT }}>{h}</th>
+                      <th key={h} className={`px-5 py-3 text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 ${h === "Alumno" || h === "% Asistencia" ? "text-left" : "text-center"}`}>{h}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-sb-outline-variant/10">
                   {stats.length === 0 ? (
                     <tr><td colSpan={7} className="py-16 text-center">
-                      <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-                      <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin registros</p>
+                      <Users className="h-10 w-10 mx-auto mb-3 text-sb-on-surface-variant/15" />
+                      <p className="text-xs text-sb-on-surface-variant/50">Sin registros</p>
                     </td></tr>
-                  ) : stats.map((s, i) => (
-                    <tr key={s.id} className="transition-colors" style={{ borderBottom: i < stats.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
+                  ) : stats.map(s => (
+                    <tr key={s.id} className="transition-colors hover:bg-sb-surface-container-low/50">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
-                            <span className="text-[9px] font-bold" style={{ color: "var(--note-text)" }}>{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
+                          <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0 bg-sb-surface-container">
+                            <span className="text-[9px] font-semibold text-sb-on-surface-variant/60">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                           </div>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
-                            <p className="text-[9px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>DNI: {s.dni}</p>
+                            <p className="text-xs font-medium truncate text-sb-on-surface">{s.apellidos}, {s.nombres}</p>
+                            <p className="text-[9px] text-sb-on-surface-variant/50">DNI: {s.dni}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.present}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.late}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.absent}</td>
-                      <td className="px-3 py-3 text-center text-sm font-semibold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.justified}</td>
-                      <td className="px-3 py-3 text-center text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.total}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-sb-on-surface">{s.present}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-sb-on-surface-variant/60">{s.late}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-sb-on-surface-variant/60">{s.absent}</td>
+                      <td className="px-3 py-3 text-center text-sm font-semibold text-sb-on-surface">{s.justified}</td>
+                      <td className="px-3 py-3 text-center text-xs text-sb-on-surface-variant/50">{s.total}</td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2 justify-end">
-                          <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
-                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${s.rate}%`, background: "var(--note-text)", opacity: s.rate >= 80 ? 0.9 : 0.5 }} />
+                          <div className="w-24 h-1.5 rounded-full overflow-hidden bg-sb-surface-container">
+                            <div className={`h-full rounded-full transition-all duration-500 bg-sb-on-surface ${s.rate >= 80 ? "opacity-90" : "opacity-50"}`} style={{ width: `${s.rate}%` }} />
                           </div>
-                          <span className="text-xs font-bold w-9 text-right" style={{ color: "var(--note-text)", opacity: s.rate >= 80 ? 1 : 0.6, fontFamily: FONT }}>{s.rate}%</span>
+                          <span className={`text-xs font-semibold w-9 text-right ${s.rate >= 80 ? "text-sb-on-surface" : "text-sb-on-surface-variant/60"}`}>{s.rate}%</span>
                         </div>
                       </td>
                     </tr>
@@ -620,75 +567,72 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
             {summary.map(item => {
               const Icon = item.icon
               return (
-                <div key={item.label} className="p-4 transition-all duration-300 hover:scale-[1.02]" style={{ background: "var(--note-surface)", borderRadius: "20px", border: "1px solid var(--note-hairline)" }}>
-                  <div className="h-8 w-8 flex items-center justify-center mb-2" style={{ background: "var(--note-fill)", borderRadius: "10px" }}>
-                    <Icon className="h-4 w-4" style={{ color: "var(--note-muted)" }} />
+                <div key={item.label} className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-4 transition-all duration-300 hover:scale-[1.02]">
+                  <div className="h-8 w-8 flex items-center justify-center mb-2 rounded-lg bg-sb-surface-container">
+                    <Icon className="h-4 w-4 text-sb-on-surface-variant/50" />
                   </div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{item.label}</p>
-                  <p className="mt-1.5 text-lg font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>{item.value}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">{item.label}</p>
+                  <p className="mt-1.5 text-lg font-semibold leading-none text-sb-on-surface">{item.value}</p>
                 </div>
               )
             })}
           </div>
 
           {/* Student list */}
-          <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
+          <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden">
             <div className="px-5 pt-4 pb-3">
               <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.8px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Lista de alumnos</p>
-                  <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{filtered.length} de {students.length} alumnos</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Lista de alumnos</p>
+                  <p className="text-[11px] mt-0.5 text-sb-on-surface-variant/50">{filtered.length} de {students.length} alumnos</p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button onClick={handleMarkAllPresent} className="h-9 px-4 text-xs font-bold flex items-center gap-1.5 transition-all hover:opacity-90 active:scale-[0.97]"
-                    style={{ borderRadius: "10px", background: "var(--note-fill-strong)", color: "var(--note-text)", fontFamily: FONT }}>
+                  <button onClick={handleMarkAllPresent} className="sb-btn tonal rounded h-9 px-4 text-xs font-semibold flex items-center gap-1.5">
                     <UserCheck className="h-3.5 w-3.5" /> Marcar todos
                   </button>
                   <button onClick={handleClearAll} disabled={students.every(s => s.status === null)}
-                    className="h-9 px-4 text-xs font-semibold transition-all disabled:opacity-40 hover:opacity-80"
-                    style={{ borderRadius: "10px", background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>Limpiar</button>
+                    className="sb-btn rounded h-9 px-4 text-xs font-medium">Limpiar</button>
                   <div className="relative w-44">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5" style={{ color: "var(--note-muted)", opacity: 0.5 }} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sb-on-surface-variant/40" />
                     <input placeholder="Buscar..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                      className="w-full h-9 pl-9 pr-3 text-[13px] focus:outline-none"
-                      style={{ borderRadius: "10px", background: "var(--note-fill)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
+                      className="sb-input h-9 pl-9 pr-3 text-[13px]" />
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4 pt-3" style={{ borderTop: "1px solid var(--note-hairline)" }}>
+              <div className="flex items-center gap-4 pt-3 border-t border-sb-outline-variant/10">
                 {statusChips.map(chip => (
                   <div key={chip.status} className="flex items-center gap-1.5">
-                    <span className="h-4 w-4 rounded-lg flex items-center justify-center text-[9px] font-bold" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)" }}>{chip.label}</span>
-                    <span className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{chip.title}</span>
-                    <span className="text-[10px] font-semibold ml-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{students.filter(s => s.status === chip.status).length}</span>
+                    <span className={`h-4 w-4 rounded-md flex items-center justify-center text-[9px] font-bold ${chip.status ? STATUS_CONFIG[chip.status].color : "bg-sb-surface-container text-sb-on-surface-variant/60"}`}>{chip.label}</span>
+                    <span className="text-[10px] text-sb-on-surface-variant/50">{chip.title}</span>
+                    <span className="text-[10px] font-semibold ml-0.5 text-sb-on-surface-variant/60">{students.filter(s => s.status === chip.status).length}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div style={{ borderTop: "1px solid var(--note-hairline)" }}>
-              {filtered.map((s, i) => (
-                <div key={s.id} className="flex items-center justify-between gap-3 px-5 py-3 transition-all duration-200"
-                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--note-hairline)" : "none", background: s.status ? "var(--note-fill)" : "transparent" }}
-                  onMouseEnter={e => { if (!s.status) e.currentTarget.style.background = "var(--note-fill)" }}
-                  onMouseLeave={e => { if (!s.status) e.currentTarget.style.background = "transparent" }}>
+            <div className="border-t border-sb-outline-variant/10 divide-y divide-sb-outline-variant/10">
+              {filtered.map(s => (
+                <div key={s.id} className={`flex items-center justify-between gap-3 px-5 py-3 transition-all duration-200 hover:bg-sb-surface-container-low/50 ${s.status ? "bg-sb-surface-container-low/50" : ""}`}>
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
-                      <span className="text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
+                    <div className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0 bg-sb-surface-container">
+                      <span className="text-[10px] font-semibold text-sb-on-surface-variant/60">{(s.nombres?.[0] || '') + (s.apellidos?.[0] || '')}</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.apellidos}, {s.nombres}</p>
-                      <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>DNI: {s.dni}</p>
+                      <p className="text-sm font-medium truncate text-sb-on-surface">{s.apellidos}, {s.nombres}</p>
+                      <p className="text-[10px] text-sb-on-surface-variant/50">DNI: {s.dni}</p>
                     </div>
                   </div>
                   <div className="flex gap-1.5 shrink-0">
-                    {statusChips.map(chip => (
-                      <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
-                        className="h-8 px-3 rounded-xl text-[11px] font-bold transition-all duration-200 flex items-center gap-1"
-                        style={{ background: s.status === chip.status ? "var(--note-fill-strong)" : "var(--note-fill)", color: s.status === chip.status ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
-                        {chip.label}{s.status === chip.status && <Check className="h-3 w-3" />}
-                      </button>
-                    ))}
+                    {statusChips.map(chip => {
+                      const active = s.status === chip.status
+                      const cfg = chip.status ? STATUS_CONFIG[chip.status] : null
+                      return (
+                        <button key={chip.status} onClick={() => handleStatusClick(s.id, chip.status)} title={chip.title}
+                          className={`h-8 px-3 rounded-xl text-[11px] font-semibold transition-all duration-200 flex items-center gap-1 ${active ? (cfg?.color || "") : "bg-sb-surface-container text-sb-on-surface-variant/50"}`}>
+                          {chip.label}{active && <Check className="h-3 w-3" />}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
@@ -696,33 +640,31 @@ function AsistenciaAlumnos({ prefillCourse = "" }: { prefillCourse?: string }) {
           </div>
 
           {/* Save bar */}
-          <div className="flex items-center gap-4 sticky bottom-4 backdrop-blur-xl p-4" style={{ borderRadius: "20px", border: "1px solid var(--note-hairline)", background: "var(--note-surface)" }}>
+          <div className="flex items-center gap-4 sticky bottom-4 backdrop-blur-xl p-4 rounded-2xl border border-sb-outline-variant/10 bg-sb-surface">
             <div className="flex-1 space-y-1.5">
-              <p className="text-sm font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{marked} de {students.length} marcados</p>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%`, background: "var(--note-text)" }} />
+              <p className="text-sm font-semibold text-sb-on-surface">{marked} de {students.length} marcados</p>
+              <div className="h-2 rounded-full overflow-hidden bg-sb-surface-container">
+                <div className="h-full rounded-full transition-all duration-500 bg-sb-on-surface" style={{ width: `${students.length ? (marked / students.length) * 100 : 0}%` }} />
               </div>
             </div>
-            <button onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}
-              className="h-12 px-8 text-sm font-bold flex items-center justify-center gap-2.5 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 hover:opacity-90 active:scale-[0.98]"
-              style={{ borderRadius: "14px", background: "var(--note-solid-bg)", color: "var(--note-solid-fg)", fontFamily: FONT }}>
+            <SbBtn variant="filled" rounded className="h-12 px-8 text-sm font-semibold" onClick={handleGuardar} disabled={saving || students.every(s => s.status === null)}>
               {saving ? <span className="animate-spin h-4 w-4 border-2 border-current/30 border-t-current rounded-full" /> : null}Guardar
-            </button>
+            </SbBtn>
           </div>
         </>
       )}
 
       {loaded && students.length === 0 && (
-        <div className="py-16 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-          <UserX className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-          <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>No hay alumnos en este curso</p>
+        <div className="py-16 text-center rounded-2xl bg-sb-surface border border-sb-outline-variant/10">
+          <UserX className="h-10 w-10 mx-auto mb-3 text-sb-on-surface-variant/15" />
+          <p className="text-xs text-sb-on-surface-variant/50">No hay alumnos en este curso</p>
         </div>
       )}
 
       {!loaded && courses.length === 0 && (
-        <div className="py-16 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-          <Users className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-          <p className="text-xs" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin cursos asignados</p>
+        <div className="py-16 text-center rounded-2xl bg-sb-surface border border-sb-outline-variant/10">
+          <Users className="h-10 w-10 mx-auto mb-3 text-sb-on-surface-variant/15" />
+          <p className="text-xs text-sb-on-surface-variant/50">Sin cursos asignados</p>
         </div>
       )}
     </div>

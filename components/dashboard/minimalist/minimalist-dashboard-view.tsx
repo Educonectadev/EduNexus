@@ -37,6 +37,7 @@ interface MinimalistDashboardViewProps {
   metrics: Metric[]
   quickActions: QuickAction[]
   activities: Activity[]
+  emptyState?: React.ReactNode
 }
 
 export function MinimalistDashboardView({
@@ -44,6 +45,7 @@ export function MinimalistDashboardView({
   metrics,
   quickActions,
   activities,
+  emptyState,
 }: MinimalistDashboardViewProps) {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? "Buenos dias" : hour < 18 ? "Buenas tardes" : "Buenas noches"
@@ -193,7 +195,7 @@ export function MinimalistDashboardView({
             Actividad reciente
           </h2>
           {activities.length === 0 ? (
-            <ChartReal />
+            emptyState ?? <ChartReal />
           ) : (
           <div className="space-y-px rounded-2xl overflow-hidden bg-sb-outline-variant/10">
             {activities.map((act, i) => {

@@ -2,10 +2,9 @@
 
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
-import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, BarChart3, Sun, Moon, Download, ChevronDown } from "@/components/ui/proicons"
-import NotificationBell from "@/components/layout/notification-bell"
+import { Plus, BookMarked, TrendingUp, TrendingDown, Pencil, Trash2, Download } from "@/components/ui/proicons"
 import { useAuthStore } from "@/stores/auth-store"
-import { useTheme } from "next-themes"
+import { SbSectionHeader, SbBtn } from "@/components/ui/sb"
 
 interface Grade {
   id: string; student_id: string; course_id: string; period: string
@@ -21,7 +20,6 @@ interface Course {
 
 const PERIODS = ["Bimestre 1", "Bimestre 2", "Bimestre 3", "Bimestre 4"]
 const MAX_SCORE = 20
-const FONT = "var(--app-main-font, 'DM Sans'), sans-serif"
 
 function getInitials(name: string) { return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) }
 
@@ -33,10 +31,10 @@ function calcAverage(grades: Grade[]) {
 function studentName(s: Student) { return `${s.first_name} ${s.last_name}` }
 
 function gradeColor(g: number) {
-  if (g >= 18) return { text: "var(--note-text)", bg: "var(--note-fill-strong)", label: "AD" }
-  if (g >= 14) return { text: "var(--note-text)", bg: "var(--note-fill)", label: "A" }
-  if (g >= 11) return { text: "var(--note-muted)", bg: "var(--note-fill)", label: "B" }
-  return { text: "var(--note-muted)", bg: "var(--note-fill)", label: "C" }
+  if (g >= 18) return { text: "text-emerald-600", bg: "bg-emerald-500/10", label: "AD" }
+  if (g >= 14) return { text: "text-emerald-600", bg: "bg-emerald-500/8", label: "A" }
+  if (g >= 11) return { text: "text-amber-600", bg: "bg-amber-500/10", label: "B" }
+  return { text: "text-red-600", bg: "bg-red-500/10", label: "C" }
 }
 
 export default function CalificacionesPage() {
@@ -46,7 +44,6 @@ export default function CalificacionesPage() {
 function CalificacionesInner() {
   const searchParams = useSearchParams()
   const user = useAuthStore((s) => s.user)
-  const { theme, setTheme } = useTheme()
   const prefilterCourse = searchParams.get("curso") || ""
   const [courses, setCourses] = React.useState<Course[]>([])
   const [courseId, setCourseId] = React.useState(prefilterCourse)
@@ -197,305 +194,270 @@ function CalificacionesInner() {
   const approvedPct = students.length ? Math.round((approvedCount / students.length) * 100) : 0
 
   return (
-    <div className="w-full h-full rounded-[25px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] bg-white dark:bg-[#1a1a1c] sb-note">
-      <div className="p-5 md:p-8 pb-24 md:pb-8 space-y-5">
+    <div className="space-y-5">
+      <SbSectionHeader title="Calificaciones" description="Gestiona las notas de tus alumnos"
+        action={
+          <div className="flex items-center gap-2">
+            <SbBtn variant="filled" rounded className="flex items-center gap-2" onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
+            </SbBtn>
+            {students.length > 0 && (
+              <SbBtn variant="outlined" rounded className="flex items-center gap-2" onClick={exportPDF}>
+                <Download className="h-4 w-4" /> <span className="hidden sm:inline">PDF</span>
+              </SbBtn>
+            )}
+          </div>
+        }
+      />
 
-        {/* HEADER */}
-        <header>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[14px] font-medium mb-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Académico</p>
-              <h1 className="text-[36px] md:text-[48px] font-bold leading-tight" style={{ color: "var(--note-text)", fontFamily: FONT }}>Calificaciones</h1>
-              <p className="text-[13px] mt-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Gestiona las notas de tus alumnos</p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 mt-1">
-              {user && (
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5">
-                  <div className="h-6 w-6 rounded-full flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
-                    <span className="text-[9px] font-semibold" style={{ color: "var(--note-text)" }}>{user.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "D"}</span>
-                  </div>
-                  <span className="text-sm md:text-base font-medium whitespace-nowrap" style={{ color: "var(--note-text)", fontFamily: FONT }}>{user.full_name}</span>
-                </div>
-              )}
-              <NotificationBell />
-              <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="h-10 w-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity relative">
-                <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" style={{ color: "var(--note-text)" }} />
-                <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" style={{ color: "var(--note-text)" }} />
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+        <div className="sm:w-64">
+          <select value={courseId} onChange={e => setCourseId(e.target.value)} disabled={loading}
+            className="sb-select w-full text-[13px]">
+            {courses.length === 0 && <option value="">Sin cursos asignados</option>}
+            {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
+          </select>
+        </div>
+        {students.length > 0 && (
+          <div className="flex items-center gap-1 p-1 bg-sb-surface-container rounded-2xl">
+            {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
+              <button key={key} onClick={() => setViewMode(key)}
+                className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-all ${viewMode === key ? "bg-sb-on-surface text-sb-surface" : "text-sb-on-surface-variant/50 hover:text-sb-on-surface/70"}`}>
+                {label}
               </button>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-4">
-            <div className="sm:w-56">
-              <select value={courseId} onChange={e => setCourseId(e.target.value)} disabled={loading}
-                className="w-full h-10 px-3 text-[13px] font-medium rounded-xl transition-all"
-                style={{ border: `1.5px solid ${courseId ? "var(--note-text)" : "var(--note-hairline)"}`, background: courseId ? "var(--note-fill)" : "transparent", color: courseId ? "var(--note-text)" : "var(--note-muted)", fontFamily: FONT }}>
-                {courses.length === 0 && <option value="">Sin cursos asignados</option>}
-                {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              {students.length > 0 && (
-                <div className="flex items-center gap-1 p-1 rounded-full" style={{ background: "var(--note-fill)" }}>
-                  {([["lista", "Lista"], ["tabla", "Notas"]] as const).map(([key, label]) => (
-                    <button key={key} onClick={() => setViewMode(key)}
-                      className="h-9 px-4 text-[13px] font-semibold flex items-center justify-center rounded-full transition-all duration-200"
-                      style={{ background: viewMode === key ? "var(--note-text)" : "transparent", color: viewMode === key ? "var(--note-surface)" : "var(--note-muted)", fontFamily: FONT }}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <button className="h-10 px-5 text-sm font-bold flex items-center justify-center gap-2 rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} onClick={() => setRegisterOpen(true)} disabled={!courses.length}>
-                <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Registrar</span>
-              </button>
-              {students.length > 0 && (
-                <button className="h-10 px-4 text-sm font-medium flex items-center justify-center gap-2 rounded-xl transition-all hover:opacity-80 active:scale-[0.97]" style={{ border: "1.5px solid var(--note-hairline)", color: "var(--note-text)", fontFamily: FONT }} onClick={exportPDF}>
-                  <Download className="h-4 w-4" /> <span className="hidden sm:inline">PDF</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
-
-        {error && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">{error}</div>}
-
-        {loading ? (
-          <div className="animate-pulse space-y-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-28" style={{ background: "var(--note-fill)", borderRadius: "20px" }} />)}</div>
-            <div className="h-96" style={{ background: "var(--note-fill)", borderRadius: "24px" }} />
-          </div>
-        ) : students.length === 0 ? (
-          <div className="py-20 text-center" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }}>
-            <BookMarked className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-            <p className="text-sm font-medium" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-              {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
-            </p>
-          </div>
-        ) : viewMode === "tabla" ? (
-          <TablaNotas key={courseId} students={students} courseId={courseId} maxScore={MAX_SCORE} savingCell={savingCell} saveError={saveError} onSaveCell={handleSaveCell} />
-        ) : (
-          <>
-            {/* HERO STATS */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              {[
-                { label: "Promedio General", value: avgGeneral.toFixed(1), sub: `de ${MAX_SCORE}`, pct: (avgGeneral / MAX_SCORE) * 100 },
-                { label: "Mejor Nota", value: bestScore, sub: "puntuación máxima", pct: (bestScore / MAX_SCORE) * 100 },
-                { label: "Aprobados", value: `${approvedPct}%`, sub: `${approvedCount} de ${students.length}`, pct: approvedPct },
-                { label: "Total Alumnos", value: students.length, sub: "matriculados", pct: 100 },
-              ].map((s, i) => (
-                <div key={i} className="p-4 transition-all duration-300 hover:scale-[1.02]" style={{ background: "var(--note-surface)", borderRadius: "20px", border: "1px solid var(--note-hairline)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.8px] mb-2" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.label}</p>
-                  <p className="text-2xl font-bold leading-none" style={{ color: "var(--note-text)", fontFamily: FONT }}>{s.value}</p>
-                  <p className="text-[10px] mt-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.sub}</p>
-                  <div className="h-1 rounded-full mt-3 overflow-hidden" style={{ background: "var(--note-fill)" }}>
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${Math.min(s.pct, 100)}%`, background: "var(--note-text)" }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* STUDENT LIST */}
-            <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
-              {students.map((s, i) => {
-                const avg = calcAverage(s.grades)
-                const trend = getTrend(s.grades)
-                const gc = gradeColor(avg)
-                const isLast = i === students.length - 1
-                return (
-                  <div key={s.id}
-                    onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
-                    className="flex items-center justify-between px-4 py-3.5 transition-all duration-200 cursor-pointer group"
-                    style={{ borderBottom: isLast ? "none" : "1px solid var(--note-hairline)" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105" style={{ background: "var(--note-fill-strong)" }}>
-                        <span className="text-[10px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.grades.length} notas</span>
-                          {s.grades.slice(-4).map((g, j) => (
-                            <span key={j} className="text-[9px] font-mono px-1.5 py-0.5 rounded-lg" style={{ background: gradeColor(g.score).bg, color: gradeColor(g.score).text }}>{g.score}</span>
-                          ))}
-                          {s.grades.length > 4 && <span className="text-[10px]" style={{ color: "var(--note-muted)" }}>+{s.grades.length - 4}</span>}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      {trend ? <TrendingUp className="h-3.5 w-3.5" style={{ color: "var(--note-text)", opacity: 0.5 }} /> : <TrendingDown className="h-3.5 w-3.5" style={{ color: "var(--note-muted)", opacity: 0.5 }} />}
-                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill)" }}>
-                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(avg / MAX_SCORE) * 100}%`, background: "var(--note-text)" }} />
-                      </div>
-                      <span className="text-base font-bold w-8 text-right" style={{ color: avg === 0 ? "var(--note-muted)" : "var(--note-text)", opacity: avg === 0 ? 0.3 : 1, fontFamily: FONT }}>{avg === 0 ? "—" : avg}</span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </>
-        )}
-
-        {/* DETAIL MODAL */}
-        {detailOpen && selected && (
-          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setDetailOpen(false)}>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <div className="relative w-full max-w-[560px] max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
-              {/* Modal Header */}
-              <div className="sticky top-0 z-10 px-6 pt-6 pb-4" style={{ background: "var(--note-surface)", borderBottom: "1px solid var(--note-hairline)" }}>
-                <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-2xl flex items-center justify-center" style={{ background: "var(--note-fill-strong)" }}>
-                    <span className="text-sm font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(selected))}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-lg font-bold truncate" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(selected)}</p>
-                    <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{courseLabel} · {selected.grades.length} calificaciones</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-2xl font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{selected.grades.length ? calcAverage(selected.grades) : "—"}</p>
-                    <p className="text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-6 py-5 space-y-5">
-                {/* Progress */}
-                {selected.grades.length > 0 && (
-                  <div className="p-4" style={{ background: "var(--note-fill)", borderRadius: "16px" }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Rendimiento</span>
-                      <span className="text-sm font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>{calcAverage(selected.grades)}/{MAX_SCORE}</span>
-                    </div>
-                    <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--note-fill-strong)" }}>
-                      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%`, background: "var(--note-text)" }} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Grades */}
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Historial de Notas</p>
-                  <div className="space-y-2">
-                    {selected.grades.map(g => (
-                      <div key={g.id} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors group" style={{ background: "var(--note-fill)" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill-strong)" }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "var(--note-fill)" }}>
-                        {editGradeId === g.id ? (
-                          <>
-                            <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)} autoFocus
-                              className="h-9 w-16 text-center text-sm font-bold rounded-xl focus:outline-none focus:ring-2" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                            <div className="flex-1 flex items-center gap-1">
-                              <button onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))} className="h-8 px-3 rounded-lg text-xs font-bold transition-all hover:opacity-90" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>Guardar</button>
-                              <button onClick={() => { setEditGradeId(null); setEditScore("") }} className="h-8 px-3 rounded-lg text-xs font-semibold transition-all hover:opacity-80" style={{ background: "var(--note-fill-strong)", color: "var(--note-muted)", fontFamily: FONT }}>Cancelar</button>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: gradeColor(g.score).bg }}>
-                              <span className="text-sm font-bold" style={{ color: gradeColor(g.score).text }}>{g.score}</span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium" style={{ color: "var(--note-text)", fontFamily: FONT }}>{g.period}</p>
-                              <p className="text-[10px] truncate" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-                                {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}{g.notes ? ` · ${g.notes}` : ""}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: "var(--note-muted)" }}>
-                                <Pencil className="h-3.5 w-3.5" />
-                              </button>
-                              <button onClick={() => handleDeleteGrade(g.id)} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: "var(--note-muted)" }}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                    {selected.grades.length === 0 && (
-                      <div className="text-center py-16 rounded-xl" style={{ border: "1px dashed var(--note-hairline)" }}>
-                        <BookMarked className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--note-muted)", opacity: 0.2 }} />
-                        <p className="text-sm" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Sin calificaciones</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Add Grade */}
-                <div className="p-4" style={{ background: "var(--note-fill)", borderRadius: "16px" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Agregar Nota</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)} className="text-sm rounded-xl h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                      <option value="">Bimestre</option>
-                      {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
-                    </select>
-                    <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)} className="rounded-xl text-sm h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                    <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="rounded-xl text-sm h-10 px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                  </div>
-                  <button onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}
-                    className="w-full mt-3 h-10 rounded-xl text-sm font-bold disabled:opacity-30 transition-all hover:opacity-90 active:scale-[0.98]"
-                    style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }}>
-                    Agregar
-                  </button>
-                </div>
-              </div>
-
-              {/* Close */}
-              <div className="sticky bottom-0 px-6 py-4" style={{ background: "var(--note-surface)", borderTop: "1px solid var(--note-hairline)" }}>
-                <button onClick={() => setDetailOpen(false)} className="w-full h-10 rounded-xl text-sm font-semibold transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }}>Cerrar</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* REGISTER DIALOG */}
-        {registerOpen && (
-          <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setRegisterOpen(false)}>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <div className="relative w-full max-w-[420px]" style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)" }} onClick={e => e.stopPropagation()}>
-              <div className="px-6 pt-6 pb-4">
-                <h3 className="text-lg font-bold" style={{ color: "var(--note-text)", fontFamily: FONT }}>Registrar calificación</h3>
-                <p className="text-[11px] mt-1" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Completa los datos para registrar una nota</p>
-              </div>
-              <div className="px-6 space-y-4 pb-2">
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Curso</label>
-                  <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                    {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</label>
-                  <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                    <option value="">{registerStudents.length > 0 ? "Seleccionar alumno..." : "Cargando alumnos..."}</option>
-                    {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Bimestre</label>
-                  <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="w-full h-10 px-3 text-sm rounded-xl" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }}>
-                    <option value="">Seleccionar bimestre...</option>
-                    {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider mb-1.5 block" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Nota (0-{MAX_SCORE})</label>
-                  <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)} className="rounded-xl text-sm h-10 w-full px-3" style={{ background: "var(--note-fill-strong)", color: "var(--note-text)", border: "1px solid var(--note-hairline)", fontFamily: FONT }} />
-                </div>
-              </div>
-              <div className="px-6 py-4 flex items-center gap-2" style={{ borderTop: "1px solid var(--note-hairline)" }}>
-                <button className="flex-1 h-10 text-sm font-semibold rounded-xl transition-all hover:opacity-80" style={{ background: "var(--note-fill)", color: "var(--note-muted)", fontFamily: FONT }} onClick={() => setRegisterOpen(false)}>Cancelar</button>
-                <button className="flex-1 h-10 text-sm font-bold rounded-xl transition-all disabled:opacity-30 hover:opacity-90 active:scale-[0.97]" style={{ background: "var(--note-text)", color: "var(--note-surface)", fontFamily: FONT }} disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
-                  {saving ? "Guardando..." : "Guardar"}
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         )}
       </div>
+
+      {error && <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-600">{error}</div>}
+
+      {loading ? (
+        <div className="animate-pulse space-y-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">{[1, 2, 3, 4].map(i => <div key={i} className="h-28 rounded-2xl bg-sb-surface-container" />)}</div>
+          <div className="h-96 rounded-2xl bg-sb-surface-container" />
+        </div>
+      ) : students.length === 0 ? (
+        <div className="py-20 text-center rounded-2xl bg-sb-surface border border-sb-outline-variant/10">
+          <BookMarked className="h-12 w-12 mx-auto mb-4 text-sb-on-surface-variant/15" />
+          <p className="text-sm font-medium text-sb-on-surface-variant/50">
+            {courseLabel ? "Sin alumnos matriculados en este curso" : "Selecciona un curso para ver calificaciones"}
+          </p>
+        </div>
+      ) : viewMode === "tabla" ? (
+        <TablaNotas key={courseId} students={students} courseId={courseId} maxScore={MAX_SCORE} savingCell={savingCell} saveError={saveError} onSaveCell={handleSaveCell} />
+      ) : (
+        <>
+          {/* HERO STATS */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { label: "Promedio General", value: avgGeneral.toFixed(1), sub: `de ${MAX_SCORE}`, pct: (avgGeneral / MAX_SCORE) * 100 },
+              { label: "Mejor Nota", value: bestScore, sub: "puntuación máxima", pct: (bestScore / MAX_SCORE) * 100 },
+              { label: "Aprobados", value: `${approvedPct}%`, sub: `${approvedCount} de ${students.length}`, pct: approvedPct },
+              { label: "Total Alumnos", value: students.length, sub: "matriculados", pct: 100 },
+            ].map((s, i) => (
+              <div key={i} className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 p-4 transition-all duration-300 hover:scale-[1.02]">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-2">{s.label}</p>
+                <p className="text-2xl font-semibold leading-none text-sb-on-surface">{s.value}</p>
+                <p className="text-[10px] mt-1 text-sb-on-surface-variant/50">{s.sub}</p>
+                <div className="h-1 rounded-full mt-3 overflow-hidden bg-sb-surface-container">
+                  <div className="h-full rounded-full transition-all duration-700 bg-sb-on-surface" style={{ width: `${Math.min(s.pct, 100)}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* STUDENT LIST */}
+          <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden divide-y divide-sb-outline-variant/10">
+            {students.map(s => {
+              const avg = calcAverage(s.grades)
+              const trend = getTrend(s.grades)
+              return (
+                <div key={s.id}
+                  onClick={() => { setSelected(s); setEditGradeId(null); setNewPeriod(""); setNewScore(""); setNewNotes(""); setDetailOpen(true) }}
+                  className="flex items-center justify-between px-4 py-3.5 transition-all duration-200 cursor-pointer group hover:bg-sb-surface-container-low/50">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 bg-sb-surface-container">
+                      <span className="text-[10px] font-semibold text-sb-on-surface-variant/60">{getInitials(studentName(s))}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate text-sb-on-surface">{studentName(s)}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-sb-on-surface-variant/50">{s.grades.length} notas</span>
+                        {s.grades.slice(-4).map((g, j) => (
+                          <span key={j} className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full ${gradeColor(g.score).bg} ${gradeColor(g.score).text}`}>{g.score}</span>
+                        ))}
+                        {s.grades.length > 4 && <span className="text-[10px] text-sb-on-surface-variant/50">+{s.grades.length - 4}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {trend ? <TrendingUp className="h-3.5 w-3.5 text-emerald-500/60" /> : <TrendingDown className="h-3.5 w-3.5 text-sb-on-surface-variant/40" />}
+                    <div className="w-16 h-1.5 rounded-full overflow-hidden bg-sb-surface-container">
+                      <div className="h-full rounded-full transition-all duration-500 bg-sb-on-surface" style={{ width: `${(avg / MAX_SCORE) * 100}%` }} />
+                    </div>
+                    <span className={`text-base font-semibold w-8 text-right ${avg === 0 ? "text-sb-on-surface-variant/30" : "text-sb-on-surface"}`}>{avg === 0 ? "—" : avg}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
+
+      {/* DETAIL MODAL */}
+      {detailOpen && selected && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setDetailOpen(false)}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="relative w-full max-w-[560px] max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden rounded-2xl bg-sb-surface border border-sb-outline-variant/10" onClick={e => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="sticky top-0 z-10 px-6 pt-6 pb-4 bg-sb-surface border-b border-sb-outline-variant/10">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-sb-surface-container">
+                  <span className="text-sm font-semibold text-sb-on-surface-variant/60">{getInitials(studentName(selected))}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-lg font-semibold truncate text-sb-on-surface">{studentName(selected)}</p>
+                  <p className="text-[11px] mt-0.5 text-sb-on-surface-variant/50">{courseLabel} · {selected.grades.length} calificaciones</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-2xl font-semibold text-sb-on-surface">{selected.grades.length ? calcAverage(selected.grades) : "—"}</p>
+                  <p className="text-[10px] text-sb-on-surface-variant/50">Promedio</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-6 py-5 space-y-5">
+              {/* Progress */}
+              {selected.grades.length > 0 && (
+                <div className="p-4 rounded-xl bg-sb-surface-container-low/50 border border-sb-outline-variant/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Rendimiento</span>
+                    <span className="text-sm font-semibold text-sb-on-surface">{calcAverage(selected.grades)}/{MAX_SCORE}</span>
+                  </div>
+                  <div className="h-2.5 rounded-full overflow-hidden bg-sb-surface-container">
+                    <div className="h-full rounded-full transition-all duration-700 bg-sb-on-surface" style={{ width: `${(calcAverage(selected.grades) / MAX_SCORE) * 100}%` }} />
+                  </div>
+                </div>
+              )}
+
+              {/* Grades */}
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-3">Historial de Notas</p>
+                <div className="space-y-2">
+                  {selected.grades.map(g => (
+                    <div key={g.id} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors group bg-sb-surface-container-low/50 hover:bg-sb-surface-container">
+                      {editGradeId === g.id ? (
+                        <>
+                          <input type="number" min={0} max={MAX_SCORE} value={editScore} onChange={e => setEditScore(e.target.value)} autoFocus
+                            className="h-9 w-16 text-center text-sm font-semibold rounded-xl bg-sb-surface-container text-sb-on-surface border border-sb-outline-variant/20 outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all" />
+                          <div className="flex-1 flex items-center gap-1">
+                            <SbBtn variant="filled" rounded size="sm" onClick={() => handleSaveGrade(selected.id, g.id, Number(editScore))}>Guardar</SbBtn>
+                            <SbBtn variant="tonal" rounded size="sm" onClick={() => { setEditGradeId(null); setEditScore("") }}>Cancelar</SbBtn>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${gradeColor(g.score).bg}`}>
+                            <span className={`text-sm font-semibold ${gradeColor(g.score).text}`}>{g.score}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-sb-on-surface">{g.period}</p>
+                            <p className="text-[10px] truncate text-sb-on-surface-variant/50">
+                              {new Date(g.created_at).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })}{g.notes ? ` · ${g.notes}` : ""}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => { setEditGradeId(g.id); setEditScore(g.score.toString()) }} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors text-sb-on-surface-variant/50 hover:bg-sb-surface-container-high">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button onClick={() => handleDeleteGrade(g.id)} className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors text-sb-on-surface-variant/50 hover:bg-sb-surface-container-high">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  {selected.grades.length === 0 && (
+                    <div className="text-center py-16 rounded-xl border border-dashed border-sb-outline-variant/20">
+                      <BookMarked className="h-10 w-10 mx-auto mb-3 text-sb-on-surface-variant/15" />
+                      <p className="text-sm text-sb-on-surface-variant/50">Sin calificaciones</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Add Grade */}
+              <div className="p-4 rounded-xl bg-sb-surface-container-low/50 border border-sb-outline-variant/10">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-3">Agregar Nota</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <select value={newPeriod} onChange={e => setNewPeriod(e.target.value)} className="sb-select w-full text-sm h-10">
+                    <option value="">Bimestre</option>
+                    {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                  <input type="number" min={0} max={MAX_SCORE} placeholder="Nota" value={newScore} onChange={e => setNewScore(e.target.value)} className="sb-input rounded-xl text-sm h-10" />
+                  <input placeholder="Comentario" value={newNotes} onChange={e => setNewNotes(e.target.value)} className="sb-input rounded-xl text-sm h-10" />
+                </div>
+                <SbBtn variant="filled" rounded className="w-full mt-3 h-10 text-sm font-semibold" onClick={() => handleAddGrade(selected.id)} disabled={!newPeriod || !newScore}>
+                  Agregar
+                </SbBtn>
+              </div>
+            </div>
+
+            {/* Close */}
+            <div className="sticky bottom-0 px-6 py-4 bg-sb-surface border-t border-sb-outline-variant/10">
+              <SbBtn variant="tonal" rounded className="w-full h-10 text-sm font-medium" onClick={() => setDetailOpen(false)}>Cerrar</SbBtn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REGISTER DIALOG */}
+      {registerOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" onClick={() => setRegisterOpen(false)}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="relative w-full max-w-[420px] rounded-2xl bg-sb-surface border border-sb-outline-variant/10" onClick={e => e.stopPropagation()}>
+            <div className="px-6 pt-6 pb-4">
+              <h3 className="text-lg font-semibold text-sb-on-surface">Registrar calificación</h3>
+              <p className="text-[11px] mt-1 text-sb-on-surface-variant/50">Completa los datos para registrar una nota</p>
+            </div>
+            <div className="px-6 space-y-4 pb-2">
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-1.5 block">Curso</label>
+                <select value={registerCourseId} onChange={e => { setRegisterCourseId(e.target.value); setRegisterStudentId("") }} className="sb-select w-full text-sm h-10">
+                  {courses.map(c => <option key={c.id} value={c.id}>{c.name} · {c.grade} &quot;{c.section}&quot;</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-1.5 block">Alumno</label>
+                <select value={registerStudentId} onChange={e => setRegisterStudentId(e.target.value)} className="sb-select w-full text-sm h-10">
+                  <option value="">{registerStudents.length > 0 ? "Seleccionar alumno..." : "Cargando alumnos..."}</option>
+                  {registerStudents.map(s => <option key={s.id} value={s.id}>{studentName(s)}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-1.5 block">Bimestre</label>
+                <select value={registerPeriod} onChange={e => setRegisterPeriod(e.target.value)} className="sb-select w-full text-sm h-10">
+                  <option value="">Seleccionar bimestre...</option>
+                  {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50 mb-1.5 block">Nota (0-{MAX_SCORE})</label>
+                <input type="number" min={0} max={MAX_SCORE} placeholder="15" value={registerScore} onChange={e => setRegisterScore(e.target.value)} className="sb-input rounded-xl text-sm h-10 w-full" />
+              </div>
+            </div>
+            <div className="px-6 py-4 flex items-center gap-2 border-t border-sb-outline-variant/10">
+              <SbBtn variant="tonal" rounded className="flex-1 h-10 text-sm font-medium" onClick={() => setRegisterOpen(false)}>Cancelar</SbBtn>
+              <SbBtn variant="filled" rounded className="flex-1 h-10 text-sm font-semibold" disabled={!registerStudentId || !registerScore || !registerPeriod || saving} onClick={handleRegister}>
+                {saving ? "Guardando..." : "Guardar"}
+              </SbBtn>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -513,45 +475,43 @@ function TablaNotas({ students, courseId, maxScore, savingCell, saveError, onSav
   const commit = (studentId: string, period: string) => { const key = cellKey(studentId, period); const value = drafts[key]; if (value === undefined) return; onSaveCell(studentId, period, value) }
 
   return (
-    <div style={{ background: "var(--note-surface)", borderRadius: "24px", border: "1px solid var(--note-hairline)", overflow: "hidden" }}>
+    <div className="rounded-2xl bg-sb-surface border border-sb-outline-variant/10 overflow-hidden">
       {saveError && <div className="px-5 pt-4"><div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5 text-sm text-red-600">{saveError}</div></div>}
-      <div className="px-5 pt-5 pb-4" style={{ borderBottom: "1px solid var(--note-hairline)" }}>
+      <div className="px-5 pt-5 pb-4 border-b border-sb-outline-variant/10">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Libro de notas</p>
-            <p className="text-[11px] mt-0.5" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Escribe la nota (0-{maxScore}) y presiona Enter para guardar</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Libro de notas</p>
+            <p className="text-[11px] mt-0.5 text-sb-on-surface-variant/50">Escribe la nota (0-{maxScore}) y presiona Enter para guardar</p>
           </div>
-          <div className="flex items-center gap-3 text-[10px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-text)" }} /> {approvedCount} Aprobados</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-muted)", opacity: 0.4 }} /> {disapprovedCount} Desaprobados</span>
-            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ background: "var(--note-fill-strong)" }} /> {noGradeCount} Sin nota</span>
+          <div className="flex items-center gap-3 text-[11px] text-sb-on-surface-variant/50">
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> {approvedCount} Aprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-400/60" /> {disapprovedCount} Desaprobados</span>
+            <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-sb-on-surface-variant/30" /> {noGradeCount} Sin nota</span>
           </div>
         </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
-            <tr style={{ background: "var(--note-fill)" }}>
-              <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Alumno</th>
-              {PERIODS.map(p => <th key={p} className="px-3 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>B{p.split(" ")[1]}</th>)}
-              <th className="px-4 py-3 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--note-muted)", fontFamily: FONT }}>Promedio</th>
+            <tr className="bg-sb-surface-container/50">
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Alumno</th>
+              {PERIODS.map(p => <th key={p} className="px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">B{p.split(" ")[1]}</th>)}
+              <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-sb-on-surface-variant/50">Promedio</th>
             </tr>
           </thead>
-          <tbody>
-            {students.map((s, i) => {
+          <tbody className="divide-y divide-sb-outline-variant/10">
+            {students.map(s => {
               const avg = calcAverage(s.grades)
               return (
-                <tr key={s.id} className="transition-colors" style={{ borderBottom: i < students.length - 1 ? "1px solid var(--note-hairline)" : "none" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--note-fill)" }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "transparent" }}>
+                <tr key={s.id} className="transition-colors hover:bg-sb-surface-container-low/50">
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "var(--note-fill-strong)" }}>
-                        <span className="text-[9px] font-bold" style={{ color: "var(--note-text)" }}>{getInitials(studentName(s))}</span>
+                      <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0 bg-sb-surface-container">
+                        <span className="text-[9px] font-semibold text-sb-on-surface-variant/60">{getInitials(studentName(s))}</span>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium truncate max-w-[160px]" style={{ color: "var(--note-text)", fontFamily: FONT }}>{studentName(s)}</p>
-                        <p className="text-[9px]" style={{ color: "var(--note-muted)", fontFamily: FONT }}>{s.code}</p>
+                        <p className="text-xs font-medium truncate max-w-[160px] text-sb-on-surface">{studentName(s)}</p>
+                        <p className="text-[9px] text-sb-on-surface-variant/50">{s.code}</p>
                       </div>
                     </div>
                   </td>
@@ -563,15 +523,14 @@ function TablaNotas({ students, courseId, maxScore, savingCell, saveError, onSav
                           <input type="number" min={0} max={maxScore} step="0.5" value={value} placeholder="—"
                             onChange={e => setDrafts(prev => ({ ...prev, [key]: e.target.value }))}
                             onBlur={() => commit(s.id, p)} onKeyDown={e => { if (e.key === "Enter") (e.target as HTMLInputElement).blur() }}
-                            className="w-14 h-9 rounded-xl text-center text-sm font-semibold focus:outline-none focus:ring-2 transition-all"
-                            style={{ background: "var(--note-fill-strong)", color: g ? (g.score >= 11 ? "var(--note-text)" : "var(--note-muted)") : "var(--note-muted)", opacity: g ? 1 : 0.5, fontFamily: FONT } as any} />
-                          {isSaving && <span className="absolute -top-1 -right-1 h-2.5 w-2.5"><span className="absolute inset-0 rounded-full animate-ping" style={{ background: "var(--note-muted)", opacity: 0.3 }} /><span className="absolute inset-0 rounded-full" style={{ background: "var(--note-text)" }} /></span>}
+                            className={`w-14 h-9 rounded-xl text-center text-sm font-semibold bg-sb-surface-container border border-sb-outline-variant/20 outline-none focus:ring-2 focus:ring-sb-primary/30 transition-all ${g ? (g.score >= 11 ? "text-sb-on-surface" : "text-amber-600") : "text-sb-on-surface-variant/50 opacity-60"}`} />
+                          {isSaving && <span className="absolute -top-1 -right-1 h-2.5 w-2.5"><span className="absolute inset-0 rounded-full animate-ping bg-sb-primary/40" /><span className="absolute inset-0 rounded-full bg-sb-primary" /></span>}
                         </div>
                       </td>
                     )
                   })}
                   <td className="px-4 py-2 text-center">
-                    <span className="text-base font-bold" style={{ color: avg === 0 ? "var(--note-muted)" : "var(--note-text)", opacity: avg === 0 ? 0.3 : 1, fontFamily: FONT }}>{avg === 0 ? "—" : avg.toFixed(1)}</span>
+                    <span className={`text-base font-semibold ${avg === 0 ? "text-sb-on-surface-variant/30" : "text-sb-on-surface"}`}>{avg === 0 ? "—" : avg.toFixed(1)}</span>
                   </td>
                 </tr>
               )
