@@ -13,3 +13,12 @@ export function levelMismatch(teacherGradeLevel?: string | null, courseGrade?: s
   const course = academicLevel(courseGrade)
   return Boolean(teacher && course && teacher !== course)
 }
+
+export function normalizeGradeLabel(text?: string | null): string {
+  const t = (text || "").trim()
+  if (!t) return ""
+  const year = t.match(/^(\d+)\s*°/)?.[1] || ""
+  const level = academicLevel(t)
+  if (!level) return t
+  return year ? `${year}° de ${level}` : level
+}

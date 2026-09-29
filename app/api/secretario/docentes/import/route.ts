@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getAuthPayload, resolveInstId } from '@/lib/resolveInstId'
 import { checkPlanFeature } from '@/lib/checkPlanLimit'
+import { ensureTeacherRow } from '@/lib/ensure-teacher'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 
@@ -115,6 +116,7 @@ export async function POST(request: NextRequest) {
       if (chunk.length === 0) continue
 
       const values: any[][] = []
+      const inserted: { id: string; name: string; email: string; lineNum: number }[] = []
       for (const row of chunk) {
         const id = crypto.randomUUID()
         const email = row.email || generateEmail(row.name)
@@ -131,6 +133,7 @@ export async function POST(request: NextRequest) {
           institutionId, row.dni, row.phone, row.subject,
           row.level, row.contract || '', row.status || 'active'
         ])
+        inserted.push({ id, name: row.name, email, lineNum: row.lineNum })
         credentials.push({ name: row.name, email, password })
         existingEmailSet.add(email)
       }
@@ -146,7 +149,14 @@ export async function POST(request: NextRequest) {
            VALUES ${placeholders}`,
           flatValues
         )
-        for (const row of chunk) created.push(row.lineNum)
+        for (const row of inserted) {
+          created.push(row.lineNum)
+          try {
+            await ensureTeacherRow(institutionId, { id: row.id, full_name: row.name, email: row.email })
+          } catch (e: any) {
+            errors.push(`Línea ${row.lineNum}: no se creó la ficha del docente (${e?.message || 'error'})`)
+          }
+        }
       } catch (e: any) {
         errors.push(`Lote ${Math.floor(batch / BATCH_SIZE) + 1}: ${e.message || 'error'}`)
       }

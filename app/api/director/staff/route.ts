@@ -4,6 +4,7 @@ import { getAuthPayload, resolveInstId } from '@/lib/resolveInstId'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { notifyUsers } from '@/lib/notify'
+import { ensureTeacherRow } from '@/lib/ensure-teacher'
 
 function generatePassword(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%'
@@ -100,6 +101,11 @@ export async function POST(request: NextRequest) {
     }
 
     if ((role || 'docente') === 'docente') {
+      try {
+        await ensureTeacherRow(instId, { id: userId, full_name, email: finalEmail })
+      } catch (e: any) {
+        console.error('[staff] teachers row error:', e?.message || e)
+      }
       notifyUsers(
         instId,
         [userId],

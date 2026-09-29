@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { resolveInstId } from '@/lib/resolveInstId'
-import { normalizeTeacherId, validateCourseFields } from './_teacher-id'
+import { resolveTeacherId, resolveGrade, validateCourseFields } from './_teacher-id'
 import crypto from 'crypto'
 
 export async function GET(request: NextRequest) {
@@ -52,12 +52,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: tooLong }, { status: 400 })
     }
 
-    const teacherId = await normalizeTeacherId(instId, teacher_id)
+    const gradeResolution = await resolveGrade(instId, grade)
+    if (gradeResolution.error) {
+      return NextResponse.json({ error: gradeResolution.error }, { status: 400 })
+    }
+    const gradeLength = validateCourseFields({ name, code, grade: gradeResolution.grade, section })
+    if (gradeLength) {
+      return NextResponse.json({ error: gradeLength }, { status: 400 })
+    }
+
+    const teacher = await resolveTeacherId(instId, teacher_id)
+    if (teacher.error) {
+      return NextResponse.json({ error: teacher.error }, { status: 400 })
+    }
+
     const id = crypto.randomUUID()
     await pool.query(
       `INSERT INTO courses (id, institution_id, name, code, grade, section, teacher_id, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')`,
-      [id, instId, name, code, grade, section || 'A', teacherId]
+      [id, instId, name, code, gradeResolution.grade, section || 'A', teacher.teacherId]
     )
 
     return NextResponse.json({ success: true, id })

@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { SbSectionHeader, SbModal, SbModalHeader, SbModalBody, SbModalFooter, SbBtn, SbInput } from "@/components/ui/sb"
 import { SbfSearchBar, SbfSelect, SbfResultsCount } from "@/components/ui/search-filter-bar"
 import "@/frontend.css"
+import { normalizeGradeLabel } from "@/lib/academic-level"
 
 interface Course {
   id: string; name: string; code: string; grade: string; section: string
@@ -327,6 +328,13 @@ export default function CursosSecretarioPage() {
     })
   }
 
+  const allStudentsSelected = studentsAll.length > 0 && studentsAll.every(s => studentsSelected.has(s.id))
+
+  const toggleAllStudents = () => {
+    setStudentsDirty(true)
+    setStudentsSelected(allStudentsSelected ? new Set() : new Set(studentsAll.map(s => s.id)))
+  }
+
   const handleSaveStudents = async () => {
     if (!studentsCourse) return
     setStudentsSaving(true)
@@ -415,9 +423,10 @@ export default function CursosSecretarioPage() {
   }
 
   const openEdit = (c: Course) => {
+    const catalogMatch = academicGrades.find(g => normalizeGradeLabel(g) === normalizeGradeLabel(c.grade)) || c.grade
     setEditing(c)
     setSaveError(null)
-    setFormData({ name: c.name, code: c.code, grade: c.grade, section: c.section, teacher_id: c.teacher_id || "" })
+    setFormData({ name: c.name, code: c.code, grade: catalogMatch, section: c.section, teacher_id: c.teacher_id || "" })
     setDialogOpen(true)
   }
 
@@ -427,6 +436,14 @@ export default function CursosSecretarioPage() {
     const g = (grade || "").match(/^(\d+°)?/)?.[0]?.replace("°", "") || ""
     return `${base}-${g}${(section || "A").toUpperCase()}`
   }
+
+  const patch = (next: Partial<typeof formData>) =>
+    setFormData(prev => {
+      const merged = { ...prev, ...next }
+      if (!editing) merged.code = genCode(merged.name, merged.grade, merged.section)
+      else if (!String(merged.code || "").trim()) merged.code = genCode(merged.name, merged.grade, merged.section)
+      return merged
+    })
 
   const teacherCourses = React.useMemo(() => {
     if (!formData.teacher_id) return []
@@ -446,7 +463,7 @@ export default function CursosSecretarioPage() {
         const subject = teacher.subject || teacher.specialization || ""
         if (subject && !next.name) {
           next.name = subject
-          next.code = genCode(subject, next.grade, next.section)
+          if (!editing || !String(next.code || "").trim()) next.code = genCode(subject, next.grade, next.section)
         }
       }
       return next
@@ -483,14 +500,7 @@ export default function CursosSecretarioPage() {
     try { await fetch(`/api/secretario/cursos/${id}`, { method: "DELETE" }); setDeleteConfirm(null); fetchData() } catch {}
   }
 
-  const normGradeStr = (g: string) => {
-    const t = (g || "").trim()
-    const year = t.match(/^(\d+°)/)?.[1] || ""
-    if (t.includes("Secundaria")) return `${year} de Secundaria`
-    if (t.includes("Primaria")) return `${year} de Primaria`
-    if (t.includes("Inicial")) return `${year} de Inicial`
-    return t
-  }
+  const normGradeStr = (g: string) => normalizeGradeLabel(g)
 
   const q = search.toLowerCase()
   const filtered = cursos.filter(c => {
@@ -509,6 +519,17 @@ export default function CursosSecretarioPage() {
   const sortedCourses = [...filtered].sort((a, b) => gradeRank(a.grade) - gradeRank(b.grade) || String(a.section).localeCompare(String(b.section)))
 
   const grades = sortedGrades
+
+  const gradeOptions = React.useMemo(() => {
+    const base = academicGrades.length > 0 ? [...academicGrades] : [...(GRADES as string[])]
+    if (formData.grade && !base.some(g => g === formData.grade)) base.unshift(formData.grade)
+    return base
+  }, [academicGrades, formData.grade])
+
+  const gradeNotInCatalog =
+    academicGrades.length > 0 &&
+    Boolean(formData.grade) &&
+    !academicGrades.some(g => normalizeGradeLabel(g) === normalizeGradeLabel(formData.grade))
 
   return (
     <div className="space-y-5">
@@ -798,7 +819,7 @@ export default function CursosSecretarioPage() {
             {/* NOMBRE + CÓDIGO */}
             <div>
               <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Nombre del curso *</label>
-              <SbInput placeholder="Ej: Matemática, Comunicación..." value={formData.name} onChange={e => setFormData({...formData, name: e.target.value, code: genCode(e.target.value, formData.grade, formData.section)})} />
+              <SbInput placeholder="Ej: Matemática, Comunicación..." value={formData.name} onChange={e => patch({ name: e.target.value })} />
             </div>
             <div>
               <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Código *</label>
@@ -809,15 +830,21 @@ export default function CursosSecretarioPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Grado *</label>
-                <select value={formData.grade} onChange={e => setFormData({...formData, grade: e.target.value, code: genCode(formData.name, e.target.value, formData.section)})} className="sbf-native-select w-full">
+                <select value={formData.grade} onChange={e => patch({ grade: e.target.value })} className="sbf-native-select w-full">
                   <option value="">Seleccionar grado...</option>
-                  {academicGrades.length > 0 ? academicGrades.map(g => <option key={g} value={g}>{g}</option>) : (GRADES as string[]).map(g => <option key={g} value={g}>{g}</option>)}
+                  {gradeOptions.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
+                {gradeNotInCatalog && (
+                  <p className="mt-1.5 flex items-center gap-1 text-[11px] text-red-600">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    El grado «{formData.grade}» no está en el catálogo de grados.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="text-[11px] font-medium text-sb-on-surface-variant/60 mb-1.5 block">Sección</label>
-                <select value={formData.section} onChange={e => setFormData({...formData, section: e.target.value, code: genCode(formData.name, formData.grade, e.target.value)})} className="sbf-native-select w-full">
-                  {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>Sección {s}</option>)}
+                <select value={formData.section} onChange={e => patch({ section: e.target.value })} className="sbf-native-select w-full">
+                  {(academicSections.length > 0 ? academicSections : SECTIONS).map(s => <option key={s} value={s}>{/^secci(ó|o)n/i.test(String(s)) ? s : `Sección ${s}`}</option>)}
                 </select>
               </div>
             </div>
@@ -873,9 +900,18 @@ export default function CursosSecretarioPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between px-1">
+              <div className="flex items-center justify-between gap-2 px-1">
                 <p className="text-xs text-sb-on-surface-variant/40">Alumnos del grado y sección del curso. Marca para asignar.</p>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{studentsSelected.size} asignados</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={toggleAllStudents}
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-sb-outline-variant/30 text-sb-on-surface-variant/70 hover:bg-sb-surface-container hover:text-sb-on-surface transition-colors"
+                  >
+                    {allStudentsSelected ? "Quitar todos" : "Seleccionar todo"}
+                  </button>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sb-primary/10 text-sb-primary">{studentsSelected.size} asignados</span>
+                </div>
               </div>
               <div className="bg-sb-surface-container/40 rounded-xl divide-y divide-sb-outline-variant/10 max-h-[320px] overflow-y-auto">
                 {studentsAll.map((s, i) => {
